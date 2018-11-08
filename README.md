@@ -10,23 +10,23 @@ What will not be covered in this book:
 - Image Understanding
 - Text generation (maybe)
 
-├ Introduction
-│  ├ What will and wont be in this book
-├─ General Natural language information/Word Level Semantics
-│  ├ What is a word
-│  ├ stopwords
-│  ├ Lemma/stemming
-│  ├ part of speech
-│  ├ Tokenization
-│  ├ Text mining /w tidytext
-│  └ Word embeddings
-├─ Non-deep learning methods (find better names)
-│  ├ Regression
-│  ├ Classification
-│  ├ Summarizing
-│  └ Topic modeling/clustering
-└─ Deep learning methods (find better names)
-   ├ Regression
-   ├ Classification
-   ├ Summarizing
-   └ topic modeling/clustering
+├ Introduction  
+│  ├ What will and wont be in this book  
+├─ General Natural language information/Word Level Semantics  
+│  ├ What is a word  
+│  ├ stopwords  
+│  ├ Lemma/stemming  
+│  ├ part of speech  
+│  ├ Tokenization  
+│  ├ Text mining /w tidytext  
+│  └ Word embeddings  
+├─ Non-deep learning methods (find better names)  
+│  ├ Regression  
+│  ├ Classification  
+│  ├ Summarizing  
+│  └ Topic modeling/clustering  
+└─ Deep learning methods (find better names)  
+   ├ Regression  
+   ├ Classification  
+   ├ Summarizing  
+   └ topic modeling/clustering  
