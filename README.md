@@ -19,15 +19,14 @@ What will not be covered in this book:
 │  ├ part of speech
 │  ├ Tokenization
 │  ├ Text mining /w tidytext
-│  ├ Word embeddings
-│  └ Language Modelling
+│  └ Word embeddings
 ├─ Non-deep learning methods (find better names)
-│  ├ Classification
 │  ├ Regression
+│  ├ Classification
 │  ├ Summarizing
-│  └ topic modeling/clustering
+│  └ Topic modeling/clustering
 └─ Deep learning methods (find better names)
-   ├ Classification
    ├ Regression
+   ├ Classification
    ├ Summarizing
    └ topic modeling/clustering
