@@ -1,7 +1,7 @@
 --- 
-title: "NLP in R"
+title: "Text Modeling in R"
 author: "Emil Hvitfeldt"
-date: "2018-11-08"
+date: "2018-12-05"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
