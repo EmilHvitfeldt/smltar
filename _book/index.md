@@ -1,7 +1,7 @@
 --- 
 title: "Text Modeling in R"
 author: "Emil Hvitfeldt"
-date: "2018-12-05"
+date: "2019-06-14"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book

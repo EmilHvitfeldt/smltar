@@ -4,7 +4,7 @@
 
 The book will be divided into 3 main parts. This book will make the rather arbitrary distinction between *machine learning methods* and *deep learning methods* by saying that deep learning is any kind of multi-layer neural network (LSTM, bi-LSTM, CNN), while machine learning in anything else (Bayes, SVM, random forest). This partition was done as the different methods uses different packages and modeling infrastructure and from a pragmatic point of view it was deemed reasonable to split it up this way. Some of the topics will overlap between the second and third as the are different approaches to the tasks.
 
-- **Natural language features**, walk-though of the ways and  struggles from going from strings to numbers. Will go though many different preprocessing steps will be be using later in the book while commenting on the pros and cons.
+- **Natural language features**, walk-though of the ways and struggles from going from strings to numbers. Will go though many different preprocessing steps will be be using later in the book while commenting on the pros and cons.
 
 - **Machine learning methods**, we will investigate the power of some of the simple and more light-weight models in our arsenal.
 
@@ -19,6 +19,10 @@ TODO (expand section)
 - Text to Speech
 - Image Understanding
 - Text generation (maybe)
+
+## Who is this book for?
+
+This book is designed for individuals or smaller teams in organizations that want to integrate text into their modeling pipelines. 
 
 ## Code
 

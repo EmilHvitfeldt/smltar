@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Text Modeling in R</title>
-  <meta name="description" content="This is a book describing various text analysis procedures done in R">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>8 Text Mining | Text Modeling in R</title>
+  <meta name="description" content="This is a book describing various text analysis procedures done in R" />
+  <meta name="generator" content="bookdown 0.11 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Text Modeling in R" />
+  <meta property="og:title" content="8 Text Mining | Text Modeling in R" />
   <meta property="og:type" content="book" />
   
   
@@ -17,25 +16,26 @@
   <meta name="github-repo" content="EmilHvitfeldt/tidy-nlp-in-R-book" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Text Modeling in R" />
+  <meta name="twitter:title" content="8 Text Mining | Text Modeling in R" />
   
   <meta name="twitter:description" content="This is a book describing various text analysis procedures done in R" />
   
 
-<meta name="author" content="Emil Hvitfeldt">
+<meta name="author" content="Emil Hvitfeldt" />
 
 
-<meta name="date" content="2018-12-05">
+<meta name="date" content="2019-06-14" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
 <link rel="prev" href="part-of-speech.html">
 <link rel="next" href="word-embeddings.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
@@ -70,14 +70,17 @@
 <li class="chapter" data-level="2" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>2</b> Introduction</a><ul>
 <li class="chapter" data-level="2.1" data-path="intro.html"><a href="intro.html#outline"><i class="fa fa-check"></i><b>2.1</b> Outline</a></li>
 <li class="chapter" data-level="2.2" data-path="intro.html"><a href="intro.html#what-you-wont-see-in-this-book"><i class="fa fa-check"></i><b>2.2</b> What you wont see in this book</a></li>
-<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#code"><i class="fa fa-check"></i><b>2.3</b> Code</a></li>
-<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#related-literature"><i class="fa fa-check"></i><b>2.4</b> Related literature</a></li>
-<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#acknowledgements"><i class="fa fa-check"></i><b>2.5</b> Acknowledgements</a></li>
+<li class="chapter" data-level="2.3" data-path="intro.html"><a href="intro.html#who-is-this-book-for"><i class="fa fa-check"></i><b>2.3</b> Who is this book for?</a></li>
+<li class="chapter" data-level="2.4" data-path="intro.html"><a href="intro.html#code"><i class="fa fa-check"></i><b>2.4</b> Code</a></li>
+<li class="chapter" data-level="2.5" data-path="intro.html"><a href="intro.html#related-literature"><i class="fa fa-check"></i><b>2.5</b> Related literature</a></li>
+<li class="chapter" data-level="2.6" data-path="intro.html"><a href="intro.html#acknowledgements"><i class="fa fa-check"></i><b>2.6</b> Acknowledgements</a></li>
 </ul></li>
 <li class="part"><span><b>I Natural Language Features</b></span></li>
 <li class="chapter" data-level="3" data-path="what-are-words.html"><a href="what-are-words.html"><i class="fa fa-check"></i><b>3</b> What are words?</a></li>
 <li class="chapter" data-level="4" data-path="tokenization.html"><a href="tokenization.html"><i class="fa fa-check"></i><b>4</b> Tokenization</a></li>
-<li class="chapter" data-level="5" data-path="stopwords.html"><a href="stopwords.html"><i class="fa fa-check"></i><b>5</b> Stopwords</a></li>
+<li class="chapter" data-level="5" data-path="stopwords.html"><a href="stopwords.html"><i class="fa fa-check"></i><b>5</b> Stopwords</a><ul>
+<li class="chapter" data-level="5.1" data-path="stopwords.html"><a href="stopwords.html#pros-and-cons"><i class="fa fa-check"></i><b>5.1</b> Pros and cons</a></li>
+</ul></li>
 <li class="chapter" data-level="6" data-path="stemming.html"><a href="stemming.html"><i class="fa fa-check"></i><b>6</b> Stemming</a></li>
 <li class="chapter" data-level="7" data-path="part-of-speech.html"><a href="part-of-speech.html"><i class="fa fa-check"></i><b>7</b> Part of Speech</a></li>
 <li class="chapter" data-level="8" data-path="text-mining.html"><a href="text-mining.html"><i class="fa fa-check"></i><b>8</b> Text Mining</a></li>
@@ -116,6 +119,8 @@
             <section class="normal" id="section-">
 <div id="text-mining" class="section level1">
 <h1><span class="header-section-number">8</span> Text Mining</h1>
+<p>“text mining with R” condensed to a chapter as a EDA tool.</p>
+<p>Should assume no knowlegde about tidytext but will show the basics.</p>
 
 </div>
             </section>
@@ -144,7 +149,7 @@ gitbook.start({
 "google": false,
 "linkedin": false,
 "weibo": false,
-"instapper": false,
+"instapaper": false,
 "vk": false,
 "all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
 },
@@ -156,6 +161,10 @@ gitbook.start({
 "edit": {
 "link": "https://github.com/rstudio/bookdown-demo/edit/master/text-mining.Rmd",
 "text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
 },
 "download": ["_main.pdf", "_main.epub"],
 "toc": {
