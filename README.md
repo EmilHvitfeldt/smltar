@@ -22,16 +22,13 @@ What will not be covered in this book:
     - Lemma/stemming
     - part of speech
     - Tokenization
-    - Text mining /w tidytext
     - Word embeddings
 - Non-deep learning methods
     - Regression
     - Classification
-    - Summarizing
     - Topic modeling/clustering
 - Deep learning methods
     - Regression
     - Classification
-    - Summarizing
     - topic modeling/clustering
 ```
