@@ -1,13 +1,152 @@
 # Tokenization
 
-What is a token
+```{r, message=FALSE}
+library(tokenizers)
+library(tidyverse)
+library(hcandersenr)
+the_fir_tree <- hcandersen_en %>%
+  filter(book == "The fir tree") %>%
+  pull(text)
+```
 
-what is tokenization
+In this chapter we will become familiar with the concepts of *tokens*, *ngrams*, *tokenization* and how to perform tokenization in R.
 
-How to do tokenization
+## What is a token?
 
-compare methods and explain why they are different. 
+In R you will generally have text saved as a character vector of strings. If we look at the first paragraph of The Fir Tree, then the text is split into strings, which themselves are a series of letters, spaces and punctuation.
 
-Showcase where the different methods have strengths and weaknesses
+```{r}
+head(the_fir_tree, 9)
+```
 
-What do you lose when you tokenize?
+These strings don't contain any information regarding what are words and what isn't. This is where tokenization comes in.
+
+In tokenization you take an input (a string) and a type (a word) and proceed to split the input in to pieces (tokens) that correspond the type. [@Manning:2008:IIR:1394399]
+
+![](images/tokenization/tokenization.jpg) TODO
+
+Typically will we want to allow tokenization to happen on the word level. However it is quite difficult to define what we mean by a "word". As an exercise lets start by defining a word as being any selection of alphanumeric (letter and numbers) symbols. Lets start by using some regex with `strsplit` to split the first 2 lines of The Fir Tree by anything non alphanumeric.
+
+```{r}
+strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
+```
+
+At first sight it looks pretty decent. We are losing all punctuation which may or may not be favorable, and the hero of the story "fir-tree" got split in half. Already it is clear that tokenization is going to be quite complicated. Luckily a lot of work have gone into this process, and we will use what they got. Introducing the **tokenizers** package. This package contains a wealth of fast tokenizers we can use.  
+
+TODO find example that shows a difference between strsplit and tokenize_words
+
+```{r}
+library(tokenizers)
+tokenize_words(the_fir_tree[1:2])
+```
+
+And we get a sensible result. `tokenize_words` is using the **stringi** using the hood making it very fast. Tokenization according to words is done by finding word boundaries according to the specification from International Components for Unicode (ICU). The word boundary algorithm goes as follows
+
+- Break at the start and end of text, unless the text is empty.
+- Do not break within CRLF.
+- Otherwise break before and after Newlines (including CR and LF)
+- Do not break within emoji zwj sequences.
+- Keep horizontal whitespace together.
+- Ignore Format and Extend characters, except after sot, CR, LF, and Newline.
+- Do not break between most letters.
+- Do not break letters across certain punctuation.
+- Do not break within sequences of digits, or digits adjacent to letters (“3a”, or “A3”).
+- Do not break within sequences, such as “3.2” or “3,456.789”.
+- Do not break between Katakana.
+- Do not break from extenders.
+- Do not break within emoji flag sequences. 
+- Otherwise, break everywhere (including around ideographs).
+
+TODO add reference to https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries
+
+While you might not understand what each and every step is doing you can appreciate it is many times more sophisticated then our initial approach. In the remaining of the book we will let the **tokenizers** package determine a baseline tokenizer for reference. We want to stress that the choice of tokenizer will have an influence on your results. Don't be afraid to experiment with different tokenizers or to write your own to fit your problem.
+
+## Types of tokens
+
+Taking a token to mean "word" was a useful idea however hard to implement concretely in software, however we can generalize the notion of a token to mean "document unit". Under this new definition we can let a token be a variety of things including
+
+- characters
+- words
+- sentences
+- lines
+- paragraphs and
+- ngrams.
+
+
+### character tokens
+
+the first and simplest tokenization is the character tokenization. This simply splits the texts into characters. Here we run `tokenize_characters` with default starting parameters. Notice how it have arguments to convert everything to lowercase and to strip all non alpha numeric characters. These are both done to reduce the number of different tokens we are returned. The `tokenize_*()` functions will by default return a list of character vectors, one character vector for each string in the input.
+
+```{r}
+tft_token_characters <- tokenize_characters(x = the_fir_tree,
+                                            lowercase = TRUE,
+                                            strip_non_alphanum = TRUE,
+                                            simplify = FALSE)
+```
+
+And if we take a look this is what we get.
+
+```{r}
+# TODO find better way to print this
+head(tft_token_characters)
+```
+
+However we don't have to stay with the defaults and we can include the punctuation and spaces by setting `strip_non_alphanum = FALSE` and we see that spaces and punctuation are included too now.
+
+```{r}
+tokenize_characters(x = the_fir_tree,
+                    strip_non_alphanum = FALSE) %>%
+  head()
+```
+
+TODO Find examples of when a character is hard to define. Look at Arabic, German (double s) and danish (double a).
+
+### words tokens
+
+### lines, sentences and paragraph tokens
+
+### ngrams tokens
+
+## Where does it break down?
+
+TODO What do you lose when you tokenize?
+
+TODO compare methods and explain why they are different. 
+
+TODO Showcase where the different methods have strengths and weaknesses
+
+TODO Do comparing of compression of data with different types of tokenizations
+
+
+```{r}
+if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
+  hcandersen_en %>%
+    nest(text) %>%
+    mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
+    mutate(chars = tokenize_characters(data) %>% map_int(~table(.x) %>% length()),
+           chars_non_alphanum = tokenize_characters(data, strip_non_alphanum = FALSE) %>% map_int(~table(.x) %>% length()),
+           words = tokenize_words(data) %>% map_int(~table(.x) %>% length()),
+           words_no_lowercase = tokenize_words(data, lowercase = FALSE) %>% map_int(~table(.x) %>% length()),
+           words_stems = tokenize_word_stems(data) %>% map_int(~table(.x) %>% length())) %>%
+    select(-data) %>%
+    pivot_longer(-book) %>%
+    ggplot(aes(name, value)) +
+    geom_boxplot() +
+    geom_jitter(alpha = 0.1) +
+    scale_y_log10() +
+    theme_minimal() +
+    coord_flip() +
+    labs(title = "Number of distinct tokens varies greatly with choice of tokenizer")
+}
+
+```
+
+
+## Building your own tokenizer
+
+properly building your own with `strsplit` and **stringi**/**stringr**.
+
+Idea: 
+- tokenize_characters but only with letters
+- character ngrams
+
