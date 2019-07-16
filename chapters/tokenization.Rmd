@@ -3,6 +3,7 @@
 ```{r, message=FALSE}
 library(tokenizers)
 library(tidyverse)
+library(tidytext)
 library(hcandersenr)
 the_fir_tree <- hcandersen_en %>%
   filter(book == "The fir tree") %>%
@@ -72,10 +73,37 @@ Taking a token to mean "word" was a useful idea however hard to implement concre
 - paragraphs and
 - ngrams.
 
+We will in the following sections showcase how to do tokenization using the **tokenizers** package. These functions will take a character vector as the input and returns lists of character vectors. However these same operations can also be done using the **tidytext** package. 
+
+```{r}
+sample_vector <- c("This is the first of two strings",
+                   "And here is the second string.")
+sample_tibble <- tibble(text = sample_vector)
+```
+
+therefore the tokenization done by using `tokenize_words` on `sample_vector`
+
+```{r}
+tokenize_words(sample_vector)
+```
+
+will yield the same tokenization as `unnest_tokens` done on `sample_tibble`, only difference being the format. Difference.
+
+```{r}
+sample_tibble %>%
+  unnest_tokens(word, text, token = "words")
+```
+
+Furthermore arguments used in `tokenize_words` can be passed through `unnest_tokens` using the `...` like so
+
+```{r}
+sample_tibble %>%
+  unnest_tokens(word, text, token = "words", strip_punct = FALSE)
+```
 
 ### character tokens
 
-the first and simplest tokenization is the character tokenization. This simply splits the texts into characters. Here we run `tokenize_characters` with default starting parameters. Notice how it have arguments to convert everything to lowercase and to strip all non alpha numeric characters. These are both done to reduce the number of different tokens we are returned. The `tokenize_*()` functions will by default return a list of character vectors, one character vector for each string in the input.
+The first and simplest tokenization is the character tokenization. This simply splits the texts into characters. Here we run `tokenize_characters` with default starting parameters. Notice how it have arguments to convert everything to lowercase and to strip all non alpha numeric characters. These are both done to reduce the number of different tokens we are returned. The `tokenize_*()` functions will by default return a list of character vectors, one character vector for each string in the input.
 
 ```{r}
 tft_token_characters <- tokenize_characters(x = the_fir_tree,
@@ -103,20 +131,60 @@ TODO Find examples of when a character is hard to define. Look at Arabic, German
 
 ### words tokens
 
+TODO decide if `tokenize_word_stems()` should be introduced in this chapter of the stemming chapter.
+
+The word tokenization is perhaps the most common and widely studied tokenization. As we described earlier it is the procedure of splitting our text into words. To do this we will use the `tokenize_words()` functions.
+
+```{r}
+tft_token_words <- tokenize_words(x = the_fir_tree,
+                                  lowercase = TRUE, 
+                                  stopwords = NULL, 
+                                  strip_punct = TRUE,
+                                  strip_numeric = FALSE)
+```
+
+And if we take a look this is what we get.
+
+```{r}
+# TODO find better way to print this
+head(tft_token_words)
+```
+
+We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` should be fairly self-explanatory. They control whether we remove punctuation and numerics respectively. Lastly we have `stopwords = NULL`, which we will talk more in depth about in chapter \@ref(stop words).
+
+If we create a tibble with the two fairly tales "The fir tree" and "The little mermaid". Then we can use use `unnest_tokens` together with some **dplyr** verbs to find the must commonly used words in each.
+
+```{r}
+hcandersen_en %>%
+  filter(book %in% c("The fir tree", "The little mermaid")) %>%
+  unnest_tokens(word, text) %>%
+  count(book, word) %>%
+  group_by(book) %>%
+  arrange(desc(n)) %>%
+  slice(1:5)
+```
+
+We see that the 5 most commonly words in each fairly tale are fairly uninformative (only exception being "tree" in the "The fir tree" which might not be too surprising). These words are called *stop words* and will be handled in chapter \@ref(stop words).
+
 ### lines, sentences and paragraph tokens
 
+The following tokenizers are rarely used to create tokens for analytic uses, as the tokens produced tend to be fairly unique it is very uncommon for multiple sentences in a text to be identical. However these tokenizers will still provide value for preprocessing and labeling.
+
 ### ngrams tokens
+
+TODO find reference for ngrams
 
 ## Where does it break down?
 
 TODO What do you lose when you tokenize?
+- double spaces
+- potentially capitalization. Which could collapse patty and Patty together.
 
 TODO compare methods and explain why they are different. 
 
 TODO Showcase where the different methods have strengths and weaknesses
 
 TODO Do comparing of compression of data with different types of tokenizations
-
 
 ```{r}
 if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
@@ -138,7 +206,6 @@ if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
     coord_flip() +
     labs(title = "Number of distinct tokens varies greatly with choice of tokenizer")
 }
-
 ```
 
 
@@ -147,6 +214,7 @@ if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
 properly building your own with `strsplit` and **stringi**/**stringr**.
 
 Idea: 
-- tokenize_characters but only with letters
+- tokenize_characters but only with letters, or removing stop-letters
 - character ngrams
 
+Do multiple and benchmark time.
