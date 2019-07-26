@@ -1,8 +1,114 @@
-# Stemming
+# Stemming {#stemming}
 
-what is stemming
+```{r echo = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE)
+library(ggplot2)
+theme_set(theme_light())
+``` 
 
-how to do stemming
+When we deal with text, often documents contain different versions of one root word, or **stem**. *The Fir-Tree*, for example, contains more than one version (i.e., inflected form) of the word "tree".
+
+```{r tidy_fir_tree}
+library(hcandersenr)
+library(tidyverse)
+library(tidytext)
+
+fir_tree <- hca_fairytales() %>% 
+  filter(book == "The fir tree", 
+         language == "English")
+
+tidy_fir_tree <- fir_tree %>%
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords())
+
+tidy_fir_tree %>% 
+  count(word, sort = TRUE) %>% 
+  filter(str_detect(word, "^tree"))
+```
+
+Trees, we see once again, are important in this story; the singular form appears 76 times and the plural form appears twelve times. (We'll come back to how we might handle the apostrophe in "tree's" later in this chapter.)
+
+What if we aren't interested in the difference between "trees" and "tree" and we want to treat both together? That idea is at the heart of **stemming**, the process of identifying the base word (or stem) for a dataset of words. In this example, "trees" would lose its letter "s" while "tree" stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem "tree" (89, if we also find the stem for "tree's").
+
+## How to stem text in R
+
+There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the Porter stemming algorithm, a widely-used stemmer for English first published in 1980. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
+
+```{r dependson="tidy_fir_tree"}
+library(SnowballC)
+
+tidy_fir_tree %>%
+  mutate(stem = wordStem(word)) %>%
+  count(stem, sort = TRUE)
+```
+
+Take a look at those stems. Notice that we do now have 88 incidences of "tree". Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both "story" and "stories" as "stori", not a regular English word but instead a special stem object.
+
+The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the [hunspell](https://cran.r-project.org/package=hunspell) package.
+
+```{r dependson="tidy_fir_tree"}
+library(hunspell)
+
+tidy_fir_tree %>%
+  mutate(stem = hunspell_stem(word)) %>%
+  unnest(stem) %>%
+  count(stem, sort = TRUE)
+```
+
+Notice that the code here is a little different (we had to use `unnest()`) and that the results are a little different. We have only real English words, and we have more total rows in the result. What happened?
+
+```{r}
+hunspell_stem("discontented")
+```
+
+We have **two** stems! This stemmer works differently; it uses both morphological analysis of a word and existing dictionaries to find possible stems. It's possible to end up with more than one, and it's possible for a stem to be a word that is not related by meaning to the original word. For example, one of the stems of "number" is "numb" with this library. The Hunspell library was built to be a spell checker, so depending on your analytical purposes, it may not be an appropriate choice.
+
+## Should you use stemming at all?
+
+You will often see stemming as part of NLP pipelines, sometime without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.
+
+Why does stemming often help, if you are training a machine learning model for text? Stemming **reduces the sparsity** of text data. Let's see this in action, with some Hans Christian Andersen fairy tales in English. How many words are there, after removing a standard dataset of stopwords?
+
+```{r tidy_hca}
+tidy_hca <- hca_fairytales() %>% 
+  filter(language == "English") %>%
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords())
+
+tidy_hca %>%
+  count(word, sort = TRUE)
+```
+
+There are `r scales::comma(n_distinct(tidy_hca$word))` distinct words in this dataset we have created (after removing stopwords). A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [quanteda](https://cran.r-project.org/package=quanteda) package).
+
+```{r dependson="tidy_hca"}
+tidy_hca %>%
+  count(book, word) %>%
+  cast_dfm(book, word, n)
+```
+
+Notice the sparsity of this matrix. It's high! Think of this sparsity as the sparsity of data that we will want to use to build a supervised machine learning model.
+
+What if instead we use stemming as a preprocessing step here?
+
+```{r dependson="tidy_hca"}
+tidy_hca %>%
+  mutate(stem = wordStem(word)) %>%
+  count(book, stem) %>%
+  cast_dfm(book, stem, n)
+```
+
+We reduced the sparsity of our data by over 1%, and the number of word features by several thousand. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any information by stemming*.
+
+There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
+
+> Despite their frequent use in topic modeling, we find that stemmers produce no meaningful improvement in likelihood and coherence and in fact can degrade topic stability.
+
+Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context.
+
+
+
 
 go through example of individual steps of algorithm
 
