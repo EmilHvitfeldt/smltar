@@ -211,10 +211,61 @@ if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
 
 ## Building your own tokenizer
 
-properly building your own with `strsplit` and **stringi**/**stringr**.
+Sometimes the out-of-the-box tokenizers wont be able to do what you want need them to do. In this case you will have to wield **stringi**/**stringr** and [regular expression](https://en.wikipedia.org/wiki/Regular_expression) (regex for short). There are two main paths to tokenization
 
-Idea: 
-- tokenize_characters but only with letters, or removing stop-letters
-- character ngrams
+1. *Split* the string up according to some rule
+2. *Extract* tokens based on some rule
 
-Do multiple and benchmark time.
+the number and complexity of your rules is determined by your desired outcome. You can reach complex outcomes by chaining together many smaller rules. In this section we will implement a couple of specility tokenizers to showcase the techniques.  
+
+### Tokenize to characters, only keeping letters
+
+Here we want to make a modification to `tokenize_characters()` such that we only keep keep letters. At first thought there are 2 main options. Use `tokenize_characters()` and remove any non letters, or extract extract the letters one by one. This is a fairly simple goal so we will go with the latter option. This is an *extract* task and we will be using `str_extract_att()` as each string has the possiblity of including more then 1 token. Since we want to extract letters we can use the letters character class `[:alpha:]` to match for letters and the quantifier `{1}` to only extract the first one. (In this example leaving out the quantifier yields the same result, however more specific regular expressions runs faster).
+
+```{r}
+letter_tokens <- str_extract_all("This sentence include 2 numbers and 1 period.", 
+                                 "[:alpha:]{1}")
+letter_tokens
+```
+
+You could be tempted to use specify the character class yourself to be something like `[a-zA-Z]{1}`, it would run faster but you would lose non-english characters. This is a design choice you would have to make depending on the goals of your specific problem. 
+
+```{r}
+danish_sentence <- "Så mødte han en gammel heks på landevejen; hun var så ækel, hendes underlæbe hang hende lige ned på brystet."
+
+str_extract_all(danish_sentence, "[:alpha:]")  
+str_extract_all(danish_sentence, "[a-zA-Z]")
+```
+
+### Allow for hyponated words
+
+So far we have had problems with "fir-tree" being split up, we are going to fix this problem in two different ways. First we will find a regex to match words with hyptons and extract those. Next we will try to reach the same goal by splitting on white spaces, this should hopefully give us the same result.
+
+```{r, eval=FALSE}
+str_extract_all("This is a sentence with hyphonated-words.", "TODO find hyponated-words regex")
+```
+
+```{r}
+str_split("This is a sentence with hyphonated-words.", "\\s")
+```
+
+### Character ngrams
+
+TODO chain together 
+
+- remove nonword
+- loop troight each string n times
+
+
+## Tokenization benchmark
+
+```{r}
+the_fir_tree1 <- c("1", the_fir_tree)
+
+bench::mark(
+  `[:alpha:]` = str_extract_all(the_fir_tree1, "[:alpha:]"),
+  `[a-zA-Z]` = str_extract_all(the_fir_tree1, "[a-zA-Z]"),
+  `[a-zA-Z]{1}` = str_extract_all(the_fir_tree1, "[a-zA-Z]{1}"),
+  `[:Letter:]` = str_extract_all(the_fir_tree1, "[:Letter:]")
+)
+```
