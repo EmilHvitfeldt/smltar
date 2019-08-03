@@ -33,7 +33,7 @@ What if we aren't interested in the difference between "trees" and "tree" and we
 
 ## How to stem text in R
 
-There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the Porter stemming algorithm, a widely-used stemmer for English first published in 1980. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
+There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
 
 ```{r dependson="tidy_fir_tree"}
 library(SnowballC)
@@ -107,10 +107,37 @@ There is a growing body of academic research demonstrating that stemming can be 
 
 Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context.
 
+## Understand a stemming algorithm
+
+If stemming is going to be in our NLP toolbox, it's worth sitting down with one approach in detail to understand how it works under the hood. The Porter stemming algorithm is so approachable that we can walk through its outline in less than a page or so. It involves five steps, and the idea of a word **measure**.
 
 
+Think of any word as made up alternating groups of vowels $V$ and consonants $C$. One or more vowels together are one instance of $V$, and one or more consonants togther are one instance of $C$. We can write any word as
 
-go through example of individual steps of algorithm
+$$[C](VC)^m[V]$$
+where $m$ is called the "measure" of the word. The first $C$ and the last $V$ in brackets are optional. In this framework, we could write out the word "tree" as
+
+$$CV$$
+
+with $C$ being "tr" and $V$ being "ee"; it's an `m = 0` word. We would write out the word "algorithms" as 
+
+$$VCVCVC$$
+and that is an `m = 3` word.
+
+- The first step of the Porter stemmer is (perhaps this seems like cheating) actually made of three substeps working with plural and past participle wording endings. In the first substep (1a), "sses" is replaced with "ss", "ies" is replaced with "i", and final single "s" letters are removed. The second substep (1b) depends on the measure of the word `m` but works with endings like "eed", "ed", "ing", adding "e" back on to make endings like "ate", "ble", and "ize" when appropriate. The third substep (1c) replaces "y" with "i" for words of a certain `m`.
+- The second step of the Porter stemmer takes the output of the first step and regularizes a set of 20 endings. In this step, "ization" goes to "ize", "alism" goes to "al", "aliti" goes to "al" (notice that the ending "i" there came from the first step), and so on for the other 17 endings.
+- The third step again processes the output, using a list of seven endings. Here, "ical" and "iciti" both go to "ic", "ful" and "ness" are both removed, and so forth for the three other endings in this step.
+- The fourth step involves a longer list of endings to deal with again (19), and they are all removed. Endings like "ent", "ism", "ment", and more are removed in this step.
+- The fifth and final step has two substeps, both which depend on the measure `m` of the word. In this step, depending on `m`, final "e" letters are sometimes removed and final double letters are sometimes removed.
+
+
+```{block, type = "rmdnote"}
+How would look work for a few example words? The word "supervised" loses its "ed" in step 1b and is not touched by the rest of the algorithm, ending at "supervis". The word "relational" changes "ational" to "ate" in step 2 and loses its final "e" in step 5, ending at "relat". Notice that neither of these results are regular English words, but instead special stem objects. This is expected.
+```
+
+This algorithm was first published in @Porter80 and is still broadly used, but we can reach even further back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
+
+
 
 Compare algorithms, "stemming done by removing ending s", removing multiple of letters
 
