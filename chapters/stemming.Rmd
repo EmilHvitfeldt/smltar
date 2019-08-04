@@ -103,13 +103,17 @@ tidy_hca %>%
   cast_dfm(book, stem, n)
 ```
 
-We reduced the sparsity of our data by over 1%, and the number of word features by several thousand. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any information by stemming*.
+We reduced the sparsity of our data by over 1%, and the number of word features by several thousand. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
 > Despite their frequent use in topic modeling, we find that stemmers produce no meaningful improvement in likelihood and coherence and in fact can degrade topic stability.
 
-Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context.
+Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context. As we work through the rest of this chapter and learn more about stemming, consider what information we lose when we stem text in exchange for reducing the number of word features. Stemming can be helpful in some contexts, but typical stemming algorithms are somewhat aggressive and have been built to favor sensitivity (or recall, or the true positive rate) at the expense of specificity (or precision, or the true negative rate). Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:
+
+- meaning and mean
+- likely, like, liking
+- university and universe
 
 ## Understand a stemming algorithm
 
@@ -141,14 +145,25 @@ How would this work for a few example words? The word "supervised" loses its "ed
 
 This algorithm was first published in @Porter80 and is still broadly used, but we can reach even further back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
 
+## Handling punctuation when stemming
 
-
-Compare algorithms, "stemming done by removing ending s", removing multiple of letters
 
 do you remove punctuation?
 
-stemming vs lemmatisation
+## Compare some stemming options
+
+Compare algorithms, "stemming done by removing ending s", removing multiple of letters
+
+## Lemmatization and stemming
+
+When people use the word "stemming" in natural language processing, they typically mean a system like the one we've been describing in this chapter, with rules, conditions, heuristics, and lists of word endings. Think of stemming as typically implemented in NLP as **rule-based**, operating on the word by itself. There is another option for normalizing words to a root that takes a different approach. Instead of using rules to cut words down to their stems, lemmatization uses knowledge about a language's structure to reduce words down to their lemmas, the canonical or dictionary forms of words. Think of lemmatization as typically implemented in NLP as **linguistics-based**, operating on the word in its context.
+
+Lemmatization requires more information than the rule-based stemmers we've discussed so far. We need to know what part of speech a word is to correctly identify its lemma, and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like [WordNet](https://wordnet.princeton.edu/) as a way to look up word meanings for a given part-of-speech use [@Miller95]. Notice that lemmatization involves more linguistic knowledge of a language than stemming. 
+
+```{block, type = "rmdtip"}
+How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
+```
 
 
+Our favorite way to implement lemmatization in R is the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17]. It provides R users access to, among other things, the excellent [spaCy](https://spacy.io/) library using a dataframe-centric design. Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
 
-What information do you lose when you tokenize? Which bias will you encounter
