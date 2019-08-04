@@ -33,7 +33,7 @@ What if we aren't interested in the difference between "trees" and "tree" and we
 
 ## How to stem text in R
 
-There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the Porter stemming algorithm, a widely-used stemmer for English first published in 1980. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
+There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
 
 ```{r dependson="tidy_fir_tree"}
 library(SnowballC)
@@ -44,6 +44,10 @@ tidy_fir_tree %>%
 ```
 
 Take a look at those stems. Notice that we do now have 88 incidences of "tree". Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both "story" and "stories" as "stori", not a regular English word but instead a special stem object.
+
+```{block, type = "rmdtip"}
+If you want to tokenize *and* stem your text data, you can try out the function `tokenize_word_stems()` from the tokenizers package, which implements Porter stemming just like what we demonstrated here. For more on tokenization, see Chapter \@ref(tokenization). 
+```
 
 The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the [hunspell](https://cran.r-project.org/package=hunspell) package.
 
@@ -99,26 +103,115 @@ tidy_hca %>%
   cast_dfm(book, stem, n)
 ```
 
-We reduced the sparsity of our data by over 1%, and the number of word features by several thousand. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any information by stemming*.
+We reduced the sparsity of our data by over 1%, and the number of word features by several thousand. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
 > Despite their frequent use in topic modeling, we find that stemmers produce no meaningful improvement in likelihood and coherence and in fact can degrade topic stability.
 
-Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context.
+Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context. As we work through the rest of this chapter and learn more about stemming, consider what information we lose when we stem text in exchange for reducing the number of word features. Stemming can be helpful in some contexts, but typical stemming algorithms are somewhat aggressive and have been built to favor sensitivity (or recall, or the true positive rate) at the expense of specificity (or precision, or the true negative rate). Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:
+
+- meaning and mean
+- likely, like, liking
+- university and universe
+
+## Understand a stemming algorithm
+
+If stemming is going to be in our NLP toolbox, it's worth sitting down with one approach in detail to understand how it works under the hood. The Porter stemming algorithm is so approachable that we can walk through its outline in less than a page or so. It involves five steps, and the idea of a word **measure**.
 
 
+Think of any word as made up alternating groups of vowels $V$ and consonants $C$. One or more vowels together are one instance of $V$, and one or more consonants togther are one instance of $C$. We can write any word as
+
+$$[C](VC)^m[V]$$
+where $m$ is called the "measure" of the word. The first $C$ and the last $V$ in brackets are optional. In this framework, we could write out the word "tree" as
+
+$$CV$$
+
+with $C$ being "tr" and $V$ being "ee"; it's an `m = 0` word. We would write out the word "algorithms" as 
+
+$$VCVCVC$$
+and it is an `m = 3` word.
+
+- The first step of the Porter stemmer is (perhaps this seems like cheating) actually made of three substeps working with plural and past participle word endings. In the first substep (1a), "sses" is replaced with "ss", "ies" is replaced with "i", and final single "s" letters are removed. The second substep (1b) depends on the measure of the word `m` but works with endings like "eed", "ed", "ing", adding "e" back on to make endings like "ate", "ble", and "ize" when appropriate. The third substep (1c) replaces "y" with "i" for words of a certain `m`.
+- The second step of the Porter stemmer takes the output of the first step and regularizes a set of 20 endings. In this step, "ization" goes to "ize", "alism" goes to "al", "aliti" goes to "al" (notice that the ending "i" there came from the first step), and so on for the other 17 endings.
+- The third step again processes the output, using a list of seven endings. Here, "ical" and "iciti" both go to "ic", "ful" and "ness" are both removed, and so forth for the three other endings in this step.
+- The fourth step involves a longer list of endings to deal with again (19), and they are all removed. Endings like "ent", "ism", "ment", and more are removed in this step.
+- The fifth and final step has two substeps, both which depend on the measure `m` of the word. In this step, depending on `m`, final "e" letters are sometimes removed and final double letters are sometimes removed.
 
 
-go through example of individual steps of algorithm
+```{block, type = "rmdnote"}
+How would this work for a few example words? The word "supervised" loses its "ed" in step 1b and is not touched by the rest of the algorithm, ending at "supervis". The word "relational" changes "ational" to "ate" in step 2 and loses its final "e" in step 5, ending at "relat". Notice that neither of these results are regular English words, but instead special stem objects. This is expected.
+```
 
-Compare algorithms, "stemming done by removing ending s", removing multiple of letters
+This algorithm was first published in @Porter80 and is still broadly used, but we can reach even further back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
+
+## Handling punctuation when stemming
+
 
 do you remove punctuation?
 
-stemming vs lemmatisation
+## Compare some stemming options
 
-tokenize_word_stems()
+Let's compare a few simple stemming algorithms and see what results we end with. Let's look at *The Fir-Tree*, specifically the tidied dataset from which we have removed stop words. Let's compare three very straightforward stemming approaches.
+
+- **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
+- **Handle plural endings with slightly more complex rules.** These rules are the same as step 1a of Porter stemming.
+- **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.
+
+```{r stemming, dependson="tidy_hca"}
+stemming <- tidy_fir_tree %>%
+  select(-book, -language) %>%
+  mutate(`Remove S` = str_remove(word, "s$"),
+         `Plural endings` = case_when(str_detect(word, "sses$") ~ 
+                                        str_replace(word, "sses$", "ss"),
+                                      str_detect(word, "ies$") ~ 
+                                        str_replace(word, "ies$", "y"),
+                                      str_detect(word, "ss$") ~
+                                        word,
+                                      str_detect(word, "s$") ~
+                                        str_remove(word, "s$"),
+                                      TRUE ~ word),
+         `Porter stemming` = wordStem(word)) %>%
+  rename(`Original word` = word)
+
+stemming
+```
+
+Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from "trees" to "tree" in the same way, but we have different results for "stories" to "story" or "stori" or "storie", differently handling of "branches", and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
+
+```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=8}
+stemming %>%
+  gather(Type, Result, `Original word`:`Plural endings`) %>%
+  mutate(Type = fct_inorder(Type)) %>%
+  count(Type, Result) %>%
+  group_by(Type) %>%
+  top_n(20, n) %>%
+  ungroup %>%
+  ggplot(aes(fct_reorder(Result, n), 
+             n, fill = Type)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Type, scales = "free_y") +
+  coord_flip() +
+  labs(x = NULL, y = "Frequency")
+```
+
+In the top twenty words here, we don't see any differences in between removing only the letter "s" and taking a slightly more sophisticated approach to plural endings. In what situations *do* we see a difference?
+
+```{r dependson="stemming"}
+stemming %>% 
+  filter(`Remove S` != `Plural endings`)
+```
 
 
-What information do you lose when you tokenize? Which bias will you encounter
+## Lemmatization and stemming
+
+When people use the word "stemming" in natural language processing, they typically mean a system like the one we've been describing in this chapter, with rules, conditions, heuristics, and lists of word endings. Think of stemming as typically implemented in NLP as **rule-based**, operating on the word by itself. There is another option for normalizing words to a root that takes a different approach. Instead of using rules to cut words down to their stems, lemmatization uses knowledge about a language's structure to reduce words down to their lemmas, the canonical or dictionary forms of words. Think of lemmatization as typically implemented in NLP as **linguistics-based**, operating on the word in its context.
+
+Lemmatization requires more information than the rule-based stemmers we've discussed so far. We need to know what part of speech a word is to correctly identify its lemma, and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like [WordNet](https://wordnet.princeton.edu/) as a way to look up word meanings for a given part-of-speech use [@Miller95]. Notice that lemmatization involves more linguistic knowledge of a language than stemming. 
+
+```{block, type = "rmdtip"}
+How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
+```
+
+Our favorite way to implement lemmatization in R is the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17]. It provides R users access to, among other things, the excellent [spaCy](https://spacy.io/) library using a dataframe-centric design. Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
+
