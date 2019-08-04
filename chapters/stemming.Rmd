@@ -152,7 +152,56 @@ do you remove punctuation?
 
 ## Compare some stemming options
 
-Compare algorithms, "stemming done by removing ending s", removing multiple of letters
+Let's compare a few simple stemming algorithms and see what results we end with. Let's look at *The Fir-Tree*, specifically the tidied dataset from which we have removed stop words. Let's compare three very straightforward stemming approaches.
+
+- **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
+- **Handle plural endings with slightly more complex rules.** These rules are the same as step 1a of Porter stemming.
+- **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.
+
+```{r stemming, dependson="tidy_hca"}
+stemming <- tidy_fir_tree %>%
+  select(-book, -language) %>%
+  mutate(`Remove S` = str_remove(word, "s$"),
+         `Plural endings` = case_when(str_detect(word, "sses$") ~ 
+                                        str_replace(word, "sses$", "ss"),
+                                      str_detect(word, "ies$") ~ 
+                                        str_replace(word, "ies$", "y"),
+                                      str_detect(word, "ss$") ~
+                                        word,
+                                      str_detect(word, "s$") ~
+                                        str_remove(word, "s$"),
+                                      TRUE ~ word),
+         `Porter stemming` = wordStem(word)) %>%
+  rename(`Original word` = word)
+
+stemming
+```
+
+Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from "trees" to "tree" in the same way, but we have different results for "stories" to "story" or "stori" or "storie", differently handling of "branches", and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
+
+```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=8}
+stemming %>%
+  gather(Type, Result, `Original word`:`Plural endings`) %>%
+  mutate(Type = fct_inorder(Type)) %>%
+  count(Type, Result) %>%
+  group_by(Type) %>%
+  top_n(20, n) %>%
+  ungroup %>%
+  ggplot(aes(fct_reorder(Result, n), 
+             n, fill = Type)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Type, scales = "free_y") +
+  coord_flip() +
+  labs(x = NULL, y = "Frequency")
+```
+
+In the top twenty words here, we don't see any differences in between removing only the letter "s" and taking a slightly more sophisticated approach to plural endings. In what situations *do* we see a difference?
+
+```{r dependson="stemming"}
+stemming %>% 
+  filter(`Remove S` != `Plural endings`)
+```
+
 
 ## Lemmatization and stemming
 
@@ -163,7 +212,6 @@ Lemmatization requires more information than the rule-based stemmers we've discu
 ```{block, type = "rmdtip"}
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
 ```
-
 
 Our favorite way to implement lemmatization in R is the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17]. It provides R users access to, among other things, the excellent [spaCy](https://spacy.io/) library using a dataframe-centric design. Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
 
