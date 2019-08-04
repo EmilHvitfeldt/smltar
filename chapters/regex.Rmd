@@ -2,44 +2,256 @@
 
 # Regular expressions
 
-Text Patterns and Matches
+TODO add captions to all tables.
 
-Literal Characters
-mention 12 special characters
-Escaping Metacharacters
+This section will give a brief overview of [regular expression](https://en.wikipedia.org/wiki/Regular_expression), often abbreviated *regex*. Regular expression is a way to specify patterns of strings using a sequence of characters. By combining a selection of simple patterns will you be able to capture quite complicated strings.
 
-Character Classes or Character Sets
+Many functions in R take advantage of regular expressions. `grep`, `grepl`, `regexpr`, `gregexpr`, `sub`, `gsub` and `strsplit` are some of the obvious functions from `base` to use regular expression, however `ls` and `list.files` also uses them. The `stringr` package is another package that takes advantage of regular expressions and are expected to be passed to the `patterm =` argument. Regular expression can be used to detect, locate or extract parts of a string.
 
-Shorthand Character Classes with table
+```{r}
+library(stringr)
+```
 
-Non-Printable Characters, properly not, just use the table
+## Literal characters
 
-The Dot Matches (Almost) Any Character
+The most basic regular expression consists of a single character. Here we are trying to detect if a each of the strings contain the letter "j".
 
-quanifiers
+```{r}
+animals <- c("jaguar", "jay", "bat")
+str_detect(animals, "j")
+```
 
-Anchors
+Likewise are we able to extract the match with `str_extract()` which isn't too useful right now but will become very exciting once we start to use more advanced regular expressions.
 
-Alternation
-Repetition
-multipliersa
-Greedy and Lazy Repetition
-Grouping and Capturing
+```{r}
+str_extract(animals, "j")
+```
 
-Lookaround
+Lastly we are able to locate the position of the match using `str_locate()`
 
+```{r}
+str_locate(animals, "j")
+```
 
+```{block, type = "rmdnote"}
+The `stringr` package includes many more functions. `str_detect()`, `str_extract()` and `str_locate()` are some of the simple and powerful main functions. To see the remaining functions please run `help(package = "stringr")` to open the documentation.
+```
 
+you are also able to have multiple characters in a row.
 
-has good tables
-https://www.rexegg.com/regex-quickstart.html
+```{r}
+animals <- c("jaguar", "jay", "bat")
+str_detect(animals, "jag")
+```
 
+Notice how literal characters are taken to be case sensitive.
 
-https://code.tutsplus.com/tutorials/8-regular-expressions-you-should-know--net-6149
-https://thoughtbot.com/blog/back-to-basics-regular-expressions#modifiers
+```{r}
+wows <- c("wow", "WoW", "WOW")
+str_detect(wows, "wow")
+```
 
-https://code.tutsplus.com/tutorials/you-dont-know-anything-about-regular-expressions-a-complete-guide--net-7869
+### Meta characters
 
-https://regexr.com/
+There are 14 meta character that carry special meaning inside regular expressions and we need to "escape" them with a backslash if we want to match the literal character. Remember that backslashes need to be doubled when used in R. You can think of "escaping" as stripping the character of its special meaning.
 
-https://www.regular-expressions.info/quickstart.html
+```{r}
+math <- c("1 + 2", "14 + 5", "3 - 5")
+str_detect(math, "\\-")
+```
+
+The complete list of meta characters is displayed in the follow table [@boost_c_libraries].
+
+```{r echo=FALSE}
+tribble(
+  ~description, ~character,
+  "opening square bracket", "[",
+  "closing square bracket", "]",
+  "backslash", "\\\\",
+  "caret", "^",
+  "dollar sign", "$",
+  "period/dot", ".",
+  "vertical bar", "|",
+  "question mark", "?",
+  "asterisk", "*",
+  "plus sign", "+",
+  "opening curly brackets", "{",
+  "closing curly brackets", "}",
+  "opening parentheses", "(",
+  "closing parentheses", ")"
+) %>% 
+  knitr::kable()
+```
+
+## Full stop, the wildcard
+
+The first meta character we will introduce is the full stop/period/dot, which act as a wildcard. This means that it will match anything in place other then a newline character. 
+
+```{r}
+strings <- c("cat", "cut", "cue")
+str_extract(strings, "c.")
+str_extract(strings, "c.t")
+```
+
+## Character Classes
+
+So far we have only been able to match exact characters or wildcards. Here we introduce "character classes (also called character sets). A character class allows you to match 1 character specified inside the class. A character class is constructed with square brackets. The following character class `[ac]` will match either a "a" or a "c". 
+
+```{r}
+strings <- c("a", "b", "c")
+str_detect(strings, "[ac]")
+```
+
+```{block, type = "rmdnote"}
+Spaces inside characters are meaningful as they are taken as literal characters. Thus the character class `"[ac]"` will match the letter a and c, on the other hand the character class `"[a c]"` will match the letters a and c but also a space.
+```
+
+you can use a hyphen character to define a range of character. Thus `[1-5]` is the same as `[12345]`.
+
+```{r}
+numbers <- c("1", "2", "3", "4", "5", "6", "7", "8", "9")
+str_detect(numbers, "[2-7]")
+
+sentence <- "This is a long sentence with 2 numbers with 1 digits."
+str_locate_all(sentence, "[1-2a-b]")
+```
+
+you are also able to negate characters in a class with a caret "^". By placing a caret immediately inside the opening square bracket will cause the regular expression to match anything *not* inside the class. Thus the regular expression `[^ac]` will match anything that isn't the letter a or c.
+
+```{r}
+strings <- c("a", "b", "c")
+str_detect(strings, "[^ac]")
+```
+
+### Shorthand Character Classes
+
+Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have and even shorter shorthand's. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 but it can also be described by
+
+```{r}
+tribble(
+  ~class, ~description,
+  "[:digit:] or \\\\\\\\d", "Digits; [0-9]",
+  "[:alpha:]", "Alphabetic characters, Upper and lowercase [A-z]",
+  "[:alnum:]", "Alphanumeric characters, letters and digits [A-z0-9]",
+  "[:graph:]", "Graphical characters; [[:alnum:][:punct:]]",
+  "[:print:]", "Printable characters; [[:alnum:][:punct:][:space:]]",
+  "[:lower:]", "Lower-case letters [a-z]",
+  "[:upper:]", "Upper-case letters [A-Z]",
+  "[:cntrl:]", "Control characters; \\n, \\r etc.",
+  "[:punct:]", "Punctuation characters; !\"#$%&’()*+,-./:;<=>?@[]^_`{|}~",
+  "[:blank:]", "Space and tab",
+  "[:space:] or \\\\\\\\s", "Space, tab, vertical tab, newline, form feed, carriage return",
+  "[:xdigit:]", "Hexadecimal digits [0-9A-Fa-f]",
+  "\\\\\\\\S", "Not space; [^[:space:]]",
+  "\\\\\\\\w", "Word characters;  Letters, digits and underscores [A-z0-9_]",
+  "\\\\\\\\W", "Non-word characters [^A-z0-9_]",
+  "\\\\\\\\D", "Non-digits; [^0-9]"
+) %>% 
+  knitr::kable()
+```
+
+Notice that these shorthands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
+
+TODO find a easy way to showcase regex in different locales.
+
+## Quantifiers
+
+To specify how many times we expect something to occur we can use quantifiers. This is useful in the sense that we don't have to write `[:digit:][:digit:][:digit:][:digit:]` if we want to find a 4 digit number. The ways to specify repetitions can be found in the following table. You will notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}`[@javascriptinforegexpquantifiers].
+
+```{r}
+tribble(
+  ~regex, ~matches,
+  "?", "zero or one times",
+  "*", "zero or more times",
+  "+", "one or more times",
+  "{n}", "exactly n times",
+  "{n,}", "at least n times",
+  "{n,m}", "between n and m times"
+) %>% 
+  knitr::kable()
+```
+
+This means we are able to detect both color and colour by placing a quantifier after the u that detects 0 or 1 times used.
+
+```{r}
+col <- c("colour", "color", "farver")
+str_detect(col, "colou?r")
+```
+
+And we extract 4 digit numbers.
+
+```{r}
+sentence <- "The year was 1776."
+str_extract(sentence, "\\d{4}")
+```
+
+Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in normal parentheses. In the following example are we trying to match all the "NA" in the string. This is done by putting "NA " inside a parentheses and putting a + after it to make sure we match at least once.
+
+```{r}
+batman <- "NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!"
+str_extract(batman, "(NA )+")
+```
+
+however we notice that this matches the last space which we don't want. We can fix this my matching zero or more "NA " followed by exactly 1 "NA".
+
+```{r}
+batman <- "NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!"
+str_extract(batman, "(NA )*(NA){1}")
+```
+
+ By default these quantifiers are "greedy", meaning that they will try to match the longest string possible. We can make them "lazy" by placing a ? after, this will make them try to match the shortest string possible.
+
+```{r}
+tribble(
+  ~regex, ~matches,
+  "??", "zero or one times, prefers 0",
+  "*?", "zero or more times, match as few times as possible",
+  "+?", "one or more times, match as few times as possible",
+  "{n}?", "exactly n times, match as few times as possible",
+  "{n,}?", "at least n times, match as few times as possible",
+  "{n,m}?", "between n and m times, match as few times as possible but at least n"
+) %>% 
+  knitr::kable()
+```
+
+Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.
+
+```{r}
+batman <- "NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!"
+str_extract(batman, "(NA ){3,7}")
+str_extract(batman, "(NA ){3,7}?")
+```
+
+## Anchors
+
+The characters `^` and `$` have special meaning in regular expressions. When used they force the engine to check in the beginning and end of the string respectively, hence the name anchor. A mnemonic device to remember this is "First you get the power(`^`) and the you get the money(`\$`)".
+
+```{r}
+seasons <- c("The summer is hot this year",
+             "The spring is a lovely time",
+             "Winter is my favorite time of the year",
+             "Fall is a time of peace")
+str_detect(seasons, "^The")
+str_detect(seasons, "year$")
+```
+
+We can also combine the two to match a string completely.
+
+```{r}
+folder_names <- c("analysis", "data-raw", "data", "R")
+str_detect(folder_names, "^data$")
+```
+
+## Additional resources
+
+These chapters covered some of the basics of regular expressions. If you want to learn more please go to any of the links below:
+
+TODO lists these better  
+
+rstudio cheat sheets
+https://www.rstudio.com/resources/cheat sheets/  
+https://www.rexegg.com/regex-quickstart.html  
+https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html  
+https://www.regular-expressions.info/quickstart.html  
+https://r4ds.had.co.nz/strings.html  
+https://www.amazon.com/dp/0596528124/ref=cm_sw_su_dp  
