@@ -179,9 +179,9 @@ stemming
 
 Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from "trees" to "tree" in the same way, but we have different results for "stories" to "story" or "stori" or "storie", differently handling of "branches", and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
 
-```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=8, fig.cap='TODO Add a caption here. Needed to make ref work'}
+```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=8, fig.cap="Results for three different stemming strategies"}
 stemming %>%
-  gather(Type, Result, `Original word`:`Plural endings`) %>%
+  gather(Type, Result, `Remove S`:`Porter stemming`) %>%
   mutate(Type = fct_inorder(Type)) %>%
   count(Type, Result) %>%
   group_by(Type) %>%
@@ -195,7 +195,7 @@ stemming %>%
   labs(x = NULL, y = "Frequency")
 ```
 
-In the top twenty words here, we don't see any differences in between removing only the letter "s" and taking a slightly more sophisticated approach to plural endings. In what situations *do* we see a difference?
+Porter stemming is the most different from the other two approaches. In the top twenty words here, we don't see much difference between removing only the letter "s" and taking a slightly more sophisticated approach to plural endings. In what situations *do* we see a difference?
 
 ```{r dependson="stemming"}
 stemming %>% 
@@ -203,6 +203,16 @@ stemming %>%
   distinct(`Remove S`, `Plural endings`, .keep_all = TRUE)
 ```
 
+We also see situations where the same sets of original words are bucketed differently (not just with different stem labels) under different stemming strategies. In the following very small example, two of the strategies bucket these words into two stems while one strategy buckets them into one stem.
+
+```{r dependson="stemming"}
+stemming %>%
+  gather(Type, Result, `Remove S`:`Porter stemming`) %>%
+  filter(Result %in% c("come", "coming")) %>% 
+  distinct(`Original word`, Type, Result)
+```
+
+These different characteristics can either be positive or negative, depending on the nature of the text being modeled and the analytical question being pursued.
 
 ## Lemmatization and stemming
 
