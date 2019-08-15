@@ -199,7 +199,8 @@ In the top twenty words here, we don't see any differences in between removing o
 
 ```{r dependson="stemming"}
 stemming %>% 
-  filter(`Remove S` != `Plural endings`)
+  filter(`Remove S` != `Plural endings`) %>%
+  distinct(`Remove S`, `Plural endings`, .keep_all = TRUE)
 ```
 
 
