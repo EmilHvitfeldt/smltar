@@ -152,8 +152,36 @@ Does stemming only work for English? Far from it! Check out the [steps of a Snow
 
 ## Handling punctuation when stemming
 
+Punctuation contains information that can be used in text analysis. Punctuation *is* typically less information-dense than the words themselves and thus it is often removed early in a text mining analysis project, but it's worth thinking through the impact of punctuation specifically on stemming. Think about words like "they're" and "child's".
 
-do you remove punctuation?
+We've already seen how punctuation and stemming can interact with our small example of *The Fir-Tree*; none of the stemming strategies we've discussed so far have recognized "tree's" as belonging to the same stem as "trees" and "tree".
+
+```{r dependson="tidy_fir_tree"}
+tidy_fir_tree %>% 
+  count(word, sort = TRUE) %>% 
+  filter(str_detect(word, "^tree"))
+```
+
+It is possible to split tokens not only on white space but **also** on punctuation, using a regular expression (see Appendix \@ref(regex)). 
+
+```{r fir_tree_counts, dependson="tidy_fir_tree"}
+fir_tree_counts <- fir_tree %>%
+  unnest_tokens(word, text, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
+  anti_join(get_stopwords()) %>%
+  mutate(stem = wordStem(word)) %>%
+  count(stem, sort = TRUE)
+
+fir_tree_counts
+```
+
+Now we are able to put all these related words together, having identified them with the same stem.
+
+```{r}
+fir_tree_counts %>% 
+  filter(str_detect(stem, "^tree"))
+```
+
+Handling punctuation in this way further reduces sparsity in word features. Whether this kind of tokenization and stemming strategy is a good choice in any particular data analysis situation depends on the particulars of the text characteristics.
 
 ## Compare some stemming options
 
