@@ -33,7 +33,7 @@ What if we aren't interested in the difference between "trees" and "tree" and we
 
 ## How to stem text in R
 
-There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm under the name [Snowball](https://snowballstem.org/) with an open-source license and you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
+There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework [Snowball](https://snowballstem.org/) with an open-source license; you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
 
 ```{r dependson="tidy_fir_tree"}
 library(SnowballC)
@@ -143,7 +143,12 @@ and it is an `m = 3` word.
 How would this work for a few example words? The word "supervised" loses its "ed" in step 1b and is not touched by the rest of the algorithm, ending at "supervis". The word "relational" changes "ational" to "ate" in step 2 and loses its final "e" in step 5, ending at "relat". Notice that neither of these results are regular English words, but instead special stem objects. This is expected.
 ```
 
-This algorithm was first published in @Porter80 and is still broadly used, but we can reach even further back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
+This algorithm was first published in @Porter80 and is still broadly used; read @Willett06 for background on how and why it has become a stemming standard. We can reach even *further* back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
+
+```{block, type = "rmdwarning"}
+Does stemming only work for English? Far from it! Check out the [steps of a Snowball stemming algorithm for German](https://snowballstem.org/algorithms/german/stemmer.html). 
+```
+
 
 ## Handling punctuation when stemming
 
