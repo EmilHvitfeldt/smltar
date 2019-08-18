@@ -239,15 +239,14 @@ str_extract_all(danish_sentence, "[a-zA-Z]")
 
 ### Allow for hyponated words
 
-So far we have had problems with "fir-tree" being split up, we are going to fix this problem in two different ways. First we will find a regex to match words with hyptons and extract those. Next we will try to reach the same goal by splitting on white spaces, this should hopefully give us the same result.
+So far we have had problems with "fir-tree" being split up, we are going to fix this problem in two different ways. First we will be splitting on white spaces this is a decent way of finding workds, similary this doesn't split up hyponated words as the hyphon isn't considered a white-space. Next we will find a regex to match words with hyptons and extract those.
+
+splitting by white-space is easy since we can use character classes \@ref(tab:characterclasses).
 
 ```{r, eval=FALSE}
-str_extract_all("This is a sentence with hyphonated-words.", "TODO find hyponated-words regex")
+str_extract_all("This isn't a sentence with hyphonated-words.", "([:alpha:]+-?[:alpha:]+|[:alpha:]{1})")
 ```
 
-```{r}
-str_split("This is a sentence with hyphonated-words.", "\\s")
-```
 
 ### Character ngrams
 
