@@ -2,8 +2,6 @@
 
 # Regular expressions {#regex}
 
-TODO add captions to all tables.
-
 This section will give a brief overview of [regular expression](https://en.wikipedia.org/wiki/Regular_expression), often abbreviated *regex*. Regular expression is a way to specify patterns of strings using a sequence of characters. By combining a selection of simple patterns will you be able to capture quite complicated strings.
 
 Many functions in R take advantage of regular expressions. `grep`, `grepl`, `regexpr`, `gregexpr`, `sub`, `gsub` and `strsplit` are some of the obvious functions from `base` to use regular expression, however `ls` and `list.files` also uses them. The `stringr` package is another package that takes advantage of regular expressions and are expected to be passed to the `patterm =` argument. Regular expression can be used to detect, locate or extract parts of a string.
@@ -62,7 +60,7 @@ str_detect(math, "\\-")
 
 The complete list of meta characters is displayed in the follow table [@boost_c_libraries].
 
-```{r echo=FALSE}
+```{r metacharacters, echo=FALSE}
 tribble(
   ~description, ~character,
   "opening square bracket", "[",
@@ -80,7 +78,7 @@ tribble(
   "opening parentheses", "(",
   "closing parentheses", ")"
 ) %>% 
-  knitr::kable()
+  knitr::kable(caption = 'All meta characters.')
 ```
 
 ## Full stop, the wildcard
@@ -127,7 +125,7 @@ str_detect(strings, "[^ac]")
 
 Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have and even shorter shorthand's. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 but it can also be described by
 
-```{r characterclasses}
+```{r characterclasses, echo=FALSE}
 tribble(
   ~class, ~description,
   "[:digit:] or \\\\\\\\d", "Digits; [0-9]",
@@ -150,7 +148,7 @@ tribble(
   knitr::kable(caption = 'All character classes.')
 ```
 
-Notice that these shorthands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
+Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
 
 TODO find a easy way to showcase regex in different locales.
 
@@ -201,7 +199,7 @@ str_extract(batman, "(NA )*(NA){1}")
 
  By default these quantifiers are "greedy", meaning that they will try to match the longest string possible. We can make them "lazy" by placing a ? after, this will make them try to match the shortest string possible.
 
-```{r}
+```{r quantifiers, echo=FALSE}
 tribble(
   ~regex, ~matches,
   "??", "zero or one times, prefers 0",
@@ -211,7 +209,7 @@ tribble(
   "{n,}?", "at least n times, match as few times as possible",
   "{n,m}?", "between n and m times, match as few times as possible but at least n"
 ) %>% 
-  knitr::kable()
+  knitr::kable(caption = 'All quantifiers.')
 ```
 
 Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.
@@ -246,12 +244,9 @@ str_detect(folder_names, "^data$")
 
 These chapters covered some of the basics of regular expressions. If you want to learn more please go to any of the links below:
 
-TODO lists these better  
+- Rstudio have an good collection of cheat sheets, some of which is related to regular expressions https://www.rstudio.com/resources/cheatsheets/.
+- www.rexegg.com has many pages of valuable information. This page includes a good list of tables https://www.rexegg.com/regex-quickstart.html.
+- https://www.regular-expressions.info/ is another great general regular expression site.
+- The strings chapters in "R for Data Science" goes into some examples written in R https://r4ds.had.co.nz/strings.html.
+- Lastly if you want to go down to the metal, you would have to spend a little money to buy https://www.amazon.com/dp/0596528124/ref=cm_sw_su_dp.
 
-rstudio cheat sheets
-https://www.rstudio.com/resources/cheat sheets/  
-https://www.rexegg.com/regex-quickstart.html  
-https://cran.r-project.org/web/packages/stringr/vignettes/regular-expressions.html  
-https://www.regular-expressions.info/quickstart.html  
-https://r4ds.had.co.nz/strings.html  
-https://www.amazon.com/dp/0596528124/ref=cm_sw_su_dp  
