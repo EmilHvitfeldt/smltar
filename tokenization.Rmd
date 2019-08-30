@@ -41,7 +41,7 @@ library(tokenizers)
 tokenize_words(the_fir_tree[1:2])
 ```
 
-And we get a sensible result. `tokenize_words` is using the **stringi** using the hood making it very fast. Tokenization according to words is done by finding word boundaries according to the specification from International Components for Unicode (ICU). The word boundary algorithm goes as follows
+And we get a sensible result. `tokenize_words` is using the **stringi** using the hood making it very fast. Tokenization according to words is done by finding word boundaries according to the specification from International Components for Unicode (ICU). The word boundary algorithm [@ICUWordBoundary] goes as follows
 
 - Break at the start and end of text, unless the text is empty.
 - Do not break within CRLF.
@@ -57,8 +57,6 @@ And we get a sensible result. `tokenize_words` is using the **stringi** using th
 - Do not break from extenders.
 - Do not break within emoji flag sequences. 
 - Otherwise, break everywhere (including around ideographs).
-
-TODO add reference to https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries
 
 While you might not understand what each and every step is doing you can appreciate it is many times more sophisticated then our initial approach. In the remaining of the book we will let the **tokenizers** package determine a baseline tokenizer for reference. We want to stress that the choice of tokenizer will have an influence on your results. Don't be afraid to experiment with different tokenizers or to write your own to fit your problem.
 
@@ -173,6 +171,8 @@ The following tokenizers are rarely used to create tokens for analytic uses, as 
 ### ngrams tokens
 
 TODO find reference for ngrams
+
+https://en.wikipedia.org/wiki/N-gram
 
 ## Where does it break down?
 
