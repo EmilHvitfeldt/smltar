@@ -216,11 +216,11 @@ Sometimes the out-of-the-box tokenizers wont be able to do what you want need th
 1. *Split* the string up according to some rule
 2. *Extract* tokens based on some rule
 
-the number and complexity of your rules is determined by your desired outcome. You can reach complex outcomes by chaining together many smaller rules. In this section we will implement a couple of specility tokenizers to showcase the techniques.  
+the number and complexity of your rules is determined by your desired outcome. You can reach complex outcomes by chaining together many smaller rules. In this section we will implement a couple of specialty tokenizers to showcase the techniques.  
 
 ### Tokenize to characters, only keeping letters
 
-Here we want to make a modification to `tokenize_characters()` such that we only keep keep letters. At first thought there are 2 main options. Use `tokenize_characters()` and remove any non letters, or extract extract the letters one by one. This is a fairly simple goal so we will go with the latter option. This is an *extract* task and we will be using `str_extract_att()` as each string has the possiblity of including more then 1 token. Since we want to extract letters we can use the letters character class `[:alpha:]` to match for letters and the quantifier `{1}` to only extract the first one. (In this example leaving out the quantifier yields the same result, however more specific regular expressions runs faster).
+Here we want to make a modification to `tokenize_characters()` such that we only keep keep letters. At first thought there are 2 main options. Use `tokenize_characters()` and remove any non letters, or extract extract the letters one by one. This is a fairly simple goal so we will go with the latter option. This is an *extract* task and we will be using `str_extract_att()` as each string has the possibility of including more then 1 token. Since we want to extract letters we can use the letters character class `[:alpha:]` to match for letters and the quantifier `{1}` to only extract the first one. (In this example leaving out the quantifier yields the same result, however more specific regular expressions runs faster).
 
 ```{r}
 letter_tokens <- str_extract_all("This sentence include 2 numbers and 1 period.", 
@@ -237,62 +237,62 @@ str_extract_all(danish_sentence, "[:alpha:]")
 str_extract_all(danish_sentence, "[a-zA-Z]")
 ```
 
-### Allow for hyponated words
+### Allow for hyphenated words
 
-So far we have had problems with "fir-tree" being split up, we are going to fix this problem in two different ways. First we will be splitting on white spaces this is a decent way of finding workds, similary this doesn't split up hyponated words as the hyphon isn't considered a white-space. Next we will find a regex to match words with hyptons and extract those.
+So far we have had problems with "fir-tree" being split up, we are going to fix this problem in two different ways. First we will be splitting on white spaces this is a decent way of finding words, similarly this doesn't split up hyphenated words as the hyphen isn't considered a white-space. Next we will find a regex to match words with hyphen and extract those.
 
 splitting by white-space is easy since we can use character classes \@ref(tab:characterclasses). We will use the white space character class `[:space:]` to split the sentence over
 
 ```{r}
-str_split("This isn't a sentence with hyphonated-words.", "[:space:]")
+str_split("This isn't a sentence with hyphenated-words.", "[:space:]")
 ```
 
-And we nothing that is is doing pretty well. This version doesn't drop punctuation, but this can be achived by removing punctuation characters in the beginning and ends of words.
+And we nothing that is is doing pretty well. This version doesn't drop punctuation, but this can be achieved by removing punctuation characters in the beginning and ends of words.
 
 ```{r}
-str_split("This isn't a sentence with hyphonated-words.", "[:space:]") %>%
+str_split("This isn't a sentence with hyphenated-words.", "[:space:]") %>%
   map(~ str_remove_all(.x, "^[:punct:]+|[:punct:]+$"))
 ```
 
-This regex is a little complicated so lets split it up a little. `^[:punct:]*` will look at the begining of the string (`^`) to look for punctuation character (`[:punct:]`) where it will select 1 or more (`+`). `[:punct:]+$` will look for punctuation character (`[:punct:]`) that appears 1 or more (`+`) and be in the end of the string (`$`). Lastly this will alternate (`|`) such that we get matches from both sides of the words. The reason we are using the quantifier `+` is because there are cases where a word is followed by multiple characters we dont want, such as `okay...` and `Really?!!!`. We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list, this example only have one element. 
+This regex is a little complicated so lets split it up a little. `^[:punct:]*` will look at the beginning of the string (`^`) to look for punctuation character (`[:punct:]`) where it will select 1 or more (`+`). `[:punct:]+$` will look for punctuation character (`[:punct:]`) that appears 1 or more (`+`) and be in the end of the string (`$`). Lastly this will alternate (`|`) such that we get matches from both sides of the words. The reason we are using the quantifier `+` is because there are cases where a word is followed by multiple characters we don't want, such as `okay...` and `Really?!!!`. We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list, this example only have one element. 
 
 ```{block, type = "rmdnote"}
-If you are in a situation where you want to avoid the dependensies that come with `purrr` you are able to use `lapply()` just as well. 
+If you are in a situation where you want to avoid the dependencies that come with `purrr` you are able to use `lapply()` just as well. 
 `lapply(str_remove_all, pattern = "^[:punct:]+|[:punct:]+$")`
 ```
 
-Now we will see if we can get the same result by extraction. We will start of by constructing a regular expression that will capture the idea of a hyphonated word. Our definition is a word with 1 hyphon located inside. Since we want the hyphon to be inside the word will be need a non-zero number of character on either side of the hyphon. 
+Now we will see if we can get the same result by extraction. We will start of by constructing a regular expression that will capture the idea of a hyphenated word. Our definition is a word with 1 hyphen located inside. Since we want the hyphen to be inside the word will be need a non-zero number of character on either side of the hyphen. 
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphonated-words.", "[:alpha:]+-[:alpha:]+")
+str_extract_all("This isn't a sentence with hyphenated-words.", "[:alpha:]+-[:alpha:]+")
 ```
 
-but wait, this only matched the hyponated word. This is happening because we are only matching words with hyphons, if we add the quantifier `?` then we can match 0 or 1 occurances.
+but wait, this only matched the hyphenated word. This is happening because we are only matching words with hyphens, if we add the quantifier `?` then we can match 0 or 1 occurrences.
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphonated-words.", "[:alpha:]+-?[:alpha:]+")
+str_extract_all("This isn't a sentence with hyphenated-words.", "[:alpha:]+-?[:alpha:]+")
 ```
 
 Now we are getting more words, however the ending of `"ins't"` isn't there anymore and we lost the word `"a"`. We can get matches for the whole contraction by expanding the character class `[:alpha:]` to include the character `'`. This is done with `[[:alpha:]']`.
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphonated-words.", "[[:alpha:]']+-?[[:alpha:]']+")
+str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?[[:alpha:]']+")
 ```
 
-Next we need to find out why `"a"` wasn't matched. If we look at the regular expression, we remember that we imposed the restriction that a non-zero number of characters needed to surround the hyphon place to avoid matching words start or ending with a hyphon, this means that the smallest possible pattern matched is 2 characters long. This can be fixed by using an alternation with `|`, we will keep our previous match on the lefthand side, and include `[:alpha:]{1}` on the righthand side to match the single length words that won't be picked up by the lefthand side. Notice how we arn't using `[[:alpha:]']` since we are not interested in matching single `'`'s.
+Next we need to find out why `"a"` wasn't matched. If we look at the regular expression, we remember that we imposed the restriction that a non-zero number of characters needed to surround the hyphen place to avoid matching words start or ending with a hyphen, this means that the smallest possible pattern matched is 2 characters long. This can be fixed by using an alternation with `|`, we will keep our previous match on the left-hand side, and include `[:alpha:]{1}` on the right-hand side to match the single length words that won't be picked up by the left-hand side. Notice how we aren't using `[[:alpha:]']` since we are not interested in matching single `'`'s.
 
-```{r, eval=FALSE}
-str_extract_all("This isn't a sentence with hyphonated-words.", "[[:alpha:]']+-?[[:alpha:]']+|[:alpha:]{1}")
+```{r}
+str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?[[:alpha:]']+|[:alpha:]{1}")
 ```
 
 And we are getting the same answer as before. 
 
 ### Character ngrams
-
+TODO change to toktok tokenizer
 Next we want to look at all character ngrams, for the purpose of this example a character ngram is defined as a consecutive group of n characters. This will not jump over spaces, but will include overlapping matches. So the 3-grams of `"nice dog"` would be `"nic", "ice", "dog"`. since the regex engine in R normally doesn't support overlapping matches we have to get creative. First We will use a "lookahead" to find the location of all the matches, then we will use those locations to match the ngrams.
 
 ```{r}
-sentence <- c("This isn't a sentence with hyphonated-words.",
+sentence <- c("This isn't a sentence with hyphenated-words.",
               "Same with this one")
 
 ngram_loc <- str_locate_all(sentence, "(?=(\\w{3}))")
@@ -302,9 +302,9 @@ map2(ngram_loc, sentence, ~str_sub(.y, .x[, 1], .x[, 1]+2))
 
 ### Wrapping it into a function
 
-We have shown how one can take some regular expressions to extract the tokens we want. however the code have so far been rather unstructored. We would ideally wrap these tasks into functions that can be used the same way `tokenize_words()` is used.
+We have shown how one can take some regular expressions to extract the tokens we want. however the code have so far been rather unstructured. We would ideally wrap these tasks into functions that can be used the same way `tokenize_words()` is used.
 
-Lets start wirth the example with hyphonated words. To give it a little more spice lets add an option to turn all the words to lowercase.
+Lets start with the example with hyphenated words. To give it a little more spice lets add an option to turn all the words to lowercase.
 
 ```{r}
 tokenize_hyphonated_words <- function(x, lowercase = TRUE) {
@@ -319,7 +319,7 @@ tokenize_hyphonated_words <- function(x, lowercase = TRUE) {
 tokenize_hyphonated_words(the_fir_tree[1:3])
 ```
 
-We just need to make sure that the output is a list. Notice how we turned to lowercase before we did everything else as the remainding on the operations are case insensitive.
+We just need to make sure that the output is a list. Notice how we turned to lowercase before we did everything else as the remaining on the operations are case insensitive.
 
 Next lets turn character ngram into a tokenizer. And we would like to have a variable `n` argument.
 
