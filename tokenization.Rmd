@@ -185,7 +185,7 @@ add_paragraphs <- function(data) {
 }
 ```
 
-Now we take the data and add chapter count by seeing when `CHAPTER` appears on the beginning of a line. Then we next the text colomn, apply our `add_paragraphs()` function and unnest again.
+Now we take the data and add chapter count by seeing when `CHAPTER` appears on the beginning of a line. Then we next the text column, apply our `add_paragraphs()` function and unnest again.
 
 ```{r}
 library(janeaustenr)
@@ -200,13 +200,71 @@ emma_paragraphed <- tibble(text = emma) %>%
 glimpse(emma_paragraphed)
 ```
 
-Now we have `r nrow(emma_paragraphed)` seperate paragraphs we can analyse. It is easy to see how we could go a step further to split by sentences, lines or words.
+Now we have `r nrow(emma_paragraphed)` separate paragraphs we can analyse. It is easy to see how we could go a step further to split by sentences, lines or words.
 
 ### ngrams tokens
 
-TODO find reference for ngrams
+A ngram (also referred to as a n-gram) is a term in linguistics for a contiguous sequence of n items from a given sequence of text or speech. The item can be phonemes, syllables, letters or words depending on the application, however it appears that most people take the default item to be words. In the rest of the book we will use ngram to denote word ngrams unless otherwise stated. We use Latin prefixes, such that a 1-gram is called a unigram, 2-gram is called a bigram, 3-gram called a trigram and so on. Examples of different ngrams are
 
-https://en.wikipedia.org/wiki/N-gram
+- unigram: "Hello", "day", "my", "little"
+- bigram: "White House", "happy dog", "to be", "Robin Hood"
+- trigram: "You and I", "please let go", "no time like", "great strong soldier"
+
+The benefit of using ngrams compared to words is that we get to capture word order which would order wise be lost. Similarly if you use character-ngrams you will be able to model the beginning and ends of words since a space will be located in the end of a ngram for the end of a word and in the beginning of the ngram of the beginning of a word.
+
+To tokenize into ngrams we can use the the function `tokenize_ngrams()`. It has a little more arguments so lets go over them one by one.
+
+```{r}
+tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
+                                   lowercase = TRUE,
+                                   n = 3L,
+                                   n_min = 3L,
+                                   stopwords = character(),
+                                   ngram_delim = " ",
+                                   simplify = FALSE)
+```
+
+We have seen the arguments `lowercase`, `stopwords` and `simplify` before and they work the same as before. Next we have `n`, this is the argument to determine which degree of ngram to return. Setting `n = 1` returns unigrams, `n = 2` bigrams, `n = 3` gives trigrams and so on. Related is the `n_min` argument, which specifies the minimum number of ngrams to include. By default both `n` and `n_min` is set to 3 making `tokenize_ngrams()` return only trigrams, but by setting `n = 3` and `n_min = 1` will we get all unigrams, bigrams and trigrams of a text. Lastly we have the `ngram_delim` argument which specifies the separator between words in the ngrams. Now lets look at the result from the first line of The Fyr Tree
+
+```{r}
+tft_token_ngram[[1]]
+```
+
+Notice how the words in the trigrams overlap such that the word "down" appears in the middle of the first trigram and beginning of the second trigram. 
+
+It is important to choose the right value for `n` when using ngrams. Using unigrams provide more stable number but you loose a lot of information since you don't include the word order, using a higher value for n give more information results, however we are drastically increasing the vector space in which the words take place thus reducing the counts drastically. A sensible starting point in most cases is 3, however if you don't have many words it might be worth to start at 2 instead of 3 and go from there. The following chart showcases the how once you start using trigrams that you get more infrequent tokens. 
+
+```{r}
+lenght_and_max <- function(x) {
+  tab <- table(x)
+  
+  paste(length(tab), max(tab), sep = "-")
+}
+
+if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
+  plotting_data <- hcandersen_en %>%
+    nest(data = c(text)) %>%
+    mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
+    mutate(unigram = tokenize_ngrams(data, n = 1, n_min = 1) %>% map_chr(lenght_and_max),
+           bigram = tokenize_ngrams(data, n = 2, n_min = 2) %>% map_chr(lenght_and_max),
+           trigram = tokenize_ngrams(data, n = 3, n_min = 3) %>% map_chr(lenght_and_max),
+           quadrugram = tokenize_ngrams(data, n = 4, n_min = 4) %>% map_chr(lenght_and_max)) %>%
+    select(unigram, bigram, trigram, quadrugram) %>%
+    pivot_longer(cols = unigram:quadrugram, names_to = "ngrams") %>%
+    separate(value, c("length", "max"), convert = TRUE) %>%
+    mutate(ngrams = factor(ngrams, levels = c("quadrugram", "trigram", "bigram", "unigram"))) 
+  
+  plotting_data  %>%
+    ggplot(aes(length, ngrams, color = max)) +
+    geom_jitter(width = 0, alpha = 0.8, height = 0.35) +
+    scale_color_viridis_c(trans = "log", labels=scales::comma) +
+    labs(x = "Number of unique ngrams", 
+         y = NULL,
+         color = "Count of\nmost frequent\nngram",
+         title = "Using longer ngrams results in higher number of unique tokens \nwith fewer counts",
+         subtitle = "Each point represents a H.C. Andersen Fairy tale")
+}
+```
 
 ## Where does it break down?
 
@@ -262,7 +320,7 @@ letter_tokens <- str_extract_all("This sentence include 2 numbers and 1 period."
 letter_tokens
 ```
 
-You could be tempted to use specify the character class yourself to be something like `[a-zA-Z]{1}`, it would run faster but you would lose non-english characters. This is a design choice you would have to make depending on the goals of your specific problem. 
+You could be tempted to use specify the character class yourself to be something like `[a-zA-Z]{1}`, it would run faster but you would lose non-English characters. This is a design choice you would have to make depending on the goals of your specific problem. 
 
 ```{r}
 danish_sentence <- "Så mødte han en gammel heks på landevejen; hun var så ækel, hendes underlæbe hang hende lige ned på brystet."
@@ -369,6 +427,8 @@ tokenize_character_ngram(the_fir_tree[1:3], n  =3)
 Notice how we can use `paste0()` to construct a regex. 
 
 ## Tokenization benchmark
+
+TODO showcase other libraries for tokenization
 
 ```{r}
 the_fir_tree1 <- c("1", the_fir_tree)
