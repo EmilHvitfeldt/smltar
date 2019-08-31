@@ -32,9 +32,7 @@ Typically will we want to allow tokenization to happen on the word level. Howeve
 strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
 ```
 
-At first sight it looks pretty decent. We are losing all punctuation which may or may not be favorable, and the hero of the story "fir-tree" got split in half. Already it is clear that tokenization is going to be quite complicated. Luckily a lot of work have gone into this process, and we will use what they got. Introducing the **tokenizers** package. This package contains a wealth of fast tokenizers we can use.  
-
-TODO find example that shows a difference between strsplit and tokenize_words
+At first sight it looks pretty decent. We are losing all punctuation which may or may not be favorable, and the hero of the story "fir-tree" got split in half. Already it is clear that tokenization is going to be quite complicated. Luckily a lot of work have gone into this process, and we will use what they got. Introducing the **tokenizers** package. This package contains a wealth of fast tokenizers we can use.
 
 ```{r}
 library(tokenizers)
@@ -113,8 +111,8 @@ tft_token_characters <- tokenize_characters(x = the_fir_tree,
 And if we take a look this is what we get.
 
 ```{r}
-# TODO find better way to print this
-head(tft_token_characters)
+head(tft_token_characters) %>%
+  glimpse()
 ```
 
 However we don't have to stay with the defaults and we can include the punctuation and spaces by setting `strip_non_alphanum = FALSE` and we see that spaces and punctuation are included too now.
@@ -122,14 +120,13 @@ However we don't have to stay with the defaults and we can include the punctuati
 ```{r}
 tokenize_characters(x = the_fir_tree,
                     strip_non_alphanum = FALSE) %>%
-  head()
+  head() %>%
+  glimpse()
 ```
 
 TODO Find examples of when a character is hard to define. Look at Arabic, German (double s) and danish (double a).
 
 ### words tokens
-
-TODO decide if `tokenize_word_stems()` should be introduced in this chapter of the stemming chapter.
 
 The word tokenization is perhaps the most common and widely studied tokenization. As we described earlier it is the procedure of splitting our text into words. To do this we will use the `tokenize_words()` functions.
 
@@ -144,8 +141,8 @@ tft_token_words <- tokenize_words(x = the_fir_tree,
 And if we take a look this is what we get.
 
 ```{r}
-# TODO find better way to print this
-head(tft_token_words)
+head(tft_token_words) %>%
+  glimpse()
 ```
 
 We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` should be fairly self-explanatory. They control whether we remove punctuation and numerics respectively. Lastly we have `stopwords = NULL`, which we will talk more in depth about in chapter \@ref(stopwords).
@@ -162,11 +159,48 @@ hcandersen_en %>%
   slice(1:5)
 ```
 
-We see that the 5 most commonly words in each fairly tale are fairly uninformative (only exception being "tree" in the "The fir tree" which might not be too surprising). These words are called *stop words* and will be handled in chapter \@ref(stop words).
+We see that the 5 most commonly words in each fairly tale are fairly uninformative (only exception being "tree" in the "The fir tree" which might not be too surprising). These words are called *stop words* and will be handled in chapter \@ref(stopwords).
+
+```{block, type='rmdtip'}
+this is a test
+```
+
 
 ### lines, sentences and paragraph tokens
 
 The following tokenizers are rarely used to create tokens for analytic uses, as the tokens produced tend to be fairly unique it is very uncommon for multiple sentences in a text to be identical. However these tokenizers will still provide value for preprocessing and labeling.
+
+For example if we take Jane Austin's novel Emma, It is already preprocessed to have each string being a line of at most 80 characters long. However it might be useful to the data split into chapters and paragraphs instead.
+
+First we create a function, that takes a data.frame containing a variable called `text` and turns it into a data.frame where the the text is transformed to paragraphs. This is done first collapsing the string into one string by using `collapse = "\n"` to denote line breaks, next we use `tokenize_paragraphs()` to get the paragraphs and put them back into a data.frame and add a paragraph count with `row_number()`.
+
+```{r}
+add_paragraphs <- function(data) {
+  pull(data, text) %>% 
+    paste(collapse = "\n") %>%
+    tokenize_paragraphs() %>%
+    unlist() %>%
+    tibble(text = .) %>%
+    mutate(paragraph = row_number())
+}
+```
+
+Now we take the data and add chapter count by seeing when `CHAPTER` appears on the beginning of a line. Then we next the text colomn, apply our `add_paragraphs()` function and unnest again.
+
+```{r}
+library(janeaustenr)
+
+emma_paragraphed <- tibble(text = emma) %>%
+  mutate(chapter = cumsum(str_detect(text, "^CHAPTER "))) %>%
+  filter(chapter > 0, !str_detect(text, "^CHAPTER ")) %>%
+  nest(data = text) %>%
+  mutate(data = map(data, add_paragraphs)) %>% 
+  unnest(cols = c(data))
+
+glimpse(emma_paragraphed)
+```
+
+Now we have `r nrow(emma_paragraphed)` seperate paragraphs we can analyse. It is easy to see how we could go a step further to split by sentences, lines or words.
 
 ### ngrams tokens
 
