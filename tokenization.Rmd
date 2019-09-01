@@ -268,13 +268,23 @@ if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
 
 ## Where does it break down?
 
-TODO What do you lose when you tokenize?
-- double spaces
-- potentially capitalization. Which could collapse patty and Patty together.
+Tokenization will generally be one of first thing you do with the data, therefore it is very important to consider what happens in this first step of data reduction. As with most software we have a trade-off between speed and customizability as you will see in section \@ref(tokenization-benchmark). The fastest tokenization methods will give you little control over how it is done.
 
-TODO compare methods and explain why they are different. 
+While the defaults works well it a lot of cases you will encounter situations where you might want to impose stricter roles to get better tokenized result. Consider the sentence "Don't forget you owe the bank $1 million for the house." which has a couple of interesting parts which we need to decide is worth keeping or fine to ignore. The first part is the contraction in "Don't" where we have a couple of different ways to go. The first and fastest way is to keep it as one word, but it could also be split up into  “do” and “n’t”. By performing the split we will be able to gain insight into both the amount of contractions as "n't" will be different then "not", but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. Next issue at hand is how to deal with "\$1", the dollar sign is highly important part of this sentence as it denotes a mode of currency. Again we have the choice between removing and keeping, furthermore within the choice of keeping we can make the decision between keeping it as one or two tokens "\$1" or "\$" and "1". If we look at the default for `tokenize_words()` we notice that it defaults to removing punctuation which \$ is considered.
 
-TODO Showcase where the different methods have strengths and weaknesses
+```{r}
+tokenize_words("$1")
+```
+
+However we we can keep the dollar sign if we don't strip punctuation.
+
+```{r}
+tokenize_words("$1", strip_punct = FALSE)
+```
+
+Lastly there is the question to keep the period as a sentence ender or not. By removing it we will not be able to locate the last word in a sentence using ngrams.
+
+More things you might lose when you tokenize are things more frequent in online and more casual text. Multiple spaces, extreme usage usage of exclamation characters and deliberately use of capitalization can be completely lost depending on your choice of tokenizer and parameters. But that isn't to say that it is always worth keeping that extra bit of information. If you are studying the trend of epidemics diseases by studying tweets, the style it is written in is not nearly as important as what words are used. However if you are trying to model the social groups it becomes much more important what style of language the different individuals use towards each other.
 
 TODO Do comparing of compression of data with different types of tokenizations
 
