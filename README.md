@@ -1,5 +1,6 @@
 [![Travis-CI Build Status](https://travis-ci.org/EmilHvitfeldt/tidy-nlp-in-R-book.svg?branch=master)](https://travis-ci.org/EmilHvitfeldt/tidy-nlp-in-R-book)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/687baf1d-ae7e-4cdb-82f3-7cf62eceb774/deploy-status)](https://app.netlify.com/sites/text-and-modeling-in-r/deploys)
+
 Work in process of text discussing various text analysis techniques in R.  
 
 The Scope of this book is to be used by a R user who are interested in natural language processing for personal or (small to medium sized) professional use. A focus on visualizing results will in addition be given in this book.
