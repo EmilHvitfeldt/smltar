@@ -1,19 +1,104 @@
-# Stopwords {#stopwords}
+# Stop words {#stopwords}
 
-What are stopwords
+Once we have tokenized our text into words, it might occur to you that not all of these words carry the same amount of information with then, if any information at all. Words that doesn't carry any information with them are called **stop words**. It is common advice to remove stopwords in various NLP tasks, but the task of stop word removal is more nuanced then many resources would like you to think. In this chapter we will go over what a stop word list is and the differences between them and the effects on using them in your preprocessing workflow.
 
-Using premade stopwords.
+The concept of stop words has a long history with Hans Peter Luhn being creditied with coining the term back in 1960 [@Luhn1960]. Examples of these words is "a", "the", "of" and "didn't" since they don't appear to add more to the meaning of the text other then making sure the structure of the sentence is sound. Thinking of words as being either informative or information is quite limiting and we would rather think of words as having a more fluid amount of information assosiated with them, where this information is very context specific as well. Historically one of the main reasons of removing stop words was to improve computational time as it can be seen as a dimentionality reduction of the data, and was commonly done in search engine to give better results (TODO find reference).
 
-Compare stopword lists
+http://snowball.tartarus.org/algorithms/english/stop.txt
 
-All stopword lists are content specific, did you check yours?
+https://en.wikipedia.org/wiki/Stop_words
 
-Creating your own stopwords list.
+## Using premade stop words
+
+A quick solution to getting a list of stop words is to use one that is already created for you. This is quite tempting as it requrices little to no effort. But beware not all lists are created equal. @nothman-etal-2018-stop found in a study of 52 stop words lists available in open-source software packages quite some alarming results. They found expected things like how different stop word lists have a varrying number of words depending on specificity of the list. Amoug some of the more grave issues was the finding of missspellings (fify instead of fifty), inclusion of informative words such as "computer" and "cry" and various inconsistensies such as including the word "has" but not the word "does". Of of this is not to say that you shouldn't use a stop word list that has been included in your software. But you should always inspect and verify the list you are using. Both to make sure it hasn't changed since you used it last, but also to check that it is appropiate for your usecase.
+
+There is a broad selection of stop word lists available in different packages. For the purpose of this chapter will we limit the discussion to the 3 lists provided by the **stopwords** package. The package includes word lists from a range of languages and sources. We will focus on lists of English words which gives us the stopword list bases on SMART System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. Next we will consider the english Snowball stop word list (TODO find reference) and lastly the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stopword lists are all considered to general and thus not domain specific.
+
+Before we start looking at the words inside the lists lets take a look at how many words is included in each
+
+```{r, results='hold'}
+library(stopwords)
+length(stopwords(source = "smart"))
+length(stopwords(source = "snowball"))
+length(stopwords(source = "stopwords-iso"))
+```
+
+we see that the length of these lists are quite varried, with the longest list being over 7 times longer then the shortest. Next lets take a look at the overlap between the words that appear in the 3 lists
+
+```{r}
+library(UpSetR)
+fromList(list(smart = stopwords(source = "smart"),
+              snowball = stopwords(source = "snowball"),
+              iso = stopwords(source = "stopwords-iso"))) %>%
+  upset(empty.intersections = "on")
+```
+
+We see that the 3 lists are almost true subsets of eachother. The only diaviation is 10 words that appear in Snowball and ISO but not in the SMART list. Lets take a look at those words first
+
+```{r}
+setdiff(stopwords(source = "snowball"), stopwords(source = "smart"))
+```
+
+and we see that all the words appear to be contractions. This is not because the SMART lexicon doesn't include contractions because if we look there are almost 50 of them.
+
+```{r}
+str_subset(stopwords(source = "smart"), "'")
+```
+
+And we even find a inconsistency, Why does SMART include "he's" but not "she's"? It is hard to tell, but it should be worth rectifying before applying these stop word lists.
+
+
+
+
+
+Consider the size and breath when picking a list.
+
+showcase how one removes stopwords.
+
+## Creating your own stopwords list
+
+
+automatic generation of stopwords
+inother languages
+https://ieeexplore.ieee.org/abstract/document/4721850
+
+think about imbalance
+
+high frequency terms.
+
+low idf.
+
+## All stopword lists are content specific, did you check yours?
+
+These words are also called **filler words**
+
+## What happens when you remove stopwords
+
+effect of removing stopwords in other languages
+https://www.researchgate.net/profile/Ibrahim_Abu_El-Khair/publication/257984496_Effects_of_Stop_Words_Elimination_for_Arabic_Information_Retrieval_A_Comparative_Study/links/5864a1b908ae329d6203abac/Effects-of-Stop-Words-Elimination-for-Arabic-Information-Retrieval-A-Comparative-Study.pdf
+
+https://www.researchgate.net/profile/Jatinderkumar_Saini/publication/308186288_Stop-Word_Removal_Algorithm_and_its_Implementation_for_Sanskrit_Language/links/57e9460f08ae113df5206b0d.pdf
+
+https://www.researchgate.net/profile/Amal_Alajmi2/publication/306364790_Toward_an_ARABIC_Stop-Words_List_Generation/links/5b5d45b5aca272a2d6727927/Toward-an-ARABIC-Stop-Words-List-Generation.pdf
+https://ieeexplore.ieee.org/abstract/document/6493219
+
+https://www.kaggle.com/c/quora-question-pairs/discussion/31273
+
+https://medium.com/@wilamelima/why-is-removing-stop-words-not-always-a-good-idea-c8d35bd77214
+
+https://nlp.stanford.edu/IR-book/html/htmledition/dropping-common-terms-stop-words-1.html
 
 ## Pros and cons
+
+https://ieeexplore.ieee.org/abstract/document/1223656
+
+http://oro.open.ac.uk/40666/
 
 Do you handle misspellings, 
 
 out of vocabulary words
 
 multi-word words
+
+
+https://www.aclweb.org/anthology/W18-2502/
