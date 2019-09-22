@@ -11,13 +11,65 @@ github-repo: EmilHvitfeldt/tidy-nlp-in-R-book
 description: "This is a book describing various text analysis procedures done in R"
 ---
 
-# Preface
-
-This is a work in progress of various NLP tasks you can do in R. For now it will be very disorganized but will maybe one day turn into something wonderful.
-
 ```{r include=FALSE}
 # automatically create a bib database for R packages
 knitr::write_bib(c(
   .packages(), 'bookdown', 'knitr', 'rmarkdown'
 ), 'packages.bib')
 ```
+
+# Welcome to Predictive Modeling with Text in R {-}
+
+This is the [website](https://text-and-modeling-in-r.netlify.com/) for *Predictive Modeling with Text in R*! Visit the [GitHub repository for this site](https://github.com/EmilHvitfeldt/tidy-nlp-in-R-book).
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/us/88x31.png" /></a><br />This work by [Emil Hvitfeldt](https://www.hvitfeldt.me/) and [Julia Silge](http://juliasilge.com/) is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/us/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 United States License</a>.
+
+
+# Preface {-}
+
+Modeling as a statistical practice can encompass a wide variety of activities. This book focuses on **supervised or predictive modeling for text**, using text data to make predictions about the world around us. The two types of models we train in this book are regression and classification. Think of regression models as predicting numeric, continuous quantities and classification models as predicting discrete quantities or class membership or labels. We use the [tidymodels](https://github.com/tidymodels) framework for modeling, with ...
+
+@Silge17 provides a practical introduction to text mining with R using tidy data principles. If you have already started on the path of gaining insight from your text data, a next step is using that text directly in predictive modeling. Text data contains within it latent information that can be used for insight, understanding, and better decision-making, and predictive modeling with text can bring that information and insight to light. If you have already explored how to analyze text as demonstrated in @Silge17, this book will move one step further to show you how to *learn and make predictions* from that text data with supervised models. If you are unfamiliar with this previous work, this book will still provide a robust introduction to how text can be represented in useful ways for modeling and a diverse set of supervised modeling approaches for text.
+
+ONE MORE PARAGRAPH
+
+## Outline {-}
+
+The book is divided into three sections. We make a (perhaps arbitrary) distinction between *machine learning methods* and *deep learning methods* by defining deep learning as any kind of multi-layer neural network (LSTM, bi-LSTM, CNN) and machine learning as anything else (Bayes, SVM, random forest). We make this distinction because these different methods use separate software packages and modeling infrastructure; from a pragmatic point of view, it is helpful to split up the chapters this way. Some of the topics will overlap between the second and third sections as these are different approaches to the same tasks.
+
+- **Natural language features:** How do we transform text data into a representation useful for modeling? In these chapters, we explore the most common preprocessing steps for text, when they are helpful, and when they are not.
+
+- **Machine learning methods:** We investigate the power of some of the simpler and more light-weight models in our arsenal.
+
+- **Deep learning methods:** Given more time and resources, we see what is possible once we turn to neural networks. 
+
+## Topics this book will not cover {-}
+
+This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. The [CRAN Task View on Natural Language Processing](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
+
+- Text generation
+- Speech processing
+- Machine translation
+- Text-to-speech
+
+## Who is this book for? {-}
+
+This book is designed to provide practical guidance and directly applicable knowledge for data scientists and analysts who want to integrate text into their modeling pipelines. 
+
+We assume that the reader is somewhat familiar with R, machine learning concepts for non-text data, and the [tidyverse](https://www.tidyverse.org/) family of packages. For users who don't have this background, we recommend books such as [*R for Data Science*](http://r4ds.had.co.nz/). We don't assume an extensive background in text analysis, but [*Text Mining with R*](https://www.tidytextmining.com/), by one of the authors (JS) and David Robinson, provides helpful skills in exploratory data analysis for text that will promote successful text modeling.
+
+This book is more advanced than *Text Mining with R* and will help practitioners use their text data in more sophisticated ways.
+
+## Code {-}
+
+All the code used to generate this book, including the examples, is available in our [public GitHub repository](https://github.com/EmilHvitfeldt/tidy-nlp-in-R-book).  
+
+The end of this book contains a software bibliography with descriptions of the software and packages being used; please refer to it for details on all software. Each chapter or section will start by loading the packages used there.
+
+## Acknowledgements {-}
+
+We are so thankful for the contributions, help, and perspectives of people who have supported us in this project. There are several we would like to thank in particular.
+
+We would like to thank David Robinson for his collaboration on the [tidytext](https://github.com/juliasilge/tidytext) package, ...
+
+This book was written in the open, and several people contributed via pull requests or issues. Special thanks goes to those who contributed via GitHub:
