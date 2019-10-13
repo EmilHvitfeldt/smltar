@@ -98,6 +98,34 @@ These words are also called **filler words**
 
 ## What happens when you remove stopwords
 
+```{r}
+plotting_data <- hcandersen_en %>%
+  nest(data = c(text)) %>%
+  mutate(tokens = map(data, ~ unlist(tokenize_words(.x$text))),
+         no_snowball = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "snowball")))),
+         no_smart = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "smart")))),
+         no_iso = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "stopwords-iso")))),
+         n_tokens = lengths(tokens)) %>%
+  pivot_longer(no_snowball:no_iso) %>%
+  mutate(value = 1 - value / n_tokens)
+
+plotting_data %>%
+  mutate(name = factor(name, c("no_snowball", "no_smart",  "no_iso"),
+                       c("snowball (175)", "smart (571)", "stopwords-iso (1298)"))) %>%
+  ggplot(aes(n_tokens, value, color = name)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = 'loess', se = FALSE) +
+  scale_color_brewer(palette = "Set2") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = "Number of words", 
+       y = "Procentage of words removed",
+       color = "Removed",
+       title = "Stop words take up a larger part of the text in longer fairy tales",
+       subtitle = "Each group of horizontal line of points represents a H.C. Andersen Fairy tale")
+
+```
+
+
 effect of removing stopwords in other languages
 https://www.researchgate.net/profile/Ibrahim_Abu_El-Khair/publication/257984496_Effects_of_Stop_Words_Elimination_for_Arabic_Information_Retrieval_A_Comparative_Study/links/5864a1b908ae329d6203abac/Effects-of-Stop-Words-Elimination-for-Arabic-Information-Retrieval-A-Comparative-Study.pdf
 
