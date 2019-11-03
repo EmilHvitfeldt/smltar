@@ -162,7 +162,7 @@ calc_idf <- function(df, word, document) {
 
   n_docs <- length(unique(pull(df, {{document}})))
   
-  n_words <- wood_tokens %>%
+  n_words <- df %>%
     nest(data = c({{word}})) %>%
     pull(data) %>%
     map_dfc(~ words %in% unique(pull(.x, {{word}}))) %>%
