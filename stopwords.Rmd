@@ -233,6 +233,8 @@ plotting_data %>%
 
 We notice predictably that larger stopword lists remove more words then shorter stopword lists. In the examples with fairy tales then over half of the words have been removed, with the big list removing over 80% of the words. An interesting observation is that shorter texts have a lower percentage of stopwords. Since we are looking at fairy tales this could be explained by the fact that a story have to be told regardless of the length of the fairy tale so shorter texts is going to be more dense with informative words.
 
+The stopword lists we examined in this chapter have been English and the notion of "short" and "long" lists we have used here are specific to English as a langauge. You should expect different languges to have a varrying number of "uninfomative" words. Furthermore due to morphological richness of a language; list that contains all possible morphological variants of each stop-word could become quite large.
+
 Another consideration one should take it to make sure that the order in which you perform stemming and stopword removal in happening. Some lists only include words in their unstemmed form, if that is the case then you should remove stopwords before you do stemming so some words don't fall though the gaps. A handy little trick is to use the following function on your stopword list to return the words that doesn't have it's stemmed version in the list. If the function returns a length 0 vector then you can use stem and remove stopwords in any order.
 
 ```{r}
@@ -248,3 +250,9 @@ Here we see that most of the words that lost is the contradictions, since "they"
 Another problem you might have is dealing with misspellings. Most premade stopword lists assume that all the words are spelled correctly. Handling misspelling when using premade lists can be done by manually adding common misspellings. One could imagine creating all words that are a certain edit-distance away from the stopwords, but it would not be recommended as you would quickly would include informative words this way.
 
 One of the downsides of creating your own stopword lists using frequencies is that you are limited to using words that you have already observed. It could happen that "she'd" is included in your training corpus but not "he'd" didn't reach the cutoff. This is a case where you need to look at your words and adjust accordingly. Here the large premade stopword lists can serve as inspiration for missing words.
+
+In an later chapter (TODO add link) will we take a look at the influence of removing stopwords in the context of modeling where we see that  given the right list of words you see no harm to the model performance, and may even see improvement in result due to noise reduction[@Feldman2007].
+
+TODO find langauge where propositions have meaning
+In English the propositions such as “the,” “on,” and “with” are usually stop words. However ...
+
