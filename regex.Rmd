@@ -161,9 +161,9 @@ TODO find a easy way to showcase regex in different locales. (Note from Julia: I
 
 ## Quantifiers
 
-We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:quantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@javascriptinforegexpquantifiers].
+We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@javascriptinforegexpquantifiers].
 
-```{r quantifiers, echo=FALSE}
+```{r greedyquantifiers, echo=FALSE}
 tribble(
   ~Regex, ~Matches,
   "?", "zero or one times",
@@ -173,7 +173,7 @@ tribble(
   "{n,}", "at least n times",
   "{n,m}", "between n and m times"
 ) %>% 
-  knitr::kable()
+  knitr::kable(caption = 'Regular expression quantifiers.')
 ```
 
 We can detect both color and colour by placing a quantifier after the "u" that detects 0 or 1 times used.
@@ -216,7 +216,7 @@ tribble(
   "{n,}?", "at least n times, match as few times as possible",
   "{n,m}?", "between n and m times, match as few times as possible but at least n"
 ) %>% 
-  knitr::kable(caption = 'All quantifiers.')
+  knitr::kable(caption = 'Lazy quantifiers.')
 ```
 
 Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.
