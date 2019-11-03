@@ -2,17 +2,13 @@
 
 Once we have tokenized our text into words, it might occur to you that not all of these words carry the same amount of information with then, if any information at all. Words that doesn't carry any information with them are called **stop words**. It is common advice to remove stopwords in various NLP tasks, but the task of stop word removal is more nuanced then many resources would like you to think. In this chapter we will go over what a stop word list is and the differences between them and the effects on using them in your preprocessing workflow.
 
-The concept of stop words has a long history with Hans Peter Luhn being creditied with coining the term back in 1960 [@Luhn1960]. Examples of these words is "a", "the", "of" and "didn't" since they don't appear to add more to the meaning of the text other then making sure the structure of the sentence is sound. Thinking of words as being either informative or information is quite limiting and we would rather think of words as having a more fluid amount of information assosiated with them, where this information is very context specific as well. Historically one of the main reasons of removing stop words was to improve computational time as it can be seen as a dimentionality reduction of the data, and was commonly done in search engine to give better results (TODO find reference).
-
-http://snowball.tartarus.org/algorithms/english/stop.txt
-
-https://en.wikipedia.org/wiki/Stop_words
+The concept of stop words has a long history with Hans Peter Luhn being credited with coining the term back in 1960 [@Luhn1960]. Examples of these words is "a", "the", "of" and "didn't" since they don't appear to add more to the meaning of the text other then making sure the structure of the sentence is sound. Thinking of words as being either informative or information is quite limiting and we would rather think of words as having a more fluid amount of information associated with them, where this information is very context specific as well. Historically one of the main reasons of removing stop words was to improve computational time as it can be seen as a dimentionality reduction of the data, and was commonly done in search engine to give better results (TODO find reference).
 
 ## Using premade stop words
 
-A quick solution to getting a list of stop words is to use one that is already created for you. This is quite tempting as it requrices little to no effort. But beware not all lists are created equal. @nothman-etal-2018-stop found in a study of 52 stop words lists available in open-source software packages quite some alarming results. They found expected things like how different stop word lists have a varrying number of words depending on specificity of the list. Amoug some of the more grave issues was the finding of missspellings (fify instead of fifty), inclusion of informative words such as "computer" and "cry" and various inconsistensies such as including the word "has" but not the word "does". Of of this is not to say that you shouldn't use a stop word list that has been included in your software. But you should always inspect and verify the list you are using. Both to make sure it hasn't changed since you used it last, but also to check that it is appropiate for your usecase.
+A quick solution to getting a list of stop words is to use one that is already created for you. This is quite tempting as it requires little to no effort. But beware not all lists are created equal. @nothman-etal-2018-stop found in a study of 52 stop words lists available in open-source software packages quite some alarming results. They found expected things like how different stop word lists have a varying number of words depending on specificity of the list. Among some of the more grave issues was the finding of misspellings (fify instead of fifty), inclusion of informative words such as "computer" and "cry" and various inconsistencies such as including the word "has" but not the word "does". Of of this is not to say that you shouldn't use a stop word list that has been included in your software. But you should always inspect and verify the list you are using. Both to make sure it hasn't changed since you used it last, but also to check that it is appropriate for your use case.
 
-There is a broad selection of stop word lists available in different packages. For the purpose of this chapter will we limit the discussion to the 3 lists provided by the **stopwords** package. The package includes word lists from a range of languages and sources. We will focus on lists of English words which gives us the stopword list bases on SMART System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. Next we will consider the english Snowball stop word list (TODO find reference) and lastly the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stopword lists are all considered to general and thus not domain specific.
+There is a broad selection of stop word lists available in different packages. For the purpose of this chapter will we limit the discussion to the 3 lists provided by the **stopwords** package. The package includes word lists from a range of languages and sources. We will focus on lists of English words which gives us the stopword list bases on SMART System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. Next we will consider the English Snowball stop word list (TODO find reference) and lastly the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stopword lists are all considered to general and thus not domain specific.
 
 Before we start looking at the words inside the lists lets take a look at how many words is included in each
 
@@ -23,7 +19,7 @@ length(stopwords(source = "snowball"))
 length(stopwords(source = "stopwords-iso"))
 ```
 
-we see that the length of these lists are quite varried, with the longest list being over 7 times longer then the shortest. Next lets take a look at the overlap between the words that appear in the 3 lists
+we see that the length of these lists are quite varied, with the longest list being over 7 times longer then the shortest. Next lets take a look at the overlap between the words that appear in the 3 lists
 
 ```{r}
 library(UpSetR)
@@ -33,7 +29,7 @@ fromList(list(smart = stopwords(source = "smart"),
   upset(empty.intersections = "on")
 ```
 
-We see that the 3 lists are almost true subsets of eachother. The only diaviation is 10 words that appear in Snowball and ISO but not in the SMART list. Lets take a look at those words first
+We see that the 3 lists are almost true subsets of each other. The only deviation is 10 words that appear in Snowball and ISO but not in the SMART list. Lets take a look at those words first
 
 ```{r}
 setdiff(stopwords(source = "snowball"), stopwords(source = "smart"))
@@ -45,7 +41,7 @@ and we see that all the words appear to be contractions. This is not because the
 str_subset(stopwords(source = "smart"), "'")
 ```
 
-And we even find a inconsistency, Why does SMART include "he's" but not "she's"? It is hard to tell, but it should be worth rectifying before applying these stop word lists. It appears that this stop word list have been computer generated by selecting most frequent words across a large corpus of text. This is again a reminder that one should always look carefully at premade word list to make sure it works with your needs. It is okay to select a premade wordlist and remove or append additional words according to your use-case. 
+And we even find a inconsistency, Why does SMART include "he's" but not "she's"? It is hard to tell, but it should be worth rectifying before applying these stop word lists. It appears that this stop word list have been computer generated by selecting most frequent words across a large corpus of text. This is again a reminder that one should always look carefully at premade word list to make sure it works with your needs. It is okay to select a premade word list and remove or append additional words according to your use-case. 
 
 When you select a stop word list it is important that you consider the size and breath, having a small and concise list of words can moderately reduce your token count while not having too great of an influence on your models, assuming that you picked appropriate words. As the size of your list grows, each word added will have a diminishing effect with the increasing risk that a meaningful word have been placed on the list by mistake. In a later chapter we will have a study where we will analyse the effect of different stop word lists.
 
@@ -77,20 +73,125 @@ tidy_fir_tree %>%
   anti_join(stop_words, by = "word")
 ```
 
-the result of these two stop word removals was different  since we didn't use the same stop word lists.
+the result of these two stop word removals was different since we didn't use the same stop word lists.
 
 ## Creating your own stopwords list
 
+Another way to get a stop word list is to create one yourself. We will be looking at a few different ways to find words to use. We will use the tokenized Fir-Tree as an first example. We take the words and order them by their count. The proposition is that the most frequent words happen appear the most frequently.
 
-automatic generation of stopwords
-inother languages
-https://ieeexplore.ieee.org/abstract/document/4721850
+TODO make sure words don't clip sides.
+```{r}
+tidy_fir_tree %>%
+  count(word, sort = TRUE) %>%
+  slice(1:120) %>%
+  mutate(row = rep(1:5, each = n()/5),
+         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  ggplot(aes(row, column, label = word)) +
+  geom_text() +
+  theme_void()
+```
 
-think about imbalance
+by looking at the first column of words we recognize a lot of what we would consider stop words, with 3 big exceptions. "tree" at 3, "fir" at 12 and "little" at 22. These words appeared high on our list but does provide valuable information as it is referencing the main character. So what went wrong in this approach? Creating a stopword lists using high frequency words works best when it is created on a corpus of documents, not individual documents. This is because the words found in a single documents will be document specific and not generalize that well. The word "tree" does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Lets try extraction high frequency words from the corpus of all English fairy tales by H.C. Andersen.
 
-high frequency terms.
+```{r}
+hcandersen_en %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  slice(1:120) %>%
+  mutate(row = rep(1:5, each = n()/5),
+         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  ggplot(aes(row, column, label = word)) +
+  geom_text() +
+  theme_void()
+```
 
-low idf.
+these words feel more in line with our concept of stop words. Now it is time for us to make some choices. How many we want to include, and which words to add and remove based on prior information. Selection the number of words to remove is best done by a case-by-case basis as it can be hard to determine apriori how many different "meaningless" words that appear in a corpus. Our suggestion would be to start with a low number like 20, and increase by 10 words until you get to words that doesn't feel like stopwords. It is worth keeping in mind that this list is not perfect, and it is based on the corpus of documents we had available, a potential biased one since all the fairy tales where written by the same European white male from the early 1800s. This bias can be minimized by removing words we would expect to be over represented, or to add words we expect to be under represented. Easy examples is to include the compliments to the words in the lists if they are not present. Include "big" if "small" is present, "old" if "young" is present. this example have female words often listed after male words. With "man" being 79, but "woman" is `r hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()` having a cutoff at 100 would lead to only one of these words be included. Depending on how important you think pronouns are going to be in your texts to you either add "woman" or delete "man".
+
+The following chart shows how the male gendered words have lower rank then the female rank, showing that by simply using a cutoff you would be likely to only include the male form of the word.
+
+```{r}
+gender_words <- tribble(
+  ~male, ~female,
+  "he", "she",
+  "his", "her",
+  "man", "woman",
+  "men", "women",
+  "boy", "girl",
+  "he's", "she's",
+  "he'd", "she'd",
+  "he'll", "she'll",
+  "himself", "herself"
+)
+
+ordered_words <- hcandersen_en %>% 
+  unnest_tokens(word, text) %>% 
+  count(word, sort = TRUE) %>% 
+  pull(word)
+
+gender_words_plot <- gender_words %>%
+  mutate(male_index = match(male, ordered_words),
+         female_index = match(female, ordered_words)) %>%
+  mutate(slope = log10(male_index) - log10(female_index)) %>%
+  pivot_longer(male_index:female_index) %>%
+  mutate(value = log10(value),
+         label = ifelse(name == "male_index", male, female)) %>%
+  mutate(name = factor(name, c("male_index", "female_index"), c("male", "female")))
+
+limit <- max(abs(gender_words_plot$slope)) * c(-1, 1)
+
+gender_words_plot %>%
+  ggplot(aes(name, value, group = female)) +
+  geom_line(aes(color = slope), size = 1) +
+  scale_y_reverse(labels = function(x) 10 ^ x) +
+  geom_text(aes(label = label)) +
+  scale_color_distiller(type = "div", limit = limit) +
+  guides(color = "none") +
+  labs(x = NULL, y = "rank")
+```
+
+Imagine now we would like to create a stopword list that spans multiple different genres, in such a way that the subject specific stop words don't overlap. For this case we would like words to be denoted as a stopword only if it is a stopword in all the genres. You could find the words individually in each genre and using the right intersections. However that approach might take a substantial amount of time.
+
+Below is a bad example where we try to create a multi-language list of stopwords. To accomplish this will we calculate the inverse document frequency (IDF) of each word, and create the stopword-list based on the words with the lowest IDF. The following function takes a tokenized data.frame and returns a data.frame with a column for each word and a column of the IDF.
+
+```{r}
+library(rlang)
+calc_idf <- function(df, word, document) {
+  words <- df %>% pull({{word}}) %>% unique()
+
+  n_docs <- length(unique(pull(df, {{document}})))
+  
+  n_words <- wood_tokens %>%
+    nest(data = c({{word}})) %>%
+    pull(data) %>%
+    map_dfc(~ words %in% unique(pull(.x, {{word}}))) %>%
+    rowSums()
+  
+  tibble(word = words,
+         idf = log(n_docs / n_words))
+}
+```
+
+And the following is the result where we try to create a cross-language list of stopwords, by taking each fairy tale as a document. And it is not very good. Since the overlap between what words appear in each language is very small. And that is what we mostly see in this list.
+
+```{r}
+hcandersenr::hca_fairytales() %>%
+  unnest_tokens(word, text) %>%
+  mutate(document = paste(language, book)) %>%
+  select(word, document) %>%
+  calc_idf(word, document) %>%
+  arrange(idf) %>%
+  slice(1:120) %>%
+  mutate(row = rep(1:5, each = n()/5),
+         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  ggplot(aes(row, column, label = word)) +
+  geom_text() +
+  theme_void()
+```
+
+TODO do same example with English only.
 
 ## All stopword lists are content specific, did you check yours?
 
@@ -99,6 +200,8 @@ Since all work related to text is going to be context specific, it is important 
 On the other hand you will have to fill in some of the words yourself depending on the domain. If you are working with texts for desert recipes, certain ingredients (sugar, eggs, water) and actions (whisking, baking, stirring) will have a chance of becoming frequent enough to pass your stop word threshold, but be important enough to keep as they have high signal. Throwing away "eggs" as a common word would make it harder or downright impossible to determine if  certain  recipes are vegan or not,  while whisking and stirring will properly be fine to remove as differentiating between recipes that do and don't require a whisk might not be that big of a deal.
 
 ## What happens when you remove stopwords
+
+We talked about different ways of detecting and removing stopwords now lets see what happens once you remove them. First thing we are going to look at is the the number of words that are included in the list. The following chart shows what percentage of words have been removed as a function of number of words in a text. The different colors represents the 3 different stopword lists we have considered in this chapter.
 
 ```{r}
 plotting_data <- hcandersen_en %>%
@@ -113,46 +216,35 @@ plotting_data <- hcandersen_en %>%
 
 plotting_data %>%
   mutate(name = factor(name, c("no_snowball", "no_smart",  "no_iso"),
-                       c("snowball (175)", "smart (571)", "stopwords-iso (1298)"))) %>%
+                       c("snowball (175)", "smart (571)", "stopwords-iso (1298)")),
+         name = fct_rev(name)) %>%
   ggplot(aes(n_tokens, value, color = name)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = 'loess', se = FALSE) +
   scale_color_brewer(palette = "Set2") +
   scale_y_continuous(labels = scales::percent) +
   labs(x = "Number of words", 
-       y = "Procentage of words removed",
+       y = "Percentage of words removed",
        color = "Removed",
        title = "Stop words take up a larger part of the text in longer fairy tales",
        subtitle = "Each group of horizontal line of points represents a H.C. Andersen Fairy tale")
 
 ```
 
+We notice predictably that larger stopword lists remove more words then shorter stopword lists. In the examples with fairy tales then over half of the words have been removed, with the big list removing over 80% of the words. An interesting observation is that shorter texts have a lower percentage of stopwords. Since we are looking at fairy tales this could be explained by the fact that a story have to be told regardless of the length of the fairy tale so shorter texts is going to be more dense with informative words.
 
-effect of removing stopwords in other languages
-https://www.researchgate.net/profile/Ibrahim_Abu_El-Khair/publication/257984496_Effects_of_Stop_Words_Elimination_for_Arabic_Information_Retrieval_A_Comparative_Study/links/5864a1b908ae329d6203abac/Effects-of-Stop-Words-Elimination-for-Arabic-Information-Retrieval-A-Comparative-Study.pdf
+Another consideration one should take it to make sure that the order in which you perform stemming and stopword removal in happening. Some lists only include words in their unstemmed form, if that is the case then you should remove stopwords before you do stemming so some words don't fall though the gaps. A handy little trick is to use the following function on your stopword list to return the words that doesn't have it's stemmed version in the list. If the function returns a length 0 vector then you can use stem and remove stopwords in any order.
 
-https://www.researchgate.net/profile/Jatinderkumar_Saini/publication/308186288_Stop-Word_Removal_Algorithm_and_its_Implementation_for_Sanskrit_Language/links/57e9460f08ae113df5206b0d.pdf
+```{r}
+not_stemmed_in <- function(x) {
+  x[!SnowballC::wordStem(x) %in% x]
+}
 
-https://www.researchgate.net/profile/Amal_Alajmi2/publication/306364790_Toward_an_ARABIC_Stop-Words_List_Generation/links/5b5d45b5aca272a2d6727927/Toward-an-ARABIC-Stop-Words-List-Generation.pdf
-https://ieeexplore.ieee.org/abstract/document/6493219
+not_stemmed_in(stopwords(source = "snowball"))
+```
 
-https://www.kaggle.com/c/quora-question-pairs/discussion/31273
+Here we see that most of the words that lost is the contradictions, since "they" is included in the list but "they'" isn't.
 
-https://medium.com/@wilamelima/why-is-removing-stop-words-not-always-a-good-idea-c8d35bd77214
+Another problem you might have is dealing with misspellings. Most premade stopword lists assume that all the words are spelled correctly. Handling misspelling when using premade lists can be done by manually adding common misspellings. One could imagine creating all words that are a certain edit-distance away from the stopwords, but it would not be recommended as you would quickly would include informative words this way.
 
-https://nlp.stanford.edu/IR-book/html/htmledition/dropping-common-terms-stop-words-1.html
-
-## Pros and cons
-
-https://ieeexplore.ieee.org/abstract/document/1223656
-
-http://oro.open.ac.uk/40666/
-
-Do you handle misspellings, 
-
-out of vocabulary words
-
-multi-word words
-
-
-https://www.aclweb.org/anthology/W18-2502/
+One of the downsides of creating your own stopword lists using frequencies is that you are limited to using words that you have already observed. It could happen that "she'd" is included in your training corpus but not "he'd" didn't reach the cutoff. This is a case where you need to look at your words and adjust accordingly. Here the large premade stopword lists can serve as inspiration for missing words.
