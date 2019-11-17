@@ -4,7 +4,7 @@ In this chapter we will focus on the concepts of *tokens*, *n-grams*, *tokenizat
 
 ## What is a token?
 
-In R, text is generally represented as a character vector, similar to strings in other languages. If we look at the first paragraph of *The Fir Tree*, we find the text of the story is in multiple character vectors, which themselves are a series of letters, spaces, and punctuation.
+In R, text is typically represented as a character vector, similar to strings in other languages. If we look at the first paragraph of *The Fir Tree*, we find the text of the story is in multiple character vectors, which themselves are a series of letters, spaces, and punctuation.
 
 ```{r}
 library(tokenizers)
@@ -19,13 +19,13 @@ the_fir_tree <- hcandersen_en %>%
 head(the_fir_tree, 9)
 ```
 
-These vectors don't contain any information regarding what are words and what aren't. This is where the process of tokenization comes in.
+These vectors don't contain any metadata or information to tell us which characters are words and which aren't. This is where the process of tokenization comes in.
 
-In tokenization, we take an input (a string) and a type (a meaningful unit of text, such as a word) and split the input in to pieces (tokens) that correspond the type. [@Manning:2008:IIR:1394399]
+In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input in to pieces (tokens) that correspond to the type. [@Manning:2008:IIR:1394399]
 
 ![](images/tokenization/tokenization.jpg) TODO
 
-Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.
+Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.
 
 As an exercise in understanding tokenization, let's start by defining a word as being any selection of alphanumeric (letter and numbers) symbols. Lets start by using some regex with `strsplit` to split the first 2 lines of The Fir Tree by anything non alphanumeric.
 
