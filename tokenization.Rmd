@@ -4,7 +4,7 @@ In this chapter we will focus on the concepts of *tokens*, *n-grams*, *tokenizat
 
 ## What is a token?
 
-In R, text is typically represented with the **character** data type, similar to strings in other languages. If we look at the first paragraph of *The Fir Tree*, we find the text of the story is in a character vector, a series of letters, spaces, and punctuation organized as a vector.
+In R, text is typically represented with the **character** data type, similar to strings in other languages. If we look at the first paragraph of "The Fir Tree", we find the text of the story is in a character vector, a series of letters, spaces, and punctuation organized as a vector.
 
 ```{r}
 library(tokenizers)
@@ -27,7 +27,7 @@ In tokenization, we take an input (a string) and a token type (a meaningful unit
 
 Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.
 
-To understand the process of tokenization, let's start by defining a word as any selection of alphanumeric (letters and numbers) symbols. Let's use some regex (Appendix \@ref(regex)) with `strsplit` to split the first two lines of *The Fir Tree* by any characters that are not alphanumeric.
+To understand the process of tokenization, let's start by defining a word as any selection of alphanumeric (letters and numbers) symbols. Let's use some regex (Appendix \@ref(regex)) with `strsplit()` to split the first two lines of "The Fir Tree" by any characters that are not alphanumeric.
 
 ```{r}
 strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
@@ -40,7 +40,7 @@ library(tokenizers)
 tokenize_words(the_fir_tree[1:2])
 ```
 
-We see sensible single-word results here; the `tokenize_words` function uses the **stringi** package [@Gagolewski19] under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does the word boundary algorithm [@ICUWordBoundary] work?
+We see sensible single-word results here; the `tokenize_words()` function uses the **stringi** package [@Gagolewski19] under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does the word boundary algorithm [@ICUWordBoundary] work?
 
 - Break at the start and end of text, unless the text is empty.
 - Do not break within CRLF (new line characters).
@@ -78,31 +78,30 @@ sample_vector <- c("This is the first of two strings",
 sample_tibble <- tibble(text = sample_vector)
 ```
 
-The tokenization achieved by using `tokenize_words` on `sample_vector`:
+The tokenization achieved by using `tokenize_words()` on `sample_vector`:
 
 ```{r}
 tokenize_words(sample_vector)
 ```
 
-will yield the same results as using `unnest_tokens` on `sample_tibble`; the only difference is the data structure, and thus how you might use the result moving forward in your analysis.
+will yield the same results as using `unnest_tokens()` on `sample_tibble`; the only difference is the data structure, and thus how you might use the result moving forward in your analysis.
 
 ```{r}
 sample_tibble %>%
   unnest_tokens(word, text, token = "words")
 ```
 
-Arguments used in `tokenize_words` can be passed through `unnest_tokens` using the `...`.
+Arguments used in `tokenize_words()` can be passed through `unnest_tokens()` using the ["the dots"](https://adv-r.hadley.nz/functions.html#fun-dot-dot-dot), `...`.
 
 ```{r}
 sample_tibble %>%
   unnest_tokens(word, text, token = "words", strip_punct = FALSE)
 ```
 
-GOT HERE
 
-### character tokens
+### Character tokens
 
-The first and simplest tokenization is the character tokenization. This simply splits the texts into characters. Here we run `tokenize_characters` with default starting parameters. Notice how it have arguments to convert everything to lowercase and to strip all non alpha numeric characters. These are both done to reduce the number of different tokens we are returned. The `tokenize_*()` functions will by default return a list of character vectors, one character vector for each string in the input.
+Perhaps the simplest tokenization is character tokenization, which splits texts into characters. Let's use `tokenize_characters()` with its default parameters; this function has arguments to convert to lowercase and to strip all non-alphanumeric characters. These defaults will reduce the number of different tokens that are returned. The `tokenize_*()` functions by default return a list of character vectors, one character vector for each string in the input.
 
 ```{r}
 tft_token_characters <- tokenize_characters(x = the_fir_tree,
@@ -111,14 +110,14 @@ tft_token_characters <- tokenize_characters(x = the_fir_tree,
                                             simplify = FALSE)
 ```
 
-And if we take a look this is what we get.
+What do we see if we take a look?
 
 ```{r}
 head(tft_token_characters) %>%
   glimpse()
 ```
 
-However we don't have to stay with the defaults and we can include the punctuation and spaces by setting `strip_non_alphanum = FALSE` and we see that spaces and punctuation are included too now.
+We don't have to stick with the defaults. We can keep the punctuation and spaces by setting `strip_non_alphanum = FALSE` and now we see that spaces and punctuation are included in the results too.
 
 ```{r}
 tokenize_characters(x = the_fir_tree,
@@ -129,9 +128,9 @@ tokenize_characters(x = the_fir_tree,
 
 TODO Find examples of when a character is hard to define. Look at Arabic, German (double s) and danish (double a).
 
-### words tokens
+### Word tokens
 
-The word tokenization is perhaps the most common and widely studied tokenization. As we described earlier it is the procedure of splitting our text into words. To do this we will use the `tokenize_words()` functions.
+Tokenizing at the word level is perhaps the most common and widely used tokenization. As we described earlier, this is the procedure of splitting text into words. To do this, let's use the `tokenize_words()` function.
 
 ```{r}
 tft_token_words <- tokenize_words(x = the_fir_tree,
@@ -141,16 +140,16 @@ tft_token_words <- tokenize_words(x = the_fir_tree,
                                   strip_numeric = FALSE)
 ```
 
-And if we take a look this is what we get.
+The results show us the input text split into individual words.
 
 ```{r}
 head(tft_token_words) %>%
   glimpse()
 ```
 
-We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` should be fairly self-explanatory. They control whether we remove punctuation and numerics respectively. Lastly we have `stopwords = NULL`, which we will talk more in depth about in chapter \@ref(stopwords).
+We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` control whether we remove punctuation and numeric characters respectively. We also have `stopwords = NULL`, which we will talk about in more depth in Chapter \@ref(stopwords).
 
-If we create a tibble with the two fairly tales "The fir tree" and "The little mermaid". Then we can use use `unnest_tokens` together with some **dplyr** verbs to find the must commonly used words in each.
+Let's create a tibble with two fairy tales, "The Fir Tree" and "The Little Mermaid". Then we can use use `unnest_tokens()` together with some **dplyr** verbs to find the must commonly used words in each.
 
 ```{r}
 hcandersen_en %>%
@@ -162,20 +161,20 @@ hcandersen_en %>%
   slice(1:5)
 ```
 
-We see that the 5 most commonly words in each fairly tale are fairly uninformative (only exception being "tree" in the "The fir tree" which might not be too surprising). These words are called *stop words* and will be handled in chapter \@ref(stopwords).
+The five most common words in each fairy tale are fairly uninformative, with the exception being "tree" in the "The Fir Tree". 
 
 ```{block, type='rmdtip'}
-this is a test
+These uninformative words are called **stop words** and will be explored in depth in Chapter \@ref(stopwords).
 ```
 
 
-### lines, sentences and paragraph tokens
+### Lines, sentence, and paragraph tokens
 
-The following tokenizers are rarely used to create tokens for analytic uses, as the tokens produced tend to be fairly unique it is very uncommon for multiple sentences in a text to be identical. However these tokenizers will still provide value for preprocessing and labeling.
+Tokenizers to split text into larger units of text like lines, sentences, and paragraphs are rarely used directly for modeling purposes, as the tokens produced tend to be fairly unique. It is very uncommon for multiple sentences in a text to be identical! However, these tokenizers are useful for preprocessing and labeling.
 
-For example if we take Jane Austin's novel Emma, It is already preprocessed to have each string being a line of at most 80 characters long. However it might be useful to the data split into chapters and paragraphs instead.
+For example, Jane Austen's novel *Emma* (as available in the **janeaustenr** package) is already preprocessed with each line being at most 80 characters long. However, it might be useful to split the data into chapters and paragraphs instead.
 
-First we create a function, that takes a data.frame containing a variable called `text` and turns it into a data.frame where the the text is transformed to paragraphs. This is done first collapsing the string into one string by using `collapse = "\n"` to denote line breaks, next we use `tokenize_paragraphs()` to get the paragraphs and put them back into a data.frame and add a paragraph count with `row_number()`.
+Let's create a function that takes a dataframe containing a variable called `text` and turns it into a dataframe where the the text is transformed to paragraphs. First, we can collapse the text into one long string using `collapse = "\n"` to denote line breaks, and then next we can use `tokenize_paragraphs()` to identify the paragraphs and put them back into a dataframe. We can add a paragraph count with `row_number()`.
 
 ```{r}
 add_paragraphs <- function(data) {
@@ -188,7 +187,7 @@ add_paragraphs <- function(data) {
 }
 ```
 
-Now we take the data and add chapter count by seeing when `CHAPTER` appears on the beginning of a line. Then we next the text column, apply our `add_paragraphs()` function and unnest again.
+Now we take the raw text data and add the chapter count by detecting when the characters `"CHAPTER"` appear at the beginning of a line. Then we `nest()` the text column, apply our `add_paragraphs()` function, and then `unnest()` again.
 
 ```{r}
 library(janeaustenr)
@@ -203,19 +202,25 @@ emma_paragraphed <- tibble(text = emma) %>%
 glimpse(emma_paragraphed)
 ```
 
-Now we have `r nrow(emma_paragraphed)` separate paragraphs we can analyse. It is easy to see how we could go a step further to split by sentences, lines or words.
+Now we have `r nrow(emma_paragraphed)` separate paragraphs we can analyse. Similarly, we could go a step further to split these chapters into sentences, lines, or words.
 
-### ngrams tokens
+### Tokenizing by n-grams
 
-A ngram (also referred to as a n-gram) is a term in linguistics for a contiguous sequence of n items from a given sequence of text or speech. The item can be phonemes, syllables, letters or words depending on the application, however it appears that most people take the default item to be words. In the rest of the book we will use ngram to denote word ngrams unless otherwise stated. We use Latin prefixes, such that a 1-gram is called a unigram, 2-gram is called a bigram, 3-gram called a trigram and so on. Examples of different ngrams are
+An n-gram (sometimes written "ngram") is a term in linguistics for a contiguous sequence of $n$ items from a given sequence of text or speech. The item can be phonemes, syllables, letters, or words depending on the application. When most people talk about n-grams, they mean a group of $n$ words. In this book, we will use n-gram to denote word n-grams unless otherwise stated. We use Latin prefixes, such that a 1-gram is called a unigram, 2-gram is called a bigram, 3-gram called a trigram and so on. 
 
-- unigram: "Hello", "day", "my", "little"
-- bigram: "White House", "happy dog", "to be", "Robin Hood"
-- trigram: "You and I", "please let go", "no time like", "great strong soldier"
+```{block, type = "rmdnote"}
+We use Latin prefixes, so that a 1-gram is called a unigram, a 2-gram is called a bigram, a 3-gram called a trigram, and so on. 
+```
 
-The benefit of using ngrams compared to words is that we get to capture word order which would order wise be lost. Similarly if you use character-ngrams you will be able to model the beginning and ends of words since a space will be located in the end of a ngram for the end of a word and in the beginning of the ngram of the beginning of a word.
+Some example n-grams are:
 
-To tokenize into ngrams we can use the the function `tokenize_ngrams()`. It has a little more arguments so lets go over them one by one.
+- **unigram:** "Hello", "day", "my", "little"
+- **bigram:** "White House", "happy dog", "to be", "Robin Hood"
+- **trigram:** "You and I", "please let go", "no time like", "great strong soldier"
+
+The benefit of using n-grams compared to words is that we can capture word order which would otherwise be lost. Similarly, when we use character n-grams, we can model the beginning and end of words because a space will be located at the end of a n-gram for the end of a word and at the beginning of the n-gram of the beginning of a word.
+
+To split text into word n-grams, we can use the the function `tokenize_ngrams()`. It has a few more arguments, so let's go over them one by one.
 
 ```{r}
 tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
@@ -227,7 +232,9 @@ tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
                                    simplify = FALSE)
 ```
 
-We have seen the arguments `lowercase`, `stopwords` and `simplify` before and they work the same as before. Next we have `n`, this is the argument to determine which degree of ngram to return. Setting `n = 1` returns unigrams, `n = 2` bigrams, `n = 3` gives trigrams and so on. Related is the `n_min` argument, which specifies the minimum number of ngrams to include. By default both `n` and `n_min` is set to 3 making `tokenize_ngrams()` return only trigrams, but by setting `n = 3` and `n_min = 1` will we get all unigrams, bigrams and trigrams of a text. Lastly we have the `ngram_delim` argument which specifies the separator between words in the ngrams. Now lets look at the result from the first line of The Fyr Tree
+We have seen the arguments `lowercase`, `stopwords`, and `simplify` before; they work the same as before. We also have `n`, the argument to determine which degree of n-gram to return. Using `n = 1` returns unigrams, `n = 2` bigrams, `n = 3` gives trigrams, and so on. Related to `n` is the `n_min` argument, which specifies the minimum number of n-grams to include. By default both `n` and `n_min` are set to 3 making `tokenize_ngrams()` return only trigrams, but by setting `n = 3` and `n_min = 1` will we get all unigrams, bigrams and trigrams of a text. Lastly we have the `ngram_delim`, argument which specifies the separator between words in the n-grams. 
+
+Let's look at the result of n-gram tokenization for the first line of "The Fir Tree".
 
 ```{r}
 tft_token_ngram[[1]]
@@ -235,9 +242,9 @@ tft_token_ngram[[1]]
 
 Notice how the words in the trigrams overlap such that the word "down" appears in the middle of the first trigram and beginning of the second trigram. 
 
-It is important to choose the right value for `n` when using ngrams. Using unigrams provide more stable number but you loose a lot of information since you don't include the word order, using a higher value for n give more information results, however we are drastically increasing the vector space in which the words take place thus reducing the counts drastically. A sensible starting point in most cases is 3, however if you don't have many words it might be worth to start at 2 instead of 3 and go from there. The following chart showcases the how once you start using trigrams that you get more infrequent tokens. 
+It is important to choose the right value for `n` when using n-grams for the question you want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your dataset, consider starting at two instead three and going from there. Figure \@ref(fig:ngramtokens) showcases token frequency starts to decrease dramatically for trigrams and higher order n-grams. 
 
-```{r}
+```{r ngramtokens, fig.width=10, fig.height=8, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts"}
 lenght_and_max <- function(x) {
   tab <- table(x)
   
@@ -261,19 +268,27 @@ if (packageDescription("tidyr")$Version >= "0.8.3.9000") {
     ggplot(aes(length, ngrams, color = max)) +
     geom_jitter(width = 0, alpha = 0.8, height = 0.35) +
     scale_color_viridis_c(trans = "log", labels=scales::comma) +
-    labs(x = "Number of unique ngrams", 
+    labs(x = "Number of unique n-grams", 
          y = NULL,
          color = "Count of\nmost frequent\nngram",
-         title = "Using longer ngrams results in higher number of unique tokens \nwith fewer counts",
+         title = "Unique n-grams by n-gram order",
          subtitle = "Each point represents a H.C. Andersen Fairy tale")
 }
 ```
 
-## Where does it break down?
+## Where does tokenization break down?
 
-Tokenization will generally be one of first thing you do with the data, therefore it is very important to consider what happens in this first step of data reduction. As with most software we have a trade-off between speed and customizability as you will see in section \@ref(tokenization-benchmark). The fastest tokenization methods will give you little control over how it is done.
+Tokenization will generally be one of first thing you do with the data, so it is very important to consider carefully what happens in this first step of data preprocessing. As with most software there is a trade-off between speed and customizability, as demonstrated in section \@ref(tokenization-benchmark). The fastest tokenization methods will give you little control over how it is done.
 
-While the defaults works well it a lot of cases you will encounter situations where you might want to impose stricter roles to get better tokenized result. Consider the sentence "Don't forget you owe the bank $1 million for the house." which has a couple of interesting parts which we need to decide is worth keeping or fine to ignore. The first part is the contraction in "Don't" where we have a couple of different ways to go. The first and fastest way is to keep it as one word, but it could also be split up into  “do” and “n’t”. By performing the split we will be able to gain insight into both the amount of contractions as "n't" will be different then "not", but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. Next issue at hand is how to deal with "\$1", the dollar sign is highly important part of this sentence as it denotes a mode of currency. Again we have the choice between removing and keeping, furthermore within the choice of keeping we can make the decision between keeping it as one or two tokens "\$1" or "\$" and "1". If we look at the default for `tokenize_words()` we notice that it defaults to removing punctuation which \$ is considered.
+GOT HERE
+
+While the defaults works well it a lot of cases you will encounter situations where you might want to impose stricter rules to get better tokenized result. Consider the following sentence.
+
+> "Don't forget you owe the bank $1 million for the house." 
+
+This sentence has several interesting parts which we need to decide whether to keep or to ignore. The first issue is the contraction in "Don't" where we have a couple of different options. The fastest choice is to keep this as one word, but it could also be split up into "do" and "n't". By performing such a split, we could gain insight into both the amount of contractions such as "n't" will be different then "not", but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. 
+
+The next issue at hand is how to deal with "\$1", the dollar sign is highly important part of this sentence as it denotes a mode of currency. Again we have the choice between removing and keeping, furthermore within the choice of keeping we can make the decision between keeping it as one or two tokens "\$1" or "\$" and "1". If we look at the default for `tokenize_words()` we notice that it defaults to removing punctuation including \$.
 
 ```{r}
 tokenize_words("$1")
@@ -285,7 +300,7 @@ However we we can keep the dollar sign if we don't strip punctuation.
 tokenize_words("$1", strip_punct = FALSE)
 ```
 
-Lastly there is the question to keep the period as a sentence ender or not. By removing it we will not be able to locate the last word in a sentence using ngrams.
+Lastly there is the question to keep the period as a sentence ender or not. By removing it we will not be able to locate the last word in a sentence using n-grams.
 
 More things you might lose when you tokenize are things more frequent in online and more casual text. Multiple spaces, extreme usage usage of exclamation characters and deliberately use of capitalization can be completely lost depending on your choice of tokenizer and parameters. But that isn't to say that it is always worth keeping that extra bit of information. If you are studying the trend of epidemics diseases by studying tweets, the style it is written in is not nearly as important as what words are used. However if you are trying to model the social groups it becomes much more important what style of language the different individuals use towards each other.
 
@@ -392,9 +407,9 @@ str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?
 
 And we are getting the same answer as before. 
 
-### Character ngrams
+### Character n-grams
 TODO change to toktok tokenizer
-Next we want to look at all character ngrams, for the purpose of this example a character ngram is defined as a consecutive group of n characters. This will not jump over spaces, but will include overlapping matches. So the 3-grams of `"nice dog"` would be `"nic", "ice", "dog"`. since the regex engine in R normally doesn't support overlapping matches we have to get creative. First We will use a "lookahead" to find the location of all the matches, then we will use those locations to match the ngrams.
+Next we want to look at all character n-grams, for the purpose of this example a character n-gram is defined as a consecutive group of n characters. This will not jump over spaces, but will include overlapping matches. So the 3-grams of `"nice dog"` would be `"nic", "ice", "dog"`. since the regex engine in R normally doesn't support overlapping matches we have to get creative. First We will use a "lookahead" to find the location of all the matches, then we will use those locations to match the n-grams.
 
 ```{r}
 sentence <- c("This isn't a sentence with hyphenated-words.",
@@ -426,7 +441,7 @@ tokenize_hyphonated_words(the_fir_tree[1:3])
 
 We just need to make sure that the output is a list. Notice how we turned to lowercase before we did everything else as the remaining on the operations are case insensitive.
 
-Next lets turn character ngram into a tokenizer. And we would like to have a variable `n` argument.
+Next lets turn character n-gram into a tokenizer. And we would like to have a variable `n` argument.
 
 ```{r}
 tokenize_character_ngram <- function(x, n) {
