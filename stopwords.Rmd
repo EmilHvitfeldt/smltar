@@ -193,6 +193,9 @@ hcandersenr::hca_fairytales() %>%
 
 TODO do same example with English only.
 
+do MP, VP and  SAT 
+https://pdfs.semanticscholar.org/c543/8e216071f6180c228cc557fb1d3c77edb3a3.pdf
+
 ## All stopword lists are content specific, did you check yours?
 
 Since all work related to text is going to be context specific, it is important to make sure that the stop word list you use reflect the word space that you are planning on using it on. One common consideration is if pronouns is something that brings information to your text. This is a common thing people need to think about since they are contained in a lot of different stop word lists (inconsistently) and they will a lot of times not be noise in your data.
@@ -253,6 +256,21 @@ One of the downsides of creating your own stopword lists using frequencies is th
 
 In an later chapter (TODO add link) will we take a look at the influence of removing stopwords in the context of modeling where we see that  given the right list of words you see no harm to the model performance, and may even see improvement in result due to noise reduction[@Feldman2007].
 
-TODO find langauge where propositions have meaning
-In English the propositions such as “the,” “on,” and “with” are usually stop words. However ...
+## Stopwords in non-English languages
 
+So far in this chapter, we have been spent the majority of the time on the English language, however, English is not representative of every language. It is therefore important that you have an understanding of the language you are working with.
+
+Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below is a couple of diagrams showing the use of definite and indefinite articles in German, Notice how German nouns have 3 genders (Masculine, Feminine and neuter) which are not uncommon to have. Articles are almost always used as stopwords in English as very little information. However, German articles give some indication of the case which would need to be a consideration for you when selecting your list of stop words in German or any other language where the grammatical case is reflected in the text.
+
+TODO rewrite these as R graphics.
+![](https://www.iwillteachyoualanguage.com/wp-content/uploads/2018/11/German-cases-explained-different-forms-of-the.jpg)
+
+![](https://www.iwillteachyoualanguage.com/wp-content/uploads/2018/11/German-cases-explained-summary-indefinite-articles.jpg)
+
+Finding lists of stop words in Chinese has been done both manually and automatically[@Zou2006ACC] but so far none of them has been accepted as a standard [@Zou2006]. A full discussion stop word identification of stop words in Chinese text would be out of scope for this book, so we will just highlight some of the challenges that differentiate it from English. 
+
+:::note
+Chinese text is must more complex than portrayed here. With different systems and billions of users, there is much we won't be able to touch on here.
+:::
+
+The main difference from English is the use of logograms instead of letters to convey information. However Chinese characters should not be confused with Chinese words. The majority of words in modern Chinese is composed of multiple characters. This means that inferring the presence of "words" is more complicated and the notion of stop words will affect how this segmentation of characters is done.
