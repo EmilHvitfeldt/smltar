@@ -208,7 +208,7 @@ On the other hand, you will have to fill in some of the words yourself depending
 
 We talked about different ways of detecting and removing stopwords now let us see what happens once you remove them. The first thing we are going to look at is the number of words that are included in the list. The following chart shows what percentage of words have been removed as a function of the number of words in a text. The different colors represent the 3 different stopword lists we have considered in this chapter.
 
-```{r}
+```{r, echo=FALSE}
 plotting_data <- hcandersen_en %>%
   nest(data = c(text)) %>%
   mutate(tokens = map(data, ~ unlist(tokenize_words(.x$text))),
@@ -233,7 +233,6 @@ plotting_data %>%
        color = "Removed",
        title = "Stop words take up a larger part of the text in longer fairy tales",
        subtitle = "Each group of horizontal line of points represents a H.C. Andersen Fairy tale")
-
 ```
 
 We notice predictably that larger stopword lists remove more words then shorter stopword lists. In the examples with fairy tales then over half of the words have been removed, with the big list removing over 80% of the words. An interesting observation is that shorter texts have a lower percentage of stopwords. Since we are looking at fairy tales this could be explained by the fact that a story has to be told regardless of the length of the fairy tale so shorter texts are going to be more dense with informative words.
