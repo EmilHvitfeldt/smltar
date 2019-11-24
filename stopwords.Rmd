@@ -2,13 +2,13 @@
 
 Once we have tokenized our text into words, it might occur to you that not all of these words carry the same amount of information with then, if any information at all. Words that don't carry any information with them are called **stop words**. It is common advice to remove stopwords in various NLP tasks, but the task of stop word removal is more nuanced than many resources would like you to think. In this chapter, we will go over what a stop word list is and the differences between them and the effects on using them in your preprocessing workflow.
 
-The concept of stop words has a long history with Hans Peter Luhn being credited with coining the term back in 1960 [@Luhn1960]. Examples of these words are "a", "the", "of" and "didn't" since they don't appear to add more to the meaning of the text other than making sure the structure of the sentence is sound. Thinking of words as being either informative or information is quite limiting and we would rather think of words as having a more fluid amount of information associated with them, where this information is very context-specific as well. Historically one of the main reasons for removing stop words was to improve computational time as it can be seen as a dimensionality reduction of the data and was commonly done in search engines to give better results (TODO find reference).
+The concept of stop words has a long history with Hans Peter Luhn being credited with coining the term back in 1960 [@Luhn1960]. Examples of these words are "a", "the", "of" and "didn't" since they don't appear to add more to the meaning of the text other than making sure the structure of the sentence is sound. Thinking of words as being either informative or information is quite limiting and we would rather think of words as having a more fluid amount of information associated with them, where this information is very context-specific as well. Historically one of the main reasons for removing stop words was to improve computational time as it can be seen as a dimensionality reduction of the data and was commonly done in search engines to give better results [@Huston2010].
 
 ## Using premade stop words
 
 A quick solution to getting a list of stop words is to use one that is already created for you. This is quite tempting as it requires little to no effort. But beware not all lists are created equal. @nothman-etal-2018-stop found in a study of 52 stop words lists available in open-source software packages quite some alarming results. They found expected things like how different stop word lists have a varying number of words depending on the specificity of the list. Among some of the more grave issues was the finding of misspellings (fify instead of fifty), the inclusion of informative words such as "computer" and "cry" and various inconsistencies such as including the word "has" but not the word "does". This is not to say that you shouldn't use a stop word list that has been included in your software. But you should always inspect and verify the list you are using. Both to make sure it hasn't changed since you used it last, but also to check that it is appropriate for your use case.
 
-There is a broad selection of stop word lists available in different packages. For the purpose of this chapter will we limit the discussion to the 3 lists provided by the **stopwords** package. The package includes word lists from a range of languages and sources. We will focus on lists of English words that give us the stopword list bases on SMART System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. Next, we will consider the English Snowball stop word list (TODO find reference) and lastly the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stopword lists are all considered to general and thus not domain-specific.
+There is a broad selection of stop word lists available in different packages. For the purpose of this chapter will we limit the discussion to the 3 lists provided by the **stopwords** package. The package includes word lists from a range of languages and sources. We will focus on lists of English words that give us the stopword list bases on SMART System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. Next, we will consider the English Snowball stop word list [@porter2001snowball] and lastly the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stopword lists are all considered to general and thus not domain-specific.
 
 Before we start looking at the words inside the lists lets take a look at how many words are included in each
 
@@ -21,7 +21,7 @@ length(stopwords(source = "stopwords-iso"))
 
 we see that the length of these lists are quite varied, with the longest list being over 7 times longer than the shortest. Let us take a look at the overlap between the words that appear in the 3 lists
 
-```{r}
+```{r, echo=FALSE}
 library(UpSetR)
 fromList(list(smart = stopwords(source = "smart"),
               snowball = stopwords(source = "snowball"),
@@ -58,12 +58,7 @@ And we will use the Snowball stopword list as an example. Since the stopwords co
 
 ```{r, results='hold'}
 tidy_fir_tree %>%
-  filter(!tidy_fir_tree$word %in% stopwords(source = "snowball"))
-
-# The low precidence of ! means that we these two expressions evaluate to the
-# same thing.
-# tidy_fir_tree %>%
-#   filter(!(tidy_fir_tree$word %in% stopwords(source = "snowball")))
+  filter(!(tidy_fir_tree$word %in% stopwords(source = "snowball")))
 ```
 
 but if we if we use the `stop_words` from **tidytext** then we can use the `anti_join()` function.
@@ -79,8 +74,7 @@ the result of these two stop word removals was different since we didn't use the
 
 Another way to get a stop word list is to create one yourself. We will be looking at a few different ways to find words to use. We will use the tokenized Fir-Tree as a first example. We take the words and order them by their count. The proposition is that the most frequent words happen appear the most frequently.
 
-TODO make sure words don't clip sides.
-```{r}
+```{r, echo=FALSE, fig.cap="'The Fir Tree' was tokenized and tokens were counted and ordered descendingly according to count."}
 tidy_fir_tree %>%
   count(word, sort = TRUE) %>%
   slice(1:120) %>%
@@ -88,13 +82,15 @@ tidy_fir_tree %>%
          column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
-  geom_text() +
-  theme_void()
+  geom_text(hjust = 0) +
+  xlim(c(1, 5.5)) +
+  theme_void() +
+  labs(title = "120 Most frequent tokens in 'The Fir Tree'")
 ```
 
 by looking at the first column of words we recognize a lot of what we would consider stop words, with 3 big exceptions. "tree" at 3, "fir" at 12 and "little" at 22. These words appeared high on our list but do provide valuable information as it is referencing the main character. So what went wrong in this approach? Creating a stopword list using high-frequency words works best when it is created on a corpus of documents, not individual documents. This is because the words found in a single document will be document specific and not generalize that well. The word "tree" does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Let's try extraction high-frequency words from the corpus of all English fairy tales by H.C. Andersen.
 
-```{r}
+```{r, echo=FALSE, fig.cap="All of the English H.C. Andersen's fairly tales were tokenized and tokens were counted and ordered descendingly according to count."}
 hcandersen_en %>%
   unnest_tokens(word, text) %>%
   count(word, sort = TRUE) %>%
@@ -103,17 +99,19 @@ hcandersen_en %>%
          column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
-  geom_text() +
-  theme_void()
+  geom_text(hjust = 0) +
+  xlim(c(1, 5.5)) +
+  theme_void() +
+  labs(title = "120 Most frequent tokens in H.C. Andersen's fairly tales, English")
 ```
 
 these words feel more in line with our concept of stop words. Now it is time for us to make some choices. How many we want to include, and which words to add and remove based on prior information. Selection the number of words to remove is best done by a case-by-case basis as it can be hard to determine apriori how many different "meaningless" words that appear in a corpus. Our suggestion would be to start with a low number like 20 and increase by 10 words until you get to words that don't feel like stopwords. It is worth keeping in mind that this list is not perfect, and it is based on the corpus of documents we had available, a potential biased one since all the fairy tales were written by the same European white male from the early 1800s. This bias can be minimized by removing words we would expect to be over represented or to add words we expect to be underrepresented. Easy examples are to include the compliments to the words in the lists if they are not present. Include "big" if "small" is present, "old" if "young" is present. this example has female words often listed after male words. With "man" being 79, but "woman" is `r hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()` having a cutoff at 100 would lead to only one of these words be included. Depending on how important you think pronouns are going to be in your texts to you either add "woman" or delete "man".
 
 The following chart shows how the male-gendered words have lower rank than the female rank, showing that by simply using a cutoff you would be likely to only include the male form of the word.
 
-```{r}
+```{r, echo=FALSE, fig.cap="Tokens where counted and ranked according to total count. Rank 1 has most occurrences."}
 gender_words <- tribble(
-  ~male, ~female,
+  ~men, ~women,
   "he", "she",
   "his", "her",
   "man", "woman",
@@ -131,24 +129,26 @@ ordered_words <- hcandersen_en %>%
   pull(word)
 
 gender_words_plot <- gender_words %>%
-  mutate(male_index = match(male, ordered_words),
-         female_index = match(female, ordered_words)) %>%
+  mutate(male_index = match(men, ordered_words),
+         female_index = match(women, ordered_words)) %>%
   mutate(slope = log10(male_index) - log10(female_index)) %>%
   pivot_longer(male_index:female_index) %>%
   mutate(value = log10(value),
-         label = ifelse(name == "male_index", male, female)) %>%
-  mutate(name = factor(name, c("male_index", "female_index"), c("male", "female")))
+         label = ifelse(name == "male_index", men, women)) %>%
+  mutate(name = factor(name, c("male_index", "female_index"), c("men", "women")))
 
 limit <- max(abs(gender_words_plot$slope)) * c(-1, 1)
 
 gender_words_plot %>%
-  ggplot(aes(name, value, group = female)) +
+  ggplot(aes(name, value, group = women)) +
   geom_line(aes(color = slope), size = 1) +
   scale_y_reverse(labels = function(x) 10 ^ x) +
   geom_text(aes(label = label)) +
   scale_color_distiller(type = "div", limit = limit) +
   guides(color = "none") +
-  labs(x = NULL, y = "rank")
+  theme(panel.border = element_blank(), panel.grid.major.x = element_blank()) +
+  labs(x = NULL, y = "Word Rank") +
+  labs(title = "Masculine gendered words appeared more often in H.C. Andersen's fairy tales")
 ```
 
 Imagine now we would like to create a stopword list that spans multiple different genres, in such a way that the subject-specific stop words don't overlap. For this case, we would like words to be denoted as a stopword only if it is a stopword in all the genres. You could find the words individually in each genre and using the right intersections. However, that approach might take a substantial amount of time.
@@ -175,7 +175,7 @@ calc_idf <- function(df, word, document) {
 
 And the following is the result where we try to create a cross-language list of stopwords, by taking each fairy tale as a document. And it is not very good. Since the overlap between what words appear in each language is very small. And that is what we mostly see in this list.
 
-```{r}
+```{r, echo=FALSE, fig.cap="All of the H.C. Andersen's fairly tales were tokenized and tokens were counted and ordered descendingly according to count. Laguages: Danish, English, French, German and Spanish."}
 hcandersenr::hca_fairytales() %>%
   unnest_tokens(word, text) %>%
   mutate(document = paste(language, book)) %>%
@@ -187,8 +187,10 @@ hcandersenr::hca_fairytales() %>%
          column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
-  geom_text() +
-  theme_void()
+  geom_text(hjust = 0) +
+  xlim(c(1, 5.5)) +
+  theme_void() +
+  labs(title = "120 Most frequent tokens in H.C. Andersen's fairly tales, multi-language")
 ```
 
 TODO do same example with English only.
@@ -262,10 +264,32 @@ So far in this chapter, we have been spent the majority of the time on the Engli
 
 Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below is a couple of diagrams showing the use of definite and indefinite articles in German, Notice how German nouns have 3 genders (Masculine, Feminine and neuter) which are not uncommon to have. Articles are almost always used as stopwords in English as very little information. However, German articles give some indication of the case which would need to be a consideration for you when selecting your list of stop words in German or any other language where the grammatical case is reflected in the text.
 
-TODO rewrite these as R graphics.
-![](https://www.iwillteachyoualanguage.com/wp-content/uploads/2018/11/German-cases-explained-different-forms-of-the.jpg)
+```{r, echo=FALSE}
+library(magrittr)
+library(gt)
+tibble::tribble(
+  ~Masculine, ~Feminine, ~Neuter, ~Plural, ~case,
+  "der", "die", "das", "die", "Nominative",
+  "den", "die", "das", "die", "Accusative",
+  "dem", "der", "dem", "den", "Dative",
+  "des", "der", "des", "der", "Genitive"
+) %>%
+  gt(rowname_col = "case") %>%
+   tab_header(title = "German Definite Articles (the)")
+```
 
-![](https://www.iwillteachyoualanguage.com/wp-content/uploads/2018/11/German-cases-explained-summary-indefinite-articles.jpg)
+```{r, echo=FALSE}
+tibble::tribble(
+  ~Masculine, ~Feminine, ~Neuter, ~Plural, ~case,
+  "ein", "eine", "ein", "keine", "Nominative",
+  "einen", "eine", "ein", "keine", "Accusative",
+  "einem", "einer", "einem", "keinen", "Dative",
+  "eines", "einer", "eines", "keiner", "Genitive"
+) %>%
+  gt(rowname_col = "case") %>%
+   tab_header(title = "German Indefinite Articles (a/an)")
+```
+
 
 Finding lists of stop words in Chinese has been done both manually and automatically[@Zou2006ACC] but so far none of them has been accepted as a standard [@Zou2006]. A full discussion stop word identification of stop words in Chinese text would be out of scope for this book, so we will just highlight some of the challenges that differentiate it from English. 
 
