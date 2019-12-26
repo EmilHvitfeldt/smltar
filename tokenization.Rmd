@@ -25,15 +25,15 @@ In tokenization, we take an input (a string) and a token type (a meaningful unit
 
 ![](images/tokenization/tokenization.jpg) TODO
 
-Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.
+Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like `"didn't"` may more accurately be considered two words with no space.
 
-To understand the process of tokenization, let's start by defining a word as any selection of alphanumeric (letters and numbers) symbols. Let's use some regular expressions (or "regex", see Appendix \@ref(regexp)) with `strsplit()` to split the first two lines of "The Fir Tree" by any characters that are not alphanumeric.
+To understand the process of tokenization, let's start by defining a word as any selection of alphanumeric (letters and numbers) symbols. Let's use some regular expressions (or regex for short, see Appendix \@ref(regexp)) with `strsplit()` to split the first two lines of "The Fir Tree" by any characters that are not alphanumeric.
 
 ```{r}
 strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
 ```
 
-At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be favorable, and the hero of this story ("fir-tree") was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily a lot of work has been invested in this process, and we will use these existing tools. For example, the **tokenizers** package [@Mullen18] contains a wealth of fast, consistent tokenizers we can use.
+At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be favorable, and the hero of this story (`"fir-tree"`) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily a lot of work has been invested in this process, and we will use these existing tools. For example, the **tokenizers** package [@Mullen18] contains a wealth of fast, consistent tokenizers we can use.
 
 ```{r}
 library(tokenizers)
@@ -161,7 +161,7 @@ hcandersen_en %>%
   slice(1:5)
 ```
 
-The five most common words in each fairy tale are fairly uninformative, with the exception being "tree" in the "The Fir Tree". 
+The five most common words in each fairy tale are fairly uninformative, with the exception being `"tree"` in the "The Fir Tree". 
 
 ```{block2, type = "rmdtip"}
 These uninformative words are called **stop words** and will be explored in depth in Chapter \@ref(stopwords).
@@ -285,11 +285,11 @@ While the defaults work well in many cases, we encounter situations where we wan
 
 > "Don't forget you owe the bank $1 million for the house." 
 
-This sentence has several interesting parts which we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in "Don't" which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into "do" and "n't". By performing such a split, we could learn whether contractions such as "n't" will be different then "not", but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. 
+This sentence has several interesting parts which we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in `"Don't"` which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into `"do"` and `"n't"`. By performing such a split, we could learn whether contractions such as `"n't"` will be different then `"not"`, but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. 
 
 TODO FOR EMIL: THE LAST SENTENCE OF THE ABOVE PARAGRAPH IS UNCLEAR AND I CAN'T TELL WHAT IT IS INTENDING TO SAY
 
-The next issue at hand is how to deal with "\$1"; the dollar sign is highly important part of this sentence as it denotes a kind of currency. We could either remove or keep this punctuation symbol, and if we keep the dollar sign, we can choose between keeping one or two tokens, "\$1" or "\$" and "1". If we look at the default for `tokenize_words()`, we notice that it defaults to removing most punctuation including \$.
+The next issue at hand is how to deal with `"\$1"`; the dollar sign is highly important part of this sentence as it denotes a kind of currency. We could either remove or keep this punctuation symbol, and if we keep the dollar sign, we can choose between keeping one or two tokens, `"\$1"` or `"\$"` and `"1"`. If we look at the default for `tokenize_words()`, we notice that it defaults to removing most punctuation including \$.
 
 ```{r}
 tokenize_words("$1")
