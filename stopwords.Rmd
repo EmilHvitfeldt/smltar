@@ -2,7 +2,13 @@
 
 Once we have tokenized text into words, it often becomes clear that not all of these words carry the same amount of information with them, if any information at all. Words that don't carry meaningful information are called **stop words**. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.
 
-The concept of stop words has a long history with Hans Peter Luhn credited with coining the term back in 1960 [@Luhn1960]. Examples of these words in English are "a", "the", "of", and "didn't"; these words are very common and don't seem to add much to the meaning of a text other than ensuring the structure of the sentence is sound. Thinking of words as being either informative or non-informative is quite limiting, and we prefer to consider words as having a more fluid or continuous amount of information associated with them, where this information is context-specific as well. Historically, one of the main reasons for removing stop words was to decrease computational time for text mining; it can be regarded as a dimensionality reduction of text data and was commonly used in search engines to give better results [@Huston2010].
+The concept of stop words has a long history with Hans Peter Luhn credited with coining the term back in 1960 [@Luhn1960]. Examples of these words in English are "a", "the", "of", and "didn't"; these words are very common and don't seem to add much to the meaning of a text other than ensuring the structure of the sentence is sound. 
+
+```{block, type = "rmdtip"}
+Thinking of words as being either informative or non-informative is quite limiting, and we prefer to consider words as having a more fluid or continuous amount of information associated with them, where this information is context-specific as well. 
+```
+
+Historically, one of the main reasons for removing stop words was to decrease computational time for text mining; it can be regarded as a dimensionality reduction of text data and was commonly used in search engines to give better results [@Huston2010].
 
 ## Using premade stop word lists
 
@@ -295,7 +301,7 @@ tibble::tribble(
 
 Building lists of stop words in Chinese has been done both manually and automatically [@Zou2006ACC] but so far none has been accepted as a standard [@Zou2006]. A full discussion of stop word identification in Chinese text would be out of scope for this book, so we will just highlight some of the challenges that differentiate it from English. 
 
-```{block, type = "rmdwarn"}
+```{block, type = "rmdwarning"}
 Chinese text is much more complex than portrayed here. With different systems and billions of users, there is much we won't be able to touch on here.
 ```
 
