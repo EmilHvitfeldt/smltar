@@ -392,7 +392,7 @@ This regex used to remove the punctuation is a little complicated so let's discu
 ```{block, type = "rmdnote"}
 If you are in a situation where you want to avoid the dependencies that come with `purrr`, you can use `lapply()` instead. 
 
-`lapply(str_remove_all, pattern = "^[:punct:]+|[:punct:]+$")`
+`lapply(str_remove_all, pattern = "\^[:punct:]+|[:punct:]+$")`
 ```
 
 Now let's see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen. 
