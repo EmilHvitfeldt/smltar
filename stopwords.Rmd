@@ -48,9 +48,17 @@ When you select a stop word list, it is important that you consider its size and
 
 ### Stop word removal in R
 
-Now that we have some stop word lists, we can move forward with removing these words. The particular way we remove stop words depends on the shape of our data. If you have your text in a tidy for with one word per row, you can use `filter()` from **dplyr** with a negated `%in%` if you have the stop words as a vector, or you can use `anti_join()` from **dplyr** if the stop words are in a `tibble()`. Here we have `tidy_fir_tree` from chapter \@ref(stemming), without removing stop words.
+Now that we have some stop word lists, we can move forward with removing these words. The particular way we remove stop words depends on the shape of our data. If you have your text in a tidy format with one word per row, you can use `filter()` from **dplyr** with a negated `%in%` if you have the stop words as a vector, or you can use `anti_join()` from **dplyr** if the stop words are in a `tibble()`. Like in our previous chapter, let's examine the text of "The Fir-Tree" by Hans Christian Andersen, and use **tidytext** to tokenize the text into words.
 
 ```{r}
+library(hcandersenr)
+library(tidyverse)
+library(tidytext)
+
+fir_tree <- hca_fairytales() %>% 
+  filter(book == "The fir tree", 
+         language == "English")
+
 tidy_fir_tree <- fir_tree %>%
   unnest_tokens(word, text)
 ```
