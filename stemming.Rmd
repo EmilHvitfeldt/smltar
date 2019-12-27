@@ -259,6 +259,22 @@ How does lemmatization work in languages other than English? Lookup dictionaries
 
 A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library, which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19] or the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17]. You might also consider using spaCy directly in R Markdown [via the Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
 
+## Stemming and stop words
+
+Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you usually need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.
+
+A handy trick is to use the following function on your stop word list to return the words that don't have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.
+
+```{r}
+not_stemmed_in <- function(x) {
+  x[!SnowballC::wordStem(x) %in% x]
+}
+
+not_stemmed_in(stopwords(source = "snowball"))
+```
+
+Here we see that many of the words that are lost are the contractions.
+
 ## Summary
 
-In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word. Stemming reduces the sparsity of text data which can be helpful when training models, but at the cost of throwing information away. Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are unstemmed, so you usually need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.
+In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word. Stemming reduces the sparsity of text data which can be helpful when training models, but at the cost of throwing information away. 
