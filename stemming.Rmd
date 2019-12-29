@@ -274,6 +274,7 @@ Our deep dive into stemming came *after* our chapters on tokenization (Chapter \
 A handy trick is to use the following function on your stop word list to return the words that don't have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.
 
 ```{r}
+library(stopwords)
 not_stemmed_in <- function(x) {
   x[!SnowballC::wordStem(x) %in% x]
 }
