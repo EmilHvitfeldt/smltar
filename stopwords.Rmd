@@ -251,6 +251,8 @@ On the other hand, sometimes you will have to add in words yourself, depending o
 We have discussed different ways of finding and removing stop words; now let's see what happens once you do remove them. First, let's explore the impact of the number of words that are included in the list. Figure \@ref(fig:stopwordresults) shows what percentage of words are removed as a function of the number of words in a text. The different colors represent the 3 different stop word lists we have considered in this chapter.
 
 ```{r stopwordresults, echo=FALSE, fig.cap="Proportion of words removed for different stop word lists and different document lengths"}
+library(tokenizers)
+
 plotting_data <- hcandersen_en %>%
   nest(data = c(text)) %>%
   mutate(tokens = map(data, ~ unlist(tokenize_words(.x$text))),
