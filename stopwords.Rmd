@@ -125,6 +125,8 @@ In NLP, a corpus is a set of texts or documents. The set of Hans Christian Ander
 The word `"tree"` does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Let's try a different approach, extracting high-frequency words from the corpus of *all* English fairy tales by H.C. Andersen.
 
 ```{r, echo=FALSE, fig.cap="We counted words in all English fairy tales by Hans Christian Andersen and ordered them by count or frequency."}
+library(hcandersenr)
+library(tidytext)
 hcandersen_en %>%
   unnest_tokens(word, text) %>%
   count(word, sort = TRUE) %>%
@@ -147,7 +149,7 @@ It is worth keeping in mind that this list is not perfect. It is based on the co
 This bias can be minimized by removing words we would expect to be over-represented or to add words we expect to be under-represented.
 ```
 
-Easy examples are to include the compliments to the words in the lists if they are not present. Include `"big"` if `"small"` is present, `"old"` if `"young"` is present. This example list has words associated with women often listed lower in rank than words associated with men. With `"man"` being at rank 79, but `"woman"` at rank `r hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()`, choosing a threshold of 100 would lead to only one of these words be included. Depending on how important you think such nouns are going to be in your texts, either add `"woman"` or delete `"man"`.
+Easy examples are to include the compliments to the words in the lists if they are not present. Include `"big"` if `"small"` is present, `"old"` if `"young"` is present. This example list has words associated with women often listed lower in rank than words associated with men. With `"man"` being at rank 79, but `"woman"` at rank `r hcandersenr::hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()`, choosing a threshold of 100 would lead to only one of these words be included. Depending on how important you think such nouns are going to be in your texts, either add `"woman"` or delete `"man"`.
 
 Figure \@ref(fig:genderrank) shows how the words associated with men have higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.
 
