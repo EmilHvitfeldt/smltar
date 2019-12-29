@@ -1,5 +1,13 @@
 # Stop words {#stopwords}
 
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, 
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+``` 
+
 Once we have tokenized text into words, it often becomes clear that not all of these words carry the same amount of information with them, if any information at all. Words that don't carry meaningful information are called **stop words**. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.
 
 The concept of stop words has a long history with Hans Peter Luhn credited with coining the term back in 1960 [@Luhn1960]. Examples of these words in English are "a", "the", "of", and "didn't"; these words are very common and don't seem to add much to the meaning of a text other than ensuring the structure of the sentence is sound. 
