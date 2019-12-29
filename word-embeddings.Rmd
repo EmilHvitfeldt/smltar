@@ -1,5 +1,13 @@
 # Word Embeddings {#embeddings}
 
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, 
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+``` 
+
 > You shall know a word by the company it keeps.
 > `r tufte::quote_footer('--- [John Rupert Firth](https://en.wikiquote.org/wiki/John_Rupert_Firth)')`
 
@@ -8,13 +16,14 @@ So far in our discussion of natural language features, we have discussed preproc
 ```{r}
 library(tidyverse)
 library(tidytext)
+library(SnowballC)
 library(scotus)
 
 scotus_sample %>% 
-  unnest_tokens(word, text) %>%          ## tokenize
-  anti_join(get_stopwords()) %>%         ## remove stop words
-  mutate(stem = wordStem(word)) %>%      ## stem
-  count(case_name, stem) %>%             ## count words
+  unnest_tokens(word, text) %>%  
+  anti_join(get_stopwords()) %>%  
+  mutate(stem = wordStem(word)) %>% 
+  count(case_name, stem) %>%  
   cast_dfm(case_name, stem, n)
 ```
 
@@ -22,12 +31,22 @@ Another way to represent our text data is to use [tf-idf](https://www.tidytextmi
 
 ```{r}
 scotus_sample %>% 
-  unnest_tokens(word, text) %>%          ## tokenize
-  anti_join(get_stopwords()) %>%         ## remove stop words
-  mutate(stem = wordStem(word)) %>%      ## stem
-  count(case_name, stem) %>%             ## count words
-  bind_tf_idf(stem, case_name, n) %>%    ## tf-idf
+  unnest_tokens(word, text) %>% 
+  anti_join(get_stopwords()) %>%  
+  mutate(stem = wordStem(word)) %>% 
+  count(case_name, stem) %>%  
+  bind_tf_idf(stem, case_name, n) %>% 
   cast_dfm(case_name, stem, tf_idf)
 ```
 
-Notice that in either case, our final data structure is incredibly sparse and of high dimensionality. Linguists have long worked on vector models for language that reduce this number of dimensions because of the nature of how people use language; the quote that opened this chapter dates to 1957.
+Notice that in either case, our final data structure is incredibly sparse and of high dimensionality. Linguists have long worked on vector models for language that can reduce this number of dimensions because of the nature of how people use language; the quote that opened this chapter dates to 1957. These kinds of word vectors are often called **word embeddings**.
+
+## Understand word embeddings by finding them yourself
+
+## Word embeddings from deep learning
+
+## Fairness and word embeddings
+
+## Summary
+
+
