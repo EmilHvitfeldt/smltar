@@ -39,13 +39,59 @@ scotus_sample %>%
   cast_dfm(case_name, stem, tf_idf)
 ```
 
-Notice that in either case, our final data structure is incredibly sparse and of high dimensionality. Linguists have long worked on vector models for language that can reduce this number of dimensions because of the nature of how people use language; the quote that opened this chapter dates to 1957. These kinds of word vectors are often called **word embeddings**.
+Notice that in either case, our final data structure is incredibly sparse and of high dimensionality. Sparse matrices are not necessarily a problem for modeling, but... 
+
+#### SPARSE VS. NON SPARSE MATRIX
+
+Linguists have long worked on vector models for language that can reduce this number of dimensions based on how people use language; the quote that opened this chapter dates to 1957. These kinds of word vectors are often called **word embeddings**.
 
 ## Understand word embeddings by finding them yourself
 
-## Word embeddings from deep learning
+Word embeddings are a way to represent text data as numbers based on a huge corpus of text, capturing semantic meaning from words' context. Word embeddings are based on a statistical approach to modeling language, rather than a linguistics or rules-based approach.
 
-## Fairness and word embeddings
+
+Training word vectors or embeddings takes a lot of time, computational power, and data. 
+
+## Use pre-trained word embeddings {#glove}
+
+Use GloVe
+
+Fast.ai has some available here:
+http://files.fast.ai/models/
+
+https://github.com/mkearney/wactor
+
+Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) are learned from the text of Wikipedia.
+
+## Fairness and word embeddings {#fairnessembeddings}
+
+Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias. Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings. This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
+
+- African American first names are associated with more unpleasant feelings than European American first names.
+- Women's first names are more associated with family and men's first names are more associated with career.
+- Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
+
+Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or TKTK. @Garg2018 even used how bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. It's safe to assume that any large corpus of language will contain latent within it biases of the people who generated that language.
+
+When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. @Speer2017 demonstrated how using pre-trained word embeddings to train a straightforward sentiment analysis model can result in text such as 
+
+> "Let's go get Italian food"
+
+being scored much more positively than text such as
+
+> "Let's go get Mexican food"
+
+because of characteristics of the text the word embeddings were trained on.
+
+## Using word embeddings in the real world
+
+Given these profound and fundamental challenges with word embeddings, what options are out there? First, consider not using word embeddings when building a text model. Depending on the particular analytical question you are trying to answer, another numerical representation of text data (such as word frequencies or tf-idf of single words or n-grams) may be more appropriate. Consider this option even more seriously if the model you want to train is already entangled with issues of bias, such as the sentiment analysis example in Section \@ref(fairnessembeddings).
+
+Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings such as GloVe or word2vec, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is **specific** rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, hundreds of thousands or more documents) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language datasets. You can use the same approaches discussed here to check any new embeddings for dangerous biases such as racism or sexism.
+
+NLP researchers have also proposed methods for debiasing embeddings. @Bolukbasi2016 aims to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals [@Lu2018].
+
+Other researchers, such as @Caliskan2016, suggest that corrections for fairness should happen at the point of **decision** or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. 
 
 ## Summary
 
