@@ -61,7 +61,7 @@ http://files.fast.ai/models/
 
 https://github.com/mkearney/wactor
 
-Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) are learned from the text of Wikipedia.
+Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) and [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia.
 
 ## Fairness and word embeddings {#fairnessembeddings}
 
@@ -74,7 +74,7 @@ Perhaps more than any of the other preprocessing steps this book has covered so 
 Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or TKTK. @Garg2018 even used how bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
 ```{block, type = "rmdtip"}
-It's safe to assume that any large corpus of language will contain latent within it biases of the people who generated that language.
+It's safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
 ```
 
 When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. @Speer2017 demonstrated how using pre-trained word embeddings to train a straightforward sentiment analysis model can result in text such as 
@@ -99,7 +99,7 @@ Learning good quality word embeddings is only realistic when you have a large co
 You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.
 ```
 
-NLP researchers have also proposed methods for debiasing embeddings. @Bolukbasi2016 aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some given bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals [@Lu2018]. Recent work [@Ethayarajh2019] has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.
+NLP researchers have also proposed methods for debiasing embeddings. @Bolukbasi2016 aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some specific bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals [@Lu2018]. Recent work [@Ethayarajh2019] has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.
 
 Other researchers, such as @Caliskan2016, suggest that corrections for fairness should happen at the point of **decision** or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. @Gonen2019 highlight how pervasive and consistent gender bias is across different word embedding models, *even after* applying current debiasing methods.
 
