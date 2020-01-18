@@ -38,6 +38,9 @@ jobs:
 
       - name: Build site
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
+        
+      - name: Inspect repository
+        run: R -e 'fs::dir_ls()'
 
       - name: Install npm
         uses: actions/setup-node@v1
