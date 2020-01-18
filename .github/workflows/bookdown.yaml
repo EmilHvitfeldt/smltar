@@ -41,12 +41,17 @@ jobs:
 
       - name: Install npm
         uses: actions/setup-node@v1
+        
+      - name: Install Netlify-cli
+        # NETLIFY_AUTH_TOKEN added in the repo's secrets
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          npm install netlify-cli -g
 
       - name: Deploy to Netlify
         # NETLIFY_AUTH_TOKEN added in the repo's secrets
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         run: |
-          npm install netlify-cli -g
-          netlify init
           netlify deploy --prod --dir _book
