@@ -154,7 +154,73 @@ We have now successfully found word embeddings, with clear and understandable co
 
 ## Exploring CFPB word embeddings
 
-Now that we have determined word embeddings for the dataset of CFPB complaints, let's explore them and talk about they are used in modeling.
+Now that we have determined word embeddings for the dataset of CFPB complaints, let's explore them and talk about they are used in modeling. We have projected the sparse, high-dimensional set of word features into a more dense, 100-dimensional set of features. 
+
+```{block, type = "rmdnote"}
+Each word can be represented as a numeric vector in this new feature space. 
+```
+
+Which words are close to each other in this new feature space of word embeddings? Let's create a simple function that will find the nearest synonyms using our newly created word embeddings.
+
+```{r nearestsynonyms}
+nearest_synonyms <- function(df, token) {
+  df %>%
+    widely(~ . %*% (.[token, ]), sort = TRUE)(item1, dimension, value) %>%
+    select(-item2)
+}
+```
+
+This function takes the tidy word embeddings as input, along with a word (or `token`) as a string. It uses matrix multiplication to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
+
+What words are closest to `"error"` in the dataset of CFPB complaints, as determined by our word embeddings?
+
+```{r dependson=c("tidywordvectors", "nearestsynonyms")}
+tidy_word_vectors %>%
+    nearest_synonyms("error")
+```
+
+Errors, problems, issues, mistakes -- sounds bad!
+
+What is closest to the word `"month"`?
+
+```{r dependson=c("tidywordvectors", "nearestsynonyms")}
+tidy_word_vectors %>%
+    nearest_synonyms("month")
+```
+
+We see words about payments, along with other time periods such as days and years. Notice that we did not stem this text data (see Chapter \@ref(stemming)) but the word embeddings learned that singular and plural forms of words belong together.
+
+What words are closest in this embedding space to `"fee"`?
+
+```{r dependson=c("tidywordvectors", "nearestsynonyms")}
+tidy_word_vectors %>%
+    nearest_synonyms("fee")
+```
+
+We find words about interest, charges, and overdrafts.
+
+Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints.
+
+```{r embeddingpca, dependson="tidywordvectors", fig.width=8, fig.height=12, fig.cap="Word embeddings for Consumer Finance Protection Bureau complaints"}
+tidy_word_vectors %>%
+    filter(dimension <= 24) %>%
+    group_by(dimension) %>%
+    top_n(12, abs(value)) %>%
+    ungroup %>%
+    mutate(item1 = reorder_within(item1, value, dimension)) %>%
+    ggplot(aes(item1, value, fill = as.factor(dimension))) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~dimension, scales = "free_y", ncol = 4) +
+    scale_x_reordered() +
+    coord_flip() +
+    labs(x = NULL, y = "Value",
+         title = "First 24 principal components for text of CFPB complaints",
+         subtitle = "Top words contributing to the components that explain the most variation")
+```
+
+It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like `"regarding"`, `"contacted"`, and `"called"`, while component 9 highlights the use of *different* common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.
+
+We created word embeddings and can explore them to understand our text dataset, but how do we use this vector representation in modeling?
 
 ## Use pre-trained word embeddings {#glove}
 
