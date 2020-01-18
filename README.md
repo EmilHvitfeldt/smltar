@@ -1,5 +1,4 @@
-[![Travis-CI Build Status](https://travis-ci.org/EmilHvitfeldt/tidy-nlp-in-R-book.svg?branch=master)](https://travis-ci.org/EmilHvitfeldt/tidy-nlp-in-R-book)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/687baf1d-ae7e-4cdb-82f3-7cf62eceb774/deploy-status)](https://app.netlify.com/sites/text-and-modeling-in-r/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1f6443b9-c220-47cb-b8b4-2cda9f24a302/deploy-status)](https://app.netlify.com/sites/inspiring-kepler-2ccad1/deploys)
 
 This is the repo for the book [**Predictive Modeling with Text**](https://text-and-modeling-in-r.netlify.com/), by Emil Hvitfeldt and Julia Silge.
 
