@@ -78,10 +78,13 @@ One of the arguments to this function is the `window_size`, which determines the
 ```{r slidewindows}
 slide_windows <- function(tbl, window_size) {
   
-  skipgrams <- slide::slide(tbl, ~.x, 
-                            .after = window_size - 1, 
-                            .step = 1, 
-                            .complete = TRUE)
+  skipgrams <- slide::slide(
+    tbl, 
+    ~.x, 
+    .after = window_size - 1, 
+    .step = 1, 
+    .complete = TRUE
+  )
   
   safe_mutate <- safely(mutate)
   
@@ -113,7 +116,8 @@ library(furrr)
 plan(multiprocess)  ## for parallel processing
 
 tidy_pmi <- nested_words %>%  
-  mutate(words = future_map(words, slide_windows, 4)) %>%
+  mutate(words = future_map(words, slide_windows, 4,
+                            .progress = TRUE)) %>%
   unnest(words) %>%
   unite(window_id, complaint_id, window_id) %>%
   pairwise_pmi(word, window_id)
@@ -138,8 +142,10 @@ We can next determine the word vectors from the PMI values using singular value 
 
 ```{r tidywordvectors, dependson="tidypmi"}
 tidy_word_vectors <- tidy_pmi %>%
-  widely_svd(item1, item2, pmi, 
-             nv = 100, maxit = 1000)
+  widely_svd(
+    item1, item2, pmi, 
+    nv = 100, maxit = 1000
+  )
 
 tidy_word_vectors
 ```
@@ -152,10 +158,14 @@ Now that we have determined word embeddings for the dataset of CFPB complaints, 
 
 ## Use pre-trained word embeddings {#glove}
 
-Use GloVe
 
-Fast.ai has some available here:
-http://files.fast.ai/models/
+```{r}
+library(textdata)
+
+## get GloVe embeddings
+
+```
+
 
 https://github.com/mkearney/wactor
 
