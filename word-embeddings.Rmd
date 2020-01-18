@@ -239,15 +239,21 @@ Pre-trained word embeddings are trained based on very large, general purpose Eng
 
 ## Fairness and word embeddings {#fairnessembeddings}
 
-Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias. Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings. This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
+Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias. 
+
+```{block, type = "rmdwarning"}
+Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings. 
+```
+
+This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
 
 - African American first names are associated with more unpleasant feelings than European American first names.
 - Women's first names are more associated with family and men's first names are more associated with career.
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
-Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/)] @Garg2018 even used how bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
+Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/)] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
-EMPHASIZE AGAIN THE TRAINING DATASETS -- REFERENCE FOR GENDER BALANCE ON WIKIPEDIA
+Remember that word embeddings are *learned* or trained from some large dataset of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. One common dataset used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
 ```{block, type = "rmdtip"}
 It's safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
@@ -269,7 +275,7 @@ Given these profound and fundamental challenges with word embeddings, what optio
 
 Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings such as GloVe or word2vec, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is **specific** rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. 
 
-Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, hundreds of thousands or more documents) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language datasets. You can use the same approaches discussed here to check any new embeddings for dangerous biases such as racism or sexism.
+Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, hundreds of thousands or more documents) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language datasets.
 
 ```{block, type = "rmdnote"}
 You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.
