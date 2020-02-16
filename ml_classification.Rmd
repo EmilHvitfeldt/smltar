@@ -1,5 +1,13 @@
 # Classification
 
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, 
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+``` 
+
 What is classification.
 
 ## First attempt
@@ -10,13 +18,126 @@ and properly to give balanced dataset, which then later can be explored.
 
 ### Look at the data
 
+```{r, message=FALSE}
+library(tidymodels)
+library(readr)
+library(textrecipes)
+```
+
+We are going to be working with US consumer complaints on financial products and company responses.
+It contains a text field containining the complaint along with information regarding what it was for,
+how it was filed and the response. 
+In this chapter we will try to predict what type of product the complaints are referring to. 
+This first attempt will be limited to predicting if the product is a mortgage or not.
+
+We can read in the complaint data \@ref(us-consumer-finance-complaints) with `read_csv()`.
+
+```{r, message=FALSE}
+complaints <- read_csv("data/complaints.csv.gz")
+```
+
+then we will start by taking a quick look at the data to see what we have to work with
+
+```{r}
+glimpse(complaints)
+```
+
+First thing to note is our target variable `product` which we need to trim only display "Mortgage" and "Other",
+and the `consumer_complaint_narrative` variable which contains the complaints.
+Here is the first 6 complaints:
+
+```{r}
+head(complaints$consumer_complaint_narrative)
+```
+
+TODO write what the different censoring means.
+
+Since this data is given to us after the fact, 
+we need to make sure that only the information that would be avaliable at the time of prediction is included in the model,
+otherwise we are going to be very disappointed once the model is pushed to production.
+The variables we can use as predictors are
+
+- `date_received`
+- `issue`
+- `sub_issue`
+- `consumer_complaint_narrative`
+- `company`
+- `state`
+- `zip_code`
+- `tags`
+- `submitted_via`
+
+ Many of these have quite a lot of levels.
+ First we will include `date_received` for further consideration, along with `consumer_complaint_narrative` and `tags`.
+ `submitted_via` would have been a viable candidate too, but all the entries are "web".
+ The other variables could be of use too, but they are catagorial variables with many values so we will exclude them for now.
+
+We start by splitting the data into a training and testing dataset,
+this is easily done using the 
+
+```{r}
+complaints2class <- complaints %>%
+  mutate(product = factor(if_else(product == "Mortgage", "Mortgage", "Other")))
+
+complaints_split <- initial_split(complaints2class, strata = product)
+
+complaints_train <- training(complaints_split)
+complaints_test <- testing(complaints_split)
+```
+
+```{r}
+complaint_recipe <- 
+  recipe(formula = product ~ date_received + tags +
+                             consumer_complaint_narrative, 
+         data = complaints_train) %>%
+  # Extract month and day or week from `date_received`
+  step_date(date_received, features = c("month", "dow"), role = "dates") %>%
+  step_rm(date_received) %>%
+  step_dummy(has_role("dates")) %>%
+  # dummify `tags`
+  step_unknown(tags) %>%
+  step_dummy(tags) %>%
+  # tfidf with top 150 most frequent words not including stopwords
+  step_tokenize(consumer_complaint_narrative) %>%
+  step_stopwords(consumer_complaint_narrative) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
+  step_tfidf(consumer_complaint_narrative) %>%
+  prep()
+```
+
+```{r}
+train_data <- juice(complaint_recipe)
+test_data <- bake(complaint_recipe, complaints_test)
+```
+
 ### Modeling
 
+```{r}
+glmnet_model <- logistic_reg(penalty = 10, mixture = 0.1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+glmnet_model
+```
+
+```{r}
+glmnet_model_fit <- glmnet_model %>%
+  fit(product ~ ., data = train_data)
+glmnet_model_fit
+```
+
 ### Evaluation
+
+```{r}
+glmnet_model_fit %>%
+  predict(test_data) %>%
+  mutate(truth = test_data$product) %>%
+  accuracy(truth, .pred_class)
+```
 
 ## Different types of models
 
 (Not all of these models are good, but are used to show strenghs and weaknessed)
+
 - SVM
 - Naive Bayes
 - glmnet
@@ -25,6 +146,11 @@ and properly to give balanced dataset, which then later can be explored.
 - NULL model
 
 ## Two class or multiclass
+
+## Case study: What happens if you don't censor your data
+
+The complaints data already have sensitive informationo censored out with XXXX and XX. 
+Imputate fake information for all XXXX fields and compare the model run with that data with original model.
 
 ## Case study: relationship between performace
 
