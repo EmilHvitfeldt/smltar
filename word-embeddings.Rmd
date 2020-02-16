@@ -74,14 +74,14 @@ nested_words
 ```
 
 
-Next, let’s create a `slide_windows()` function, using the `slide()` function from the **slide** package [@Vaughan2020] which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see `word1` and `word2` together within this window? We can calculate probabilities based on when we do or do not.
+Next, let’s create a `slide_windows()` function, using the `slide()` function from the **slider** package [@Vaughan2020] which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see `word1` and `word2` together within this window? We can calculate probabilities based on when we do or do not.
 
 One of the arguments to this function is the `window_size`, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are [@Levy2014]. A smaller window size is also faster to compute.
 
 ```{r slidewindows}
 slide_windows <- function(tbl, window_size) {
   
-  skipgrams <- slide::slide(
+  skipgrams <- slider::slide(
     tbl, 
     ~.x, 
     .after = window_size - 1, 
@@ -253,7 +253,7 @@ This is a straightforward method for finding and using word embeddings, based on
 If your dataset is too small, you typically cannot train reliable word embeddings. 
 
 ```{block, type = "rmdtip"}
-How small is too small? It is hard to make definite statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. It may be unreasonable to expect good results with datasets smaller than a few hundred thousand documents, however.
+How small is too small? It is hard to make definitive statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 ```
 
 In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own dataset. Instead, we can turn to **pre-trained** word embeddings.
