@@ -173,7 +173,7 @@ nearest_synonyms <- function(df, token) {
 }
 ```
 
-This function takes the tidy word embeddings as input, along with a word (or `token`) as a string. It uses matrix multiplication to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
+This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
 
 What words are closest to `"error"` in the dataset of CFPB complaints, as determined by our word embeddings?
 
@@ -238,7 +238,7 @@ doc_matrix <- word_matrix %*% embedding_matrix
 dim(doc_matrix)
 ```
 
-We have a new matrix here that we can use as the input for modeling. Notice that we still have over 100,000 documents (we did lose a few complaints, compared to our example sparse matrics at the beginning of the chapter, when we filtered out rarely used words) but instead of tens of thousands of features, we have exactly 100 features.  
+We have a new matrix here that we can use as the input for modeling. Notice that we still have over 100,000 documents (we did lose a few complaints, compared to our example sparse matrices at the beginning of the chapter, when we filtered out rarely used words) but instead of tens of thousands of features, we have exactly 100 features.  
 
 ```{block, type = "rmdnote"}
 These hundred features are the word embeddings we learned from the text data itself.
@@ -246,7 +246,9 @@ These hundred features are the word embeddings we learned from the text data its
 
 If our word embeddings are of high quality, this translation of the high-dimensional space of words to the lower-dimensional space of the word embeddings allows our modeling based on such an input matrix to take advantage of the semantic meaning captured in the embeddings.
 
-This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper or move the state of the art forward, but is excellent for many applied purposes.
+This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the [text2vec](http://text2vec.org/) package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [Bojanowski2016]. 
+
+TODO maybe: mention https://github.com/mkearney/wactor???
 
 ## Use pre-trained word embeddings {#glove}
 
@@ -256,19 +258,94 @@ If your dataset is too small, you typically cannot train reliable word embedding
 How small is too small? It is hard to make definitive statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 ```
 
-In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own dataset. Instead, we can turn to **pre-trained** word embeddings.
+In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own dataset. Instead, we can turn to **pre-trained** word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the [textdata](https://cran.r-project.org/package=textdata) package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
 
-```{r}
+```{r eval=FALSE}
 library(textdata)
 
-## get GloVe embeddings
-
+glove6b <- embedding_glove6b(dimensions = 100)
+glove6b
 ```
 
+```{r glove6b, echo=FALSE}
+load("data/glove6b.rda")
+glove6b
+```
 
-https://github.com/mkearney/wactor
+We can transform these word embeddings into a more tidy format, using `pivot_longer()` from tidyr. Let's also give this tidied version the same column names as `tidy_word_vectors`, for convenience.
 
-Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) and [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia.
+```{r tidyglove, dependson="glove6b"}
+tidy_glove <- glove6b %>%
+  pivot_longer(contains("d"),
+               names_to = "dimension") %>%
+  rename(item1 = token)
+
+tidy_glove
+```
+
+We've already explored some sets of "synonyms" in the embedding space we determined ourselves from the CPFB complaints. What about this embedding space learned via the GloVe algorithm on a much larger dataset? We just need to make one change to our `nearest_synonyms()` function, because the matrices we are multiplying together are much larger this time.
+
+```{r nearestsynonyms2}
+nearest_synonyms <- function(df, token) {
+  df %>%
+    widely(~ . %*% (.[token, ]), sort = TRUE, maximum_size = NULL)(item1, dimension, value) %>%
+    select(-item2)
+}
+```
+
+Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) (what we are using here) and [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to `"error"` in the GloVe embeddings?
+
+```{r dependson=c("tidyglove", "nearestsynonyms2")}
+tidy_glove %>%
+    nearest_synonyms("error")
+```
+
+Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data.
+
+What is closest to the word `"month"` in these pre-trained GloVe embeddings?
+
+```{r dependson=c("tidyglove", "nearestsynonyms2")}
+tidy_glove %>%
+    nearest_synonyms("month")
+```
+
+Instead of words about payments, the GloVe results here focus on different time periods only.
+
+What words are closest in the GloVe embedding space to `"fee"`?
+
+```{r dependson=c("tidyglove", "nearestsynonyms2")}
+tidy_glove %>%
+    nearest_synonyms("fee")
+```
+
+The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.
+
+```{block, type = "rmdwarning"}
+These examples highlight how pre-trained word embeddings can be useful because of the incredibly rich semantic relationships they encode, but also how these vector representations are often less than ideal for specific tasks.
+```
+
+If we do choose to use pre-trained word embeddings, how do we go about integrating them into a modeling workflow? Again, we can create simple document embeddings by treating each document as a collection of words and summarizing the word embeddings. The GloVe embeddings do not contain all the tokens in the CPFB complaints, and vice versa, so let's use `inner_join()` to match up our datasets.
+
+```{r glovematrix, dependson=c("docmatrix", "tidyglove")}
+word_matrix <- tidy_complaints %>%
+  inner_join(tidy_glove %>%
+               distinct(item1) %>%
+               rename(word = item1)) %>%
+  count(complaint_id, word) %>%  
+  cast_sparse(complaint_id, word, n)
+
+glove_matrix <- tidy_glove %>%
+  inner_join(tidy_complaints %>% 
+               distinct(word) %>%
+               rename(item1 = word)) %>%
+  cast_sparse(item1, dimension, value)
+
+doc_matrix <- word_matrix %*% glove_matrix
+
+dim(doc_matrix)
+```
+
+Since these GloVe embeddings had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the dataset. We have lost documents which contain only words not included in the GloVe embeddings.
 
 ## Fairness and word embeddings {#fairnessembeddings}
 
@@ -306,9 +383,9 @@ because of characteristics of the text the word embeddings were trained on.
 
 Given these profound and fundamental challenges with word embeddings, what options are out there? First, consider not using word embeddings when building a text model. Depending on the particular analytical question you are trying to answer, another numerical representation of text data (such as word frequencies or tf-idf of single words or n-grams) may be more appropriate. Consider this option even more seriously if the model you want to train is already entangled with issues of bias, such as the sentiment analysis example in Section \@ref(fairnessembeddings).
 
-Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings such as GloVe or word2vec, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is **specific** rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. 
+Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings created using an algorithm such as GloVe or word2vec, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is **specific** rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. 
 
-Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, hundreds of thousands or more documents) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language datasets.
+Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, a million tokens) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language datasets.
 
 ```{block, type = "rmdnote"}
 You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.
@@ -320,4 +397,14 @@ Other researchers, such as @Caliskan2016, suggest that corrections for fairness 
 
 ## Summary
 
-TKTKTK It's important to keep in mind that even more advanced natural language algorithms, such as language models with transformers, also exhibit such systemic biases [@Sheng2019].
+Mapping words (or other tokens) to an embedding in a special vector space is a powerful approach in natural language processing. This chapter started from fundamentals to demonstrate how to determine word embeddings from a text dataset, but a whole host of highly sophisticated techniques have been built on this foundation. For example, document embeddings can be learned from text directly [@Le2014] rather than summarized from word embeddings. More recently, embeddings have acted as one part of language models with transformers like ULMFiT [@Howard2018] and ELMo [@Peters2018]. It's important to keep in mind that even more advanced natural language algorithms, such as these language models with transformers, also exhibit such systemic biases [@Sheng2019].
+
+### In this chapter, you learned:
+
+- what a word embedding is and why we use them
+- how to determine word embeddings from a text dataset
+- how the vector space of word embeddings encodes word similarity
+- about a simple strategy to find document similarity
+- how to handle pre-trained word embeddings
+- why word embeddings carry historic and systemic bias
+- about approaches for debiasing word embeddings
