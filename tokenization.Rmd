@@ -31,7 +31,7 @@ This character vector has nine atomic elements, each of which consists of a seri
 
 In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input in to pieces (tokens) that correspond to the type. [@Manning:2008:IIR:1394399]
 
-![](images/tokenization/tokenization.jpg) TODO
+![](diagram-files/tokenization-black-box.png)
 
 Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is  difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like `"didn't"` may more accurately be considered two words with no space.
 
@@ -106,7 +106,6 @@ sample_tibble %>%
   unnest_tokens(word, text, token = "words", strip_punct = FALSE)
 ```
 
-
 ### Character tokens
 
 Perhaps the simplest tokenization is character tokenization, which splits texts into characters. Let's use `tokenize_characters()` with its default parameters; this function has arguments to convert to lowercase and to strip all non-alphanumeric characters. These defaults will reduce the number of different tokens that are returned. The `tokenize_*()` functions by default return a list of character vectors, one character vector for each string in the input.
@@ -134,7 +133,24 @@ tokenize_characters(x = the_fir_tree,
   glimpse()
 ```
 
-TODO Find examples of when a character is hard to define. Look at Arabic, German (double s) and danish (double a).
+Sometimes you run into problems where what a "character" can be ambiguous. Depending on the format your have the data in, it might contain ligatures. Ligatures is when multiple  graphemes or letters are combined as a single glyph, which is what we have called a character
+so far. "f" and "l" gets combined into "ﬂ", "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+
+```{r}
+tokenize_characters("ﬂowers")
+```
+
+One might want to have these ligatures separated back into separate characters. Before you do this you need to consider a couple of things. Firstly, you need to consider if the presence of ligatures is a meaningful feature to the question you are trying to answer. Secondly, there are two main types of ligatures, Stylistic and functional ligatures. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase glyph. This has led the typesetters to SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples are the "W" in the Latin alphabet (two "v" or two "u" joined together), æ, ø, and å in the nordic languages, are new letters. For historical reasons some place-names still use old spelling "aa" instead of å.
+
+A newcomer in terms of characters is emoji. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Lets first look at the flag emoji. As of the time of writing, 261 different flags have emoji representation. However there they do not have individual Unicode characters. Let's take a look:
+
+```{r}
+flags <- "" # TODO figure out how to avoid breaking things`
+
+tokenize_characters(flags)
+```
+
+When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Japanese flag you will find that they are "REGIONAL INDICATOR SYMBOLS", "J" and "P" respectively. This is done such that all the flags can be represented only using 26 Unicode symbols. The same thing is done with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers and skin tone modifiers. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
 
 ### Word tokens
 
@@ -175,8 +191,6 @@ The five most common words in each fairy tale are fairly uninformative, with the
 These uninformative words are called **stop words** and will be explored in depth in Chapter \@ref(stopwords).
 
 ```
-
-
 
 ### Lines, sentence, and paragraph tokens
 
@@ -255,10 +269,9 @@ Notice how the words in the trigrams overlap so that the word "down" appears in 
 
 It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your dataset, consider starting at two instead three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher order n-grams. 
 
-```{r ngramtokens, fig.width=10, fig.height=8, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts"}
+```{r ngramtokens, echo=FALSE, fig.width=10, fig.height=8, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts"}
 length_and_max <- function(x) {
   tab <- table(x)
-  
   paste(length(tab), max(tab), sep = "-")
 }
 
@@ -293,9 +306,7 @@ While the defaults work well in many cases, we encounter situations where we wan
 
 > "Don't forget you owe the bank $1 million for the house." 
 
-This sentence has several interesting parts which we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in `"Don't"` which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into `"do"` and `"n't"`. By performing such a split, we could learn whether contractions such as `"n't"` will be different then `"not"`, but we will also have a broader reduction as the words "wouldn't" and "shouldn't" will be split according to the same pattern. 
-
-TODO FOR EMIL: THE LAST SENTENCE OF THE ABOVE PARAGRAPH IS UNCLEAR AND I CAN'T TELL WHAT IT IS INTENDING TO SAY
+This sentence has several interesting parts which we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in `"Don't"` which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into `"do"` and `"n't"`. 
 
 The next issue at hand is how to deal with `"\$1"`; the dollar sign is highly important part of this sentence as it denotes a kind of currency. We could either remove or keep this punctuation symbol, and if we keep the dollar sign, we can choose between keeping one or two tokens, `"\$1"` or `"\$"` and `"1"`. If we look at the default for `tokenize_words()`, we notice that it defaults to removing most punctuation including \$.
 
@@ -313,17 +324,17 @@ When dealing with this sentence, we also need to decide whether to keep the fina
 
 Information we can lose when we tokenize occurs more frequently in online and more casual text. Multiple spaces, extreme usage of exclamation characters, and deliberate use of capitalization can be completely lost depending on our choice of tokenizer and tokenization parameters. At the same time, it is not always worth keeping that kind of information about how text is being used. If we are studying trends in disease epidemics using Twitter data, the style the tweets are written with is likely not nearly as important as what words are used. However, if we are trying to model social groupings, language style and how individuals use language toward each other becomes much more important.
 
-TODO Do comparing of compression of data with different types of tokenizations
+Another thing to consider is the degree of compression each type of tokenization provides. depending on the choice of tokenization you are going to get a different pool of possible tokens. The choice of tokenization can make an influence on your performance. By choosing a method that gives fewer possible tokens you allow later tasks to be performed faster, purely computationally. However, that comes with the risk of collapsing together buckets of different meaning tokens into one bucket. It is also worth noting that the spread of the number of different tokens varies with your choice of the tokenizer. Below is a visualization where these past points are illustrated. Each of the fairy tales from **hcandersenr** has been tokenized in 5 different ways and the number of distinct tokens has been mapped along the x-axis, notice that we are plotting on a log scale. We see that the number of distinct tokens goes down one once we lowercase the words or extract word stems. Secondly, we see that the distribution for Character tokenizers are really narrow since it is quite likely to use all the letters in the English alphabet.
 
-```{r}
+```{r, echo=FALSE}
 hcandersen_en %>%
-  nest(text) %>%
+  nest(data = c(text)) %>%
   mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
-  mutate(chars = tokenize_characters(data) %>% map_int(~table(.x) %>% length()),
-         chars_non_alphanum = tokenize_characters(data, strip_non_alphanum = FALSE) %>% map_int(~table(.x) %>% length()),
-         words = tokenize_words(data) %>% map_int(~table(.x) %>% length()),
-         words_no_lowercase = tokenize_words(data, lowercase = FALSE) %>% map_int(~table(.x) %>% length()),
-         words_stems = tokenize_word_stems(data) %>% map_int(~table(.x) %>% length())) %>%
+  mutate(`Characters w/o alphanumerics` = tokenize_characters(data) %>% map_int(~table(.x) %>% length()),
+         `Characters` = tokenize_characters(data, strip_non_alphanum = FALSE) %>% map_int(~table(.x) %>% length()),
+         Words = tokenize_words(data) %>% map_int(~table(.x) %>% length()),
+         `Words no lowercase` = tokenize_words(data, lowercase = FALSE) %>% map_int(~table(.x) %>% length()),
+         `word stems` = tokenize_word_stems(data) %>% map_int(~table(.x) %>% length())) %>%
   select(-data) %>%
   pivot_longer(-book) %>%
   ggplot(aes(name, value)) +
@@ -336,7 +347,6 @@ hcandersen_en %>%
        x = NULL,
        y = "Number of distinct tokens")
 ```
-
 
 ## Building your own tokenizer
 
@@ -357,7 +367,6 @@ Here we want to make a modification to what `tokenize_characters()` does such th
 In this example, leaving out the quantifier yields the same result as including it. However, for more complex regular expressions, specifying the quantifier allows the string handling to run faster.
 ```
 
-
 ```{r}
 letter_tokens <- str_extract_all("This sentence include 2 numbers and 1 period.", 
                                  "[:alpha:]{1}")
@@ -376,7 +385,6 @@ str_extract_all(danish_sentence, "[a-zA-Z]")
 ```{block, type = "rmdwarning"}
 Choosing between `[:alpha:]` and `[a-zA-Z]` may seem quite similar, but the resulting differences can have a big impact on your analysis.
 ```
-
 
 ### Allow for hyphenated words
 
@@ -429,21 +437,6 @@ str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?
 
 That is getting to be quite a complex regex, but we are now getting the same answer as before. 
 
-### Character n-grams
-
-TODO change to toktok tokenizer
-
-Next let's explore character n-grams. For the purpose of this example, a character n-gram is defined as a consecutive group of $n$ characters. The matching will *not* extend over spaces, but will include overlapping matches within words. With this definiton, the 3-grams of `"nice dog"` would be `"nic", "ice", "dog"`. Since the regex engines in R normally don't support overlapping matches, we have to get creative. First we will use a "lookahead" to find the location of all the matches, then we will use those locations to match the n-grams.
-
-```{r}
-sentence <- c("This isn't a sentence with hyphenated-words.",
-              "Same with this one")
-
-ngram_loc <- str_locate_all(sentence, "(?=(\\w{3}))")
-
-map2(ngram_loc, sentence, ~str_sub(.y, .x[, 1], .x[, 1]+2))
-```
-
 ### Wrapping it into a function
 
 We have shown how we can use regular expressions to extract the tokens we want, perhaps to use in modeling. So far, the code has been rather unstructured. We would ideally wrap these tasks into functions that can be used the same way `tokenize_words()` is used.
@@ -478,18 +471,21 @@ tokenize_character_ngram(the_fir_tree[1:3], n  =3)
 
 We can use `paste0()` in this function to construct an actual regex. 
 
+## Tokenization for non-Latin alphabets
+
+TODO Use **jiebaR** for chinese.
+
 ## Tokenization benchmark
 
-TODO showcase other libraries for tokenization
+Not all tokenization packages are created equal. Most of them quite polished but they serve different purposes, some have a multitude of arguments to allow you to customize your tokenizer for great flexibility. But this flexibility comes at a price, that they tend to perform slower as you can't hardcode as many things. While we can't easily quantify flexibility, we can easily benchmark some of the tokenizers available in R so you can pick the one that best suits your needs.
 
 ```{r}
-the_fir_tree1 <- c("1", the_fir_tree)
-
-bench::mark(
-  `[:alpha:]` = str_extract_all(the_fir_tree1, "[:alpha:]"),
-  `[a-zA-Z]` = str_extract_all(the_fir_tree1, "[a-zA-Z]"),
-  `[a-zA-Z]{1}` = str_extract_all(the_fir_tree1, "[a-zA-Z]{1}"),
-  `[:Letter:]` = str_extract_all(the_fir_tree1, "[:Letter:]")
+bench::mark(check = FALSE, iterations = 10,
+  `corpus` = corpus::text_tokens(hcandersen_en$text),
+  `tokenizers` = tokenizers::tokenize_words(hcandersen_en$text),
+  `text2vec` = text2vec::word_tokenizer(hcandersen_en$text),
+  `quanteda` = quanteda::tokenize_word(hcandersen_en$text),
+  `base R` = strsplit(hcandersen_en$text, "\\s")
 )
 ```
 
