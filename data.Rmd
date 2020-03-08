@@ -1,6 +1,6 @@
 # Data {#appendixdata .unnumbered}
 
-TODO fill in
+This section includes brief explanations of the various datasets we will be using in this book.
 
 ## hcandersenr {-}
 
@@ -25,8 +25,8 @@ The **scotus**[@R-scotus] package contains a sample of the Supreme Court of the 
 The `scotus_sample` data.frame includes 1 opinion per row along with the year, case name, docket number, and a unique ID number.
 
 The text has had minimal preprocessing done on them and will include the header information in the text field.
-Example of the beginning of an opinion is shown below
-
+Example of the beginning of a court opinion is shown below
+ 
 ```{r, echo=FALSE}
 library(scotus)
 cat(paste(stringr::str_wrap(head(strsplit(scotus_sample$text[42], "\n")[[1]])), collapse = "\n"))
@@ -34,32 +34,15 @@ cat(paste(stringr::str_wrap(head(strsplit(scotus_sample$text[42], "\n")[[1]])), 
 
 ## GitHub issue {-}
 
-This [dataset](https://github.com/explosion/projects/tree/master/textcat-docs-issues) includes 1161 Github issue title and an indicator of whether the issue was about documentation or not.
+This [dataset](https://github.com/explosion/projects/tree/master/textcat-docs-issues) includes 1161 Github issue title and an indicator of whether the issue was about documentation or not, it have been converted to be accesiable from the **ghissuesdata**[@R-ghissuesdata] package.
 The dataset is split into a training data set and evaluation data set.
 
-TODO find out how to store this data
-
 ```{r, eval=FALSE}
-library(jsonlite)
-library(readr)
-library(tidyverse)
+library(ghissuesdata)
 
-json_to_df <- function(x) {
-  json <- parse_json(x)
-  
-  tibble(text = json$text,
-         label = json$label,
-         answer = json$answer)
-}
-
-github_issues_training <- read_lines("https://raw.githubusercontent.com/explosion/projects/master/textcat-docs-issues/docs_issues_training.jsonl") %>%
-  map_dfr(json_to_df)
-
-github_issues_eval <- read_lines("https://raw.githubusercontent.com/explosion/projects/master/textcat-docs-issues/docs_issues_eval.jsonl") %>%
-  map_dfr(json_to_df)
+dplyr::glimpse(github_issues_training)
 ```
 
 ## US Consumer Finance Complaints {-}
 
-This [dataset](https://www.kaggle.com/cfpb/us-consumer-finance-complaints) includes 117214 consumers’ complaints about financial products and services to companies for response. Each comes with an `complaint_id`, various catagorial variables and a text column `consumer_complaint_narrative` containing the written complaints.
-
+This [dataset](https://www.kaggle.com/cfpb/us-consumer-finance-complaints) includes 117214 consumers’ complaints about financial products and services to companies for response. Each comes with a `complaint_id`, various categorical variables and a text column `consumer_complaint_narrative` containing the written complaints.
