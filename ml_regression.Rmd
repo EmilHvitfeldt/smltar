@@ -1,24 +1,144 @@
 # Regression
 
-What is regression.
-How is it different then classification.
-Defining what to regress on. Does it generalize
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, 
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+options(crayon.enabled = FALSE)
+``` 
 
-## First attempt
+In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing or MORE HERE TODO. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
 
-first attempt and full game will use same data. 
-First attempt might use a subset of the data to make the example easier to understand.
-and properly to give balanced dataset, which then later can be explored.
+```{r scotussample}
+library(tidyverse)
+library(scotus)
 
-### Look at the data
+scotus_sample %>%
+  as_tibble()
+```
 
-### Modeling
+This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
 
-### Evaluation
+- A **classification model** predicts a class label or group membership.
+- A **regression model** predicts a numeric or continuous value.
+
+In text modeling, we use text data (such as the text of the court opinions), sometimes combined with other structured, non-text data, to predict the continuous value of interest (such as year of the court opinion).
+
+## A first regression model
+
+Let's build our first regression model using this sample of Supreme Court opinions. Before we start, let's check out how many opinions we have over time in Figure \@ref(fig:scotus_hist).
+
+```{r scotushist, dependson="scotussample", fig.cap="Supreme Court opinions per decade in sample"}
+scotus_sample %>%
+  mutate(year = as.numeric(year),
+         year = 10 * (year %/% 10)) %>%
+  count(year) %>%
+  ggplot(aes(year, n)) +
+  geom_col() +
+  labs(x = "Year", y = "Number of opinions per decade")
+```
+
+This sample of opinions reflects the true distribution over time of available opinions for analysis; there are many more opinions per year in this dataset after about 1990 than before. We will need to account for that in our modeling.
+
+### Building our first regression model
+
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value as it was originally stored as a character.
+
+```{r scotussplit, dependson="scotussample"}
+library(tidymodels)
+set.seed(1234)
+scotus_split <- scotus_sample %>%
+  mutate(year = as.numeric(year)) %>%
+  initial_split()
+
+scotus_train <- training(scotus_split)
+scotus_test <- testing(scotus_split)
+```
+
+Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
+
+- First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
+- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions.
+- After tokenization, we remove stop words (Chapter \@ref(stopwords)).
+- Next, we filter to only keep the top 75 tokens by term frequency, after removing stop words.
+- The recipe step `step_tf()`, used with defaults as here, weights each token by the raw counts used in each document.
+- Finally, we `prep()` the recipe. This means we actually do something with all these steps together with our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
+
+```{r scotusrec, dependson="scotussplit"}
+library(textrecipes)
+
+scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text) %>%
+  step_stopwords(text) %>%
+  step_tokenfilter(text, max_tokens = 75) %>%
+  step_tf(text) %>%
+  prep()
+
+scotus_rec
+```
+
+After we have split and preprocessed our data, we can specify the model we will use. Let's build a lasso regression model with `mixture = 1`. Before fitting, we set up a model specification.
+
+```{r lassospec}
+lasso_spec <- linear_reg(penalty = 0.1, mixture = 1) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
+
+lasso_spec
+```
+
+Everything is now ready for us to fit our model! We can access our preprocessed training data from our recipe using `juice(scotus_rec)`.
+
+```{r lasso_fit, dependson=c("lassospec", "scotusrec")}
+lasso_fit <- lasso_spec %>%
+  fit(year ~ .,
+      data = juice(scotus_rec))
+
+lasso_fit
+```
+
+We have successfully fit a regularized regression model to this dataset of Supreme Court opinions.
+
+### Evaluating our model
+
+One option for our evaluating our model is to predict one time on the test set to measure performance. The test set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). The purpose of the test data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this; instead we use **resampling**.
+
+For example, let's estimate the performance of the lasso regression model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+
+```{r scotusfolds, dependson="scotussplit"}
+scotus_folds <- vfold_cv(scotus_train)
+
+scotus_folds
+```
+
+Each of these "splits" contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.
+
+For convenience, let's use `workflows()` for our resampling estimates of performance. These are convenience functions that fit different modeling functions like recipes, model specifications, etc. together so they are easier to pass around in a modeling project.
+
+```{r lassowf, dependson=c("lassospec", "scotusrec")}
+lasso_wf <- workflow() %>%
+  add_recipe(scotus_rec) %>%
+  add_model(lasso_spec)
+
+lasso_wf
+```
+
+In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
+
+```{r}
+fit_resamples(
+  lasso_wf,
+  scotus_folds
+)
+```
 
 Closely examine high performaing samples and low performance sampling. 
 
 ## Different types of models
+
+Lasso regression works extremely well with text data, but it is not the only option.
 
 (Not all of these models are good, but are used to show strenghs and weaknessed)
 - SVM
