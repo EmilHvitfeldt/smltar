@@ -73,10 +73,11 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_stopwords(text) %>%
   step_tokenfilter(text, max_tokens = 75) %>%
-  step_tf(text) %>%
-  prep()
+  step_tf(text) 
 
-scotus_rec
+scotus_prep <- prep(scotus_rec)
+
+scotus_prep
 ```
 
 After we have split and preprocessed our data, we can specify the model we will use. Let's build a lasso regression model with `mixture = 1`. Before fitting, we set up a model specification.
@@ -94,7 +95,7 @@ Everything is now ready for us to fit our model! We can access our preprocessed 
 ```{r lasso_fit, dependson=c("lassospec", "scotusrec")}
 lasso_fit <- lasso_spec %>%
   fit(year ~ .,
-      data = juice(scotus_rec))
+      data = juice(scotus_prep))
 
 lasso_fit
 ```
@@ -128,11 +129,25 @@ lasso_wf
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
 ```{r}
-fit_resamples(
+lasso_rs <- fit_resamples(
   lasso_wf,
   scotus_folds
 )
+
+lasso_rs
 ```
+
+What results do we see, in terms of performance metrics?
+
+```{r}
+lasso_rs %>%
+  collect_metrics()
+```
+
+## Tuning lasso hyperparameters
+
+The value `penalty = 0.1` for regularization in the previous section was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? We can find out using resampling and tuning the model. Let's use our same set of cross-validation folds, and build a new model specification for model tuning.
+
 
 Closely examine high performaing samples and low performance sampling. 
 
