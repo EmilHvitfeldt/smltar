@@ -19,9 +19,11 @@ and properly to give balanced dataset, which then later can be explored.
 ### Look at the data
 
 ```{r, message=FALSE}
-library(tidymodels)
-library(readr)
 library(textrecipes)
+library(tidymodels)
+library(tidytext)
+library(discrim)
+library(readr)
 ```
 
 We are going to be working with US consumer complaints on financial products and company responses.
@@ -50,7 +52,18 @@ Here is the first 6 complaints:
 head(complaints$consumer_complaint_narrative)
 ```
 
-TODO write what the different censoring means.
+Throughout the narratives is series of capital x's. This has been done to hide Personally identifiable information (PII). This is not a universial censoring mechanish and can vary from source to source, hopefully you will be able to get this information in the data dictionary but you should always look at the data yoursef to verify. We also see that all monetary amounts are surrounded by curly brackets, this is another step of preprocessing that have been done for us.
+
+We can craft a regular expression to extract all the dollar amounts.
+
+```{r}
+complaints$consumer_complaint_narrative %>%
+  str_extract_all("\\{\\$[0-9\\.]*\\}") %>%
+  compact() %>%
+  head()
+```
+
+## Building our first classification model
 
 Since this data is given to us after the fact, 
 we need to make sure that only the information that would be avaliable at the time of prediction is included in the model,
@@ -67,15 +80,19 @@ The variables we can use as predictors are
 - `tags`
 - `submitted_via`
 
- Many of these have quite a lot of levels.
- First we will include `date_received` for further consideration, along with `consumer_complaint_narrative` and `tags`.
- `submitted_via` would have been a viable candidate too, but all the entries are "web".
- The other variables could be of use too, but they are catagorial variables with many values so we will exclude them for now.
+Many of these have quite a lot of levels.
+First we will include `date_received` for further consideration, along with `consumer_complaint_narrative` and `tags`.
+`submitted_via` would have been a viable candidate too, but all the entries are "web".
+The other variables could be of use too, but they are catagorial variables with many values so we will exclude them for now.
 
-We start by splitting the data into a training and testing dataset,
-this is easily done using the 
+We start by splitting the data into a training and testing dataset.
+But before we do that we will create a factor variable of product with the levels "Mortgage" and "Other".
+Then we will use the `initial_split()` from **rsample** to create a binary split of the data. 
+The `strata` argument is used to make sure that the split is created to make sure the distribution of `product` is similar in the training set and testing set. 
+Since the split is done using random sampling we set a seed so we can reproduce the results.
 
 ```{r}
+set.seed(1234)
 complaints2class <- complaints %>%
   mutate(product = factor(if_else(product == "Mortgage", "Mortgage", "Other")))
 
@@ -85,54 +102,104 @@ complaints_train <- training(complaints_split)
 complaints_test <- testing(complaints_split)
 ```
 
+Looking the dimensions of the two split shows that it worked succesfully.
+
 ```{r}
-complaint_recipe <- 
-  recipe(formula = product ~ date_received + tags +
-                             consumer_complaint_narrative, 
-         data = complaints_train) %>%
-  # Extract month and day or week from `date_received`
+dim(complaints_train)
+dim(complaints_test)
+```
+
+Next we need to do some preprocessing. We need to do this since the models we are trying to use only support all numeric data. 
+
+```{block, type = "rmdnote"}
+Some models are able to handle factor variables and missing data. But it is in our best interest to manually deal with these problems so we know how they are handled.
+```
+
+The **recipes** package allows us to create a specification of the preprocessing steps we want to perform. Futhermore it contains the transformations we have trained on the training set and apply them in the same way for the testing set.
+First off we use the `recipe()` function to initialize a recipes, we use a formula expression to specify the variables we are using along with the dataset.
+
+```{r}
+complaint_rec <- 
+  recipe(product ~ date_received + tags + consumer_complaint_narrative, 
+         data = complaints_train)
+```
+
+First will we take a look at the `date_received` variable. We use the `step_date()` to extract the month and day of the week (dow). Then we remove the original variable and dummify the variables created with `step_dummy()`.
+
+```{r}
+complaint_rec <- complaint_rec %>%
   step_date(date_received, features = c("month", "dow"), role = "dates") %>%
   step_rm(date_received) %>%
-  step_dummy(has_role("dates")) %>%
-  # dummify `tags`
+  step_dummy(has_role("dates"))
+```
+
+the `tags` variable includes some missing data. We deal with this by using `step_unknown()` to that adds a new level to the factor variable for cases of missing data. Then we dummify the variable with `step_dummy()`
+
+```{r}
+complaint_rec <- complaint_rec %>%
   step_unknown(tags) %>%
-  step_dummy(tags) %>%
-  # tfidf with top 150 most frequent words not including stopwords
+  step_dummy(tags)
+```
+
+Lastly we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we perform tokenization to words with `step_tokenize()`, by default this is done using `tokenizers::tokenize_words()`.
+Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 50 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
+
+```{r}
+complaint_rec <- complaint_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
-  step_tfidf(consumer_complaint_narrative) %>%
-  prep()
+  step_tfidf(consumer_complaint_narrative)
 ```
 
+Now that we have a full specification of the recipe we run `prep()` on it to train each of the steps on the training data.
+
 ```{r}
-train_data <- juice(complaint_recipe)
-test_data <- bake(complaint_recipe, complaints_test)
+complaint_prep <- prep(complaint_rec)
 ```
 
-### Modeling
+We can now extract the transformed training data with `juice()`. To apply the prepped recipe to the testing set we use the `bake()` function.
 
 ```{r}
-glmnet_model <- logistic_reg(penalty = 10, mixture = 0.1) %>%
+train_data <- juice(complaint_prep)
+test_data <- bake(complaint_prep, complaints_test)
+```
+
+and taking a short `glimpse()` of the prepped dataset to make sure everything went well.
+
+```{r}
+glimpse(train_data)
+```
+
+For the modeling we will use a simple Naive Bayes model (TODO add citation to both Naive bayes and its use in text classification).
+One of the main advanteges of Naive Bayes is its ability to handle a large number of features which we tend to get when using word count methods.
+Here we have only kept the 50 most frequent tokens, we could have keep more tokens and a Naive Bayes model would be able to handle it okay, but we will limit it for this first time.
+
+```{r}
+nb_spec <- naive_Bayes() %>%
   set_mode("classification") %>%
-  set_engine("glmnet")
-glmnet_model
+  set_engine("klaR")
+nb_spec
 ```
 
+Now we have everything we need to fit our first classification model, we just have to run `fit()` on out model specification and our training data.
+
 ```{r}
-glmnet_model_fit <- glmnet_model %>%
+nb_fit <- nb_spec %>%
   fit(product ~ ., data = train_data)
-glmnet_model_fit
 ```
+
+We have more succesfully fitted out first classification model.
 
 ### Evaluation
 
-```{r}
-glmnet_model_fit %>%
+```{r, eval=FALSE}
+nb_model_fit %>%
   predict(test_data) %>%
   mutate(truth = test_data$product) %>%
   accuracy(truth, .pred_class)
 ```
+
 
 ## Different types of models
 
@@ -149,8 +216,59 @@ glmnet_model_fit %>%
 
 ## Case study: What happens if you don't censor your data
 
-The complaints data already have sensitive informationo censored out with XXXX and XX. 
-Imputate fake information for all XXXX fields and compare the model run with that data with original model.
+The complaints data already have sensitive information censored out with XXXX and XX.
+This can be seen as a kind of annotation, we don't get to know the specific acocunt numbers and birthday which would be mostly unique anyways and filtered out.
+
+Below we have
+
+```{r}
+complaints_train %>%
+  slice(1:1000) %>% # TODO increase this value
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams") %>%
+  count(trigrams, sort = TRUE) %>%
+  mutate(censored = stringr::str_detect(trigrams, 'xx')) %>%
+  slice(1:20) %>%
+  ggplot(aes(n, reorder(trigrams, n), fill = censored)) +
+  geom_col() +
+  scale_fill_manual(values = c("grey40", "firebrick"))
+```
+
+```{r}
+uncensor <- function(n) {
+  as.character(sample(seq(10^(n-1), 10^n-1), 1))
+}
+
+uncensor_vec <- function(x) {
+  locs <- str_locate_all(x, "XX")
+  
+  map2_chr(x, locs, ~ {
+    for (i in seq_len(nrow(.y))) {
+      str_sub(.x, .y[i, 1], .y[i, 2]) <- uncensor(2)
+    }
+    .x
+  })
+}
+
+complaints_train %>%
+  select(consumer_complaint_narrative) %>%
+  slice(1:10) %>%
+  mutate(consumer_complaint_narrative = uncensor_vec(consumer_complaint_narrative)) %>%
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams") %>%
+  count(trigrams, sort = TRUE) %>%
+  mutate(censored = stringr::str_detect(trigrams, 'xx')) %>%
+  slice(1:20) %>%
+  ggplot(aes(n, reorder(trigrams, n), fill = censored)) +
+  geom_col() +
+  scale_fill_manual(values = c("grey40", "firebrick"))
+```
+
+
+
+```{r}
+colnames(train_data)
+```
+
+
 
 ## Case study: relationship between performace
 
