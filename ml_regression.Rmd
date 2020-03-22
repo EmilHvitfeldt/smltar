@@ -62,7 +62,7 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions.
 - After tokenization, we remove stop words (Chapter \@ref(stopwords)).
-- Next, we filter to only keep the top 75 tokens by term frequency, after removing stop words.
+- Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
 - The recipe step `step_tf()`, used with defaults as here, weights each token by the raw counts used in each document.
 - Finally, we `prep()` the recipe. This means we actually do something with all these steps together with our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
 
@@ -72,7 +72,7 @@ library(textrecipes)
 scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_stopwords(text) %>%
-  step_tokenfilter(text, max_tokens = 75) %>%
+  step_tokenfilter(text, max_tokens = 500) %>%
   step_tf(text) 
 
 scotus_prep <- prep(scotus_rec)
@@ -96,8 +96,6 @@ Everything is now ready for us to fit our model! We can access our preprocessed 
 lasso_fit <- lasso_spec %>%
   fit(year ~ .,
       data = juice(scotus_prep))
-
-lasso_fit
 ```
 
 We have successfully fit a regularized regression model to this dataset of Supreme Court opinions.
@@ -128,7 +126,7 @@ lasso_wf
 
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r}
+```{r lassors, dependson=c("lassowf", "scotusfolds")}
 lasso_rs <- fit_resamples(
   lasso_wf,
   scotus_folds
@@ -139,7 +137,7 @@ lasso_rs
 
 What results do we see, in terms of performance metrics?
 
-```{r}
+```{r, dependson="lassors"}
 lasso_rs %>%
   collect_metrics()
 ```
