@@ -219,12 +219,12 @@ nb_model_fit %>%
 The complaints data already have sensitive information censored out with XXXX and XX.
 This can be seen as a kind of annotation, we don't get to know the specific acocunt numbers and birthday which would be mostly unique anyways and filtered out.
 
-Below we have
+Below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
 
 ```{r}
 complaints_train %>%
-  slice(1:1000) %>% # TODO increase this value
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams") %>%
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
+                collapse = FALSE) %>%
   count(trigrams, sort = TRUE) %>%
   mutate(censored = stringr::str_detect(trigrams, 'xx')) %>%
   slice(1:20) %>%
@@ -232,6 +232,8 @@ complaints_train %>%
   geom_col() +
   scale_fill_manual(values = c("grey40", "firebrick"))
 ```
+
+As you see the vast majority includes one or more censored words.
 
 ```{r}
 uncensor <- function(n) {
@@ -251,7 +253,7 @@ uncensor_vec <- function(x) {
 
 complaints_train %>%
   select(consumer_complaint_narrative) %>%
-  slice(1:10) %>%
+  slice(1:1000) %>%
   mutate(consumer_complaint_narrative = uncensor_vec(consumer_complaint_narrative)) %>%
   unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams") %>%
   count(trigrams, sort = TRUE) %>%
@@ -262,13 +264,9 @@ complaints_train %>%
   scale_fill_manual(values = c("grey40", "firebrick"))
 ```
 
-
-
 ```{r}
 colnames(train_data)
 ```
-
-
 
 ## Case study: relationship between performace
 
