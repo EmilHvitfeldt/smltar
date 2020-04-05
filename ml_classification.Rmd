@@ -118,7 +118,7 @@ The **recipes** package allows us to create a specification of the preprocessing
 First off we use the `recipe()` function to initialize a recipe, we use a formula expression to specify the variables we are using along with the dataset.
 
 ```{r complaintrec1, dependson="complaintssplit"}
-complaint_rec <- 
+complaints_rec <- 
   recipe(product ~ date_received + tags + consumer_complaint_narrative, 
          data = complaints_train)
 ```
@@ -126,7 +126,7 @@ complaint_rec <-
 First will we take a look at the `date_received` variable. We use the `step_date()` to extract the month and day of the week (dow). Then we remove the original variable and dummify the variables created with `step_dummy()`.
 
 ```{r}
-complaint_rec <- complaint_rec %>%
+complaints_rec <- complaints_rec %>%
   step_date(date_received, features = c("month", "dow"), role = "dates") %>%
   step_rm(date_received) %>%
   step_dummy(has_role("dates"))
@@ -135,7 +135,7 @@ complaint_rec <- complaint_rec %>%
 the `tags` variable includes some missing data. We deal with this by using `step_unknown()` to that adds a new level to the factor variable for cases of missing data. Then we dummify the variable with `step_dummy()`
 
 ```{r complaintrec2, dependson="complaintrec1"}
-complaint_rec <- complaint_rec %>%
+complaints_rec <- complaints_rec %>%
   step_unknown(tags) %>%
   step_dummy(tags)
 ```
@@ -144,7 +144,7 @@ Lastly we use **textrecipes** to handle the `consumer_complaint_narrative` varia
 Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 50 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
 
 ```{r complaintrec3, dependson="complaintrec2"}
-complaint_rec <- complaint_rec %>%
+complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
@@ -154,7 +154,7 @@ complaint_rec <- complaint_rec %>%
 Now that we have a full specification of the recipe we run `prep()` on it to train each of the steps on the training data.
 
 ```{r complaintprep, dependson="complaintrec3"}
-complaint_prep <- prep(complaint_rec)
+complaint_prep <- prep(complaints_rec)
 ```
 
 We can now extract the transformed training data with `juice()`. To apply the prepped recipe to the testing set we use the `bake()` function.
@@ -186,13 +186,45 @@ We have more successfully fitted out first classification model.
 
 ### Evaluation
 
-```{r dependson="nbfit", eval=FALSE}
-nb_fit %>%
-  predict(test_data) %>%
-  mutate(truth = test_data$product) %>%
-  accuracy(truth, .pred_class)
+One option for our evaluating our model is to predict one time on the test set to measure performance. The test set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). The purpose of the test data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this; instead we use **resampling**.
+
+For example, let's estimate the performance of the Naive Bayes classification model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+
+```{r complaintsfolds, dependson="complaintssplit"}
+complaints_folds <- vfold_cv(complaints_train)
+
+complaints_folds
 ```
 
+Each of these "splits" contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.
+
+For convenience, let's use `workflows()` for our resampling estimates of performance. These are convenience functions that fit different modeling functions like recipes, model specifications, etc. together so they are easier to pass around in a modeling project.
+
+```{r nbwf, dependson=c("nbspec", "complaintrec3")}
+nb_wf <- workflow() %>%
+  add_recipe(complaints_rec) %>%
+  add_model(nb_spec)
+
+nb_wf
+```
+
+In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit the model many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
+
+```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
+nb_rs <- fit_resamples(
+  nb_wf,
+  complaints_folds
+)
+
+nb_rs
+```
+
+What results do we see, in terms of performance metrics?
+
+```{r, dependson="nbrs"}
+nb_rs %>%
+  collect_metrics()
+```
 
 ## Different types of models
 
