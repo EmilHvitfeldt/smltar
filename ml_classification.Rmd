@@ -16,7 +16,7 @@ The first attempt and full game will use the same data.
 The first attempt might use a subset of the data to make the example easier to understand.
 and properly give a balanced dataset, which then later can be explored.
 
-### Look at the data
+### Look at the data {#classfirstattemptlookatdata}
 
 We are going to be working with US consumer complaints on financial products and company responses.
 It contains a text field containing the complaint along with information regarding what it was for,
@@ -345,12 +345,142 @@ This technique isn't just useful for personally identifiable information but can
 
 ## Case study: Adding custom features
 
-percentage of X's
-a custom feature is something that we can easily count and add to our model that isn't part of simple BoW.
-https://github.com/mkearney/textfeatures
-examples include: number of urls
+Most of what we have looked at so far have boiled down to counting occurrences of tokens and weighting them in one way or another.
+This approach is quite broad and domain agnostic so it might miss some important parts.
+Having domain knowledge over your data allows you to extract, hopefully, more powerful, features from the data that wouldn't come up in the naive search from simple tokens.
+As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
+This is where having a little bit of @regexp pays off.
 
-## Case study: the relationship between performance
+```{block, type = "rmdnote"}
+A noteable package is [textfeatures](https://github.com/mkearney/textfeatures) which includes many functions to extract all different kinds of metrics. textfeatures can be used in textrecipes with the `step_textfeature()` function.
+```
+
+If you have some domain knowledge you might know something that can provide a meaningful signal.
+It can be simple things like; the number of URLs and the number of punctuation marks.
+But it can also be more tailored such as; the percentage of capitalization, does the text end with a hashtag, or are two people's names both mentioned in this text.
+
+It is clear by looking at the data, that certain patterns repeat that have not adequately been picked up by our model so far.
+These are related to the censoring and the annotation regarding monetary amounts that we saw in [#classfirstattemptlookatdata].
+In this section, we will walk through how to create functions to extract the following features
+
+- Detect credit cards
+- Calculate percentage censoring
+- Detect monetary amounts
+
+### Detecting credit cards
+
+We know that the credit card is represented as 4 groups of 4 capital Xs.
+Since the data is fairly well processed we are fairly sure that spacing will not be an issue and all credit cards will be represented as "XXXX XXXX XXXX XXXX". 
+The first naive attempt is to use str_detect with "XXXX XXXX XXXX XXXX" to find all the credit cards.
+It is a good idea to create a small example where you know the answer then prototyping your functions before moving them to the main data.
+We start by creating a vector with 2 positives, 1 negative and 1 potential false positive.
+The last string is more tricky since it has the same shape as a credit card but has one too many groups.
+
+```{r}
+credit_cards <- c("my XXXX XXXX XXXX XXXX balance, and XXXX XXXX XXXX XXXX.",
+                  "card with number XXXX XXXX XXXX XXXX.",
+                  "at XX/XX 2019 my first",
+                  "live at XXXX XXXX XXXX XXXX XXXX SC")
+
+
+str_detect(credit_cards, "XXXX XXXX XXXX XXXX")
+```
+
+And we see what we feared, the last vector got falsely detected to be a credit card.
+Sometimes you will have to accept a certain number of false positives and false negatives depending on the data and what you are trying to detect. 
+In this case, we can make the regex a little more complicated to avoid that specific false positive.
+We need to make sure that the word coming before the X's doesn't end in a capital X and the word following the last X doesn't start with a capital X.
+We place spaces around the credit card and use some negated character classes[#character-classes] to detect anything BUT a capital X.
+
+```{r}
+str_detect(credit_cards, "[^X] XXXX XXXX XXXX XXXX [^X]")
+```
+
+Hurray! This fixed the false positive. 
+But it gave us a false negative in return.
+Turns out that this regex doesn't allow the credit card to be followed by a period since it requires a space.
+We can fix this with an alternation to match for a period or a space and a non X.
+
+```{r}
+str_detect(credit_cards, "[^X] +XXXX XXXX XXXX XXXX(\\.| [^X])")
+```
+
+Know that we have a regular expression we are happy with we can turn it into a function we can use.
+We can extract the presence of a credit card with `str_detect()` and the number of credit cards with `str_count()`.
+
+```{r}
+creditcard_indicator <- function(x) {
+  str_detect(x, "[^X] +XXXX XXXX XXXX XXXX(\\.| [^X])")
+}
+
+creditcard_count <- function(x) {
+  str_count(x, "[^X] +XXXX XXXX XXXX XXXX(\\.| [^X])")
+}
+
+creditcard_indicator(credit_cards)
+creditcard_count(credit_cards)
+```
+
+### Calculate percentage censoring
+
+Some of the complaints contain quite a lot of censoring, and we will try to extract the percentage of the text that is censored.
+There are often many ways to get to the same solution when working with regular expressions.
+I will attack this problem by counting the number of X's in each string, then count the number of alphanumeric characters and divide the two to get a percentage.
+
+```{r}
+str_count(credit_cards, "X")
+str_count(credit_cards, "[:alnum:]")
+str_count(credit_cards, "X") / str_count(credit_cards, "[:alnum:]")
+```
+
+And we finish up by creating a function.
+
+```{r}
+procent_censoring <- function(x) {
+  str_count(x, "X") / str_count(x, "[:alnum:]")
+}
+
+procent_censoring(credit_cards)
+```
+
+### Detecting monetary amounts
+
+We have already constructed a regular expression that detects the monetary amount from the text.
+So we can look at how we can use this information.
+Let us start by creating a little example and see what we can extract.
+
+```{r}
+dollar_texts <- c("That will be {$20.00}",
+                  "{$3.00}, {$2.00} and {$7.00}",
+                  "I have no money")
+
+str_extract_all(dollar_texts, "\\{\\$[0-9\\.]*\\}")
+```
+
+We can create a function that simply detects the dollar amount, and we can count the number of times each amount appears.
+But since each occurrence also has a value, would it be nice to include that information as well, such as the mean, minimum or maximum.
+
+First, let's extract the number from the strings, we could write a regular expression for this, but the `parse_number()` function from the readr package does a really good job of pulling out numbers.
+
+```{r}
+str_extract_all(dollar_texts, "\\{\\$[0-9\\.]*\\}") %>%
+  map(readr::parse_number)
+```
+
+Now that we have the number we can iterate over them with the function of our choice.
+Since we are going to have texts with no amounts we need to make sure that we have to handle the case with zero numbers. Defaults for some functions with length 0 vectors can before undesirable as we don't want `-Inf` to be a value. I'm going to extract the maximum value and will denote cases with no values to have a maximum of 0.
+
+```{r}
+max_money <- function(x) {
+  str_extract_all(x, "\\{\\$[0-9\\.]*\\}") %>%
+    map(readr::parse_number) %>%
+    map_dbl(~ ifelse(length(.x) == 0, 0, max(.x)))
+}
+
+max_money(dollar_texts)
+```
+
+know that we have created some feature extraction functions we can use them to hopefully make our classification model better.
 
 ## Case Study: feature hashing
 
