@@ -38,6 +38,14 @@ jobs:
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
 
+      - name: Install spacy
+        run: |
+           Rscript -e "install.packages('remotes')"
+           Rscript -e "remotes::install_github('rstudio/reticulate') # TODO remove when reticulate 1.14 is on CRAN"
+           Rscript -e "reticulate::install_miniconda()"
+           Rscript -e "reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')"
+           Rscript -e "spacyr::spacy_install(prompt = FALSE)"
+           
       - name: Build site
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
 
