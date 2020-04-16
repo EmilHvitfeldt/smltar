@@ -63,9 +63,7 @@ str_detect(math, "\\+")
 
 If we tried to use the plus sign without escaping it, like `"+"`, we would get an error and this line of code would not run.
 
-The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@boost_c_libraries].
-
-TODO: where is the reference in the line above?
+The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@theopengroup2018][@boost_c_libraries].
 
 ```{r metacharacters, echo=FALSE}
 tibble::tribble(
@@ -156,6 +154,16 @@ tibble::tribble(
 ```
 
 Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
+
+```{r}
+Sys.getlocale()
+```
+
+
+```{r}
+?Sys.setlocale("LC_MESSAGES", 'en_GB.UTF-8')
+```
+
 
 TODO find a easy way to showcase regex in different locales. (Note from Julia: I think probably just print these non-reproducibly.)
 
