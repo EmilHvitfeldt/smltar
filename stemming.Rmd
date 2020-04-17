@@ -265,11 +265,13 @@ Lemmatization requires more information than the rule-based stemmers we've discu
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
 ```
 
-A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library, which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19] or the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17]. You might also consider using spaCy directly in R Markdown [via the Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
+A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19], the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [textrecipes](https://tidymodels.github.io/textrecipes/dev/) package [@textrecipes]. Chapter TODO demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
+
+Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
 
 ## Stemming and stop words
 
-Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you usually need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.
+Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.
 
 A handy trick is to use the following function on your stop word list to return the words that don't have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.
 
@@ -286,4 +288,12 @@ Here we see that many of the words that are lost are the contractions.
 
 ## Summary
 
-In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word. Stemming reduces the sparsity of text data which can be helpful when training models, but at the cost of throwing information away. 
+In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word using rules and heuristics. Stemming reduces the sparsity of text data which can be helpful when training models, but at the cost of throwing information away. Lemmatization is another way to normalize words to a root, based on language structure and how words are used in their context.
+
+### In this chapter, you learned:
+
+- about the most broadly used stemming algorithms
+- how to implement stemming
+- that stemming changes the sparsity or feature space of text data
+- the differences between stemming and lemmatization
+
