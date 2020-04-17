@@ -145,12 +145,12 @@ We might want to have these ligatures separated back into separate characters, b
 Newcomers in terms of characters are emojis. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first look at the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
 
 ```{r}
-flags <- "" # TODO figure out how to avoid breaking things`
+flags <- "🇨🇷🇪🇺🇫🇮🇨🇦🇨🇨"
 
 tokenize_characters(flags)
 ```
 
-When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Japanese flag you will find that they are "REGIONAL INDICATOR SYMBOLS", "J" and "P" respectively. This is done so that all the flags can be represented only using 26 Unicode symbols. The same thing is done with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
+When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are "REGIONAL INDICATOR SYMBOLS", "C" and "A" respectively. This is done so that all the flags can be represented only using 26 Unicode symbols. The same thing is done with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
 
 ### Word tokens
 
