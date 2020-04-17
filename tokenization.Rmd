@@ -144,8 +144,8 @@ We might want to have these ligatures separated back into separate characters, b
 
 Newcomers in terms of characters are emojis. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first look at the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
 
-```{r}
-flags <- "🇨🇷🇪🇺🇫🇮🇨🇦🇨🇨"
+```{r,}
+flags <- ""
 
 tokenize_characters(flags)
 ```
@@ -475,7 +475,21 @@ We can use `paste0()` in this function to construct an actual regex.
 
 ## Tokenization for non-Latin alphabets
 
-TODO Use **jiebaR** for chinese.
+We have talked a lot about tokenizing so far for text where words are separated by whitespace and punctuation. Even a quite basic tokenizer can give decent results. However, there are plenty of written languages that don't neatly separate words.
+
+One of these languages is Chinese where each "word" can be represented by one or more consecutive glyphs.
+This is called word segmentation and is still an active area of research [@ma-etal-2018-state], [@Huang2019]. with
+
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible to do in R as well. We use the jiebaR package. In its simplest form is it very similar to the tokenizers package, the only difference is you need to create a worker that is passed into `segment()` along with the string you want to segment.
+
+```{r}
+library(jiebaR)
+words <- c("下面是不分行输出的结果", "下面是不输出的结果")
+
+engine1 <- worker(bylines = TRUE)
+
+segment(words, engine1)
+```
 
 ## Tokenization benchmark
 
