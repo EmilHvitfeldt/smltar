@@ -486,12 +486,12 @@ We can use `paste0()` in this function to construct an actual regex.
 
 ## Tokenization for non-Latin alphabets
 
-We have talked a lot about tokenizing so far for text where words are separated by whitespace and punctuation. Even a quite basic tokenizer can give decent results. However, there are plenty of written languages that don't neatly separate words.
+Our discussion of tokenization so far has focused on text where words are separated by white space and punctuation. For such text, even a quite basic tokenizer can give decent results. However, there are many written languages that don't separate words in this way.
 
 One of these languages is Chinese where each "word" can be represented by one or more consecutive glyphs.
-This is called word segmentation and is still an active area of research [@ma-etal-2018-state], [@Huang2019]. with
+Splitting Chinese text into words is called "word segmentation" and is still an active area of research [@ma-etal-2018-state, @Huang2019].
 
-We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible to do in R as well. We use the jiebaR package. In its simplest form is it very similar to the tokenizers package, the only difference is you need to create a worker that is passed into `segment()` along with the string you want to segment.
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
 
 ```{r}
 library(jiebaR)
