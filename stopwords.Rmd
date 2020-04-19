@@ -19,11 +19,16 @@ Thinking of words as being either informative or non-informative is quite limiti
 
 Historically, one of the main reasons for removing stop words was to decrease computational time for text mining; it can be regarded as a dimensionality reduction of text data and was commonly used in search engines to give better results [@Huston2010].
 
-## Using premade stop word lists
+stop words can have different kinds of classifications in a corpus. We like to classify stop words into 3 groups: global, subject and document. Global stop words are words who almost always who are non-informative in the language as a whole, these are words such as "of" and "and" which are needed to glue the text together. These stopwords are very likely to be a safe bet to remove but they are few and far between. You are very likely to find some global stopwords in premade stop word lists \@ref(premadestopwords).
+Next up is subject-specific stop words. These words are uninformative in the subject they are written in. Subjects can be broad like; financial, fiction, non-fiction and medical, but can also be more specific like; obituaries, health-code violations and job listings for librarians in Kansas.
+Words like "bath", "bedroom" and "entryway" will generally not be considered stopwords, but they don't provide very much information in suburban house listings. You will most likely have to manually construct these stop word lists \@ref(homemadestopwords). These kinds of stop words where you can improve your performance if you have the domain expertise to create a good list.
+Lastly, we have document stopwords. As the name suggests do these words not provide any information inside its own document. These are very hard to classify and won't be worth the trouble to find. Even if you can find document stop words then it is also not entirely obvious how that kind of information should be incorporated in a regression of classification task.
+
+## Using premade stop word lists {#premadestopwords}
 
 A quick solution to getting a list of stop words is to use one that is already created for you. This is appealing because it requires a low level of effort, but be aware that not all lists are created equal. @nothman-etal-2018-stop found some alarming results in a study of 52 stop word lists available in open source software packages. Their unexpected findings included how different stop word lists have a varying number of words depending on the specificity of the list. Among some of the more grave issues were misspellings ("fify" instead of "fifty"), the inclusion of clearly informative words such as "computer" and "cry", and internal inconsistencies such as including the word "has" but not the word "does". This is not to say that you should never use a stop word list that has been included in an open source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn't changed since you used it last, and also to check that it is appropriate for your use case.
 
-There is a broad selection of stop word lists available today. For the purpose of this chapter we will focus on three lists of English stop words provided by the **stopwords** package [@R-stopwords]. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. The second is the English Snowball stop word list [@porter2001snowball], and the last is the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stop word lists are all considered general purpose and not domain specific.
+There is a broad selection of stop word lists available today. For the purpose of this chapter we will focus on three of the lists of English stop words provided by the **stopwords** package [@R-stopwords]. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. The second is the English Snowball stop word list [@porter2001snowball], and the last is the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stop word lists are all considered general purpose and not domain specific.
 
 Before we start delving into the content inside the lists, let's take a look at how many words are included in each.
 
@@ -99,7 +104,7 @@ tidy_fir_tree %>%
 
 The result of these two stop word removals is the same since we used the same stop word list in both cases.
 
-## Creating your own stop words list
+## Creating your own stop words list {#homemadestopwords}
 
 Another way to get a stop word list is to create one yourself. Let's explore a few different ways to find appropriate words to use. We will use the tokenized data from "The Fir-Tree" as a first example. Let's take the words and rank them by their count or frequency.
 
