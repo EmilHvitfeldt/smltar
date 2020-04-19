@@ -298,7 +298,7 @@ plotting_data  %>%
        subtitle = "Each point represents a H.C. Andersen Fairy tale")
 ```
 
-One is generally not limited to only use one type of n-grams. You can combine the uni-grams and bi-grams in your analysis. Getting multiple types of n-grams is a little different depending on what package you are using, using `tokenize_ngrams()` you can specify `n` and `n_min`
+We are not limited to use only one degree of n-grams. We can, for example, combine unigrams and bigrams in an analysis or model. Getting multiple degrees of n-grams is a little different depending on what package you are using; using `tokenize_ngrams()` you can specify `n` and `n_min`.
 
 ```{r}
 tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
@@ -307,7 +307,7 @@ tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
 tft_token_ngram[[1]]
 ```
 
-Combing different kinds of n-grams can allow you to extract different granularities of the data. Uni-grams can tell you how much individual words have been used a lot of times, some of these words could be overlooked in bi-grams or tri-grams if they don't co-appear with other words. Consider a scenario where every time the word "dog" was used it came after an adjective: "happy dog", "sad dog", brown dog", white dog" playful dog" etc. If this is fairly consistent and the adjectives varied enough then bi-grams would not be able to pick up that this story is about dogs. Similarly "very happy" and "not happy" will be picked up as being different under bi-grams and not under uni-grams alone.
+Combining different degrees of n-grams can allow you to extract different levels of detail from text data. Unigrams tell you which individual words have been used a lot of times; some of these words could be overlooked in bigram or trigram counts if they don't co-appear with other words often. Consider a scenario where every time the word "dog" was used it came after an adjective: "happy dog", "sad dog", "brown dog", "white dog", "playful dog", etc. If this is fairly consistent and the adjectives varied enough, then bigrams would not be able to detect that this story is about dogs. Similarly "very happy" and "not happy" will be recognized as different with bigrams and not with unigrams alone.
 
 ## Where does tokenization break down?
 
