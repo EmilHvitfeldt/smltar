@@ -144,13 +144,13 @@ We might want to have these ligatures separated back into separate characters, b
 
 Newcomers in terms of characters are emojis. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first look at the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
 
-```{r}
-flags <- "" # TODO figure out how to avoid breaking things`
+```{r,}
+flags <- ""
 
 tokenize_characters(flags)
 ```
 
-When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Japanese flag you will find that they are "REGIONAL INDICATOR SYMBOLS", "J" and "P" respectively. This is done so that all the flags can be represented only using 26 Unicode symbols. The same thing is done with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
+When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are "REGIONAL INDICATOR SYMBOLS", "C" and "A" respectively. This is done so that all the flags can be represented only using 26 Unicode symbols. The same thing is done with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
 
 ### Word tokens
 
@@ -297,6 +297,17 @@ plotting_data  %>%
        title = "Unique n-grams by n-gram order",
        subtitle = "Each point represents a H.C. Andersen Fairy tale")
 ```
+
+One is generally not limited to only use one type of n-grams. You can combine the uni-grams and bi-grams in your analysis. Getting multiple types of n-grams is a little different depending on what package you are using, using `tokenize_ngrams()` you can specify `n` and `n_min`
+
+```{r}
+tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
+                                   n = 2L,
+                                   n_min = 1L)
+tft_token_ngram[[1]]
+```
+
+Combing different kinds of n-grams can allow you to extract different granularities of the data. Uni-grams can tell you how much individual words have been used a lot of times, some of these words could be overlooked in bi-grams or tri-grams if they don't co-appear with other words. Consider a scenario where every time the word "dog" was used it came after an adjective: "happy dog", "sad dog", brown dog", white dog" playful dog" etc. If this is fairly consistent and the adjectives varied enough then bi-grams would not be able to pick up that this story is about dogs. Similarly "very happy" and "not happy" will be picked up as being different under bi-grams and not under uni-grams alone.
 
 ## Where does tokenization break down?
 
@@ -475,7 +486,21 @@ We can use `paste0()` in this function to construct an actual regex.
 
 ## Tokenization for non-Latin alphabets
 
-TODO Use **jiebaR** for chinese.
+We have talked a lot about tokenizing so far for text where words are separated by whitespace and punctuation. Even a quite basic tokenizer can give decent results. However, there are plenty of written languages that don't neatly separate words.
+
+One of these languages is Chinese where each "word" can be represented by one or more consecutive glyphs.
+This is called word segmentation and is still an active area of research [@ma-etal-2018-state], [@Huang2019]. with
+
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible to do in R as well. We use the jiebaR package. In its simplest form is it very similar to the tokenizers package, the only difference is you need to create a worker that is passed into `segment()` along with the string you want to segment.
+
+```{r}
+library(jiebaR)
+words <- c("下面是不分行输出的结果", "下面是不输出的结果")
+
+engine1 <- worker(bylines = TRUE)
+
+segment(words, engine1)
+```
 
 ## Tokenization benchmark
 
