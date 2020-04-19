@@ -298,6 +298,17 @@ plotting_data  %>%
        subtitle = "Each point represents a H.C. Andersen Fairy tale")
 ```
 
+One is generally not limited to only use one type of n-grams. You can combine the uni-grams and bi-grams in your analysis. Getting multiple types of n-grams is a little different depending on what package you are using, using `tokenize_ngrams()` you can specify `n` and `n_min`
+
+```{r}
+tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
+                                   n = 2L,
+                                   n_min = 1L)
+tft_token_ngram[[1]]
+```
+
+Combing different kinds of n-grams can allow you to extract different granularities of the data. Uni-grams can tell you how much individual words have been used a lot of times, some of these words could be overlooked in bi-grams or tri-grams if they don't co-appear with other words. Consider a scenario where every time the word "dog" was used it came after an adjective: "happy dog", "sad dog", brown dog", white dog" playful dog" etc. If this is fairly consistent and the adjectives varied enough then bi-grams would not be able to pick up that this story is about dogs. Similarly "very happy" and "not happy" will be picked up as being different under bi-grams and not under uni-grams alone.
+
 ## Where does tokenization break down?
 
 Tokenization will generally be one of first steps we take with text data when building a model, so it is important to consider carefully what happens in this step of data preprocessing. As with most software there is a trade-off between speed and customizability, as demonstrated in section \@ref(tokenization-benchmark). The fastest tokenization methods give us little control over how it is done.
