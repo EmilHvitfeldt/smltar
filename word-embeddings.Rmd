@@ -45,7 +45,7 @@ complaints %>%
 
 Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet**. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms.
 
-#### SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE
+**SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE**
 
 Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called **word embeddings**.
 
@@ -159,8 +159,8 @@ We have now successfully found word embeddings, with clear and understandable co
 
 Now that we have determined word embeddings for the dataset of CFPB complaints, let's explore them and talk about they are used in modeling. We have projected the sparse, high-dimensional set of word features into a more dense, 100-dimensional set of features. 
 
-```{block, type = "rmdnote"}
-Each word can be represented as a numeric vector in this new feature space. 
+```{block, type = "rmdwarn"}
+Each word can be represented as a numeric vector in this new feature space. A single word is mapped to only one vector, so be aware that all senses of a word are conflated in word embeddings. Because of this, word embeddings are limited for understanding lexical semantics.
 ```
 
 Which words are close to each other in this new feature space of word embeddings? Let's create a simple function that will find the nearest words to any given example in using our newly created word embeddings.
@@ -248,8 +248,6 @@ If our word embeddings are of high quality, this translation of the high-dimensi
 
 This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the [text2vec](http://text2vec.org/) package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [Bojanowski2016]. 
 
-TODO maybe: mention https://github.com/mkearney/wactor???
-
 ## Use pre-trained word embeddings {#glove}
 
 If your dataset is too small, you typically cannot train reliable word embeddings. 
@@ -300,7 +298,7 @@ tidy_glove %>%
     nearest_neighbors("error")
 ```
 
-Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data.
+Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
 
 What is closest to the word `"month"` in these pre-trained GloVe embeddings?
 
