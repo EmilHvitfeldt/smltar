@@ -1,4 +1,4 @@
-# Regression
+# Regression {#mlregression}
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -44,7 +44,7 @@ This sample of opinions reflects the true distribution over time of available op
 
 ### Building our first regression model
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value as it was originally stored as a character.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character.
 
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
@@ -73,12 +73,21 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_stopwords(text) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
-  step_tf(text) 
+  step_tfidf(text) 
 
 scotus_prep <- prep(scotus_rec)
 
 scotus_prep
 ```
+
+
+```{r}
+scotus_wf <- workflow() %>%
+  add_recipe(scotus_rec) 
+
+scotus_wf
+```
+
 
 After we have split and preprocessed our data, we can specify the model we will use. Let's build a lasso regression model with `mixture = 1`. Before fitting, we set up a model specification.
 
@@ -107,6 +116,7 @@ One option for our evaluating our model is to predict one time on the test set t
 For example, let's estimate the performance of the lasso regression model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
+set.seed(123)
 scotus_folds <- vfold_cv(scotus_train)
 
 scotus_folds
@@ -117,19 +127,20 @@ Each of these "splits" contains information about how to create cross-validation
 For convenience, let's use `workflows()` for our resampling estimates of performance. These are convenience functions that fit different modeling functions like recipes, model specifications, etc. together so they are easier to pass around in a modeling project.
 
 ```{r lassowf, dependson=c("lassospec", "scotusrec")}
-lasso_wf <- workflow() %>%
-  add_recipe(scotus_rec) %>%
-  add_model(lasso_spec)
+scotus_wf <- workflow() %>%
+  add_recipe(scotus_rec) 
 
-lasso_wf
+scotus_wf
 ```
 
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
 ```{r lassors, dependson=c("lassowf", "scotusfolds")}
+set.seed(123)
 lasso_rs <- fit_resamples(
-  lasso_wf,
-  scotus_folds
+  scotus_wf %>% add_model(lasso_spec),
+  scotus_folds,
+  control = control_resamples(save_pred = TRUE)
 )
 
 lasso_rs
@@ -142,34 +153,168 @@ lasso_rs %>%
   collect_metrics()
 ```
 
+Add null model -- are we doing better?
+Add random forest -- wow, super bad
+
+```{r}
+lasso_rs %>%
+  unnest(.predictions) %>%
+  ggplot(aes(year, .pred, color = id)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted year",
+    color = NULL
+  )
+```
+
+
 ## Tuning lasso hyperparameters
 
 The value `penalty = 0.1` for regularization in the previous section was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? We can find out using resampling and tuning the model. Let's use our same set of cross-validation folds, and build a new model specification for model tuning.
 
+```{r}
+tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
 
-Closely examine high performaing samples and low performance sampling. 
+lambda_grid <- grid_regular(penalty(), levels = 50)
+
+set.seed(2020)
+tune_rs <- tune_grid(
+  scotus_wf %>% add_model(tune_spec),
+  scotus_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+```
+
+
+```{r}
+tune_rs %>%
+  collect_metrics
+```
+
+
+```{r}
+tune_rs %>%
+  collect_metrics() %>%
+  ggplot(aes(penalty, mean, color = .metric)) +
+  geom_errorbar(aes(
+    ymin = mean - std_err,
+    ymax = mean + std_err
+  ),
+  alpha = 0.5
+  ) +
+  geom_line(size = 1.5) +
+  facet_wrap(~.metric, scales = "free", nrow = 2) +
+  scale_x_log10() +
+  theme(legend.position = "none")
+```
+
+
+```{r}
+lowest_rmse <- tune_rs %>%
+  select_best("rmse")
+
+final_lasso <- finalize_workflow(
+  scotus_wf %>% add_model(tune_spec),
+  lowest_rmse
+)
+
+final_lasso
+```
+
+## Case study: remove stop words
+
+## Case study: varying n-grams 
+
+Use different n of grams, combined with different ways of removing stopwords.
+
+```{r}
+scotus_ngram_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text, token = "ngrams", options = list()) %>%
+  step_stopwords(text) %>%
+  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tfidf(text) 
+
+scotus_ngram_rec
+```
+
+
+```{r}
+ngram_wf <- workflow() %>%
+  add_recipe(scotus_ngram_rec) %>%
+  add_model(tune_spec)
+
+ngram_wf
+```
+
+
+```{r}
+lambda_grid <- grid_regular(penalty(), levels = 20)
+
+set.seed(2020)
+ngram_rs <- tune_grid(
+  ngram_wf,
+  scotus_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+```
+
+
+```{r, dependson="lassors"}
+ngram_rs %>%
+  collect_metrics()
+```
+
+
+```{r}
+lowest_rmse <- ngram_rs %>%
+  select_best("rmse")
+
+final_ngram <- finalize_workflow(
+  ngram_wf,
+  lowest_rmse
+)
+
+final_ngram
+```
+
+
+```{r}
+final_ngram_rs <- final_ngram %>%
+  fit_resamples(scotus_folds,
+                control = control_resamples(save_pred = TRUE)) 
+
+final_ngram_rs %>%
+  unnest(.predictions) %>%
+  ggplot(aes(year, .pred, color = id)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted year",
+    color = NULL
+  )
+```
+
+## Case study: compare lemma vs. words
+
 
 ## Different types of models
 
 Lasso regression works extremely well with text data, but it is not the only option.
 
 (Not all of these models are good, but are used to show strenghs and weaknessed)
+
 - SVM
 - Naive Bayes
 - glmnet
-- Random forrest
 - knn
-- NULL model
 
-## Case study: varying n-grams & stop words
-
-Use different n of grams, combined with different ways of removing stopwords.
-
-## Case study: Adding custom feature
-
-a custom feature is something that we can easily count and add to our model that isn't part of simple BoW.
-https://github.com/mkearney/textfeatures
-examples include: number of urls
 
 ## What evaluation metrics are appropiate
 
@@ -187,3 +332,28 @@ Data will most likely be sparse when using BoW
 
 ### Evaluation
 
+```{r}
+library(vip)
+
+final_lasso %>%
+  fit(scotus_train) %>%
+  pull_workflow_fit() %>%
+  vi(lambda = lowest_rmse$penalty) %>%
+  mutate(
+    Importance = abs(Importance),
+    Variable = str_remove_all(Variable, "tfidf_text_")
+  ) %>%
+  group_by(Sign) %>%
+  top_n(20, Importance) %>%
+  ungroup %>%
+  ggplot(aes(x = Importance, 
+             y = fct_reorder(Variable, Importance), 
+             fill = Sign)) +
+  geom_col(show.legend = FALSE) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_wrap(~Sign, scales = "free") +
+  labs(y = NULL)
+```
+
+
+Closely examine high performing samples and low performance sampling. 
