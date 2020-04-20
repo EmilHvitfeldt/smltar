@@ -225,7 +225,7 @@ calc_idf <- function(df, word, document) {
 
 Here is the result where we try to create a cross-language list of stop words, by taking each fairy tale as a document. It is not very good! The overlap between what words appear in each language is very small, and that is what we mostly see in this list.
 
-```{r, echo=FALSE, fig.cap="We counted words from all of H.C. Andersen's fairy tales in Danish, English, French, German, and Spanish and ordered by count or frequency."}
+```{r, echo=FALSE, fig.cap="We counted words from all of H.C. Andersen's fairy tales in Danish, English, French, German, and Spanish and ordered by IDF."}
 hcandersenr::hca_fairytales() %>%
   unnest_tokens(word, text) %>%
   mutate(document = paste(language, book)) %>%
@@ -240,13 +240,29 @@ hcandersenr::hca_fairytales() %>%
   geom_text(hjust = 0) +
   xlim(c(1, 5.5)) +
   theme_void() +
-  labs(title = "120 most frequent tokens in H.C. Andersen's fairy tales, multi-language")
+  labs(title = "120 tokens in H.C. Andersen's fairy tales with highest IDF, multi-language")
 ```
 
-TODO do same example with English only.
+This didn't work very well because there is very little overlap between common words. Instead, let us limit the calculation to only 1 language and calculate the IDF of each word we can find words that appear in a lot of documents.
 
-do MP, VP and  SAT 
-https://pdfs.semanticscholar.org/c543/8e216071f6180c228cc557fb1d3c77edb3a3.pdf
+```{r, echo=FALSE, fig.cap="We counted words from all of H.C. Andersen's fairy tales in English ordered by IDF."}
+hcandersenr::hcandersen_en %>%
+  unnest_tokens(word, text) %>%
+  select(word, book) %>%
+  calc_idf(word, book) %>%
+  arrange(idf) %>%
+  slice(1:120) %>%
+  mutate(row = rep(1:5, each = n()/5),
+         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  ggplot(aes(row, column, label = word)) +
+  geom_text(hjust = 0) +
+  xlim(c(1, 5.5)) +
+  theme_void() +
+  labs(title = "120 tokens in H.C. Andersen's fairy tales with highest IDF, English only")
+```
+
+This time we get quite a bit better results. The list starts with "a", "the", "and" and "to" and continues with many more reasonable choices of stop-words. We need to look at these lists manually to turn this into a list. We need to go as far down the list to catch as many words we are comfortable with. You are in full control of how you want to create the list. If you don't want to include "little" you are still able to add "are" to your list even though it is lower on the list.
 
 ## All stop word lists are context specific
 
