@@ -12,7 +12,7 @@ options(crayon.enabled = FALSE)
 > You shall know a word by the company it keeps.
 > `r tufte::quote_footer('--- [John Rupert Firth](https://en.wikiquote.org/wiki/John_Rupert_Firth)')`
 
-So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling. An example of such a data structure is a sparse matrix. Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), we would start with straightforward word counts.
+So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling. An example of such a data structure is a sparse matrix. Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), we would start with straightforward word counts. Let's create a sparse matrix where the matrix elements are the counts of words in each document.
 
 ```{r complaints}
 library(tidyverse)
@@ -31,7 +31,11 @@ complaints %>%
 
 The dataset of consumer complaints used in this book has been filtered to those submitted to the CFPB since 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text).
 
-Another way to represent our text data is to use [tf-idf](https://www.tidytextmining.com/tfidf.html) instead of word counts. This weighting for text features can often work better in predictive modeling.
+Another way to represent our text data is to create a sparse matrix where the elements are weighted, rather than straightforward counts only. The *term frequency* of a word is how frequently a word occurs in a document, and the *inverse document frequency* of a word decreases the weight for commonly used words and increases the weight for words that are not used often in a collection of documents. It is typically defined as
+
+$$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$
+
+These two quantities can be combined to calculate a term's [tf-idf](https://www.tidytextmining.com/tfidf.html) (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
 
 ```{r dependson="complaints"}
 complaints %>% 
