@@ -11,7 +11,7 @@ If you have both Anaconda and miniconda installed on your computer, you may have
 ```r
 reticulate::conda_create("r-spacyr", 
                          conda = "/path/to/Library/r-miniconda/bin/python", 
-                         packages = "python==3.6.9"")
+                         packages = "python==3.6.9")
 spacyr::spacy_install(conda = "/path/to/Library/r-miniconda/bin/python", 
                       envname = "r-spacyr")
 ```
