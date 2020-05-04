@@ -116,7 +116,8 @@ lasso_fit <- scotus_wf %>%
 
 We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()` and even `tidy()` the results into a convenient dataframe format.
 
-```{r dependson="lassofit"}
+```{r eval=FALSE, dependson="lassofit"}
+## this chunk is eval = FALSE for R 4.0 until the S3 method problem in tidymodels is solved
 lasso_fit %>%
   pull_workflow_fit() %>%
   tidy()
