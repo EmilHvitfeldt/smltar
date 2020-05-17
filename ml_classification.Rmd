@@ -516,6 +516,123 @@ know that we have created some feature extraction functions we can use them to h
 
 ## Case Study: feature hashing
 
+So far we have been very specific with creating the tokens to have meaning and be different from each other when they need to be.
+A second consideration is how we are going to represent these values in our final data.
+We have already looked at how we can use simple counts with word frequencies or weighted counts with tf-idf to represent the data.
+One of the main problems with these methods is that output space is vast and dynamic.
+You could easily have more than 10,000 features in your training set alone, which very quickly would let you run into memory problems.
+Deciding how many tokens to include essentially becomes a trade-off between computational time and information.
+Using this approach also doesn't let you take advantage of tokens you didn't see in your training data.
+
+One method that has gained popularity in the machine learning field is the **hashing trick**.
+This method provides a couple of benefits:
+
+- Very fast
+- Low memory footprint
+- No dictionary needed
+
+Before we get into more detail, let up go through the basics of feature hashing.
+First proposed by @Weinberger2009, feature hashing was introduced as a dimensionality reduction method with a simple premise.
+We start by taking a hashing function which we then apply to our tokens.
+
+:::note
+A hashing function is a function that takes a variables sized output and maps it to a fixed range. Hashing functions are commonly used in cryptography.
+:::
+
+We will use the hashFunction package to illustrate the behavior of hashing functions.
+Propose we have a lot of country names in a variable and turning them into a one-hot encoding might feel like too much.
+We start by applying the hashing function to each of the strings to project it into an integer space defined by the hashing function.
+We will be using the 32-bit version of MurmurHash3 [@appleby2008] here.
+
+:::note
+The choice of hashing function isn't based on cryptographic complexity. Instead, it just needs to fulfill a couple of properties and be fast. Uniformity of the output makes sure that the whole output space is being filled evenly. The Avalanche effect makes it so similar strings are hashed in a way so they won't be similar in out output space.
+:::
+
+```{r}
+library(hashFunction)
+countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina", "Mayotte", 
+               "Bouvet Island", "South Korea", "San Marino", "American Samoa")
+
+map_int(countries, murmur3.32)
+```
+
+Since the MurmurHash has 32 bits the number of possible values is `2^32 = 4294967296` which at the moment doesn't feel like a reduction.
+We then take the modulo of these big values to project them down to a more manageable space.
+
+```{r}
+map_int(countries, murmur3.32) %% 24
+```
+
+Now we simply use these as the indices when creating the matrix
+
+```{r, echo=FALSE}
+Matrix::sparseMatrix(1:10, map_int(countries, murmur3.32) %% 24, 
+                     dims = c(10, 24),
+                     dimnames = list(countries, NULL))
+```
+
+This method is really fast, both the hashing and modulo can be performed independently for each input since it doesn't need information about the full corpus.
+Since we are reducing the space, there is a chance that multiple words are hashed to the same value.
+This is called a collision and at first glance, it would appear that this would be a big negative for our model.
+However, it is reported that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor [@Forman2008].
+
+:::note
+Another thing that is done to avoid the negative effects of collisions is to have a second hashing function that returns 1 and -1. This will determine if we are adding or subtracting the index we get from the first hashing function. Suppose both the word "outdoor" and "pleasant" hashes to 583. Without the second hashing they would collide to 2. But using signed hashing we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.
+:::
+
+The main downsides from using feature hashing are:
+
+- Still has one tuning parameter
+- Can't be reversed
+
+The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
+It is your job to find the output that best suits your need.
+Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data.frame which can make fitting your model take a longer time. 
+The number of buckets is tunable in tidymodels using the tune package.
+
+The perhaps greater downside to using feature hashing is that the operation can't be reversed. 
+We are not able to detect if a collision occurs and it is going to be hard to figure out the effect of each word in the document.
+Remember that we are just left with n columns, so if we find that the 274th column is a highly predictive feature, then we are not certain which tokens contributed to that column. 
+We could go back to our training set and create a paired list of the tokens and what they are mapped to find the possible tokens.
+And sometimes we might find only 1 token in that list and we know what it is. 
+But it might as well have 4 different tokens contributing.
+This method is used because of its speed and scalability, not because it is interpretable.
+
+Performing feature hashing on tokens is done using the `step_texthash()` step from textrecipes.
+
+```{r, eval=FALSE}
+#TODO  eval = FALSE because of rsparse
+recipe(product ~ consumer_complaint_narrative, data = complaints_train) %>%
+  step_tokenize(consumer_complaint_narrative) %>%
+  step_texthash(consumer_complaint_narrative, signed = TRUE, num_terms = 512) %>%
+  prep() %>%
+  juice()
+
+```
+
+### text normalization
+
+```{r}
+s1 <- "sch\U00f6n"
+s2 <- "scho\U0308n"
+```
+
+```{r}
+s1 == s2
+```
+
+
+```{r}
+murmur3.32(s1)
+murmur3.32(s2)
+```
+
+```{r}
+library(stringi)
+
+stri_trans_nfc(s1) == stri_trans_nfc(s2)
+```
+
 ## What evaluation metrics are appropriate
 
 Data will most likely be sparse when using BoW
