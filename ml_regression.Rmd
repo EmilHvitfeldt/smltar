@@ -285,18 +285,14 @@ tune_rs
 
 Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
 
-```{r}
+```{r dependson="scotustuners"}
 tune_rs %>%
   collect_metrics
 ```
 
-```{r}
-knitr::knit_exit()
-```
+Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:scotustunevis) to see what the best model is.
 
-Let's visualize 
-
-```{r}
+```{r scotustunevis, dependson="scotustuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the lowest RMSE."}
 tune_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -309,14 +305,23 @@ tune_rs %>%
   geom_line(size = 1.5) +
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  labs(title = "Lasso model performance across regularization penalties",
+       subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
+We can extract the best value for, say, RMSE from our tuning results with `select_best()`.
 
-```{r}
+```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
   select_best("rmse")
 
+lowest_rmse
+```
+
+Next, let's finalize our tuneable workflow with this regularization penalty. This is the regularization penalty that our tuning results show us result in the best model.
+
+```{r}
 final_lasso <- finalize_workflow(
   scotus_wf %>% add_model(tune_spec),
   lowest_rmse
@@ -325,6 +330,11 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r lowest_rmse$penalty`. This workflow is ready to go!
+
+```{r}
+knitr::knit_exit()
+```
 
 
 Add random forest -- wow, super bad
