@@ -72,6 +72,7 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 - After tokenization, we remove stop words (Chapter \@ref(stopwords)).
 - Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
 - The recipe step `step_tfidf()`, used with defaults as here, weights each token frequency by the inverse document frequency.
+- Next, we can remove a few columns with names that contains special characters problematic for some modeling functions.
 - As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
 
 Finally, we `prep()` the recipe. This means we actually compute something for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
@@ -83,6 +84,7 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
   step_tfidf(text) %>%
+  step_rm(contains("'")) %>%  
   step_normalize(all_predictors())
 
 scotus_prep <- prep(scotus_rec)
@@ -332,12 +334,68 @@ final_lasso
 
 Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r lowest_rmse$penalty`. This workflow is ready to go!
 
-```{r}
-knitr::knit_exit()
+## Compare to a random forest model
+
+Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see @Caruana2008 and @Olson2017 for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark datasets; random forest models were one of the best overall. Let's see how a random forest model performs with our dataset of Supreme Court opinions.
+
+First, let's build a random forest model specification, using the ranger implementation. Random forest models are known for performing well without tuning, so we will just make sure we have enough `trees`.
+
+```{r scotusrfspec}
+rf_spec <- rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+```
+
+Now we can fit this random forest model. Let's use `fit_resamples()` again, so we can evaluate the model performance. We will use three arguments to this function:
+
+- Our modeling `workflow()`, with the same preprocessing recipe we have been using so far in this chapter plus our new random forest model specification
+- Our cross-validation resamples of the Supreme Court opinions
+- A `control` argument to specify that we want to keep the predictions, to explore after fitting
+
+```{r scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
+rf_rs <- fit_resamples(
+  scotus_wf %>% add_model(rf_spec),
+  scotus_folds,
+  control = control_resamples(save_pred = TRUE)
+)
+
+rf_rs
+```
+
+We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
+
+```{r, eval = FALSE, dependson="nullrs"}
+rf_rs %>%
+  collect_metrics()
+```
+
+This looks pretty promising, so let's explore the predictions for this random forest model.
+
+```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+rf_rs %>%
+  collect_predictions() %>%
+  ggplot(aes(year, .pred, color = id)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted year",
+    color = NULL,
+    title = "Predicted and true years for Supreme Court opinions using a random forest model",
+    subtitle = "Each cross-validation fold is shown in a different color"
+  )
+```
+
+Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted model. This model learned to predict the large number of opinions in 1999 and 2000 very accurately, but at the expense of all other years. One of the defining characteristics of text data is that it is **sparse**, and tree-based models such as random forests may not be well-suited to sparse data. 
+
+```{block, type = "rmdtip"}
+Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
 ```
 
 
-Add random forest -- wow, super bad
+```{r}
+knitr::knit_exit()
+```
 
 
 ## Case study: remove stop words
