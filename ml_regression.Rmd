@@ -22,7 +22,12 @@ scotus_sample %>%
   as_tibble()
 ```
 
-This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
+This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). 
+
+```{block, type = "rmdtip"}
+If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
+```
+
 
 - A **classification model** predicts a class label or group membership.
 - A **regression model** predicts a numeric or continuous value.
@@ -63,7 +68,7 @@ scotus_test <- testing(scotus_split)
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
-- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions.
+- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. ~In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19]~.
 - After tokenization, we remove stop words (Chapter \@ref(stopwords)).
 - Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
 - The recipe step `step_tfidf()`, used with defaults as here, weights each token frequency by the inverse document frequency.
@@ -127,7 +132,13 @@ We see here, printing out for the most regularized examples, what contributes to
 
 ### Evaluating our model
 
-One option for our evaluating our model is to predict one time on the testing set to measure performance. The testing set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). The purpose of the testing data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this.
+One option for our evaluating our model is to predict one time on the testing set to measure performance. 
+
+```{block, type = "rmdwarning"}
+The testing set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). 
+```
+
+The purpose of the testing data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this.
 
 Another option for our evaluating models is to predict one time on the training set to measure performance. This is the _same data_ that was used to train the model, however, and evaluating on the training data often results in performance estimates that are too optimistic. This is especially true for powerful machine learning algorithms that can learn subtle patterns from data.
 
@@ -166,7 +177,13 @@ lasso_rs %>%
   collect_metrics()
 ```
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. The lower RMSE is, the better; the closer $R^2$ is to one, the better. These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. 
+
+```{block, type = "rmdnote"}
+The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
+```
+
+These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
 
 ```{r firstregpredict, dependson="lassors", fig.width=8, fig.height=8, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
@@ -185,26 +202,76 @@ lasso_rs %>%
 
 This first model we have tried did a worse job for Supreme Court opinions from before 1850, but overall this looks good!
 
+## Compare to the null model
 
-```{r}
-knitr::knit_exit()
+One way to assess a model like this one is to compare its performance to a "null model". 
+
+```{block, type = "rmdnote"}
+A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case).
 ```
 
-Add null model -- are we doing better?
-Add random forest -- wow, super bad
+We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
 
+```{r nullrs, eval = FALSE, dependson=c("scotuswf", "scotusfolds")}
+## not running because of bug in parsnip: https://github.com/tidymodels/parsnip/issues/296
+null_regression <- null_model() %>% 
+  set_engine("parsnip") %>%
+  set_mode("regression")
+
+null_rs <- fit_resamples(
+  scotus_wf %>% add_model(null_regression),
+  scotus_folds
+)
+
+null_rs
+```
+
+What results do we obtain from the null model, in terms of performance metrics?
+
+```{r, eval = FALSE, dependson="nullrs"}
+null_rs %>%
+  collect_metrics()
+```
+
+The RMSE and $R^2$ indicate that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and no tuning) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
 
 ## Tuning lasso hyperparameters
 
-The value `penalty = 0.1` for regularization in the previous section was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? We can find out using resampling and tuning the model. Let's use our same set of cross-validation folds, and build a new model specification for model tuning.
+The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? Instead of learning this during model training, we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
-```{r}
+```{block, type = "rmdtip"}
+Think of `tune()` here as a placeholder for the regularization penalty.
+```
+
+After the tuning process, we can select a single best numeric value.
+ 
+```{r scotustunespec}
 tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
   set_mode("regression") %>%
   set_engine("glmnet")
 
-lambda_grid <- grid_regular(penalty(), levels = 50)
+tune_spec
+```
 
+We can create a regular grid of values to try using a convenience function for `penalty()`.
+
+```{r scotuslambdagrid}
+lambda_grid <- grid_regular(penalty(), levels = 30)
+
+lambda_grid
+```
+
+The function `grid_regular()` is from the dials package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values to try.
+
+Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
+
+```{block, type = "rmdnote"}
+Tuning a model uses a similar syntax compared to fitting a model to a set of resampled datasets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
+```
+
+We add our tuneable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
+
+```{r scotustuners, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec")}
 set.seed(2020)
 tune_rs <- tune_grid(
   scotus_wf %>% add_model(tune_spec),
@@ -212,14 +279,22 @@ tune_rs <- tune_grid(
   grid = lambda_grid,
   control = control_resamples(save_pred = TRUE)
 )
+
+tune_rs
 ```
 
+Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
 
 ```{r}
 tune_rs %>%
   collect_metrics
 ```
 
+```{r}
+knitr::knit_exit()
+```
+
+Let's visualize 
 
 ```{r}
 tune_rs %>%
@@ -249,6 +324,11 @@ final_lasso <- finalize_workflow(
 
 final_lasso
 ```
+
+
+
+Add random forest -- wow, super bad
+
 
 ## Case study: remove stop words
 
