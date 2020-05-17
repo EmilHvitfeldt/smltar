@@ -644,7 +644,7 @@ We have come a long way since our first model \ref(classfirstmodel) and it is ti
 ### Feature selection
 
 We start by creating a new recipe. 
-We are using the same predictors as the first time and the way we are handeling `date_received` and `tags` will stay the same.
+We are using the same predictors as the first time and the way we are handling `date_received` and `tags` will stay the same.
 
 ```{r complaintrecfinal1, dependson="complaintssplit"}
 complaints_rec_v2 <- 
@@ -657,7 +657,7 @@ complaints_rec_v2 <-
   step_dummy(tags)
 ```
 
-After exploring the data more in \ref(custumfeatures) it seems appropiate to add these features in our final model.
+After exploring the data more in \ref(custumfeatures) it seems appropriate to add these features in our final model.
 To do this will we use `step_textfeature()` to calculate custom text features for our data. 
 We create a list of the custom text features we want to include and pass it to `step_textfeature()` using the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
@@ -671,14 +671,14 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization and stipword removal will commence like normal, however this time will we count bi-grams instead of unigrams.
-Last time we only included 100 tokens which isn't that many. 
+The tokenization and stop word removal will commence like normal, however, this time will we count bi-grams instead of unigrams.
+Last time we only included 100 tokens which aren't that many. 
 Let us treat the number of parameters as a hyperparameter that we will vary when we tune the final model.
 I have also set the `min_times` argument to 50, this will throw away tokens if they appeared less then 50 times in the entire corpus.
-We want the model to be robust and a token needs to appear a curtuin number of times before it turns from noise to signal.
+We want the model to be robust and a token needs to appear a certain number of times before it turns from noise to signal.
 
 ```{block, type = "rmdnote"}
-This dataset has much more then 50 of the most common 1000 tokens. It is still a good practice to specify to be safe. 50 is also an abetrary choice and needs to be picked depending on your preferences on the robustness of your model.
+This dataset has much more than 50 of the most common 1000 tokens. It is still a good practice to specify to be safe. 50 is also an arbitrary choice and needs to be picked depending on your preferences on the robustness of your model.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
@@ -692,7 +692,7 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
 
 ### Specifying models
 
-We will be using a Naive Bayes model again this time, the model engine we arer using only has one parameter we can tune `Laplace` which controls the correction to smoothing low-frequency counts. Since we don't have any low frequency counts we will not need to tune this parameter so we can use the previous model specification
+We will be using a Naive Bayes model again this time, the model engine we are using only has one parameter we can tune `Laplace` which controls the correction to smoothing low-frequency counts. Since we don't have any low-frequency counts we will not need to tune this parameter so we can use the previous model specification
 
 We can reuse parts of the old workflow and simply update the 
 
