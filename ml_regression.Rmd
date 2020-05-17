@@ -7,6 +7,9 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
+
+## for Julia's local environment
+## spacyr::spacy_initialize(condaenv = "r-spacyr")
 ``` 
 
 In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing or MORE HERE TODO. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
@@ -19,7 +22,12 @@ scotus_sample %>%
   as_tibble()
 ```
 
-This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
+This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). 
+
+```{block, type = "rmdtip"}
+If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
+```
+
 
 - A **classification model** predicts a class label or group membership.
 - A **regression model** predicts a numeric or continuous value.
@@ -42,7 +50,7 @@ scotus_sample %>%
 
 This sample of opinions reflects the true distribution over time of available opinions for analysis; there are many more opinions per year in this dataset after about 1990 than before. We will need to account for that in our modeling.
 
-### Building our first regression model
+### Building our first regression model {#firstregression}
 
 Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character.
 
@@ -60,36 +68,40 @@ scotus_test <- testing(scotus_split)
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
-- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions.
+- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. ~In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19]~.
 - After tokenization, we remove stop words (Chapter \@ref(stopwords)).
 - Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
-- The recipe step `step_tf()`, used with defaults as here, weights each token by the raw counts used in each document.
-- Finally, we `prep()` the recipe. This means we actually do something with all these steps together with our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
+- The recipe step `step_tfidf()`, used with defaults as here, weights each token frequency by the inverse document frequency.
+- As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
+
+Finally, we `prep()` the recipe. This means we actually compute something for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
 
 ```{r scotusrec, dependson="scotussplit"}
 library(textrecipes)
 
 scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
-  step_stopwords(text) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
-  step_tfidf(text) 
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
 
 scotus_prep <- prep(scotus_rec)
 
 scotus_prep
 ```
 
+Let's create a `workflow()` to bundle together this recipe with any model specifications we may want to create later. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
 
-```{r}
+First, let's only add the data preprocessor, `scotus_rec`.
+
+```{r scotuswf, dependson="scotusrec"}
 scotus_wf <- workflow() %>%
   add_recipe(scotus_rec) 
 
 scotus_wf
 ```
 
-
-After we have split and preprocessed our data, we can specify the model we will use. Let's build a lasso regression model with `mixture = 1`. Before fitting, we set up a model specification.
+Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a lasso regression model with `mixture = 1`. Before fitting, we set up a model specification.
 
 ```{r lassospec}
 lasso_spec <- linear_reg(penalty = 0.1, mixture = 1) %>%
@@ -99,26 +111,42 @@ lasso_spec <- linear_reg(penalty = 0.1, mixture = 1) %>%
 lasso_spec
 ```
 
-Everything is now ready for us to fit our model! We can access our preprocessed training data from our recipe using `juice(scotus_rec)`.
+Everything is now ready for us to fit our model. Let's add our model to the workflow with `add_model()` and fit to our training data `scotus_train`.
 
-```{r lasso_fit, dependson=c("lassospec", "scotusrec")}
-lasso_fit <- lasso_spec %>%
-  fit(year ~ .,
-      data = juice(scotus_prep))
+```{r lassofit, dependson=c("lassospec", "scotuswf")}
+lasso_fit <- scotus_wf %>%
+  add_model(lasso_spec) %>%
+  fit(data = scotus_train)
 ```
 
-We have successfully fit a regularized regression model to this dataset of Supreme Court opinions.
+We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()` and even `tidy()` the results into a convenient dataframe format.
 
-
-```{r}
-knitr::knit_exit()
+```{r eval=FALSE, dependson="lassofit"}
+## this chunk is eval = FALSE for R 4.0 until the S3 method problem in tidymodels is solved
+lasso_fit %>%
+  pull_workflow_fit() %>%
+  tidy()
 ```
+
+We see here, printing out for the most regularized examples, what contributes to a Supreme Court opinion being written more recently.
 
 ### Evaluating our model
 
-One option for our evaluating our model is to predict one time on the test set to measure performance. The test set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). The purpose of the test data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this; instead we use **resampling**.
+One option for our evaluating our model is to predict one time on the testing set to measure performance. 
 
-For example, let's estimate the performance of the lasso regression model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+```{block, type = "rmdwarning"}
+The testing set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). 
+```
+
+The purpose of the testing data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this.
+
+Another option for our evaluating models is to predict one time on the training set to measure performance. This is the _same data_ that was used to train the model, however, and evaluating on the training data often results in performance estimates that are too optimistic. This is especially true for powerful machine learning algorithms that can learn subtle patterns from data.
+
+Yet another option for evaluating or comparing models is to use a separate validation set. In this situation, we split our data not into two sets (training and testing) but into three sets (testing, training, and validation). The validation set is used for computing performance metrics to compare models or model parameters. This can be a great option if you have enough data for it, but often we as practitioners are not so lucky. 
+
+What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated datasets from the training set for the purpose of, for example, measuring model performance.
+
+Let's estimate the performance of the lasso regression model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
 set.seed(123)
@@ -127,20 +155,11 @@ scotus_folds <- vfold_cv(scotus_train)
 scotus_folds
 ```
 
-Each of these "splits" contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.
+Each of these "splits" contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold for analysis and the other 10% is held out for assessment.
 
-For convenience, let's use `workflows()` for our resampling estimates of performance. These are convenience functions that fit different modeling functions like recipes, model specifications, etc. together so they are easier to pass around in a modeling project.
+In Section \@ref(firstregression), we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r lassowf, dependson=c("lassospec", "scotusrec")}
-scotus_wf <- workflow() %>%
-  add_recipe(scotus_rec) 
-
-scotus_wf
-```
-
-In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
-
-```{r lassors, dependson=c("lassowf", "scotusfolds")}
+```{r lassors, dependson=c("scotuswf", "scotusfolds", "lassospec")}
 set.seed(123)
 lasso_rs <- fit_resamples(
   scotus_wf %>% add_model(lasso_spec),
@@ -151,41 +170,108 @@ lasso_rs <- fit_resamples(
 lasso_rs
 ```
 
-What results do we see, in terms of performance metrics?
+These results look a lot like the resamples, but they have some additional columns, like the `.metrics` that we can use to measure how well this model performed and the `.predictions` we can use to explore that performance more deeply. What results do we see, in terms of performance metrics?
 
 ```{r, dependson="lassors"}
 lasso_rs %>%
   collect_metrics()
 ```
 
-Add null model -- are we doing better?
-Add random forest -- wow, super bad
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. 
 
-```{r}
+```{block, type = "rmdnote"}
+The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
+```
+
+These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
+
+```{r firstregpredict, dependson="lassors", fig.width=8, fig.height=8, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
-  unnest(.predictions) %>%
+  collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
   geom_point(alpha = 0.5) +
   labs(
     x = "Truth",
     y = "Predicted year",
-    color = NULL
+    color = NULL,
+    title = "Predicted and true years for Supreme Court opinions",
+    subtitle = "Each cross-validation fold is shown in a different color"
   )
 ```
 
+This first model we have tried did a worse job for Supreme Court opinions from before 1850, but overall this looks good!
+
+## Compare to the null model
+
+One way to assess a model like this one is to compare its performance to a "null model". 
+
+```{block, type = "rmdnote"}
+A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case).
+```
+
+We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
+
+```{r nullrs, eval = FALSE, dependson=c("scotuswf", "scotusfolds")}
+## not running because of bug in parsnip: https://github.com/tidymodels/parsnip/issues/296
+null_regression <- null_model() %>% 
+  set_engine("parsnip") %>%
+  set_mode("regression")
+
+null_rs <- fit_resamples(
+  scotus_wf %>% add_model(null_regression),
+  scotus_folds
+)
+
+null_rs
+```
+
+What results do we obtain from the null model, in terms of performance metrics?
+
+```{r, eval = FALSE, dependson="nullrs"}
+null_rs %>%
+  collect_metrics()
+```
+
+The RMSE and $R^2$ indicate that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and no tuning) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
 
 ## Tuning lasso hyperparameters
 
-The value `penalty = 0.1` for regularization in the previous section was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? We can find out using resampling and tuning the model. Let's use our same set of cross-validation folds, and build a new model specification for model tuning.
+The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? Instead of learning this during model training, we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
-```{r}
+```{block, type = "rmdtip"}
+Think of `tune()` here as a placeholder for the regularization penalty.
+```
+
+After the tuning process, we can select a single best numeric value.
+ 
+```{r scotustunespec}
 tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
   set_mode("regression") %>%
   set_engine("glmnet")
 
-lambda_grid <- grid_regular(penalty(), levels = 50)
+tune_spec
+```
 
+We can create a regular grid of values to try using a convenience function for `penalty()`.
+
+```{r scotuslambdagrid}
+lambda_grid <- grid_regular(penalty(), levels = 30)
+
+lambda_grid
+```
+
+The function `grid_regular()` is from the dials package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values to try.
+
+Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
+
+```{block, type = "rmdnote"}
+Tuning a model uses a similar syntax compared to fitting a model to a set of resampled datasets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
+```
+
+We add our tuneable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
+
+```{r scotustuners, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec")}
 set.seed(2020)
 tune_rs <- tune_grid(
   scotus_wf %>% add_model(tune_spec),
@@ -193,16 +279,20 @@ tune_rs <- tune_grid(
   grid = lambda_grid,
   control = control_resamples(save_pred = TRUE)
 )
+
+tune_rs
 ```
 
+Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
 
-```{r}
+```{r dependson="scotustuners"}
 tune_rs %>%
   collect_metrics
 ```
 
+Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:scotustunevis) to see what the best model is.
 
-```{r}
+```{r scotustunevis, dependson="scotustuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the lowest RMSE."}
 tune_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -215,14 +305,23 @@ tune_rs %>%
   geom_line(size = 1.5) +
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  labs(title = "Lasso model performance across regularization penalties",
+       subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
+We can extract the best value for, say, RMSE from our tuning results with `select_best()`.
 
-```{r}
+```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
   select_best("rmse")
 
+lowest_rmse
+```
+
+Next, let's finalize our tuneable workflow with this regularization penalty. This is the regularization penalty that our tuning results show us result in the best model.
+
+```{r}
 final_lasso <- finalize_workflow(
   scotus_wf %>% add_model(tune_spec),
   lowest_rmse
@@ -231,9 +330,26 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r lowest_rmse$penalty`. This workflow is ready to go!
+
+```{r}
+knitr::knit_exit()
+```
+
+
+Add random forest -- wow, super bad
+
+
 ## Case study: remove stop words
 
+Several recipes that each have different set
+
+
 ## Case study: varying n-grams 
+
+Tune over ngrams with spacy
+
+At end of section, discuss again (refer back) to how different degrees measure different kinds of info
 
 Use different n of grams, combined with different ways of removing stopwords.
 
@@ -308,6 +424,7 @@ final_ngram_rs %>%
 
 ## Case study: compare lemma vs. words
 
+using spacy
 
 ## Different types of models
 
