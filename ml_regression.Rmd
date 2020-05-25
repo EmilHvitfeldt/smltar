@@ -9,7 +9,7 @@ theme_set(theme_light())
 options(crayon.enabled = FALSE)
 
 ## for Julia's local environment
-## spacyr::spacy_initialize(condaenv = "r-spacyr")
+## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
 ``` 
 
 In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing or MORE HERE TODO. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
@@ -68,11 +68,9 @@ scotus_test <- testing(scotus_split)
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
-- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. ~In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19]~.
-- After tokenization, we remove stop words (Chapter \@ref(stopwords)).
+- Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
 - Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
 - The recipe step `step_tfidf()`, used with defaults as here, weights each token frequency by the inverse document frequency.
-- Next, we can remove a few columns with names that contains special characters problematic for some modeling functions.
 - As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
 
 Finally, we `prep()` the recipe. This means we actually compute something for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
@@ -84,7 +82,6 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
   step_tfidf(text) %>%
-  step_rm(contains("'")) %>%  
   step_normalize(all_predictors())
 
 scotus_prep <- prep(scotus_rec)
@@ -123,8 +120,7 @@ lasso_fit <- scotus_wf %>%
 
 We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()` and even `tidy()` the results into a convenient dataframe format.
 
-```{r eval=FALSE, dependson="lassofit"}
-## this chunk is eval = FALSE for R 4.0 until the S3 method problem in tidymodels is solved
+```{r dependson="lassofit"}
 lasso_fit %>%
   pull_workflow_fit() %>%
   tidy()
@@ -215,7 +211,7 @@ A null model is a simple, non-informative model that always predicts the largest
 We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
 
 ```{r nullrs, eval = FALSE, dependson=c("scotuswf", "scotusfolds")}
-## not running because of bug in parsnip: https://github.com/tidymodels/parsnip/issues/296
+## not running until this change is on CRAN: https://github.com/tidymodels/tune/pull/207
 null_regression <- null_model() %>% 
   set_engine("parsnip") %>%
   set_mode("regression")
@@ -237,7 +233,7 @@ null_rs %>%
 
 The RMSE and $R^2$ indicate that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and no tuning) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
 
-## Tuning lasso hyperparameters
+## Tuning lasso hyperparameters {#tunelasso}
 
 The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? Instead of learning this during model training, we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
@@ -312,6 +308,13 @@ tune_rs %>%
        subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
+We can view the best results with `show_best()` and a choice for the metric.
+
+```{r dependson="scotustuners"}
+tune_rs %>%
+  show_best("rmse")
+```
+
 We can extract the best value for, say, RMSE from our tuning results with `select_best()`.
 
 ```{r scotuslowestrmse, dependson="scotustuners"}
@@ -332,7 +335,7 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r lowest_rmse$penalty`. This workflow is ready to go!
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go!
 
 ## Compare to a random forest model
 
@@ -392,24 +395,117 @@ Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted m
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
 ```
 
+## Case study: removing stop words
+
+We did not remove stop words (Chapter \@ref(stopwords)) in any of our models so far in this chapter. What impact will removing stop words have, and how do we know which stop word list is the best to use? The best way to answer these questions is with experimentation.
+
+Removing stop words is part of data preprocessing, so we define this step as part of our preprocessing recipe. Let's build a small recipe wrapper helper function so we can pass a value `stopword_name` to `step_stopwords()`.
+
+```{r stopwordrec, dependson="scotussplit"}
+stopword_rec <- function(stopword_name) {
+  recipe(year ~ text, data = scotus_train) %>%
+    step_tokenize(text) %>%
+    step_stopwords(text, stopword_source = stopword_name) %>%
+    step_tokenfilter(text, max_tokens = 500) %>%
+    step_tfidf(text) %>%
+    step_normalize(all_predictors())
+}
+```
+
+For example, now we can create a recipe that removes the Snowball stop words list by calling this function.
+
+```{r dependson="stopwordrec"}
+stopword_rec("snowball")
+```
+
+Next, let's set up a workflow that has a model only, using `add_model()`.
+
+```{r tuneablewf, dependson="scotustunespec"}
+tuneable_wf <- workflow() %>%
+  add_model(tune_spec) 
+
+tuneable_wf
+```
+
+Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same tuneable lasso model specification that we used in Section \@ref(tunelasso) but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
+
+The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
+
+```{r stopwordgrid}
+stopword_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
+
+stopword_grid
+```
+
+Now we can put this all together and tune these models which include stop word removal. We could create a little helper function for tuning like we did for the recipe, but we have printed out all three calls to `tune_grid()` for extra clarity. Notice for each one that there are three arguments:
+
+- A tuneable workflow, which consists of the tuneable lasso model specification and a data preprocessing recipe with stop word removal
+- The same cross-validation folds we created earlier
+- Our new grid of values for the regularization parameter
+
+```{r stopwordsres, dependson=c("stopwordgrid", "tuneablewf", "stopwordrec", "scotusfolds")}
+set.seed(123)
+snowball_rs <- tune_grid(
+  tuneable_wf %>% add_recipe(stopword_rec("snowball")),
+  scotus_folds,
+  grid = stopword_grid
+)
+
+set.seed(234)
+smart_rs <- tune_grid(
+  tuneable_wf %>% add_recipe(stopword_rec("smart")),
+  scotus_folds,
+  grid = stopword_grid
+)
+
+set.seed(345)
+stopwords_iso_rs <- tune_grid(
+  tuneable_wf %>% add_recipe(stopword_rec("stopwords-iso")),
+  scotus_folds,
+  grid = stopword_grid
+)
+```
+
+After fitting models for each of possible regularization values to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.
+
+```{r dependson="stopwordsres"}
+collect_metrics(smart_rs)
+```
+
+We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse).
+
+```{r snowballrmse, dependson="stopwordsres", fig.cap="Comparing model performa"}
+list(snowball = snowball_rs, 
+     smart = smart_rs, 
+     `stopwords-iso` = stopwords_iso_rs) %>%
+  map_dfr(show_best, "rmse", .id = "name") %>%
+  ggplot(aes(name, mean, color = name)) +
+  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
+  labs(x = NULL, y = "mean RMSE",
+       title = "Model performance for three stop word lexicons",
+       subtitle = "For this dataset, the Snowball lexicon performed best")
+```
+
+The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig:stopwordoverlap)) and, in this case, results in the best performance. Removing fewer stop words results in the best performance.
+
+```{block, type = "rmdwarning"}
+This result is not generalizable to all data sets and contexts, but the approach outlined in this section **is** generalizable. 
+```
+
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is lower than _without_ removing stop words (compare to Figure \@ref(fig:scotustunevis) and following), indicating that removing stop words (at least the small Snowball set) is a good choice.
 
 ```{r}
 knitr::knit_exit()
 ```
 
 
-## Case study: remove stop words
-
-Several recipes that each have different set
-
-
 ## Case study: varying n-grams 
 
-Tune over ngrams with spacy
+Tune over ngrams with tokenizers: for now write with three separate recipes
 
-At end of section, discuss again (refer back) to how different degrees measure different kinds of info
+Discuss again (refer back) to how different degrees measure different kinds of info
 
-Use different n of grams, combined with different ways of removing stopwords.
+Use different n of grams, combined with different ways of removing stopwords?
 
 ```{r}
 scotus_ngram_rec <- recipe(year ~ text, data = scotus_train) %>%
@@ -483,6 +579,8 @@ final_ngram_rs %>%
 ## Case study: compare lemma vs. words
 
 using spacy
+
+In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
 
 ## Different types of models
 
