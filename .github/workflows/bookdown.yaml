@@ -40,6 +40,9 @@ jobs:
           R -e 'install.packages("renv")'
           R -e 'renv::restore()'
 
+      - name: renv status
+        run: Rscript -e 'renv::status()'
+        
       - name: Install spacy
         run: |
            Rscript -e "install.packages('remotes')"
@@ -47,7 +50,7 @@ jobs:
            Rscript -e "reticulate::install_miniconda()"
            Rscript -e "reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')"
            Rscript -e "spacyr::spacy_install(prompt = FALSE)"
-           
+      
       - name: Build site
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
 
