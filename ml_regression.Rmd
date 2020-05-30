@@ -355,7 +355,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
+```{r, eval = FAlSE, scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -374,7 +374,7 @@ rf_rs %>%
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r, eval = FAlSE, rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
