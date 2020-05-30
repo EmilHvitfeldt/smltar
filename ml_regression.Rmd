@@ -356,7 +356,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r, scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
+```{r scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -368,7 +368,7 @@ rf_rs
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
 
-```{r, dependson="nullrs"}
+```{r, dependson="scotusrfrs"}
 rf_rs %>%
   collect_metrics()
 ```
@@ -396,7 +396,19 @@ Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted m
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
 ```
 
-## Case study: removing stop words
+This is less true when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
+
+## Compare to a ??? model
+
+Lasso regression works extremely well with text data, but it is not the only option.
+
+Choose one more to demonstrate in this chapter:
+
+- SVM
+- Naive Bayes (used in classification chapter -- probaby not)
+- knn
+
+## Case study: removing stop words {#casestudystopwords}
 
 We did not remove stop words (Chapter \@ref(stopwords)) in any of our models so far in this chapter. What impact will removing stop words have, and how do we know which stop word list is the best to use? The best way to answer these questions is with experimentation.
 
@@ -432,10 +444,10 @@ Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None
 
 The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
 
-```{r stopwordgrid}
-stopword_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
+```{r gridtwenty}
+grid_twenty <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
 
-stopword_grid
+grid_twenty
 ```
 
 Now we can put this all together and tune these models which include stop word removal. We could create a little helper function for tuning like we did for the recipe, but we have printed out all three calls to `tune_grid()` for extra clarity. Notice for each one that there are three arguments:
@@ -444,26 +456,26 @@ Now we can put this all together and tune these models which include stop word r
 - The same cross-validation folds we created earlier
 - Our new grid of values for the regularization parameter
 
-```{r stopwordsres, dependson=c("stopwordgrid", "tuneablewf", "stopwordrec", "scotusfolds")}
+```{r stopwordsres, dependson=c("gridtwenty", "tuneablewf", "stopwordrec", "scotusfolds")}
 set.seed(123)
 snowball_rs <- tune_grid(
   tuneable_wf %>% add_recipe(stopword_rec("snowball")),
   scotus_folds,
-  grid = stopword_grid
+  grid = grid_twenty
 )
 
 set.seed(234)
 smart_rs <- tune_grid(
   tuneable_wf %>% add_recipe(stopword_rec("smart")),
   scotus_folds,
-  grid = stopword_grid
+  grid = grid_twenty
 )
 
 set.seed(345)
 stopwords_iso_rs <- tune_grid(
   tuneable_wf %>% add_recipe(stopword_rec("stopwords-iso")),
   scotus_folds,
-  grid = stopword_grid
+  grid = grid_twenty
 )
 ```
 
@@ -495,51 +507,123 @@ This result is not generalizable to all data sets and contexts, but the approach
 
 This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is lower than _without_ removing stop words (compare to Figure \@ref(fig:scotustunevis) and following), indicating that removing stop words (at least the small Snowball set) is a good choice.
 
+## Case study: varying n-grams 
+
+Each model trained so far in this chapter has involved singled words or _unigrams_, but using n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words and effects from word order that can be predictive.
+
+This is another part of data preprocessing, so we again define this step as part of our preprocessing recipe. Let's build another small recipe wrapper helper function so we can pass a list of options `ngram_options` to `step_tokenize()`.
+
+```{r ngramrec, dependson="scotussplit"}
+ngram_rec <- function(ngram_options) {
+  recipe(year ~ text, data = scotus_train) %>%
+    step_tokenize(text, token = "ngrams", options = ngram_options) %>%
+    step_tokenfilter(text, max_tokens = 500) %>%
+    step_tfidf(text) %>%
+    step_normalize(all_predictors())
+}
+```
+
+There are two options we can specify, `n` and `n_min`, when we are using `engine = "tokenizers"`. We can set up a recipe with only `n = 1` to tokenize and only extract the unigrams.
+
+```{r eval=FALSE}
+ngram_rec(list(n = 1))
+```
+
+We can use `n = 3, n_min = 1` to identify the set of all trigrams, bigrams, _and_ unigrams.
+
+```{r eval=FALSE}
+ngram_rec(list(n = 3, n_min = 1))
+```
+
+```{block, type = "rmdnote"}
+Including n-grams of different orders in a model (such as trigrams, bigrams, plus unigrams) allows the model to learn at different levels of linguistic organization and context. 
+```
+
+We can reuse the same components `tuneable_wf` and `grid_twenty` from here. These model components provide the tuneable lasso model specification and possible regularization parameters to try. Let's put it all together and create a helper function to use `tune_grid()` with these components plus our helper recipe function.
+
+```{r tunengram, dependson=c("gridtwenty", "tuneablewf", "ngramrec", "scotusfolds")}
+tune_ngram <- function(ngram_options) {
+  tune_grid(
+    tuneable_wf %>% add_recipe(ngram_rec(ngram_options)),
+    scotus_folds,
+    grid = grid_twenty
+  )
+}
+```
+
+```{block, type = "rmdtip"}
+We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords)) but there we showed each call to `tune_grid()` for extra clarity.
+```
+
+With this helper function, let's try out predicting the year of Supreme Court opinions using:
+
+- only unigrams,
+- bigrams and unigrams,
+- trigrams, bigrams, and unigrams.
+
+```{r ngramres, dependson=c("tunengram")}
+set.seed(123)
+unigram_rs <- tune_ngram(list(n = 1))
+
+set.seed(234)
+bigram_rs <- tune_ngram(list(n = 2, n_min = 1))
+
+set.seed(345)
+trigram_rs <- tune_ngram(list(n = 3, n_min = 1))
+```
+
+These sets of results contain metrics computed for the model for that set of tokenization choices.
+
+```{r dependson="ngramres"}
+collect_metrics(bigram_rs)
+```
+
+We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
+
+```{r ngramrmse, dependson="ngramres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
+list(`1` = unigram_rs, 
+     `1 and 2` = bigram_rs, 
+     `1, 2, and 3` = trigram_rs) %>%
+  map_dfr(collect_metrics, .id = "name") %>%
+  filter(.metric == "rmse") %>%
+  ggplot(aes(name, mean, fill = name)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", binpositions="all",
+               show.legend = FALSE) +
+  labs(x = "Degree of n-grams", y = "mean RMSE",
+       title = "Model performance for different degrees of n-gram tokenization",
+       subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
+```
+
+Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. Notice that the performance gain in moving from unigrams to unigrams plus bigrams is significant.
+
+
+
 ```{r}
 knitr::knit_exit()
 ```
 
+## Case study: compare lemma vs. words
 
-## Case study: varying n-grams 
+using spacy
 
-Tune over ngrams with tokenizers: for now write with three separate recipes
-
-Discuss again (refer back) to how different degrees measure different kinds of info
-
-Use different n of grams, combined with different ways of removing stopwords?
-
-```{r}
-scotus_ngram_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(text, token = "ngrams", options = list()) %>%
-  step_stopwords(text) %>%
-  step_tokenfilter(text, max_tokens = 500) %>%
-  step_tfidf(text) 
-
-scotus_ngram_rec
-```
+In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
 
 
-```{r}
-ngram_wf <- workflow() %>%
-  add_recipe(scotus_ngram_rec) %>%
-  add_model(tune_spec)
 
-ngram_wf
-```
+## What evaluation metrics are appropiate?
 
 
-```{r}
-lambda_grid <- grid_regular(penalty(), levels = 20)
+## Full game
 
-set.seed(2020)
-ngram_rs <- tune_grid(
-  ngram_wf,
-  scotus_folds,
-  grid = lambda_grid,
-  control = control_resamples(save_pred = TRUE)
-)
-```
+### Feature selection
 
+### Splitting the data
+
+### Specifying models
+
+### Cross-validation
+
+### Evaluation
 
 ```{r, dependson="lassors"}
 ngram_rs %>%
@@ -577,39 +661,6 @@ final_ngram_rs %>%
   )
 ```
 
-## Case study: compare lemma vs. words
-
-using spacy
-
-In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
-
-## Different types of models
-
-Lasso regression works extremely well with text data, but it is not the only option.
-
-(Not all of these models are good, but are used to show strenghs and weaknessed)
-
-- SVM
-- Naive Bayes
-- glmnet
-- knn
-
-
-## What evaluation metrics are appropiate
-
-Data will most likely be sparse when using BoW
-
-## Full game
-
-### Feature selection
-
-### Splitting the data
-
-### Specifying models
-
-### Cross-validation
-
-### Evaluation
 
 ```{r}
 library(vip)
