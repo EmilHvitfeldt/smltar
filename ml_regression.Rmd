@@ -52,13 +52,14 @@ This sample of opinions reflects the true distribution over time of available op
 
 ### Building our first regression model {#firstregression}
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models we want to try out.
 
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
 set.seed(1234)
 scotus_split <- scotus_sample %>%
-  mutate(year = as.numeric(year)) %>%
+  mutate(year = as.numeric(year),
+         text = str_remove_all(text, "'")) %>%
   initial_split()
 
 scotus_train <- training(scotus_split)
@@ -355,7 +356,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r, eval = FALSE, scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
+```{r, scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -367,14 +368,14 @@ rf_rs
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
 
-```{r, eval = FALSE, dependson="nullrs"}
+```{r, dependson="nullrs"}
 rf_rs %>%
   collect_metrics()
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r, eval = FALSE, rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r, rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
