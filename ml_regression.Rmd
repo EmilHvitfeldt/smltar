@@ -368,14 +368,14 @@ rf_rs
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
 
-```{r, dependson="scotusrfrs"}
+```{r dependson="scotusrfrs"}
 rf_rs %>%
   collect_metrics()
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r, rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -604,9 +604,7 @@ knitr::knit_exit()
 
 ## Case study: compare lemma vs. words
 
-using spacy
-
-In this chapter, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
+In this section, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
 
 
 
