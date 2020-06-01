@@ -305,7 +305,8 @@ tune_rs %>%
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
   theme(legend.position = "none") +
-  labs(title = "Lasso model performance across regularization penalties",
+  labs(y = "RMSE",
+       title = "Lasso model performance across regularization penalties",
        subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
@@ -316,7 +317,7 @@ tune_rs %>%
   show_best("rmse")
 ```
 
-We can extract the best value for, say, RMSE from our tuning results with `select_best()`.
+The best value for RMSE from this tuning run is `r show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
 
 ```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
@@ -325,7 +326,7 @@ lowest_rmse <- tune_rs %>%
 lowest_rmse
 ```
 
-Next, let's finalize our tuneable workflow with this regularization penalty. This is the regularization penalty that our tuning results show us result in the best model.
+Next, let's finalize our tuneable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
 
 ```{r}
 final_lasso <- finalize_workflow(
@@ -405,7 +406,7 @@ Lasso regression works extremely well with text data, but it is not the only opt
 Choose one more to demonstrate in this chapter:
 
 - SVM
-- Naive Bayes (used in classification chapter -- probaby not)
+- Naive Bayes (used in classification chapter -- probably not)
 - knn
 
 ## Case study: removing stop words {#casestudystopwords}
@@ -505,7 +506,7 @@ The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig
 This result is not generalizable to all data sets and contexts, but the approach outlined in this section **is** generalizable. 
 ```
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is lower than _without_ removing stop words (compare to Figure \@ref(fig:scotustunevis) and following), indicating that removing stop words (at least the small Snowball set) is a good choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is at least somewhat lower than _without_ removing stop words for all stop word lexicons (compare to Figure \@ref(fig:scotustunevis) and following), indicating that removing stop words is a good choice. This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost is low.
 
 ## Case study: varying n-grams 
 
@@ -594,19 +595,101 @@ list(`1` = unigram_rs,
        subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
 ```
 
-Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. Notice that the performance gain in moving from unigrams to unigrams plus bigrams is significant.
+Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation much.
 
+## Case study: lemmatization
 
+As we discussed in Section \@ref(lemmatization), we can normalize words to their roots or **lemmas** based on each word's context and the structure of a language. Table \@ref(tab:lemmatb) shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
+
+```{r lemmatb, echo=FALSE}
+## for GH actions and people with "regular" environments i.e. not Julia
+spacyr::spacy_initialize(entity = FALSE)
+
+spacyr::spacy_parse(c("However, the Court of Appeals disagreed with the District Court's construction of the state statute, concluding that it did authorize issuance of the orders to withhold to the Postal Service.")) %>% 
+  select(`original word` = token, lemma) %>% 
+  knitr::kable()
+```
+
+Notice several things about lemmatization that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
+
+- Words are converted to lower case except for proper nouns.
+- The lemma for pronouns is `-PRON-`.
+- Irregular verbs are converted to their canonical form ("did" to "do").
+
+Using lemmatization instead of a more straightforward tokenization strategy is slower because of the increased complexity involved, but it can be worth it. Let's explore how to train a model using _lemmas_ instead of _words_.
+
+Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing down by the tokenization engine.
+
+```{r lemmarec, dependson="scotussplit"}
+spacyr::spacy_initialize(entity = FALSE)
+
+lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text, engine = "spacyr") %>%
+  step_lemma(text) %>%
+  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
+```
+
+```{block, type = "rmdnote"}
+Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in our model and it takes a lot of computational power. Initializing with `entity = FALSE` will allow our data preprocessing for lemmatization to run much faster.
+```
+
+Let's combine this lemmatized text with our tuneable workflow and grid of possible parameter values. We can then tune our workflow and identify the best model for the lemmatized text.
+
+```{r, message=FALSE, eval=FALSE}
+set.seed(123)
+lemma_rs <- tune_grid(
+  tuneable_wf %>% add_recipe(lemma_rec),
+  scotus_folds,
+  grid = grid_twenty
+)
+
+lemma_rs
+```
+
+```{r, eval=FALSE, echo=FALSE}
+write_rds(lemma_rs, "data/ml_reg_lemma_rs.rds")
+```
+
+```{r lemmatuners, echo=FALSE}
+lemma_rs <- read_rds("data/ml_reg_lemma_rs.rds")
+lemma_rs
+```
+
+Let's visualize the performance metrics, RMSE and $R^2$, in Figure \@ref(fig:scotuslemmavis) to see what the best model using lemmas is, much like we did in Figure \@ref(fig:scotustunevis).
+
+```{r scotuslemmavis, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
+lemma_rs %>%
+  collect_metrics() %>%
+  ggplot(aes(penalty, mean, color = .metric)) +
+  geom_errorbar(aes(
+    ymin = mean - std_err,
+    ymax = mean + std_err
+  ),
+  alpha = 0.5
+  ) +
+  geom_line(size = 1.5) +
+  facet_wrap(~.metric, scales = "free", nrow = 2) +
+  scale_x_log10() +
+  theme(legend.position = "none") +
+  labs(y = "RMSE",
+       title = "Lasso model performance using lemmatization",
+       subtitle = "Performance metrics indicate that lemmatization improves model performance")
+```
+
+What is the best model, using lemmatization?
+
+```{r dependson="scotustuners"}
+lemma_rs %>%
+  show_best("rmse")
+```
+
+The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
 
 ```{r}
 knitr::knit_exit()
 ```
-
-## Case study: compare lemma vs. words
-
-In this section, we are tokenizing via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
-
-
 
 ## What evaluation metrics are appropiate?
 
