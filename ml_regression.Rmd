@@ -12,7 +12,7 @@ options(crayon.enabled = FALSE)
 ## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
 ``` 
 
-In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing or MORE HERE TODO. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
+In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
 
 ```{r scotussample}
 library(tidyverse)
@@ -22,7 +22,7 @@ scotus_sample %>%
   as_tibble()
 ```
 
-This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is a continuous variable (rather than a group membership of discrete label). 
+This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
 
 ```{block, type = "rmdtip"}
 If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
@@ -243,7 +243,7 @@ Think of `tune()` here as a placeholder for the regularization penalty.
 ```
 
 After the tuning process, we can select a single best numeric value.
- 
+
 ```{r scotustunespec}
 tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
   set_mode("regression") %>%
@@ -305,8 +305,7 @@ tune_rs %>%
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
   theme(legend.position = "none") +
-  labs(y = "RMSE",
-       title = "Lasso model performance across regularization penalties",
+  labs(title = "Lasso model performance across regularization penalties",
        subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
@@ -695,7 +694,7 @@ We have focused on using RMSE and $R^2$ as metrics for our models in this chapte
 lemma_rs <- tune_grid(
   tuneable_wf %>% add_recipe(lemma_rec),
   scotus_folds,
-  grid = grid_twenty
+  grid = grid_twenty,
   metrics = metric_set(mae, mape)
 )
 ```
@@ -726,68 +725,154 @@ tune_rs %>%
   mae(year, .pred)
 ```
 
-To see the full set of regression metric options, see the [yardstick website](https://yardstick.tidymodels.org/reference/).
+For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
 
-```{r}
-knitr::knit_exit()
+## The full game
+
+In this chapter, we started from the beginning and then explored both different types of models and different data preprocessing steps. Let's take a step back and build one final model, using everything we've learned. For our final model, let's again used a lasso regression model, since it performed better than the other options we looked at. We will:
+
+- train on the same set of cross-validation resamples used throughout this chapter,
+- tune both the lasso regularization parameter _and_ the number of tokens used in the model,
+- include both unigrams and bigrams,
+- remove the Snowball stop word lexicon,
+- choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and
+- finally evaluate on the testing set, which we have not touched at all yet.
+
+### Preprocess the data
+
+First, let's create the data preprocessing recipe. By setting the tokenization options to `list(n = 2, n_min = 1)`, we will include both unigrams and bigrams in our model. When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value.
+
+```{r finalscotusrec, dependson="scotussplit"}
+final_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text, token = "ngrams", options = list(n = 2, n_min = 1)) %>%
+  step_tokenfilter(text, max_tokens = tune()) %>%
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
 ```
 
-## Full game
 
-### Feature selection
+### Specify the model
 
-### Splitting the data
+Let's use the same lasso regression model specification we have used multiple times in this chapter, and set it up here again to remind ourselves. Using `mixture = 1` sets up a lasso model (`mixture = 0` would be a ridge model), and we will `tune()` the regularization penalty to find the best value.
 
-### Specifying models
+```{r scotustunespec2}
+tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
 
-### Cross-validation
-
-### Evaluation
-
-```{r, dependson="lassors"}
-ngram_rs %>%
-  collect_metrics()
+tune_spec
 ```
 
+We can combine the preprocessing recipe and the model specification in a tuneable workflow.
 
-```{r}
-lowest_rmse <- ngram_rs %>%
-  select_best("rmse")
+```{r tunescotuswf, dependson=c("finalscotusrec", "scotustunespec2")}
+tune_wf <- workflow() %>%
+  add_recipe(final_rec) %>%
+  add_model(tune_spec)
 
-final_ngram <- finalize_workflow(
-  ngram_wf,
-  lowest_rmse
+tune_wf
+```
+
+### Tune the model
+
+Before we tune the model, we need to set up a set of possible parameter values to try. There are _two_ tuneable parameters in this model, the regularization parameter and the maximum number of tokens included in the model. Let's include seven possible values for each parameter, for a combination of 49 models.
+
+```{r finalscotusgrid}
+final_grid <- grid_regular(penalty(range = c(-4, 0)),
+                           max_tokens(range = c(200, 1000)),
+                           levels = 7)
+
+final_grid
+```
+
+Throughout this chapter, we have used `grid_regular()` where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`.
+
+Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and means absolute percent error during tuning.
+
+```{r finalscotusrs, dependson=c("tunescotuswf", "scotusfolds", "finalscotusgrid")}
+final_rs <- tune_grid(
+  tune_wf,
+  scotus_folds,
+  grid = final_grid,
+  metrics = metric_set(rmse, mae, mape),
+  control = control_resamples(save_pred = TRUE)
 )
 
-final_ngram
+final_rs
 ```
 
+We trained all these models!
 
-```{r}
-final_ngram_rs <- final_ngram %>%
-  fit_resamples(scotus_folds,
-                control = control_resamples(save_pred = TRUE)) 
+### Evaluate the modeling
 
-final_ngram_rs %>%
-  unnest(.predictions) %>%
+Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:scotusfinaltunevis) shows us that
+
+```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=8, fig.height=8, fig.cap="We see that..."}
+final_rs %>%
+  collect_metrics() %>%
+  ggplot(aes(penalty, mean, color = .metric)) +
+  geom_errorbar(aes(
+    ymin = mean - std_err,
+    ymax = mean + std_err
+  ),
+  alpha = 0.5
+  ) +
+  geom_line(size = 1.5) +
+  facet_wrap(~.metric, scales = "free", nrow = 2) +
+  scale_x_log10() +
+  theme(legend.position = "none") +
+  labs(title = "Lasso model performance across regularization penalties",
+       subtitle = "Performance metrics can be used to identity the best penalty")
+```
+
+We can also examine how the true and predicted years compare. Figure \@ref(fig:scotusfinalpredvis) shows us that
+
+```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=8, fig.height=8, fig.cap="We see that..."}
+final_rs %>%
+  collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
   geom_point(alpha = 0.5) +
   labs(
     x = "Truth",
     y = "Predicted year",
-    color = NULL
+    color = NULL,
+    title = "Predicted and true years for Supreme Court opinions",
+    subtitle = "Each cross-validation fold is shown in a different color"
   )
 ```
 
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the simplest model within some limit around the numerically best result. Let's stick with choosing the model with the best performance.
 
-```{r}
+```{r lowestmae, dependson="finalscotusrs"}
+lowest_mae <- final_rs %>%
+  select_best("mae")
+
+lowest_mae
+```
+
+After we have that parameter, we can finalize our earlier tuneable workflow, by updating it with this value.
+
+```{r scotusfinalwf, dependson=c("lowestmae", "tunescotuswf")}
+final_wf <- finalize_workflow(
+  tune_wf,
+  lowest_mae
+)
+
+final_wf
+```
+
+Notice that `final_wf` now has finalized values for `max_tokens` and `penalty`.
+
+We can now fit this finalized workflow on training data. For example, we can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
+
+```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.width=8, fig.height=8, fig.cap="We see that..."}
 library(vip)
 
-final_lasso %>%
+final_wf %>%
   fit(scotus_train) %>%
   pull_workflow_fit() %>%
-  vi(lambda = lowest_rmse$penalty) %>%
+  vi(lambda = lowest_mae$penalty) %>%
   mutate(
     Importance = abs(Importance),
     Variable = str_remove_all(Variable, "tfidf_text_")
@@ -804,5 +889,30 @@ final_lasso %>%
   labs(y = NULL)
 ```
 
+Finally, let's return to our testing data. Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
 
-Closely examine high performing samples and low performance sampling. 
+```{r dependson=c("scotusfinalwf", "scotussplit")}
+last_fit(
+  final_wf,
+  scotus_split
+) %>%
+  collect_metrics()
+```
+
+The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning.
+
+TODO: Examine high performing/low performing observations?
+
+## Summary
+
+You can use regression modeling to predict a continuous variable from a dataset, such as a text dataset. Regularized linear models, such as lasso, often work well for text datasets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own priorities.
+
+### In this chapter, you learned:
+
+- what kind of quantities can be modeled using regression
+- to tune a lasso regression model using resampled data
+- how to compare different model types
+- about measuring the impact of n-gram tokenization on models
+- how to implement lemmatization and stop word removal with text models
+- about performance metrics for regression models
+
