@@ -176,7 +176,7 @@ lasso_rs %>%
   collect_metrics()
 ```
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. 
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) round(1)` years.
 
 ```{block, type = "rmdnote"}
 The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
@@ -693,6 +693,44 @@ knitr::knit_exit()
 
 ## What evaluation metrics are appropiate?
 
+We have focused on using RMSE and $R^2$ as metrics for our models in this chapter, the defaults in the tidymodels framework. Other metrics can also be appropriate for regression models. Another common set of regression metric options are the various flavors of mean absolute error. If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for mean absolute error (`mae`) and mean absolute percent error (`mape`).
+
+```{r eval=FALSE}
+lemma_rs <- tune_grid(
+  tuneable_wf %>% add_recipe(lemma_rec),
+  scotus_folds,
+  grid = grid_twenty
+  metrics = metric_set(mae, mape)
+)
+```
+
+If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. Let's go back to the lasso model we tuned in Section \@ref(tunelasso), with results in `tune_rs`. We can compute the overall mean absolute percent error.
+
+```{r dependson="scotustuners"}
+tune_rs %>%
+  collect_predictions() %>%
+  mape(year, .pred)
+```
+
+We can also compute the mean absolute percent error for each resample.
+
+```{r dependson="scotustuners"}
+tune_rs %>%
+  collect_predictions() %>%
+  group_by(id) %>%
+  mape(year, .pred)
+```
+
+Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.
+
+```{r dependson="scotustuners"}
+tune_rs %>%
+  collect_predictions() %>%
+  group_by(id) %>%
+  mae(year, .pred)
+```
+
+To see the full set of regression metric options, see the [yardstick website](https://yardstick.tidymodels.org/reference/).
 
 ## Full game
 
