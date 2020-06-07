@@ -687,10 +687,6 @@ lemma_rs %>%
 
 The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
 
-```{r}
-knitr::knit_exit()
-```
-
 ## What evaluation metrics are appropiate?
 
 We have focused on using RMSE and $R^2$ as metrics for our models in this chapter, the defaults in the tidymodels framework. Other metrics can also be appropriate for regression models. Another common set of regression metric options are the various flavors of mean absolute error. If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for mean absolute error (`mae`) and mean absolute percent error (`mape`).
@@ -731,6 +727,10 @@ tune_rs %>%
 ```
 
 To see the full set of regression metric options, see the [yardstick website](https://yardstick.tidymodels.org/reference/).
+
+```{r}
+knitr::knit_exit()
+```
 
 ## Full game
 
