@@ -177,7 +177,7 @@ lasso_rs %>%
   collect_metrics()
 ```
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) round(1)` years.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` years.
 
 ```{block, type = "rmdnote"}
 The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
