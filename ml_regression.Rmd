@@ -7,6 +7,7 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
+doParallel::registerDoParallel()
 
 ## for Julia's local environment
 ## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
@@ -744,7 +745,11 @@ First, let's create the data preprocessing recipe. By setting the tokenization o
 
 ```{r finalscotusrec, dependson="scotussplit"}
 final_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(text, token = "ngrams", options = list(n = 2, n_min = 1)) %>%
+  step_tokenize(
+    text, token = "ngrams", 
+    options = list(n = 2, n_min = 1,
+                   stopwords = stopwords::stopwords(source = "snowball"))
+  ) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
@@ -779,7 +784,7 @@ Before we tune the model, we need to set up a set of possible parameter values t
 
 ```{r finalscotusgrid}
 final_grid <- grid_regular(penalty(range = c(-4, 0)),
-                           max_tokens(range = c(200, 1000)),
+                           max_tokens(range = c(200, 2000)),
                            levels = 7)
 
 final_grid
@@ -825,24 +830,7 @@ final_rs %>%
        subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
-We can also examine how the true and predicted years compare. Figure \@ref(fig:scotusfinalpredvis) shows us that
-
-```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=8, fig.height=8, fig.cap="We see that..."}
-final_rs %>%
-  collect_predictions() %>%
-  ggplot(aes(year, .pred, color = id)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.5) +
-  labs(
-    x = "Truth",
-    y = "Predicted year",
-    color = NULL,
-    title = "Predicted and true years for Supreme Court opinions",
-    subtitle = "Each cross-validation fold is shown in a different color"
-  )
-```
-
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the simplest model within some limit around the numerically best result. Let's stick with choosing the model with the best performance.
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the simplest model within some limit around the numerically best result. Let's stick with choosing the model with the best performance, in terms of one of the metrics we chose.
 
 ```{r lowestmae, dependson="finalscotusrs"}
 lowest_mae <- final_rs %>%
@@ -851,7 +839,7 @@ lowest_mae <- final_rs %>%
 lowest_mae
 ```
 
-After we have that parameter, we can finalize our earlier tuneable workflow, by updating it with this value.
+After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tuneable workflow, by updating it with this value.
 
 ```{r scotusfinalwf, dependson=c("lowestmae", "tunescotuswf")}
 final_wf <- finalize_workflow(
@@ -862,7 +850,7 @@ final_wf <- finalize_workflow(
 final_wf
 ```
 
-Notice that `final_wf` now has finalized values for `max_tokens` and `penalty`.
+The `final_wf` workflow now has finalized values for `max_tokens` and `penalty`.
 
 We can now fit this finalized workflow on training data. For example, we can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
 
@@ -889,17 +877,39 @@ final_wf %>%
   labs(y = NULL)
 ```
 
+The tokens (unigrams or bigrams) that contribute in the positive direction are associated with higher, later years and those that contribute in the negative direction are associated with lower, earlier years for these Supreme Court opinions.
+
 Finally, let's return to our testing data. Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
 
 ```{r dependson=c("scotusfinalwf", "scotussplit")}
-last_fit(
+final_fitted <- last_fit(
   final_wf,
   scotus_split
-) %>%
+) 
+
+final_fitted %>%
   collect_metrics()
 ```
 
-The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning.
+The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
+
+We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are not reliable before that year.
+
+```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=8, fig.height=8, fig.cap="For the testing data, "}
+final_fitted %>%
+  collect_predictions() %>%
+  ggplot(aes(year, .pred)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted year",
+    color = NULL,
+    title = "Predicted and true years for Supreme Court opinions",
+    subtitle = "For the testing data"
+  )
+```
+
 
 TODO: Examine high performing/low performing observations?
 
