@@ -237,13 +237,7 @@ The RMSE and $R^2$ indicate that this null model is dramatically worse than our 
 
 ## Tuning lasso hyperparameters {#tunelasso}
 
-The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat at random. How do we know the *right* or *best* regularization parameter penalty? Instead of learning this during model training, we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
-
-```{block, type = "rmdtip"}
-Think of `tune()` here as a placeholder for the regularization penalty.
-```
-
-After the tuning process, we can select a single best numeric value.
+The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
 ```{r scotustunespec}
 tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
@@ -253,7 +247,14 @@ tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
 tune_spec
 ```
 
-We can create a regular grid of values to try using a convenience function for `penalty()`.
+After the tuning process, we can select a single best numeric value.
+
+```{block, type = "rmdtip"}
+Think of `tune()` here as a placeholder for the regularization penalty.
+```
+
+
+We can create a regular grid of values to try, using a convenience function for `penalty()`.
 
 ```{r scotuslambdagrid}
 lambda_grid <- grid_regular(penalty(), levels = 30)
@@ -261,7 +262,7 @@ lambda_grid <- grid_regular(penalty(), levels = 30)
 lambda_grid
 ```
 
-The function `grid_regular()` is from the dials package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values to try.
+The function `grid_regular()` is from the **dials** package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values.
 
 Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
 
@@ -287,7 +288,7 @@ Now, instead of one set of metrics, we have a set of metrics for each value of t
 
 ```{r dependson="scotustuners"}
 tune_rs %>%
-  collect_metrics
+  collect_metrics()
 ```
 
 Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:scotustunevis) to see what the best model is.
@@ -310,14 +311,14 @@ tune_rs %>%
        subtitle = "Performance metrics can be used to identity the best penalty")
 ```
 
-We can view the best results with `show_best()` and a choice for the metric.
+We can view the best results with `show_best()` and a choice for the metric, such as RMSE.
 
 ```{r dependson="scotustuners"}
 tune_rs %>%
   show_best("rmse")
 ```
 
-The best value for RMSE from this tuning run is `r show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
+The best value for RMSE from this tuning run is `r show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(1)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
 
 ```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
@@ -337,7 +338,7 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go!
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
 
 ## Compare to a random forest model {#comparerf}
 
@@ -376,7 +377,7 @@ rf_rs %>%
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=8, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=7, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -397,7 +398,7 @@ Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted m
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
 ```
 
-This is less true when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
+Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
 
 ## Compare to a ??? model
 
