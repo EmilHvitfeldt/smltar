@@ -185,7 +185,7 @@ The lower RMSE is, the better; the closer $R^2$ is to one, the better.
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
 
-```{r firstregpredict, dependson="lassors", fig.width=8, fig.height=7, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
+```{r firstregpredict, dependson="lassors", fig.width=7, fig.height=6, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -377,7 +377,7 @@ rf_rs %>%
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredict, dependson="scotusrfrs", fig.width=8, fig.height=7, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, dependson="scotusrfrs", fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -511,7 +511,7 @@ This approach can be used to compare different lexicons and find the best one fo
 
 ## Case study: varying n-grams 
 
-Each model trained so far in this chapter has involved singled words or _unigrams_, but using n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words and effects from word order that can be predictive.
+Each model trained so far in this chapter has involved single words or _unigrams_, but using n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words, as well as effects from word order, that can be predictive.
 
 This is another part of data preprocessing, so we again define this step as part of our preprocessing recipe. Let's build another small recipe wrapper helper function so we can pass a list of options `ngram_options` to `step_tokenize()`.
 
@@ -541,7 +541,7 @@ ngram_rec(list(n = 3, n_min = 1))
 Including n-grams of different orders in a model (such as trigrams, bigrams, plus unigrams) allows the model to learn at different levels of linguistic organization and context. 
 ```
 
-We can reuse the same components `tuneable_wf` and `grid_twenty` from here. These model components provide the tuneable lasso model specification and possible regularization parameters to try. Let's put it all together and create a helper function to use `tune_grid()` with these components plus our helper recipe function.
+We can reuse the same components `tuneable_wf` and `grid_twenty` from our earlier case study; these modular components are a benefit to adopting this approach to supervised machine learning. These model components provide the tuneable lasso model specification and possible regularization parameters to try. Let's put it all together and create a helper function to use `tune_grid()` with these components plus our helper recipe function.
 
 ```{r tunengram, dependson=c("gridtwenty", "tuneablewf", "ngramrec", "scotusfolds")}
 tune_ngram <- function(ngram_options) {
@@ -553,15 +553,15 @@ tune_ngram <- function(ngram_options) {
 }
 ```
 
-```{block, type = "rmdtip"}
+```{block2, type = "rmdtip"}
 We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords)) but there we showed each call to `tune_grid()` for extra clarity.
 ```
 
 With this helper function, let's try out predicting the year of Supreme Court opinions using:
 
-- only unigrams,
-- bigrams and unigrams,
-- trigrams, bigrams, and unigrams.
+- only unigrams
+- bigrams and unigrams
+- trigrams, bigrams, and unigrams
 
 ```{r ngramres, dependson=c("tunengram")}
 set.seed(123)
@@ -574,7 +574,7 @@ set.seed(345)
 trigram_rs <- tune_ngram(list(n = 3, n_min = 1))
 ```
 
-These sets of results contain metrics computed for the model for that set of tokenization choices.
+These sets of results contain metrics computed for the model with that tokenization strategy.
 
 ```{r dependson="ngramres"}
 collect_metrics(bigram_rs)
@@ -596,7 +596,7 @@ list(`1` = unigram_rs,
        subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
 ```
 
-Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation much.
+Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much.
 
 ## Case study: lemmatization
 
@@ -608,7 +608,7 @@ spacyr::spacy_initialize(entity = FALSE)
 
 spacyr::spacy_parse(c("However, the Court of Appeals disagreed with the District Court's construction of the state statute, concluding that it did authorize issuance of the orders to withhold to the Postal Service.")) %>% 
   select(`original word` = token, lemma) %>% 
-  knitr::kable()
+  knitr::kable(caption = "Lemmatization of one sentence from a Supreme Court opinion")
 ```
 
 Notice several things about lemmatization that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
@@ -619,9 +619,9 @@ Notice several things about lemmatization that are different from the kind of de
 
 Using lemmatization instead of a more straightforward tokenization strategy is slower because of the increased complexity involved, but it can be worth it. Let's explore how to train a model using _lemmas_ instead of _words_.
 
-Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing down by the tokenization engine.
+Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.
 
-```{r lemmarec, dependson="scotussplit"}
+```{r lemmarec, dependson="scotussplit", echo=FALSE}
 spacyr::spacy_initialize(entity = FALSE)
 
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
@@ -692,10 +692,7 @@ The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min
 
 We have focused on using RMSE and $R^2$ as metrics for our models in this chapter, the defaults in the tidymodels framework. Other metrics can also be appropriate for regression models. Another common set of regression metric options are the various flavors of mean absolute error.
 
-```{block, type = "rmdnote"}
 If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for mean absolute error (`mae`) and mean absolute percent error (`mape`).
-```
-
 
 ```{r eval=FALSE}
 lemma_rs <- tune_grid(
@@ -706,10 +703,7 @@ lemma_rs <- tune_grid(
 )
 ```
 
-
-```{block, type = "rmdnote"}
 If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. 
-```
 
 Let's go back to the lasso model we tuned in Section \@ref(tunelasso), with results in `tune_rs`. We can compute the overall mean absolute percent error.
 
@@ -737,7 +731,12 @@ tune_rs %>%
   mae(year, .pred)
 ```
 
+
+```{block, type = "rmdnote"}
 For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
+```
+
+
 
 ## The full game
 
@@ -813,9 +812,12 @@ There are _two_ tuneable parameters in this model, the regularization parameter 
 Let's include seven possible values for each parameter, for a combination of 49 models.
 
 ```{r finalscotusgrid}
-final_grid <- grid_regular(penalty(range = c(-4, 0)),
-                           max_tokens(range = c(500, 5000)),
-                           levels = 7)
+final_grid <- grid_regular(
+  penalty(range = c(-4, 0)),
+  max_tokens(range = c(500, 5000)),
+  levels = 7
+)
+
 
 final_grid
 ```
@@ -825,9 +827,9 @@ final_grid
 Throughout this chapter, we have used `grid_regular()` where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`.
 ```
 
-Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and means absolute percent error during tuning.
+Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
 
-```{r finalscotusrs, dependson=c("tunescotuswf", "scotusfolds", "finalscotusgrid")}
+```{r, eval = FALSE}
 final_rs <- tune_grid(
   tune_wf,
   scotus_folds,
@@ -838,6 +840,16 @@ final_rs <- tune_grid(
 
 final_rs
 ```
+
+```{r, eval=FALSE, echo=FALSE}
+write_rds(final_rs, "data/ml_reg_final_rs.rds")
+```
+
+```{r finalscotusrs, echo=FALSE}
+final_rs <- read_rds("data/ml_reg_final_rs.rds")
+final_rs
+```
+
 
 We trained all these models!
 
@@ -850,7 +862,7 @@ Pay attention to how increasing regularization affects performance as more token
 ```
 
 
-```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=10, fig.height=8, fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
+```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=9, fig.height=6, fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
 final_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = as.factor(max_tokens))) +
@@ -939,9 +951,9 @@ final_fitted %>%
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
 
-We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are not reliable before that year.
+We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year.
 
-```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=8, fig.height=8, fig.cap="For the testing data, "}
+```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6, fig.height=6, fig.cap="Predicted and true years from a lasso regression model with bigrams and unigrams, and stop words removed"}
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
@@ -950,9 +962,8 @@ final_fitted %>%
   labs(
     x = "Truth",
     y = "Predicted year",
-    color = NULL,
-    title = "Predicted and true years for Supreme Court opinions",
-    subtitle = "For the testing data"
+    title = "Predicted and true years for the testing set of Supreme Court opinions",
+    subtitle = "For the testing set, predictions are more reliable after 1850"
   )
 ```
 
@@ -961,7 +972,7 @@ TODO: Examine high performing/low performing observations?
 
 ## Summary
 
-You can use regression modeling to predict a continuous variable from a dataset, such as a text dataset. Regularized linear models, such as lasso, often work well for text datasets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own priorities.
+You can use regression modeling to predict a continuous variable from a dataset, including a text dataset. Regularized linear models, such as lasso, often work well for text datasets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own concerns and priorities.
 
 ### In this chapter, you learned:
 
