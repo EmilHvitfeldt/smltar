@@ -37,7 +37,7 @@ In text modeling, we use text data (such as the text of the court opinions), som
 
 ## A first regression model
 
-Let's build our first regression model using this sample of Supreme Court opinions. Before we start, let's check out how many opinions we have over time in Figure \@ref(fig:scotus_hist).
+Let's build our first regression model using this sample of Supreme Court opinions. Before we start, let's check out how many opinions we have over time in Figure \@ref(fig:scotushist).
 
 ```{r scotushist, dependson="scotussample", fig.cap="Supreme Court opinions per decade in sample"}
 scotus_sample %>%
@@ -53,7 +53,7 @@ This sample of opinions reflects the true distribution over time of available op
 
 ### Building our first regression model {#firstregression}
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models we want to try out.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref{comparerf}, does not handle special characters in columns names well.] we want to try out.
 
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
@@ -69,13 +69,13 @@ scotus_test <- testing(scotus_split)
 
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
 
-- First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text) and what our training data is.
+- First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
 - Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
-- The recipe step `step_tfidf()`, used with defaults as here, weights each token frequency by the inverse document frequency.
+- The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
 - As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
 
-Finally, we `prep()` the recipe. This means we actually compute something for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
+Finally, we `prep()` the recipe. This means we compute values for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
 
 ```{r scotusrec, dependson="scotussplit"}
 library(textrecipes)
@@ -120,7 +120,7 @@ lasso_fit <- scotus_wf %>%
   fit(data = scotus_train)
 ```
 
-We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()` and even `tidy()` the results into a convenient dataframe format.
+We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the results into a convenient dataframe format.
 
 ```{r dependson="lassofit"}
 lasso_fit %>%
@@ -140,9 +140,9 @@ The testing set is extremely valuable data, however, and in real world situation
 
 The purpose of the testing data is to estimate how your final model will perform on new data. Often during the process of modeling, we want to compare models or different model parameters. We can't use the test set for this.
 
-Another option for our evaluating models is to predict one time on the training set to measure performance. This is the _same data_ that was used to train the model, however, and evaluating on the training data often results in performance estimates that are too optimistic. This is especially true for powerful machine learning algorithms that can learn subtle patterns from data.
+Another option for evaluating models is to predict one time on the training set to measure performance. This is the _same data_ that was used to train the model, however, and evaluating on the training data often results in performance estimates that are too optimistic. This is especially true for powerful machine learning algorithms that can learn subtle patterns from data.
 
-Yet another option for evaluating or comparing models is to use a separate validation set. In this situation, we split our data not into two sets (training and testing) but into three sets (testing, training, and validation). The validation set is used for computing performance metrics to compare models or model parameters. This can be a great option if you have enough data for it, but often we as practitioners are not so lucky. 
+Yet another option for evaluating or comparing models is to use a separate validation set. In this situation, we split our data _not_ into two sets (training and testing) but into three sets (testing, training, and validation). The validation set is used for computing performance metrics to compare models or model parameters. This can be a great option if you have enough data for it, but often we as machine learning practitioners are not so lucky. 
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated datasets from the training set for the purpose of, for example, measuring model performance.
 
@@ -185,7 +185,7 @@ The lower RMSE is, the better; the closer $R^2$ is to one, the better.
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
 
-```{r firstregpredict, dependson="lassors", fig.width=8, fig.height=8, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
+```{r firstregpredict, dependson="lassors", fig.width=8, fig.height=7, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -200,7 +200,7 @@ lasso_rs %>%
   )
 ```
 
-This first model we have tried did a worse job for Supreme Court opinions from before 1850, but overall this looks good!
+This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
 
 ## Compare to the null model
 
@@ -339,7 +339,7 @@ final_lasso
 
 Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go!
 
-## Compare to a random forest model
+## Compare to a random forest model {#comparerf}
 
 Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see @Caruana2008 and @Olson2017 for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark datasets; random forest models were one of the best overall. Let's see how a random forest model performs with our dataset of Supreme Court opinions.
 
