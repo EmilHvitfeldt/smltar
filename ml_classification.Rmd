@@ -663,7 +663,51 @@ Luckily this is easily fixed by using `stri_trans_nfc()` on our text columns bef
 
 ## What evaluation metrics are appropriate
 
-Data will most likely be sparse when using BoW
+We have so far used [accuracy](https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification) and the area under the receiver operator curve (roc_auc) for hours models so far, these are the defaults used in classification tasks in tidymodels. These are not the only kind of metrics you can use and the choise will depend on how much you value false positives and false negatives.
+
+If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for recall (`recall`) and precision (`precision`).
+
+```{r, eval = FALSE}
+nb_rs <- fit_resamples(
+  nb_wf,
+  complaints_folds,
+  metrics = metric_set(recal, precision)
+)
+```
+
+If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. 
+
+Let's go back to the lasso model we tuned in Section \@ref(classfirstmodel), with results in `nb_rs`. We can compute the [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
+
+```{r}
+nb_rs %>%
+  collect_predictions() %>%
+  recall(product, .pred)
+```
+
+We can also compute the recall for each resample by using `group_by()` to calculate inside each resample.
+
+```{r}
+nb_rs %>%
+  collect_predictions() %>%
+  group_by(id) %>%
+  recall(product, .pred)
+```
+
+Many of the matrics used for classification is some function of the true positive, true negative, false positive and false negative rates. 
+We can take a look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix) to look at the contingency table between observed classes and predicted classes.
+
+```{r}
+nb_rs %>%
+  collect_predictions() %>%
+  conf_mat(product, .pred)
+```
+
+It is possible to archive high accuracy with a bad model just by predicting the majority class. This is not favorable as we are not using any information from the data to guide our predictions.
+
+```{block, type = "rmdnote"}
+For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
+```
 
 ## Full game
 
