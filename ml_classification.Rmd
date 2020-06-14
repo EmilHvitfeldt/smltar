@@ -596,15 +596,17 @@ This method is used because of its speed and scalability, not because it is inte
 
 Performing feature hashing on tokens is done using the `step_texthash()` step from textrecipes.
 
-```{r, eval=FALSE}
-#TODO  eval = FALSE because of rsparse
-recipe(product ~ consumer_complaint_narrative, data = complaints_train) %>%
+```{r}
+complaints_hash <- recipe(product ~ consumer_complaint_narrative, data = complaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_texthash(consumer_complaint_narrative, signed = TRUE, num_terms = 512) %>%
   prep() %>%
   juice()
 
+complaints_hash
 ```
+By using `step_texthash()` are we able to quickly generate machine-ready data with a consistent number of variables.
+This will have a slight loss of power compared to using a traditional bag-of-words representation. An example of the loss in performance is illustrated in this [textrecipes blogpost](https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/).
 
 ### text normalization
 
