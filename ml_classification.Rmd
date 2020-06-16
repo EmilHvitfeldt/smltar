@@ -679,7 +679,7 @@ If you have already fit your model, you can still compute and explore non-defaul
 
 Let's go back to the lasso model we tuned in Section \@ref(classfirstmodel), with results in `nb_rs`. We can compute the [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
 
-```{r}
+```{r, eval = FALSE}
 nb_rs %>%
   collect_predictions() %>%
   recall(product, .pred)
@@ -687,7 +687,7 @@ nb_rs %>%
 
 We can also compute the recall for each resample by using `group_by()` to calculate inside each resample.
 
-```{r}
+```{r, eval = FALSE}
 nb_rs %>%
   collect_predictions() %>%
   group_by(id) %>%
@@ -697,7 +697,7 @@ nb_rs %>%
 Many of the matrics used for classification is some function of the true positive, true negative, false positive and false negative rates. 
 We can take a look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix) to look at the contingency table between observed classes and predicted classes.
 
-```{r}
+```{r, eval = FALSE}
 nb_rs %>%
   collect_predictions() %>%
   conf_mat(product, .pred)
