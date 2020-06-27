@@ -6,6 +6,7 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
                tidy = "styler", fig.width = 8, fig.height = 5)
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
+quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 ``` 
 
 When we deal with text, often documents contain different versions of one base word, often called a **stem**. "The Fir-Tree", for example, contains more than one version (i.e., inflected form) of the word `"tree"`.
@@ -46,7 +47,7 @@ tidy_fir_tree %>%
 
 Take a look at those stems. Notice that we do now have 88 incidences of "tree". Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both "story" and "stories" as "stori", not a regular English word but instead a special stem object.
 
-```{block2, type = "rmdtip"}
+```{block2, type = "rmdnote"}
 If you want to tokenize *and* stem your text data, you can try out the function `tokenize_word_stems()` from the tokenizers package, which implements Porter stemming just like what we demonstrated here. For more on tokenization, see Chapter \@ref(tokenization).
 
 ```
@@ -215,7 +216,7 @@ stemming
 
 Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from `"trees"` to `"tree"` in the same way, but we have different results for `"stories"` to `"story"` or `"stori"` or `"storie"`, different handling of `"branches"`, and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
 
-```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=6, fig.cap="Results for three different stemming strategies"}
+```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=5, fig.cap="Results for three different stemming strategies"}
 stemming %>%
   gather(Type, Result, `Remove S`:`Porter stemming`) %>%
   mutate(Type = fct_inorder(Type)) %>%
@@ -261,7 +262,7 @@ When people use the word "stemming" in natural language processing, they typical
 
 Lemmatization requires more information than the rule-based stemmers we've discussed so far. We need to know what part of speech a word is to correctly identify its lemma ^[Part-of-speech information is also sometimes used directly in machine learning], and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like [WordNet](https://wordnet.princeton.edu/) as a way to look up word meanings for a given part-of-speech use [@Miller95]. Notice that lemmatization involves more linguistic knowledge of a language than stemming. 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
 ```
 
