@@ -209,7 +209,8 @@ In the last section, we fit one time to the training data as a whole. Now, to es
 ```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
 nb_rs <- fit_resamples(
   nb_wf,
-  complaints_folds
+  complaints_folds,
+  control = control_resamples(save_pred = TRUE)
 )
 
 nb_rs
@@ -220,6 +221,45 @@ What results do we see, in terms of performance metrics?
 ```{r, dependson="nbrs"}
 nb_rs %>%
   collect_metrics()
+```
+
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator curve). The accuracy is the percentage of accurate predictions. Which means that for this resample the average accurracy was `r collect_metrics(nb_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`.
+
+```{block, type = "rmdnote"}
+For both Accuracy and ROC AUC values closer to 1 are better.
+```
+
+The [reciver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) shows the sensitivity at different thresholds. It shows us how well the classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled datasets.
+
+```{r firstroccurve, dependson="nbrs", fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Complaints."}
+nb_rs %>%
+  collect_predictions() %>%
+  group_by(id) %>%
+  roc_curve(truth = product, .pred_Mortgage) %>%
+  autoplot() +
+  labs(
+    color = NULL,
+    title = "Receiver operator curve for US Consumer Finance Complaints",
+    subtitle = "Each resample fold is shown in a different color"
+  )
+
+```
+
+The area under each of these curves is the `roc_auc` metric we have been collecting. If the curve was going along the diagonal line then the model would be no better then random chance.
+
+Another way to evaluate our model is to look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). This will tell us how well the model is doing with false positives and false negatives for each class.
+there is not a trivial way to visualize multiple confusion matrices, so we will look at them individually for each fold.
+
+```{r firstheatmap, dependson="nbrs"}
+nb_rs %>%
+  collect_predictions() %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+```{block, type = "rmdnote"}
+One metric can give you a complete picture of how well your classification model is performing. The Confusion matrix is a good starting point to get an overview of your model performance as it includes a lot of information.
 ```
 
 ## Compare to a SVM model
