@@ -7,6 +7,9 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
+
+## for Julia's local environment
+## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
 ``` 
 
 When we deal with text, often documents contain different versions of one base word, often called a **stem**. "The Fir-Tree", for example, contains more than one version (i.e., inflected form) of the word `"tree"`.
@@ -107,7 +110,7 @@ tidy_scotus %>%
   cast_dfm(case_name, stem, n)
 ```
 
-We reduced the sparsity of our data by about 1%, and the number of word features by many thousands. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
+We reduced the sparsity of our data by about 0.1%, and the number of word features by many thousands. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
@@ -267,6 +270,30 @@ How does lemmatization work in languages other than English? Lookup dictionaries
 ```
 
 A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19], the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [textrecipes](https://tidymodels.github.io/textrecipes/dev/) package [@textrecipes]. Chapter \@ref(mlregression) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
+
+Let's briefly walk through how to use spacyr.
+
+```{r lemmafirtree, dependson="tidy_fir_tree", fig.width = 6, fig.height = 5, fig.cap="Results for lemmatization, rather than stemming"}
+library(spacyr)
+spacy_initialize(entity = FALSE)
+
+fir_tree %>% 
+  mutate(doc_id = paste0("doc", row_number())) %>% 
+  select(doc_id, everything()) %>% 
+  spacy_parse() %>%
+  anti_join(get_stopwords(), by = c("lemma" = "word")) %>%
+  count(lemma, sort = TRUE) %>%
+  top_n(20, n) %>%
+  ggplot(aes(n, fct_reorder(lemma, n))) +
+  geom_col() +
+  labs(x = "Frequency", y = NULL)
+```
+
+Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization is from stemming, especially is we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
+
+```{block, type = "rmdnote"}
+Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book and it takes a lot of computational power. Initializing with `entity = FALSE` will allow lemmatization to run much faster.
+```
 
 Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.
 
