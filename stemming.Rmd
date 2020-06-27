@@ -195,29 +195,27 @@ Handling punctuation in this way further reduces sparsity in word features. Whet
 Let's compare a few simple stemming algorithms and see what results we end with. Let's look at "The Fir-Tree", specifically the tidied dataset from which we have removed stop words. Let's compare three very straightforward stemming approaches.
 
 - **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
-- **Handle plural endings with slightly more complex rules.** These rules are the same as step 1a of Porter stemming.
+- **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[stemmernote]
 - **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.
+
+[stemmernote]: This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.
 
 ```{r stemming, dependson="tidy_hca"}
 stemming <- tidy_fir_tree %>%
   select(-book, -language) %>%
   mutate(`Remove S` = str_remove(word, "s$"),
-         `Plural endings` = case_when(str_detect(word, "sses$") ~ 
-                                        str_replace(word, "sses$", "ss"),
-                                      str_detect(word, "ies$") ~ 
+         `Plural endings` = case_when(str_detect(word, "[^e|aies$]ies$") ~ 
                                         str_replace(word, "ies$", "y"),
-                                      str_detect(word, "ss$") ~
-                                        word,
-                                      str_detect(word, "s$") ~
+                                      str_detect(word, "[^e|a|oes$]es$") ~ 
+                                        str_replace(word, "es$", "e"),
+                                      str_detect(word, "[^ss$|us$]s$") ~
                                         str_remove(word, "s$"),
                                       TRUE ~ word),
          `Porter stemming` = wordStem(word)) %>%
   rename(`Original word` = word)
-
-stemming
 ```
 
-Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from `"trees"` to `"tree"` in the same way, but we have different results for `"stories"` to `"story"` or `"stori"` or `"storie"`, different handling of `"branches"`, and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
+Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from `"trees"` to `"tree"` in the same way, but we have different results for `"stories"` to `"story"` or `"stori"`, different handling of `"branches"`, and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
 
 ```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=5, fig.cap="Results for three different stemming strategies"}
 stemming %>%
@@ -235,7 +233,7 @@ stemming %>%
   labs(x = NULL, y = "Frequency")
 ```
 
-Porter stemming is the most different from the other two approaches. In the top twenty words here, we don't see much difference between removing only the letter "s" and taking a slightly more sophisticated approach to plural endings. In what situations *do* we see a difference?
+Porter stemming is the most different from the other two approaches. In the top twenty words here, we don't see a difference between removing only the letter "s" and taking the slightly more sophisticated "S" stemmer approach to plural endings. In what situations *do* we see a difference?
 
 ```{r dependson="stemming"}
 stemming %>% 
@@ -313,6 +311,10 @@ not_stemmed_in(stopwords(source = "snowball"))
 ```
 
 Here we see that many of the words that are lost are the contractions.
+
+```{block2, type = "rmdwarning"}
+In Section \@ref(homemadestopwords), we explored whether to include "tree" as a stop word for "The Fir-Tree". Now we can understand that this is more complicated than we first discussed, because there are different versions of the base word ("trees", "tree's") in our dataset. Interactions between preprocessing steps can have a major impact on your analysis.
+```
 
 ## Summary
 
