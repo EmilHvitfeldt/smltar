@@ -264,7 +264,59 @@ One metric can give you a complete picture of how well your classification model
 
 ## Compare to a SVM model
 
-WIP
+[Support Vector Machines](https://en.wikipedia.org/wiki/Support_vector_machine) are a class of machine learning models that can be used in regression and classification tasks. While they don't see widespread use in the general machine learning space they still have some properties that make them suitable for text classification [@Joachims1998] and can at times give good performance [@Vantu2016].
+
+We create a specification of an SVM with a radial basis function as the kernel. 
+
+```{r svmspec}
+svm_spec <- svm_rbf() %>%
+  set_mode("classification") %>%
+  set_engine("liquidSVM")
+
+svm_spec
+```
+
+Then we create another workflow object with the SVM specification.
+
+```{r svmwf, dependson=c("svmspec", "complaintrec3")}
+svm_wf <- workflow() %>%
+  add_recipe(complaints_rec) %>%
+  add_model(svm_spec)
+```
+
+The **liquidSVM** engine doesn't support class probabilities so we have to replace the default metric set with a metric set that doesn't use class probabilities. Here we use accuracy, [sensitivity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Sensitivity) and [specificity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Specificity).
+
+```{r svmrs, dependson=c("svmwf", "complaintsfolds")}
+svm_rs <- fit_resamples(
+  svm_wf,
+  complaints_folds,
+  metrics = metric_set(accuracy, sensitivity, specificity),
+  control = control_resamples(save_pred = TRUE)
+)
+
+svm_rs
+```
+
+We can now run `collect_metrics()` to extract and format the 3 performance metrics for the SVM model.
+
+```{r}
+svm_rs %>% 
+  collect_metrics()
+```
+
+They look pretty promising considering we didn't do any hyperparameter tuning on the model parameters.
+Let us finish by generating a confusion matrix.
+
+```{r svmheatmap, dependson="nbrs"}
+svm_rs %>%
+  collect_predictions() %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+one of the main benefits of support vector machines is their support for sparse data. We can already see that count based text representations are quite sparse which leads support vector machines to be a great match.
+Support vector machines generally also perform well with large datasets (thousands of columns) which are also quite common with text data.
 
 ## Compare to a knn model
 
