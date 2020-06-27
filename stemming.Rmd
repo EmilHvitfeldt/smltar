@@ -110,17 +110,21 @@ tidy_scotus %>%
   cast_dfm(case_name, stem, n)
 ```
 
-We reduced the sparsity of our data by about 0.1%, and the number of word features by many thousands. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
+We reduced the number of word features by many thousands, and the sparsity of our data by about 0.1%. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
 > Despite their frequent use in topic modeling, we find that stemmers produce no meaningful improvement in likelihood and coherence and in fact can degrade topic stability.
 
-Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context. As we work through the rest of this chapter and learn more about stemming, consider what information we lose when we stem text in exchange for reducing the number of word features. Stemming can be helpful in some contexts, but typical stemming algorithms are somewhat aggressive and have been built to favor sensitivity (or recall, or the true positive rate) at the expense of specificity (or precision, or the true negative rate). Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:
+Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we'll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context. As we work through the rest of this chapter and learn more about stemming, consider what information we lose when we stem text in exchange for reducing the number of word features. Stemming can be helpful in some contexts, but typical stemming algorithms are somewhat aggressive and have been built to favor sensitivity (or recall, or the true positive rate) at the expense of specificity (or precision, or the true negative rate). 
+
+Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:
 
 - meaning and mean
 - likely, like, liking
 - university and universe
+
+In a supervised machine learning context, this affects a model's positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter \@ref(classification), we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model's ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints _not_ about mortgages, correctly.
 
 ## Understand a stemming algorithm
 
@@ -267,7 +271,7 @@ Lemmatization requires more information than the rule-based stemmers we've discu
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
 ```
 
-A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19], the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [textrecipes](https://tidymodels.github.io/textrecipes/dev/) package [@textrecipes]. Chapter \@ref(mlregression) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
+A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19], the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [textrecipes](https://tidymodels.github.io/textrecipes/dev/) package [@textrecipes]. Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
 
 Let's briefly walk through how to use spacyr.
 
