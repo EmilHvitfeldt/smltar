@@ -14,7 +14,7 @@ quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 
 When we deal with text, often documents contain different versions of one base word, often called a **stem**. "The Fir-Tree", for example, contains more than one version (i.e., inflected form) of the word `"tree"`.
 
-```{r tidy_fir_tree}
+```{r tidyfirtree}
 library(hcandersenr)
 library(tidyverse)
 library(tidytext)
@@ -40,7 +40,7 @@ What if we aren't interested in the difference between `"trees"` and `"tree"` an
 
 There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework [Snowball](https://snowballstem.org/) with an open-source license; you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
 
-```{r dependson="tidy_fir_tree"}
+```{r dependson="tidyfirtree"}
 library(SnowballC)
 
 tidy_fir_tree %>%
@@ -55,9 +55,49 @@ If you want to tokenize *and* stem your text data, you can try out the function 
 
 ```
 
+Does Porter stemming only work for English? Far from it! We can use the `language` argument to implement Porter stemming in multiple languages. First we can tokenize the text and `nest()` into list-columns.
+
+```{r tidybylang, dependson="tidyfirtree"}
+stopword_df <- tribble(~language, ~two_letter,
+                       "danish",  "da",
+                       "english", "en",
+                       "french",  "fr",
+                       "german",  "de",
+                       "spanish", "es")
+
+tidy_by_lang <- hca_fairytales() %>% 
+  filter(book == "The fir tree") %>%
+  select(text, language) %>%
+  mutate(language = str_to_lower(language)) %>%
+  unnest_tokens(word, text) %>%
+  nest(data = word)
+```
+
+Then we can remove stop words (using `get_stopwords(language = "da")` and similar for each language) and stem with the language-specific Porter algorithm. What are the top 20 stems for "The Fir-Tree" in each of these five languages, after removing the Snowball stop words for that language?
+
+```{r porterlanguages, dependson="tidybylang", fig.width=10, fig.height=7, fig.cap="Porter stemming results in five languages"}
+tidy_by_lang %>%
+  inner_join(stopword_df) %>%
+  mutate(data = map2(
+    data, two_letter, ~ anti_join(.x, get_stopwords(language = .y)))
+  )%>%
+  unnest(data) %>%
+  mutate(stem = wordStem(word, language = language)) %>%
+  group_by(language) %>%
+  count(stem) %>%
+  top_n(20, n) %>%
+  ungroup %>%
+  ggplot(aes(n, fct_reorder(stem, n), fill = language)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~language, scales = "free_y") +
+  labs(x = "Frequency", y = NULL)
+```
+
+Figure \@ref(fig:porterlanguages) demonstrates some of the challenges in working with languages other English; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.
+
 The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the [hunspell](https://cran.r-project.org/package=hunspell) package.
 
-```{r dependson="tidy_fir_tree"}
+```{r dependson="tidyfirtree"}
 library(hunspell)
 
 tidy_fir_tree %>%
@@ -157,8 +197,9 @@ How would this work for a few example words? The word "supervised" loses its "ed
 This algorithm was first published in @Porter80 and is still broadly used; read @Willett06 for background on how and why it has become a stemming standard. We can reach even *further* back and examine what is considered the first ever published stemming algorithm in @Lovins68. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!
 
 ```{block, type = "rmdwarning"}
-Does stemming only work for English? Far from it! Check out the [steps of a Snowball stemming algorithm for German](https://snowballstem.org/algorithms/german/stemmer.html). 
+Check out the [steps of a Snowball stemming algorithm for German](https://snowballstem.org/algorithms/german/stemmer.html). 
 ```
+
 
 
 ## Handling punctuation when stemming
@@ -167,7 +208,7 @@ Punctuation contains information that can be used in text analysis. Punctuation 
 
 We've already seen how punctuation and stemming can interact with our small example of "The Fir-Tree"; none of the stemming strategies we've discussed so far have recognized `"tree's"` as belonging to the same stem as `"trees"` and `"tree"`.
 
-```{r dependson="tidy_fir_tree"}
+```{r dependson="tidyfirtree"}
 tidy_fir_tree %>% 
   count(word, sort = TRUE) %>% 
   filter(str_detect(word, "^tree"))
@@ -175,7 +216,7 @@ tidy_fir_tree %>%
 
 It is possible to split tokens not only on white space but **also** on punctuation, using a regular expression (see Appendix \@ref(regexp)). 
 
-```{r fir_tree_counts, dependson="tidy_fir_tree"}
+```{r fir_tree_counts, dependson="tidyfirtree"}
 fir_tree_counts <- fir_tree %>%
   unnest_tokens(word, text, token = "regex", pattern = "\\s+|[[:punct:]]+") %>%
   anti_join(get_stopwords()) %>%
@@ -275,7 +316,7 @@ A modern, efficient implementation for lemmatization is available in the excelle
 
 Let's briefly walk through how to use spacyr.
 
-```{r lemmafirtree, dependson="tidy_fir_tree", fig.width = 6, fig.height = 5, fig.cap="Results for lemmatization, rather than stemming"}
+```{r lemmafirtree, dependson="tidyfirtree", fig.width = 6, fig.height = 5, fig.cap="Results for lemmatization, rather than stemming"}
 library(spacyr)
 spacy_initialize(entity = FALSE)
 
