@@ -140,7 +140,7 @@ complaints_rec <- complaints_rec %>%
 ```
 
 Lastly we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we perform tokenization to words with `step_tokenize()`, by default this is done using `tokenizers::tokenize_words()`.
-Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 100 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
+Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
 
 ```{r complaintrec4, dependson="complaintrec3"}
 complaints_rec <- complaints_rec %>%
@@ -165,7 +165,7 @@ test_data <- bake(complaint_prep, complaints_test)
 
 For the modeling we will use a simple Naive Bayes model (TODO add citation to both Naive Bayes and its use in text classification).
 One of the main advantages of Naive Bayes is its ability to handle a large number of features that we tend to get when using word count methods.
-Here we have only kept the 100 most frequent tokens, we could have kept more tokens and a Naive Bayes model would be able to handle it okay, but we will limit it for this first time.
+Here we have only kept the 500 most frequent tokens, we could have kept more tokens and a Naive Bayes model would be able to handle it okay, but we will limit it for this first time.
 
 ```{r nbspec}
 nb_spec <- naive_Bayes() %>%
@@ -315,34 +315,32 @@ svm_rs <- fit_resamples(
 
 We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r nbrsmetrics, eval = !online}
-nb_rs_metrics <- collect_metrics(nb_rs)
-nb_rs_predictions <- collect_predictions(nb_rs)
+```{r svmrsmetrics, eval = !online}
+svm_rs_metrics <- collect_metrics(svm_rs)
+svm_rs_predictions <- collect_predictions(svm_rs)
 ```
 
 ```{r, include = FALSE, eval = !online}
-write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
-write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
+write_rds(svm_rs_metrics, "data/ml_class_first_svm_rs_metrics.rds")
+write_rds(svm_rs_predictions, "data/ml_class_first_svm_rs_predictions.rds")
 ```
 
 ```{r, include = FALSE, eval = online}
-nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
-nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
+svm_rs_metrics <- read_rds("data/ml_class_first_svm_rs_metrics.rds")
+svm_rs_predictions <- read_rds("data/ml_class_first_svm_rs_predictions.rds")
 ```
 
 We can now run `collect_metrics()` to extract and format the 3 performance metrics for the SVM model.
 
-```{r}
-svm_rs %>% 
-  collect_metrics()
+```{r, dependson="svmrsmetrics"}
+svm_rs_metrics
 ```
 
 They look pretty promising considering we didn't do any hyperparameter tuning on the model parameters.
 Let us finish by generating a confusion matrix.
 
-```{r svmheatmap, dependson="nbrs"}
-svm_rs %>%
-  collect_predictions() %>%
+```{r svmheatmap, dependson="svmrsmetrics"}
+svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap")
@@ -385,7 +383,7 @@ multicomplaints_test <- testing(multicomplaints_split)
 
 Before we go on let us take a look at the number of cases in each of the classes
 
-```{r}
+```{r, dependson="multicomplaintssplit"}
 multicomplaints_train %>% 
   count(product, sort = TRUE) %>% 
   select(n, product)
@@ -414,7 +412,7 @@ The themis package provides many more algorithms to help you deal with unbalance
 We have to create a new recipe specification from scratch since the training data is part of the main specification.
 This specification is similar to the \@ref(classfirstattemptlookatdata) with the only chances being the data passed to the `data` argument in `recipe()` have been changed to `multicomplaints_train` and we have added `step_downsample(product)` to the end of the recipe specification to indicate that we want to downsample after doing all the text preprocessing. We want to do the downsampling last such that we still generate features on the full training dataset. The downsampling will then only affect the modeling step and hopefully create a better performing model.
 
-```{r}
+```{r multicomplaintsrec, message=FALSE, dependson="multicomplaintssplit"}
 library(themis)
 
 multicomplaints_rec <- 
@@ -427,7 +425,7 @@ multicomplaints_rec <-
   step_dummy(tags) %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative) %>%
   step_downsample(product)
 ```
@@ -441,7 +439,7 @@ multicomplaints_folds <- vfold_cv(multicomplaints_train)
 We can reuse the Support Vector Machine specification from \@ref(comparetosvm) and create a new workflow object with the new recipe specification.
 The SVM algorithm is specified for binary classification only however extensions have been made to generalize to multi-class cases. The liquidSVM method will automatically detect that we are doing multi-class classification and switch to the appropriate extension.
 
-```{r nbwf, dependson=c("nbspec", "complaintrec4")}
+```{r multisvmwf, dependson=c("svmspec", "multicomplaintsrec")}
 multi_svm_wf <- workflow() %>%
   add_recipe(multicomplaints_rec) %>%
   add_model(svm_spec)
@@ -456,31 +454,46 @@ Notice how you don't have to specify that you are doing multi-class classificati
 Now that we have everything we need to put it all into `fit_resamples()` to fit all the models. Note that we are specifying `save_pred = TRUE`. We are doing this so we can create a confusion matrix later afterward which is very beneficial when doing multi-class classification.
 We are again specifying the `metric_set()` since liquidSVM doesn't support class probabilities.
 
-```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
-multi_nb_rs <- fit_resamples(
+```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval= !online}
+multi_svm_rs <- fit_resamples(
   multi_svm_wf,
   multicomplaints_folds,
   metrics = metric_set(accuracy),
   control = control_resamples(save_pred = TRUE)
 )
 
-multi_nb_rs
+multi_svm_rs
+```
+
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r multisvmrsmetrics, dependson="multisvmrs", eval = !online}
+multi_svm_rs_metrics <- collect_metrics(multi_svm_rs)
+multi_svm_rs_predictions <- collect_predictions(multi_svm_rs)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(multi_svm_rs_metrics, "data/ml_class_first_multi_svm_rs_metrics.rds")
+write_rds(multi_svm_rs_predictions, "data/ml_class_first_multi_svm_rs_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+multi_svm_rs_metrics <- read_rds("data/ml_class_first_multi_svm_rs_metrics.rds")
+multi_svm_rs_predictions <- read_rds("data/ml_class_first_multi_svm_rs_predictions.rds")
 ```
 
 What results do we see, in terms of performance metrics?
 
-```{r, dependson="nbrs"}
-multi_nb_rs %>%
-  collect_metrics()
+```{r, dependson="multisvmrsmetrics"}
+multi_svm_rs_metrics
 ```
 
-The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_nb_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
+The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_svm_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
 
 To get a better look at how our classifier is doing let us look at one of the confusion matrices
 
-```{r multiheatmap, dependson="nbrs"}
-multi_nb_rs %>%
-  collect_predictions() %>%
+```{r multiheatmap, dependson="multisvmrsmetrics"}
+multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap")
@@ -491,9 +504,8 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to get a good view since the majority class widens the scale quite a bit.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r}
-multi_nb_rs %>%
-  collect_predictions() %>%
+```{r, dependson="multisvmrsmetrics"}
+multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
   conf_mat(product, .pred_class) %>%
