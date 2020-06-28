@@ -215,30 +215,28 @@ nb_rs <- fit_resamples(
   complaints_folds,
   control = control_resamples(save_pred = TRUE)
 )
-
-nb_rs
 ```
 
 We can extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r, eval = !online}
+```{r nbrsmetrics, eval = !online}
 nb_rs_metrics <- collect_metrics(nb_rs)
 nb_rs_predictions <- collect_predictions(nb_rs)
 ```
 
-```{r, eval = !online}
+```{r, include = FALSE, eval = !online}
 write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
 write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
 ```
 
-```{r, eval = online}
+```{r, include = FALSE, eval = online}
 nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
 nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
 ```
 
 What results do we see, in terms of performance metrics?
 
-```{r, dependson="nbrs"}
+```{r, dependson="nbrsmetrics"}
 nb_rs_metrics
 ```
 
@@ -250,7 +248,7 @@ For both Accuracy and ROC AUC values closer to 1 are better.
 
 The [reciver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) shows the sensitivity at different thresholds. It shows us how well the classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled datasets.
 
-```{r firstroccurve, dependson="nbrs", fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Complaints."}
+```{r firstroccurve, dependson="nbrsmetrics", fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Complaints."}
 nb_rs_predictions %>%
   group_by(id) %>%
   roc_curve(truth = product, .pred_Credit) %>%
@@ -306,15 +304,30 @@ svm_wf <- workflow() %>%
 
 The **liquidSVM** engine doesn't support class probabilities so we have to replace the default metric set with a metric set that doesn't use class probabilities. Here we use accuracy, [sensitivity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Sensitivity) and [specificity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Specificity).
 
-```{r svmrs, dependson=c("svmwf", "complaintsfolds")}
+```{r svmrs, dependson=c("svmwf", "complaintsfolds"), eval = !online}
 svm_rs <- fit_resamples(
   svm_wf,
   complaints_folds,
   metrics = metric_set(accuracy, sensitivity, specificity),
   control = control_resamples(save_pred = TRUE)
 )
+```
 
-svm_rs
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r nbrsmetrics, eval = !online}
+nb_rs_metrics <- collect_metrics(nb_rs)
+nb_rs_predictions <- collect_predictions(nb_rs)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
+write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
+nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
 ```
 
 We can now run `collect_metrics()` to extract and format the 3 performance metrics for the SVM model.
