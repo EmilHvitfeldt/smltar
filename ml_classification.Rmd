@@ -262,7 +262,7 @@ nb_rs %>%
 One metric can give you a complete picture of how well your classification model is performing. The Confusion matrix is a good starting point to get an overview of your model performance as it includes a lot of information.
 ```
 
-## Compare to a SVM model
+## Compare to a SVM model {#comparetosvm}
 
 [Support Vector Machines](https://en.wikipedia.org/wiki/Support_vector_machine) are a class of machine learning models that can be used in regression and classification tasks. While they don't see widespread use in the general machine learning space they still have some properties that make them suitable for text classification [@Joachims1998] and can at times give good performance [@Vantu2016].
 
@@ -320,7 +320,158 @@ Support vector machines generally also perform well with large datasets (thousan
 
 ## Two class or multiclass
 
-WIP
+We will spend most of this chapter focuses on [binary classification](https://en.wikipedia.org/wiki/Binary_classification).
+We have two classes and it can be in one or the other. This is a simpler scenario and the evaluation will be easier to do because you only have a 2 by 2 contingency matrix.
+However, it is not always possible to limit yourself to 2 classes. The topic for this section is to explore how we deal with situations where we have more then 2 classes.
+The complaints dataset we have been working with so far has 9 different product classes. Here they are in decreasing frequency:
+
+- Credit reporting, credit repair services, or other personal consumer reports
+- Debt collection
+- Credit card or prepaid card
+- Mortgage
+- Checking or savings account
+- Student loan
+- Vehicle loan or lease
+- Money transfer, virtual currency, or money service
+- Payday loan, title loan, or personal loan
+
+We assume that there is a reason why these product classes have been created in this fashion.
+Perhaps complaints from different classes are handled by different people.
+In any case, it would be nice to be able to build a multi-class classifier to classify specific product classes.
+
+We need to create a new split of the data using `initial_split()` on the unmodified `complaints` dataset.
+
+```{r, multicomplaintssplit}
+set.seed(1234)
+
+multicomplaints_split <- initial_split(complaints, strata = product)
+
+multicomplaints_train <- training(multicomplaints_split)
+multicomplaints_test <- testing(multicomplaints_split)
+```
+
+Before we go on let us take a look at the number of cases in each of the classes
+
+```{r}
+multicomplaints_train %>% 
+  count(product, sort = TRUE) %>% 
+  select(n, product)
+```
+
+There is quite a large imbalance between the classes. Especially since there are over 20 times more cases of the majority class then there is of the smallest class.
+We have to deal with this problem, which is not an uncommon problem to have when dealing with multi-class classification since the chance of having a completely balanced dataset is very low.
+
+We have a couple of additional issues we have to keep in mind when working with multi-class classification
+
+- Imbalance of classes
+- Many machine learning algorithms do not handle imbalanced data well and is likely to have a hard time predicting minority classes
+- Not all machine learning algorithms are built for multi-class classification
+- Many evaluation metrics will have to reformulated to be able to describe multi-class predictions
+
+When you have multiple classes in your data, then it is also possible to formulate the multi-class problem in 2 ways. One formulation is that you can put any given observation into multiple classes. The other formulation is that any observations can be put into one and only one class. We will be sticking to a "one class per observation" model formulation in this section.
+
+There are many different ways to deal with unbalanced data.
+We will showcase one of the simplest methods, downsampling, which is a method where observations from the majority classes are removed during training to achieve a more balanced class distribution.
+We will be using the [themis](https://github.com/tidymodels/themis) add-on package for recipes which provides the [step_downsample()](https://tidymodels.github.io/themis/reference/step_downsample.html) step to perform downsampling.
+
+```{block, type = "rmdnote"}
+The themis package provides many more algorithms to help you deal with unbalanced data.
+```
+
+We have to create a new recipe specification from scratch since the training data is part of the main specification.
+This specification is similar to the \@ref(classfirstattemptlookatdata) with the only chances being the data passed to the `data` argument in `recipe()` have been changed to `multicomplaints_train` and we have added `step_downsample(product)` to the end of the recipe specification to indicate that we want to downsample after doing all the text preprocessing. We want to do the downsampling last such that we still generate features on the full training dataset. The downsampling will then only affect the modeling step and hopefully create a better performing model.
+
+```{r}
+library(themis)
+
+multicomplaints_rec <- 
+  recipe(product ~ date_received + tags + consumer_complaint_narrative, 
+         data = multicomplaints_train) %>%
+  step_date(date_received, features = c("month", "dow"), role = "dates") %>%
+  step_rm(date_received) %>%
+  step_dummy(has_role("dates")) %>%
+  step_unknown(tags) %>%
+  step_dummy(tags) %>%
+  step_tokenize(consumer_complaint_narrative) %>%
+  step_stopwords(consumer_complaint_narrative) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
+  step_tfidf(consumer_complaint_narrative) %>%
+  step_downsample(product)
+```
+
+We also have to create a new cross-validation object since we are using a different dataset.
+
+```{r multicomplaintsfolds, dependson="complaintssplit"}
+multicomplaints_folds <- vfold_cv(multicomplaints_train)
+```
+
+We can reuse the Support Vector Machine specification from \@ref(comparetosvm) and create a new workflow object with the new recipe specification.
+The SVM algorithm is specified for binary classification only however extensions have been made to generalize to multi-class cases. The liquidSVM method will automatically detect that we are doing multi-class classification and switch to the appropriate extension.
+
+```{r nbwf, dependson=c("nbspec", "complaintrec3")}
+multi_svm_wf <- workflow() %>%
+  add_recipe(multicomplaints_rec) %>%
+  add_model(svm_spec)
+
+multi_svm_wf
+```
+
+```{block, type = "rmdnote"}
+Notice how you don't have to specify that you are doing multi-class classification. The tidymodels packages will infer that from the number of classes in the outcome variable.
+```
+
+Now that we have everything we need to put it all into `fit_resamples()` to fit all the models. Note that we are specifying `save_pred = TRUE`. We are doing this so we can create a confusion matrix later afterward which is very beneficial when doing multi-class classification.
+We are again specifying the `metric_set()` since liquidSVM doesn't support class probabilities.
+
+```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
+multi_nb_rs <- fit_resamples(
+  multi_svm_wf,
+  multicomplaints_folds,
+  metrics = metric_set(accuracy),
+  control = control_resamples(save_pred = TRUE)
+)
+
+multi_nb_rs
+```
+
+What results do we see, in terms of performance metrics?
+
+```{r, dependson="nbrs"}
+multi_nb_rs %>%
+  collect_metrics()
+```
+
+The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_nb_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
+
+To get a better look at how our classifier is doing let us look at one of the confusion matrices
+
+```{r multiheatmap, dependson="nbrs"}
+multi_nb_rs %>%
+  collect_predictions() %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+The first thing we see is that the diagonal is fairly well populated with is a good sign. This means that the model predicted the right class.
+The off-diagonals numbers are all the failures and where we should direct our focus.
+It is a little hard to get a good view since the majority class widens the scale quite a bit.
+A trick to deal with this problem is to remove all the correctly predicted observations.
+
+```{r}
+multi_nb_rs %>%
+  collect_predictions() %>%
+  filter(id == "Fold01") %>%
+  filter(.pred_class != product) %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+Now we can more clearly see where our model breaks down. One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. It is not hard to see why that is happening since they both deal with credit and properly have a great deal of overlap in vocabulary.
+Knowing what the problem is, helps us figure out how to improve our model
+The first steps for improving our models is to look at the data preprocessing steps and model selection.
+We can look at different models or model engines that might be able to more easily separate the classes. The `svm_rbf()` model has a `cost` argument that determines the penalization of wrongly predicted classes that might be worth looking at.
+Now that we have an idea of where the model isn't working we can look more closely at the data to find features in the data that would help distinguish between problematic classes. In the later section \@ref(custumfeatures) will we showcase how you can create custom features.
 
 ## Case study: What happens if you don't censor your data
 
