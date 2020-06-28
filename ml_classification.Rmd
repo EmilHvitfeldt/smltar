@@ -265,14 +265,14 @@ The area under each of these curves is the `roc_auc` metric we have been collect
 Another way to evaluate our model is to look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). This will tell us how well the model is doing with false positives and false negatives for each class.
 there is not a trivial way to visualize multiple confusion matrices, so we will look at them individually for each fold.
 
-```{r firstheatmap, dependson="nbrs"}
+```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for first Naive Bayes classifier. It appears to be biased towards predicting 'Credit'"}
 nb_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
-We see that the diagonal squares has darker shades then the off diagonal squares. This is a good sign since we are right more often then not. However the model still appears to be strugling since it is more or less at 50-50 when predicting something from the "Other" class.
+Figure \@ref(fig:firstheatmap) see that the diagonal squares has darker shades then the off diagonal squares. This is a good sign since we are right more often then not. However the model still appears to be strugling since it is more or less at 50-50 when predicting something from the "Other" class.
 
 ```{block, type = "rmdnote"}
 One metric can give you a complete picture of how well your classification model is performing. The Confusion matrix is a good starting point to get an overview of your model performance as it includes a lot of information.
@@ -337,9 +337,10 @@ svm_rs_metrics
 ```
 
 They look pretty promising considering we didn't do any hyperparameter tuning on the model parameters.
-Let us finish by generating a confusion matrix.
+Let us finish by generating a confusion matrix which we see in Figure \@ref(fig:svmheatmap).
+It appears to do much better at seperating the classes then the Naive Bayes model and it is much more symmetrical compared to the confusion matrix we saw for the Naive Bayes model in figure \@ref(fig:firstheatmap).
 
-```{r svmheatmap, dependson="svmrsmetrics"}
+```{r svmheatmap, dependson="svmrsmetrics", fig.cap="Confusion matrix for a simple Support Vector Machine classifier. Yields much more symmetric results."}
 svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
@@ -490,9 +491,9 @@ multi_svm_rs_metrics
 
 The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_svm_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
 
-To get a better look at how our classifier is doing let us look at one of the confusion matrices
+To get a better look at how our classifier is doing let us look at one of the confusion matrices in figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap}
+```{r multiheatmap, fig.cap="Confusion matrix for Multi-class Support Vector Machine classifier. Most of the classifications appear along the diagonal."}
 multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
@@ -504,7 +505,7 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to get a good view since the majority class widens the scale quite a bit.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r}
+```{r multiheatmapminusdiag, fig.cap="Confusion matrix for Multi-class Support Vector Machine classifier without diagonal."}
 multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
@@ -512,7 +513,7 @@ multi_svm_rs_predictions %>%
   autoplot(type = "heatmap")
 ```
 
-Now we can more clearly see where our model breaks down. One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. It is not hard to see why that is happening since they both deal with credit and properly have a great deal of overlap in vocabulary.
+Now we can more clearly see in figure \@ref(fig:multiheatmapminusdiag) where our model breaks down. One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. It is not hard to see why that is happening since they both deal with credit and properly have a great deal of overlap in vocabulary.
 Knowing what the problem is, helps us figure out how to improve our model
 The first steps for improving our models is to look at the data preprocessing steps and model selection.
 We can look at different models or model engines that might be able to more easily separate the classes. The `svm_rbf()` model has a `cost` argument that determines the penalization of wrongly predicted classes that might be worth looking at.
@@ -523,7 +524,7 @@ Now that we have an idea of where the model isn't working we can look more close
 The complaints data already have sensitive information censored out with XXXX and XX.
 This can be seen as a kind of annotation, we don't get to know the specific account numbers and birthday which would be mostly unique anyways and filtered out.
 
-Below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
+In figure \@ref(fig:censoredtrigram) below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
 
 ```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored words."}
 complaints_train %>%
@@ -542,10 +543,10 @@ complaints_train %>%
 As you see the vast majority includes one or more censored words.
 Not only does the most used trigrams include some kind of censoring, 
 but the censored words include some signal as they are not used uniformly between the products.
-In the following chart, we take the top 25 most frequent trigrams that includes one of more censoring,
+In the following figure \@ref(fig:trigram25), we take the top 25 most frequent trigrams that includes one of more censoring,
 and plot the proportions of the usage in "Credit" and "Other".
 
-```{r trigram25}
+```{r trigram25, fig.cap="Many of the most frequent trigrams feature censored words. There a big difference in how often they are used within each class."}
 top_censored_trigrams <- complaints_train %>%
     slice(1:1000) %>%
   unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
@@ -1150,9 +1151,9 @@ final_res_metrics
 
 And it is worth noting that it isn't much different from what we saw in the training dataset. This is good and an indication that our model was able to generalize well enough.
 
-Taking a look at the confusion matrix also yields pleasing results. It appears symmetric with a strong presence in the diagonal showing us that there isn't any strong bias one towards either of the classes.
+Taking a look at the confusion matrix in figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence in the diagonal showing us that there isn't any strong bias one towards either of the classes.
 
-```{r}
+```{r, finalheatmap, fig.cap="Confusion matrix for final Support Vector Machine classifier."}
 final_res_predictions %>% 
   conf_mat(truth = product, estimate = .pred_class) %>%
   autoplot(type = "heatmap")
