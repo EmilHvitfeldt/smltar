@@ -25,7 +25,7 @@ scotus_sample %>%
 
 This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
 ```
 
@@ -249,7 +249,7 @@ tune_spec
 
 After the tuning process, we can select a single best numeric value.
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 Think of `tune()` here as a placeholder for the regularization penalty.
 ```
 
@@ -394,7 +394,7 @@ rf_rs %>%
 
 Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted model. This model learned to predict the large number of opinions in 1999 and 2000 very accurately, but at the expense of all other years. One of the defining characteristics of text data is that it is **sparse**, and tree-based models such as random forests may not be well-suited to sparse data. 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
 ```
 
@@ -489,6 +489,8 @@ collect_metrics(smart_rs)
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
+TODO: add number of words in lexicon to plot
+
 ```{r snowballrmse, dependson="stopwordsres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
 list(snowball = snowball_rs, 
      smart = smart_rs, 
@@ -553,8 +555,8 @@ tune_ngram <- function(ngram_options) {
 }
 ```
 
-```{block2, type = "rmdtip"}
-We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords)) but there we showed each call to `tune_grid()` for extra clarity.
+```{block2, type = "rmdwarning"}
+We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords), but there we showed each call to `tune_grid()` for extra clarity.
 ```
 
 With this helper function, let's try out predicting the year of Supreme Court opinions using:
@@ -598,7 +600,7 @@ list(`1` = unigram_rs,
 
 Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much.
 
-## Case study: lemmatization
+## Case study: lemmatization {mlregressionlemmatization}
 
 As we discussed in Section \@ref(lemmatization), we can normalize words to their roots or **lemmas** based on each word's context and the structure of a language. Table \@ref(tab:lemmatb) shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
 
@@ -621,7 +623,7 @@ Using lemmatization instead of a more straightforward tokenization strategy is s
 
 Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.
 
-```{r lemmarec, dependson="scotussplit", echo=FALSE}
+```{r lemmarec, dependson="scotussplit", message=FALSE}
 spacyr::spacy_initialize(entity = FALSE)
 
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
@@ -630,10 +632,6 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
-```
-
-```{block, type = "rmdnote"}
-Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in our model and it takes a lot of computational power. Initializing with `entity = FALSE` will allow our data preprocessing for lemmatization to run much faster.
 ```
 
 Let's combine this lemmatized text with our tuneable workflow and grid of possible parameter values. We can then tune our workflow and identify the best model for the lemmatized text.
