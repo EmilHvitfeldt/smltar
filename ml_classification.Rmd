@@ -1050,51 +1050,51 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
   step_ngram(consumer_complaint_narrative, num_tokens = 2) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = tune(), min_times = 50) %>%
+  step_tokenfilter(consumer_complaint_narrative, 
+                   max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
 ### Specifying models
 
-We will be using a Naive Bayes model again this time, the model engine we are using only has one parameter we can tune `Laplace` which controls the correction to smoothing low-frequency counts. Since we don't have any low-frequency counts we will not need to tune this parameter so we can use the previous model specification
+We will be using the Support Vector Machine model since it showed some promise in \@ref(comparetosvm).
 
-We can reuse parts of the old workflow and simply update the 
+We can reuse parts of the old workflow and simply update the recipe specificatioon
 
-```{r nbwf2, dependson=c("nbspecv2", "complaintrecfinal3")}
-nb_wf_v2 <- nb_wf %>%
+```{r nbwf2, dependson=c("svmspec", "complaintrecfinal3")}
+svm_wf_v2 <- svm_wf %>%
   update_recipe(complaints_rec_v2)
 
-nb_wf_v2
+svm_wf_v2
 ```
 
 We create a grid of possible hyperparameter values using `grid_regular()` from the dials package. 
 The levels is set to 5 to give us 5 possible values of the maximum number of tokens.
 
 ```{r}
-param_grid <- grid_regular(max_tokens(range = c(100, 1000)),
+param_grid <- grid_regular(max_tokens(range = c(250, 1500)),
                            levels = 5)
 
 param_grid
 ```
 
-```{r, message=FALSE, eval=FALSE}
+```{r, message=FALSE, eval=!online}
 set.seed(2020)
 tune_rs <- tune_grid(
-  nb_wf_v2,
+  svm_wf_v2,
   complaints_folds,
-  grid = param_grid,
-  control = control_resamples(verbose = TRUE)
+  grid = param_grid, 
+  metrics = metric_set(accuracy, sensitivity, specificity),
+  control = control_resamples(save_pred = TRUE)
 )
-
-tune_rs
 ```
 
-```{r, eval=FALSE}
+```{r include=FALSE, eval=!online}
 tune_rs$splits <- NULL
 write_rds(tune_rs, "data/ml_class_final_tune.rds")
 ```
 
-```{r, echo=FALSE}
+```{r, include=FALSE, eval=online}
 tune_rs <- read_rds("data/ml_class_final_tune.rds")
 ```
 
@@ -1110,31 +1110,60 @@ We can extract the best hyperparameters and use it to finalize the workflow by s
 ```{r}
 best_accuracy <- select_best(tune_rs, "accuracy")
 
-nb_wf_final <- finalize_workflow(
-  nb_wf_v2,
+svm_wf_final <- finalize_workflow(
+  svm_wf_v2,
   best_accuracy
 )
 
-nb_wf_final
+svm_wf_final
 ```
 
 lastly, we will do a list fit and see how well the final model did on our testing data:
 
-```{r}
-final_res <- nb_wf_final %>%
-  last_fit(complaints_split)
-
-final_res %>%
-  collect_metrics()
+```{r finalres}
+final_res <- svm_wf_final %>%
+  last_fit(complaints_split, metrics = metric_set(accuracy))
 ```
 
-And we were able to get around 4% points more accuracy which is pretty good considering we only changed the  preprocessing.
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r finalresmetrics, dependson="finalres", eval = !online}
+final_res_metrics <- collect_metrics(final_res)
+final_res_predictions <- collect_predictions(final_res)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(final_res_metrics, "data/ml_class_final_res_metrics.rds")
+write_rds(final_res_predictions, "data/ml_class_final_res_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+final_res_metrics <- read_rds("data/ml_class_final_res_metrics.rds")
+final_res_predictions <- read_rds("data/ml_class_final_res_predictions.rds")
+```
+
+If we take a look at the metrics we did pretty good
+
+```{r}
+final_res_metrics
+```
+
+And it is worth noting that it isn't much different from what we saw in the training dataset. This is good and an indication that our model was able to generalize well enough.
+
+Taking a look at the confusion matrix also yields pleasing results. It appears symmetric with a strong presence in the diagonal showing us that there isn't any strong bias one towards either of the classes.
+
+```{r}
+final_res_predictions %>% 
+  conf_mat(truth = product, estimate = .pred_class) %>%
+  autoplot(type = "heatmap")
+```
 
 ## Summary
 
 You can use classification modeling to predict classes from a dataset, including datasets that have text in them.
 Naive Bayes models perform reasonably well since each feature and token is handled independently and can, therefore, handle many variables with computationally ease.
 This is a useful feature as we sometimes want thousands of tokens in our bag-of-word model.
+We also saw that Support Vector Machines performed well with keeping the classes separated.
 We also saw how handcrafted features can help improve your model.
 By using resampling data sets of the training set can we explore the space of hyperparameters to find the most performant model all without using the testing dataset. Keeping the testing dataset for a final evaluation.
 
