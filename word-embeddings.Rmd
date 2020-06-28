@@ -7,6 +7,7 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
+quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 ``` 
 
 > You shall know a word by the company it keeps.
@@ -55,7 +56,7 @@ Linguists have long worked on vector models for language that can reduce the num
 
 ## Understand word embeddings by finding them yourself
 
-Word embeddings are a way to represent text data as numbers based on a huge corpus of text, capturing semantic meaning from words' context. 
+Word embeddings are a way to represent text data as vectors of numbers based on a huge corpus of text, capturing semantic meaning from words' context. 
 
 ```{block, type = "rmdnote"}
 Modern word embeddings are based on a statistical approach to modeling language, rather than a linguistics or rules-based approach. 
@@ -141,7 +142,7 @@ tidy_pmi
 When PMI is high, the two words are associated with each other, likely to occur together. When PMI is low, the two words are not associated with each other, unlikely to occur together.
 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdwarning"}
 The step above used `unite()`, a function from **tidyr** that pastes multiple columns into one, to make a new column for `window_id` from the old `window_id` plus the `complaint_id`. This new column tells us which combination of window and complaint each word belongs to.
 ```
 
@@ -256,7 +257,7 @@ This is a straightforward method for finding and using word embeddings, based on
 
 If your dataset is too small, you typically cannot train reliable word embeddings. 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdwarning"}
 How small is too small? It is hard to make definitive statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 ```
 
@@ -322,7 +323,7 @@ tidy_glove %>%
 
 The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.
 
-```{block, type = "rmdwarning"}
+```{block, type = "rmdnote"}
 These examples highlight how pre-trained word embeddings can be useful because of the incredibly rich semantic relationships they encode, but also how these vector representations are often less than ideal for specific tasks.
 ```
 
@@ -367,7 +368,7 @@ Results like these have been confirmed over and over again, such as when @Bolukb
 
 Remember that word embeddings are *learned* or trained from some large dataset of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. One common dataset used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 It's safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
 ```
 
