@@ -6,6 +6,9 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE,
                tidy = "styler", fig.width = 8, fig.height = 5)
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
+
+# Controls caching
+online <- TRUE
 ``` 
 
 In the last section, we talked about the many ways preprocessing affects the numerical representation of the text. 
@@ -18,7 +21,7 @@ We are going to be working with US consumer complaints on financial products and
 It contains a text field containing the complaint along with information regarding what it was for,
 how it was filed and the response. 
 In this chapter, we will try to predict what type of product the complaints are referring to. 
-This first attempt will be limited to predicting if the product is a mortgage or not.
+We will for the duration of this chapter limit ourselves to binary classification and will see if a complaint is about "Credit reporting, credit repair services, or other personal consumer reports" or not.
 
 We can read in the complaint data \@ref(us-consumer-finance-complaints) with `read_csv()`.
 
@@ -39,7 +42,7 @@ then we will start by taking a quick look at the data to see what we have to wor
 glimpse(complaints)
 ```
 
-The first thing to note is our target variable `product` which we need to trim only display "Mortgage" and "Other",
+The first thing to note is our target variable `product` which we need to trim only display "Credit reporting, credit repair services, or other personal consumer reports" and "Other". We will rename product class to "Credit" for the remainder of the chapter to save space.
 and the `consumer_complaint_narrative` variable which contains the complaints.
 Here is the first 6 complaints:
 
@@ -81,7 +84,7 @@ First we will include `date_received` for further consideration, along with `con
 The other variables could be of use too, but they are categorical variables with many values so we will exclude them for now.
 
 We start by splitting the data into a training and testing dataset.
-But before we do that we will create a factor variable of `product` with the levels "Mortgage" and "Other".
+But before we do that we will create a factor variable of `product` with the levels "Credit" and "Other".
 Then we will use the `initial_split()` from **rsample** to create a binary split of the data. 
 The `strata` argument is used to make sure that the split is created to make sure the distribution of `product` is similar in the training set and testing set. 
 Since the split is done using random sampling we set a seed so we can reproduce the results.
@@ -89,7 +92,7 @@ Since the split is done using random sampling we set a seed so we can reproduce 
 ```{r, complaintssplit}
 set.seed(1234)
 complaints2class <- complaints %>%
-  mutate(product = factor(if_else(product == "Mortgage", "Mortgage", "Other")))
+  mutate(product = factor(if_else(product == "Credit reporting, credit repair services, or other personal consumer reports", "Credit", "Other")))
 
 complaints_split <- initial_split(complaints2class, strata = product)
 
@@ -121,7 +124,7 @@ complaints_rec <-
 
 First will we take a look at the `date_received` variable. We use the `step_date()` to extract the month and day of the week (dow). Then we remove the original variable and dummify the variables created with `step_dummy()`.
 
-```{r}
+```{r complaintrec2, dependson="complaintrec1"}
 complaints_rec <- complaints_rec %>%
   step_date(date_received, features = c("month", "dow"), role = "dates") %>%
   step_rm(date_received) %>%
@@ -130,26 +133,26 @@ complaints_rec <- complaints_rec %>%
 
 the `tags` variable includes some missing data. We deal with this by using `step_unknown()` to that adds a new level to the factor variable for cases of missing data. Then we dummify the variable with `step_dummy()`
 
-```{r complaintrec2, dependson="complaintrec1"}
+```{r complaintrec3, dependson="complaintrec2"}
 complaints_rec <- complaints_rec %>%
   step_unknown(tags) %>%
   step_dummy(tags)
 ```
 
 Lastly we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we perform tokenization to words with `step_tokenize()`, by default this is done using `tokenizers::tokenize_words()`.
-Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 50 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
+Next we remove stopwords with `step_stopwords()`, the default choice is the snowball stopword list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, this is to avoid creating too many variables. To end off we use `step_tfidf()` to perform tf-idf calculations.
 
-```{r complaintrec3, dependson="complaintrec2"}
+```{r complaintrec4, dependson="complaintrec3"}
 complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 50) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
 Now that we have a full specification of the recipe we run `prep()` on it to train each of the steps on the training data.
 
-```{r complaintprep, dependson="complaintrec3"}
+```{r complaintprep, dependson="complaintrec4"}
 complaint_prep <- prep(complaints_rec)
 ```
 
@@ -162,7 +165,7 @@ test_data <- bake(complaint_prep, complaints_test)
 
 For the modeling we will use a simple Naive Bayes model (TODO add citation to both Naive Bayes and its use in text classification).
 One of the main advantages of Naive Bayes is its ability to handle a large number of features that we tend to get when using word count methods.
-Here we have only kept the 50 most frequent tokens, we could have kept more tokens and a Naive Bayes model would be able to handle it okay, but we will limit it for this first time.
+Here we have only kept the 500 most frequent tokens, we could have kept more tokens and a Naive Bayes model would be able to handle it okay, but we will limit it for this first time.
 
 ```{r nbspec}
 nb_spec <- naive_Bayes() %>%
@@ -196,7 +199,7 @@ Each of these "splits" contains information about how to create cross-validation
 
 For convenience, let's use `workflows()` for our resampling estimates of performance. These are convenience functions that fit different modeling functions like recipes, model specifications, etc. together so they are easier to pass around in a modeling project.
 
-```{r nbwf, dependson=c("nbspec", "complaintrec3")}
+```{r nbwf, dependson=c("nbspec", "complaintrec4")}
 nb_wf <- workflow() %>%
   add_recipe(complaints_rec) %>%
   add_model(nb_spec)
@@ -206,40 +209,322 @@ nb_wf
 
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit the model many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
+```{r nbrs, dependson=c("nbwf", "complaintsfolds"), eval = !online}
 nb_rs <- fit_resamples(
   nb_wf,
-  complaints_folds
+  complaints_folds,
+  control = control_resamples(save_pred = TRUE)
 )
+```
 
-nb_rs
+We can extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r nbrsmetrics, eval = !online}
+nb_rs_metrics <- collect_metrics(nb_rs)
+nb_rs_predictions <- collect_predictions(nb_rs)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
+write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
+nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
 ```
 
 What results do we see, in terms of performance metrics?
 
-```{r, dependson="nbrs"}
-nb_rs %>%
-  collect_metrics()
+```{r}
+nb_rs_metrics
 ```
 
-## Compare to a SVM model
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator curve). The accuracy is the percentage of accurate predictions. Which means that for this resample the average accurracy was `r collect_metrics(nb_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`.
 
-WIP
+```{block, type = "rmdnote"}
+For both Accuracy and ROC AUC values closer to 1 are better.
+```
 
-## Compare to a knn model
+The [reciver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) shows the sensitivity at different thresholds. It shows us how well the classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled datasets.
 
-WIP
+```{r firstroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Complaints."}
+nb_rs_predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = product, .pred_Credit) %>%
+  autoplot() +
+  labs(
+    color = NULL,
+    title = "Receiver operator curve for US Consumer Finance Complaints",
+    subtitle = "Each resample fold is shown in a different color"
+  )
+```
+
+The area under each of these curves is the `roc_auc` metric we have been collecting. If the curve was going along the diagonal line then the model would be no better then random chance.
+
+Another way to evaluate our model is to look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). This will tell us how well the model is doing with false positives and false negatives for each class.
+there is not a trivial way to visualize multiple confusion matrices, so we will look at them individually for each fold.
+
+```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for first Naive Bayes classifier. It appears to be biased towards predicting 'Credit'"}
+nb_rs_predictions %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+Figure \@ref(fig:firstheatmap) see that the diagonal squares has darker shades then the off diagonal squares. This is a good sign since we are right more often then not. However the model still appears to be strugling since it is more or less at 50-50 when predicting something from the "Other" class.
+
+```{block, type = "rmdnote"}
+One metric can give you a complete picture of how well your classification model is performing. The Confusion matrix is a good starting point to get an overview of your model performance as it includes a lot of information.
+```
+
+The following sections will explore different ways we can improve this model.
+
+## Compare to a SVM model {#comparetosvm}
+
+[Support Vector Machines](https://en.wikipedia.org/wiki/Support_vector_machine) are a class of machine learning models that can be used in regression and classification tasks. While they don't see widespread use in the general machine learning space they still have some properties that make them suitable for text classification [@Joachims1998] and can at times give good performance [@Vantu2016].
+
+We create a specification of an SVM with a radial basis function as the kernel. 
+
+```{r svmspec}
+svm_spec <- svm_rbf() %>%
+  set_mode("classification") %>%
+  set_engine("liquidSVM")
+
+svm_spec
+```
+
+Then we create another workflow object with the SVM specification.
+
+```{r svmwf, dependson=c("svmspec", "complaintrec4")}
+svm_wf <- workflow() %>%
+  add_recipe(complaints_rec) %>%
+  add_model(svm_spec)
+```
+
+The **liquidSVM** engine doesn't support class probabilities so we have to replace the default metric set with a metric set that doesn't use class probabilities. Here we use accuracy, [sensitivity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Sensitivity) and [specificity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity#Specificity).
+
+```{r svmrs, dependson=c("svmwf", "complaintsfolds"), eval = !online}
+svm_rs <- fit_resamples(
+  svm_wf,
+  complaints_folds,
+  metrics = metric_set(accuracy, sensitivity, specificity),
+  control = control_resamples(save_pred = TRUE)
+)
+```
+
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r svmrsmetrics, eval = !online}
+svm_rs_metrics <- collect_metrics(svm_rs)
+svm_rs_predictions <- collect_predictions(svm_rs)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(svm_rs_metrics, "data/ml_class_first_svm_rs_metrics.rds")
+write_rds(svm_rs_predictions, "data/ml_class_first_svm_rs_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+svm_rs_metrics <- read_rds("data/ml_class_first_svm_rs_metrics.rds")
+svm_rs_predictions <- read_rds("data/ml_class_first_svm_rs_predictions.rds")
+```
+
+We can now look at `svm_rs_metrics` to see the formatted  3 performance metrics for the SVM model.
+
+```{r, dependson="svmrsmetrics"}
+svm_rs_metrics
+```
+
+They look pretty promising considering we didn't do any hyperparameter tuning on the model parameters.
+Let us finish by generating a confusion matrix which we see in Figure \@ref(fig:svmheatmap).
+It appears to do much better at seperating the classes then the Naive Bayes model and it is much more symmetrical compared to the confusion matrix we saw for the Naive Bayes model in figure \@ref(fig:firstheatmap).
+
+```{r svmheatmap, dependson="svmrsmetrics", fig.cap="Confusion matrix for a simple Support Vector Machine classifier. Yields much more symmetric results."}
+svm_rs_predictions %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+one of the main benefits of support vector machines is their support for sparse data. We can already see that count based text representations are quite sparse which leads support vector machines to be a great match.
+Support vector machines generally also perform well with large datasets (thousands of columns) which are also quite common with text data.
 
 ## Two class or multiclass
 
-WIP
+We will spend most of this chapter focuses on [binary classification](https://en.wikipedia.org/wiki/Binary_classification).
+We have two classes and it can be in one or the other. This is a simpler scenario and the evaluation will be easier to do because you only have a 2 by 2 contingency matrix.
+However, it is not always possible to limit yourself to 2 classes. The topic for this section is to explore how we deal with situations where we have more then 2 classes.
+The complaints dataset we have been working with so far has 9 different product classes. Here they are in decreasing frequency:
+
+- Credit reporting, credit repair services, or other personal consumer reports
+- Debt collection
+- Credit card or prepaid card
+- Mortgage
+- Checking or savings account
+- Student loan
+- Vehicle loan or lease
+- Money transfer, virtual currency, or money service
+- Payday loan, title loan, or personal loan
+
+We assume that there is a reason why these product classes have been created in this fashion.
+Perhaps complaints from different classes are handled by different people.
+In any case, it would be nice to be able to build a multi-class classifier to classify specific product classes.
+
+We need to create a new split of the data using `initial_split()` on the unmodified `complaints` dataset.
+
+```{r, multicomplaintssplit}
+set.seed(1234)
+
+multicomplaints_split <- initial_split(complaints, strata = product)
+
+multicomplaints_train <- training(multicomplaints_split)
+multicomplaints_test <- testing(multicomplaints_split)
+```
+
+Before we go on let us take a look at the number of cases in each of the classes
+
+```{r, dependson="multicomplaintssplit"}
+multicomplaints_train %>% 
+  count(product, sort = TRUE) %>% 
+  select(n, product)
+```
+
+There is quite a large imbalance between the classes. Especially since there are over 20 times more cases of the majority class then there is of the smallest class.
+We have to deal with this problem, which is not an uncommon problem to have when dealing with multi-class classification since the chance of having a completely balanced dataset is very low.
+
+We have a couple of additional issues we have to keep in mind when working with multi-class classification
+
+- Imbalance of classes
+- Many machine learning algorithms do not handle imbalanced data well and is likely to have a hard time predicting minority classes
+- Not all machine learning algorithms are built for multi-class classification
+- Many evaluation metrics will have to reformulated to be able to describe multi-class predictions
+
+When you have multiple classes in your data, then it is also possible to formulate the multi-class problem in 2 ways. One formulation is that you can put any given observation into multiple classes. The other formulation is that any observations can be put into one and only one class. We will be sticking to a "one class per observation" model formulation in this section.
+
+There are many different ways to deal with unbalanced data.
+We will showcase one of the simplest methods, downsampling, which is a method where observations from the majority classes are removed during training to achieve a more balanced class distribution.
+We will be using the [themis](https://github.com/tidymodels/themis) add-on package for recipes which provides the [step_downsample()](https://tidymodels.github.io/themis/reference/step_downsample.html) step to perform downsampling.
+
+```{block, type = "rmdnote"}
+The themis package provides many more algorithms to help you deal with unbalanced data.
+```
+
+We have to create a new recipe specification from scratch since the training data is part of the main specification.
+This specification is similar to the \@ref(classfirstattemptlookatdata) with the only chances being the data passed to the `data` argument in `recipe()` have been changed to `multicomplaints_train` and we have added `step_downsample(product)` to the end of the recipe specification to indicate that we want to downsample after doing all the text preprocessing. We want to do the downsampling last such that we still generate features on the full training dataset. The downsampling will then only affect the modeling step and hopefully create a better performing model.
+
+```{r multicomplaintsrec, message=FALSE, dependson="multicomplaintssplit"}
+library(themis)
+
+multicomplaints_rec <- 
+  recipe(product ~ date_received + tags + consumer_complaint_narrative, 
+         data = multicomplaints_train) %>%
+  step_date(date_received, features = c("month", "dow"), role = "dates") %>%
+  step_rm(date_received) %>%
+  step_dummy(has_role("dates")) %>%
+  step_unknown(tags) %>%
+  step_dummy(tags) %>%
+  step_tokenize(consumer_complaint_narrative) %>%
+  step_stopwords(consumer_complaint_narrative) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tfidf(consumer_complaint_narrative) %>%
+  step_downsample(product)
+```
+
+We also have to create a new cross-validation object since we are using a different dataset.
+
+```{r multicomplaintsfolds, dependson="complaintssplit"}
+multicomplaints_folds <- vfold_cv(multicomplaints_train)
+```
+
+We can reuse the Support Vector Machine specification from \@ref(comparetosvm) and create a new workflow object with the new recipe specification.
+The SVM algorithm is specified for binary classification only however extensions have been made to generalize to multi-class cases. The liquidSVM method will automatically detect that we are doing multi-class classification and switch to the appropriate extension.
+
+```{r multisvmwf, dependson=c("svmspec", "multicomplaintsrec")}
+multi_svm_wf <- workflow() %>%
+  add_recipe(multicomplaints_rec) %>%
+  add_model(svm_spec)
+
+multi_svm_wf
+```
+
+```{block, type = "rmdnote"}
+Notice how you don't have to specify that you are doing multi-class classification. The tidymodels packages will infer that from the number of classes in the outcome variable.
+```
+
+Now that we have everything we need to put it all into `fit_resamples()` to fit all the models. Note that we are specifying `save_pred = TRUE`. We are doing this so we can create a confusion matrix later afterward which is very beneficial when doing multi-class classification.
+We are again specifying the `metric_set()` since liquidSVM doesn't support class probabilities.
+
+```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval= !online}
+multi_svm_rs <- fit_resamples(
+  multi_svm_wf,
+  multicomplaints_folds,
+  metrics = metric_set(accuracy),
+  control = control_resamples(save_pred = TRUE)
+)
+
+multi_svm_rs
+```
+
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r multisvmrsmetrics, dependson="multisvmrs", eval = !online}
+multi_svm_rs_metrics <- collect_metrics(multi_svm_rs)
+multi_svm_rs_predictions <- collect_predictions(multi_svm_rs)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(multi_svm_rs_metrics, "data/ml_class_first_multi_svm_rs_metrics.rds")
+write_rds(multi_svm_rs_predictions, "data/ml_class_first_multi_svm_rs_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+multi_svm_rs_metrics <- read_rds("data/ml_class_first_multi_svm_rs_metrics.rds")
+multi_svm_rs_predictions <- read_rds("data/ml_class_first_multi_svm_rs_predictions.rds")
+```
+
+What results do we see, in terms of performance metrics?
+
+```{r}
+multi_svm_rs_metrics
+```
+
+The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_svm_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
+
+To get a better look at how our classifier is doing let us look at one of the confusion matrices in figure \@ref(fig:multiheatmap).
+
+```{r multiheatmap, fig.cap="Confusion matrix for Multi-class Support Vector Machine classifier. Most of the classifications appear along the diagonal."}
+multi_svm_rs_predictions %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+The first thing we see is that the diagonal is fairly well populated with is a good sign. This means that the model predicted the right class.
+The off-diagonals numbers are all the failures and where we should direct our focus.
+It is a little hard to get a good view since the majority class widens the scale quite a bit.
+A trick to deal with this problem is to remove all the correctly predicted observations.
+
+```{r multiheatmapminusdiag, fig.cap="Confusion matrix for Multi-class Support Vector Machine classifier without diagonal."}
+multi_svm_rs_predictions %>%
+  filter(id == "Fold01") %>%
+  filter(.pred_class != product) %>%
+  conf_mat(product, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+Now we can more clearly see in figure \@ref(fig:multiheatmapminusdiag) where our model breaks down. One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. It is not hard to see why that is happening since they both deal with credit and properly have a great deal of overlap in vocabulary.
+Knowing what the problem is, helps us figure out how to improve our model
+The first steps for improving our models is to look at the data preprocessing steps and model selection.
+We can look at different models or model engines that might be able to more easily separate the classes. The `svm_rbf()` model has a `cost` argument that determines the penalization of wrongly predicted classes that might be worth looking at.
+Now that we have an idea of where the model isn't working we can look more closely at the data to find features in the data that would help distinguish between problematic classes. In the later section \@ref(custumfeatures) will we showcase how you can create custom features.
 
 ## Case study: What happens if you don't censor your data
 
 The complaints data already have sensitive information censored out with XXXX and XX.
 This can be seen as a kind of annotation, we don't get to know the specific account numbers and birthday which would be mostly unique anyways and filtered out.
 
-Below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
+In figure \@ref(fig:censoredtrigram) below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
 
 ```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored words."}
 complaints_train %>%
@@ -258,10 +543,10 @@ complaints_train %>%
 As you see the vast majority includes one or more censored words.
 Not only does the most used trigrams include some kind of censoring, 
 but the censored words include some signal as they are not used uniformly between the products.
-In the following chart, we take the top 25 most frequent trigrams that includes one of more censoring,
-and plot the proportions of the usage in "Mortgage" and "Other".
+In the following figure \@ref(fig:trigram25), we take the top 25 most frequent trigrams that includes one of more censoring,
+and plot the proportions of the usage in "Credit" and "Other".
 
-```{r trigram25}
+```{r trigram25, fig.cap="Many of the most frequent trigrams feature censored words. There a big difference in how often they are used within each class."}
 top_censored_trigrams <- complaints_train %>%
     slice(1:1000) %>%
   unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
@@ -671,7 +956,7 @@ If you know before you fit your model that you want to compute one or more of th
 nb_rs <- fit_resamples(
   nb_wf,
   complaints_folds,
-  metrics = metric_set(recal, precision)
+  metrics = metric_set(recall, precision)
 )
 ```
 
@@ -679,28 +964,26 @@ If you have already fit your model, you can still compute and explore non-defaul
 
 Let's go back to the lasso model we tuned in Section \@ref(classfirstmodel), with results in `nb_rs`. We can compute the [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
 
-```{r, eval = FALSE}
-nb_rs %>%
-  collect_predictions() %>%
-  recall(product, .pred)
+```{r}
+nb_rs_predictions %>%
+  recall(product, .pred_class)
 ```
 
 We can also compute the recall for each resample by using `group_by()` to calculate inside each resample.
 
-```{r, eval = FALSE}
-nb_rs %>%
-  collect_predictions() %>%
+```{r}
+nb_rs_predictions %>%
   group_by(id) %>%
-  recall(product, .pred)
+  recall(product, .pred_class)
 ```
 
 Many of the matrics used for classification is some function of the true positive, true negative, false positive and false negative rates. 
 We can take a look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix) to look at the contingency table between observed classes and predicted classes.
 
-```{r, eval = FALSE}
-nb_rs %>%
-  collect_predictions() %>%
-  conf_mat(product, .pred)
+```{r}
+nb_rs_predictions %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class)
 ```
 
 It is possible to archive high accuracy with a bad model just by predicting the majority class. This is not favorable as we are not using any information from the data to guide our predictions.
@@ -768,51 +1051,51 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
   step_ngram(consumer_complaint_narrative, num_tokens = 2) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = tune(), min_times = 50) %>%
+  step_tokenfilter(consumer_complaint_narrative, 
+                   max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
 ### Specifying models
 
-We will be using a Naive Bayes model again this time, the model engine we are using only has one parameter we can tune `Laplace` which controls the correction to smoothing low-frequency counts. Since we don't have any low-frequency counts we will not need to tune this parameter so we can use the previous model specification
+We will be using the Support Vector Machine model since it showed some promise in \@ref(comparetosvm).
 
-We can reuse parts of the old workflow and simply update the 
+We can reuse parts of the old workflow and simply update the recipe specificatioon
 
-```{r nbwf2, dependson=c("nbspecv2", "complaintrecfinal3")}
-nb_wf_v2 <- nb_wf %>%
+```{r nbwf2, dependson=c("svmspec", "complaintrecfinal3")}
+svm_wf_v2 <- svm_wf %>%
   update_recipe(complaints_rec_v2)
 
-nb_wf_v2
+svm_wf_v2
 ```
 
 We create a grid of possible hyperparameter values using `grid_regular()` from the dials package. 
 The levels is set to 5 to give us 5 possible values of the maximum number of tokens.
 
 ```{r}
-param_grid <- grid_regular(max_tokens(range = c(100, 1000)),
+param_grid <- grid_regular(max_tokens(range = c(250, 1500)),
                            levels = 5)
 
 param_grid
 ```
 
-```{r, message=FALSE, eval=FALSE}
+```{r, message=FALSE, eval=!online}
 set.seed(2020)
 tune_rs <- tune_grid(
-  nb_wf_v2,
+  svm_wf_v2,
   complaints_folds,
-  grid = param_grid,
-  control = control_resamples(verbose = TRUE)
+  grid = param_grid, 
+  metrics = metric_set(accuracy, sensitivity, specificity),
+  control = control_resamples(save_pred = TRUE)
 )
-
-tune_rs
 ```
 
-```{r, eval=FALSE}
+```{r include=FALSE, eval=!online}
 tune_rs$splits <- NULL
 write_rds(tune_rs, "data/ml_class_final_tune.rds")
 ```
 
-```{r, echo=FALSE}
+```{r, include=FALSE, eval=online}
 tune_rs <- read_rds("data/ml_class_final_tune.rds")
 ```
 
@@ -828,31 +1111,60 @@ We can extract the best hyperparameters and use it to finalize the workflow by s
 ```{r}
 best_accuracy <- select_best(tune_rs, "accuracy")
 
-nb_wf_final <- finalize_workflow(
-  nb_wf_v2,
+svm_wf_final <- finalize_workflow(
+  svm_wf_v2,
   best_accuracy
 )
 
-nb_wf_final
+svm_wf_final
 ```
 
 lastly, we will do a list fit and see how well the final model did on our testing data:
 
-```{r}
-final_res <- nb_wf_final %>%
-  last_fit(complaints_split)
-
-final_res %>%
-  collect_metrics()
+```{r finalres}
+final_res <- svm_wf_final %>%
+  last_fit(complaints_split, metrics = metric_set(accuracy))
 ```
 
-And we were able to get around 4% points more accuracy which is pretty good considering we only changed the  preprocessing.
+We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+
+```{r finalresmetrics, dependson="finalres", eval = !online}
+final_res_metrics <- collect_metrics(final_res)
+final_res_predictions <- collect_predictions(final_res)
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(final_res_metrics, "data/ml_class_final_res_metrics.rds")
+write_rds(final_res_predictions, "data/ml_class_final_res_predictions.rds")
+```
+
+```{r, include = FALSE, eval = online}
+final_res_metrics <- read_rds("data/ml_class_final_res_metrics.rds")
+final_res_predictions <- read_rds("data/ml_class_final_res_predictions.rds")
+```
+
+If we take a look at the metrics we did pretty good
+
+```{r}
+final_res_metrics
+```
+
+And it is worth noting that it isn't much different from what we saw in the training dataset. This is good and an indication that our model was able to generalize well enough.
+
+Taking a look at the confusion matrix in figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence in the diagonal showing us that there isn't any strong bias one towards either of the classes.
+
+```{r, finalheatmap, fig.cap="Confusion matrix for final Support Vector Machine classifier."}
+final_res_predictions %>% 
+  conf_mat(truth = product, estimate = .pred_class) %>%
+  autoplot(type = "heatmap")
+```
 
 ## Summary
 
 You can use classification modeling to predict classes from a dataset, including datasets that have text in them.
 Naive Bayes models perform reasonably well since each feature and token is handled independently and can, therefore, handle many variables with computationally ease.
 This is a useful feature as we sometimes want thousands of tokens in our bag-of-word model.
+We also saw that Support Vector Machines performed well with keeping the classes separated.
 We also saw how handcrafted features can help improve your model.
 By using resampling data sets of the training set can we explore the space of hyperparameters to find the most performant model all without using the testing dataset. Keeping the testing dataset for a final evaluation.
 
