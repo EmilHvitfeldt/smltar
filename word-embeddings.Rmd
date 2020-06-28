@@ -7,6 +7,7 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
+quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 ``` 
 
 > You shall know a word by the company it keeps.
@@ -51,11 +52,42 @@ Notice that in either case, our final data structure is incredibly sparse and of
 
 **SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE**
 
+```{r sparsityram, dependson="complaints", fig.cap="Memory requirements and sparsity increase with corpus size"}
+get_dfm <- function(frac) {
+  complaints %>% 
+    sample_frac(frac) %>%
+    unnest_tokens(word, consumer_complaint_narrative) %>% 
+    anti_join(get_stopwords()) %>%  
+    mutate(stem = wordStem(word)) %>% 
+    count(complaint_id, stem) %>%  
+    cast_dfm(complaint_id, stem, n)
+}
+
+set.seed(123)
+tibble(frac = 2 ^ seq(-16, -6, 2)) %>%
+  mutate(dfm = map(frac, get_dfm),
+         words = map_dbl(dfm, quanteda::nfeat),
+         sparsity = map_dbl(dfm, quanteda::sparsity),
+         `RAM (in bytes)` = map_dbl(dfm, lobstr::obj_size)) %>%
+  pivot_longer(sparsity:`RAM (in bytes)`, names_to = "measure") %>%
+  ggplot(aes(words, value, color = measure)) +
+  geom_line(size = 1.5, alpha = 0.5) +
+  geom_point(size = 2) +
+  facet_wrap(~measure, scales = "free_y") +
+  scale_x_log10(labels = scales::label_comma()) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  theme(legend.position = "none") +
+  labs(x = "Number of unique words in corpus (log scale)",
+       y = NULL)
+```
+
+As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
+
 Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called **word embeddings**.
 
 ## Understand word embeddings by finding them yourself
 
-Word embeddings are a way to represent text data as numbers based on a huge corpus of text, capturing semantic meaning from words' context. 
+Word embeddings are a way to represent text data as vectors of numbers based on a huge corpus of text, capturing semantic meaning from words' context. 
 
 ```{block, type = "rmdnote"}
 Modern word embeddings are based on a statistical approach to modeling language, rather than a linguistics or rules-based approach. 
@@ -141,7 +173,7 @@ tidy_pmi
 When PMI is high, the two words are associated with each other, likely to occur together. When PMI is low, the two words are not associated with each other, unlikely to occur together.
 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdwarning"}
 The step above used `unite()`, a function from **tidyr** that pastes multiple columns into one, to make a new column for `window_id` from the old `window_id` plus the `complaint_id`. This new column tells us which combination of window and complaint each word belongs to.
 ```
 
@@ -172,7 +204,10 @@ Which words are close to each other in this new feature space of word embeddings
 ```{r nearestsynonyms}
 nearest_neighbors <- function(df, token) {
   df %>%
-    widely(~ . %*% (.[token, ]), sort = TRUE)(item1, dimension, value) %>%
+    widely(
+      ~ . %*% (.[token, ]), 
+      sort = TRUE
+    )(item1, dimension, value) %>%
     select(-item2)
 }
 ```
@@ -204,7 +239,7 @@ tidy_word_vectors %>%
     nearest_neighbors("fee")
 ```
 
-We find words about interest, charges, and overdrafts.
+We find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints.
 
@@ -227,7 +262,7 @@ tidy_word_vectors %>%
 
 It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like `"regarding"`, `"contacted"`, and `"called"`, while component 9 highlights the use of *different* common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.
 
-We created word embeddings and can explore them to understand our text dataset, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into **document embeddings**, either using a mean or sum. Let's `count()` to find the sum here in our example.
+We created word embeddings and can explore them to understand our text dataset, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into **document embeddings**, either using a mean or sum. This approach loses information about word order but is straightforward to implement. Let's `count()` to find the sum here in our example.
 
 ```{r docmatrix, dependson=c("nestedwords", "tidywordvectors")}
 word_matrix <- tidy_complaints %>% 
@@ -256,7 +291,7 @@ This is a straightforward method for finding and using word embeddings, based on
 
 If your dataset is too small, you typically cannot train reliable word embeddings. 
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdwarning"}
 How small is too small? It is hard to make definitive statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 ```
 
@@ -285,12 +320,16 @@ tidy_glove <- glove6b %>%
 tidy_glove
 ```
 
-We've already explored some sets of "synonyms" in the embedding space we determined ourselves from the CPFB complaints. What about this embedding space learned via the GloVe algorithm on a much larger dataset? We just need to make one change to our `nearest_neighbors()` function, because the matrices we are multiplying together are much larger this time.
+We've already explored some sets of "synonyms" in the embedding space we determined ourselves from the CPFB complaints. What about this embedding space learned via the GloVe algorithm on a much larger dataset? We just need to make one change to our `nearest_neighbors()` function and add `maximum_size = NULL`, because the matrices we are multiplying together are much larger this time.
 
 ```{r nearestsynonyms2}
 nearest_neighbors <- function(df, token) {
   df %>%
-    widely(~ . %*% (.[token, ]), sort = TRUE, maximum_size = NULL)(item1, dimension, value) %>%
+    widely(
+      ~ . %*% (.[token, ]), 
+      sort = TRUE, 
+      maximum_size = NULL
+    )(item1, dimension, value) %>%
     select(-item2)
 }
 ```
@@ -322,7 +361,7 @@ tidy_glove %>%
 
 The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.
 
-```{block, type = "rmdwarning"}
+```{block, type = "rmdnote"}
 These examples highlight how pre-trained word embeddings can be useful because of the incredibly rich semantic relationships they encode, but also how these vector representations are often less than ideal for specific tasks.
 ```
 
@@ -367,7 +406,7 @@ Results like these have been confirmed over and over again, such as when @Bolukb
 
 Remember that word embeddings are *learned* or trained from some large dataset of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. One common dataset used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
-```{block, type = "rmdtip"}
+```{block, type = "rmdnote"}
 It's safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
 ```
 
