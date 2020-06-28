@@ -52,6 +52,37 @@ Notice that in either case, our final data structure is incredibly sparse and of
 
 **SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE**
 
+```{r sparsityram, dependson="complaints", fig.cap="Memory requirements and sparsity increase with corpus size"}
+get_dfm <- function(frac) {
+  complaints %>% 
+    sample_frac(frac) %>%
+    unnest_tokens(word, consumer_complaint_narrative) %>% 
+    anti_join(get_stopwords()) %>%  
+    mutate(stem = wordStem(word)) %>% 
+    count(complaint_id, stem) %>%  
+    cast_dfm(complaint_id, stem, n)
+}
+
+set.seed(123)
+tibble(frac = 2 ^ seq(-16, -6, 2)) %>%
+  mutate(dfm = map(frac, get_dfm),
+         words = map_dbl(dfm, quanteda::nfeat),
+         sparsity = map_dbl(dfm, quanteda::sparsity),
+         `RAM (in bytes)` = map_dbl(dfm, lobstr::obj_size)) %>%
+  pivot_longer(sparsity:`RAM (in bytes)`, names_to = "measure") %>%
+  ggplot(aes(words, value, color = measure)) +
+  geom_line(size = 1.5, alpha = 0.5) +
+  geom_point(size = 2) +
+  facet_wrap(~measure, scales = "free_y") +
+  scale_x_log10(labels = scales::label_comma()) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  theme(legend.position = "none") +
+  labs(x = "Number of unique words in corpus (log scale)",
+       y = NULL)
+```
+
+As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
+
 Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called **word embeddings**.
 
 ## Understand word embeddings by finding them yourself
