@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: macOS-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@master
@@ -15,11 +15,6 @@ jobs:
         uses: r-lib/actions/setup-r@master
         with:
           r-version: '4.0.0'
-
-      - name: Install pandoc and pandoc citeproc
-        run: |
-          brew install pandoc
-          brew install pandoc-citeproc
 
       - name: Cache Renv packages
         uses: actions/cache@v1
