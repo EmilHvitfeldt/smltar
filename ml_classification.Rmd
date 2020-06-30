@@ -240,7 +240,7 @@ What results do we see, in terms of performance metrics?
 nb_rs_metrics
 ```
 
-The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator curve). The accuracy is the percentage of accurate predictions. Which means that for this resample the average accurracy was `r collect_metrics(nb_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`.
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator curve). The accuracy is the percentage of accurate predictions. Which means that for this resample the average accurracy was `r nb_rs_metrics %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`.
 
 ```{block, type = "rmdnote"}
 For both Accuracy and ROC AUC values closer to 1 are better.
@@ -489,7 +489,7 @@ What results do we see, in terms of performance metrics?
 multi_svm_rs_metrics
 ```
 
-The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r collect_metrics(multi_svm_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
+The accuracy metric naturally extends to multi-class tasks. But it appears quite low at `r multi_svm_rs_metrics %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()` which is quite a bit lower then for the binary class in \@ref(#comparetosvm). This is expected since multi-class classification is a harder tasker than binary classification. In binary classification, there is 1 right answer and 1 wrong answer. But in this case, there is 1 right answer and 8 wrong answers.
 
 To get a better look at how our classifier is doing let us look at one of the confusion matrices in figure \@ref(fig:multiheatmap).
 
