@@ -177,7 +177,7 @@ lasso_rs %>%
   collect_metrics()
 ```
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` years.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r #collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` years.
 
 ```{block, type = "rmdnote"}
 The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
@@ -318,7 +318,7 @@ tune_rs %>%
   show_best("rmse")
 ```
 
-The best value for RMSE from this tuning run is `r show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(1)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
+The best value for RMSE from this tuning run is `r #show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(1)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
 
 ```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
@@ -338,7 +338,7 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r #round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
 
 ## Compare to a random forest model {#comparerf}
 
@@ -684,7 +684,7 @@ lemma_rs %>%
   show_best("rmse")
 ```
 
-The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
+The best value for RMSE at `r #show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
 
 ## What evaluation metrics are appropiate?
 
