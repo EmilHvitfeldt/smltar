@@ -43,10 +43,10 @@ jobs:
         
       - name: Install spacy
         run: |
-          Sys.setenv(RETICULATE_MINICONDA_PATH = 'miniconda/')
           reticulate::install_miniconda()
-          reticulate::conda_create('r-reticulate', packages = 'python==3.6.9', conda = 'miniconda/bin/conda')
-          spacyr::spacy_install(conda = 'miniconda/bin/conda', prompt = FALSE)
+          echo "options(reticulate.conda_binary = reticulate:::miniconda_conda())" >> .Rprofile
+          reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')
+          spacyr::spacy_install(prompt = FALSE)
         shell: Rscript {0}
       
       - name: Build site
