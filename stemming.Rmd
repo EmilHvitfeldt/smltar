@@ -240,10 +240,9 @@ Handling punctuation in this way further reduces sparsity in word features. Whet
 Let's compare a few simple stemming algorithms and see what results we end with. Let's look at "The Fir-Tree", specifically the tidied dataset from which we have removed stop words. Let's compare three very straightforward stemming approaches.
 
 - **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
-- **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[stemmernote]
+- **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.]
 - **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.
 
-[stemmernote]: This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.
 
 ```{r stemming, dependson="tidy_hca"}
 stemming <- tidy_fir_tree %>%
