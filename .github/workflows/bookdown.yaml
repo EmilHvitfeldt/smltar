@@ -43,11 +43,10 @@ jobs:
         
       - name: Install spacy
         run: |
-          reticulate::install_miniconda()
+          Rscript -e "reticulate::install_miniconda()"
           echo "options(reticulate.conda_binary = reticulate:::miniconda_conda())" >> .Rprofile
-          reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')
-          spacyr::spacy_install(prompt = FALSE)
-        shell: Rscript {0}
+          Rscript -e "reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')"
+          Rscript -e "spacyr::spacy_install(prompt = FALSE)"
       
       - name: Build site
         run: Rscript -e 'bookdown::render_book("index.Rmd", quiet = TRUE)'
