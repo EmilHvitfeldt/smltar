@@ -1099,7 +1099,7 @@ The metrics for the test set look about the same as the resampled training data 
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year.
 
-```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6, fig.height=6, fig.cap="Predicted and true years from a lasso regression model with bigrams and unigrams, and stop words removed"}
+```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6.5, fig.height=6, fig.cap="Predicted and true years from a lasso regression model with bigrams and unigrams, and stop words removed"}
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
