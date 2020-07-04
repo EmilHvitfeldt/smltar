@@ -9,7 +9,7 @@ theme_set(theme_light())
 
 # Controls caching
 online <- TRUE
-``` 
+```
 
 In the last section, we talked about the many ways preprocessing affects the numerical representation of the text. 
 In and the following chapters will we use these numerical representation of the data to aid the prediction of some quantity.
@@ -60,6 +60,7 @@ complaints$consumer_complaint_narrative %>%
   compact() %>%
   head()
 ```
+
 
 ## Building our first classification model {#classfirstmodel}
 
@@ -815,18 +816,18 @@ Before we get into more detail, let up go through the basics of feature hashing.
 First proposed by @Weinberger2009, feature hashing was introduced as a dimensionality reduction method with a simple premise.
 We start by taking a hashing function which we then apply to our tokens.
 
-:::note
+```{block, type = "rmdnote"}
 A hashing function is a function that takes a variables sized output and maps it to a fixed range. Hashing functions are commonly used in cryptography.
-:::
+```
 
 We will use the hashFunction package to illustrate the behavior of hashing functions.
 Propose we have a lot of country names in a variable and turning them into a one-hot encoding might feel like too much.
 We start by applying the hashing function to each of the strings to project it into an integer space defined by the hashing function.
 We will be using the 32-bit version of MurmurHash3 [@appleby2008] here.
 
-:::note
+```{block, type = "rmdnote"}
 The choice of hashing function isn't based on cryptographic complexity. Instead, it just needs to fulfill a couple of properties and be fast. Uniformity of the output makes sure that the whole output space is being filled evenly. The Avalanche effect makes it so similar strings are hashed in a way so they won't be similar in out output space.
-:::
+```
 
 ```{r}
 library(hashFunction)
@@ -856,9 +857,9 @@ Since we are reducing the space, there is a chance that multiple words are hashe
 This is called a collision and at first glance, it would appear that this would be a big negative for our model.
 However, it is reported that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor [@Forman2008].
 
-:::note
+```{block, type = "rmdnote"}
 Another thing that is done to avoid the negative effects of collisions is to have a second hashing function that returns 1 and -1. This will determine if we are adding or subtracting the index we get from the first hashing function. Suppose both the word "outdoor" and "pleasant" hashes to 583. Without the second hashing they would collide to 2. But using signed hashing we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.
-:::
+```
 
 The main downsides from using feature hashing are:
 
@@ -889,6 +890,7 @@ complaints_hash <- recipe(product ~ consumer_complaint_narrative, data = complai
 
 complaints_hash
 ```
+
 By using `step_texthash()` are we able to quickly generate machine-ready data with a consistent number of variables.
 This will have a slight loss of power compared to using a traditional bag-of-words representation. An example of the loss in performance is illustrated in this [textrecipes blogpost](https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/).
 
@@ -898,8 +900,8 @@ When working with text you will inevitably run into problems with encodings and 
 One of these problems has a very big influence on how feature hashing is performed.
 Consider the German word "schön".
 The o with an umlaut (two dots over it) is a fairly simple character but it can be represented in a couple of different ways in data.
-We can either use a single character [\U00f6](https://www.fileformat.info/info/unicode/char/00f6/index.htm) to represent the letter with umlaut. 
-Or we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm)
+We can either use a single character [\\U00f6](https://www.fileformat.info/info/unicode/char/00f6/index.htm) to represent the letter with umlaut. 
+Or we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm)
 
 ```{r}
 s1 <- "sch\U00f6n"
@@ -946,6 +948,7 @@ Having a token have different representations could effectively split the freque
 
 Luckily this is easily fixed by using `stri_trans_nfc()` on our text columns before starting preprocessing.
 
+
 ## What evaluation metrics are appropriate
 
 We have so far used [accuracy](https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification) and the area under the receiver operator curve (roc_auc) for hours models so far, these are the defaults used in classification tasks in tidymodels. These are not the only kind of metrics you can use and the choise will depend on how much you value false positives and false negatives.
@@ -991,6 +994,7 @@ It is possible to archive high accuracy with a bad model just by predicting the 
 ```{block, type = "rmdnote"}
 For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
 ```
+
 
 ## Full game
 
