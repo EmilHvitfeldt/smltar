@@ -422,7 +422,7 @@ rf_rs %>%
   write_rds("data/ml_reg_rf_predictions.rds")
 ```
 
-```{r rfpredict, include = FALSE, fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, echo = FALSE, fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
 rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
