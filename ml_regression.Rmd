@@ -305,7 +305,7 @@ tune_rs %>%
 
 Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:scotustunevis) to see what the best model is.
 
-```{r scotustunevis, dependson="scotustuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the lowest RMSE."}
+```{r scotustunevis, dependson="scotustuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the lowest RMSE"}
 tune_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -401,7 +401,7 @@ rf_metrics
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization", eval = !online}
+```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=6, eval = !online}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -660,7 +660,7 @@ bigram_metrics
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
-```{r ngramrmseoffline, dependson="ngramres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams", eval = !online}
+```{r ngramrmseoffline, dependson="ngramres", eval = !online}
 list(`1` = unigram_rs, 
      `1 and 2` = bigram_rs, 
      `1, 2, and 3` = trigram_rs) %>%
@@ -759,7 +759,7 @@ lemma_rs
 
 Let's visualize the performance metrics, RMSE and $R^2$, in Figure \@ref(fig:scotuslemmavis) to see what the best model using lemmas is, much like we did in Figure \@ref(fig:scotustunevis).
 
-```{r scotuslemmavis, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
+```{r scotuslemmavisoffline, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, eval = !online}
 lemma_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -778,9 +778,35 @@ lemma_rs %>%
        subtitle = "Performance metrics indicate that lemmatization improves model performance")
 ```
 
+```{r, dependson="scotuslemmavisoffline", include = FALSE, eval = !online}
+lemma_rs %>%
+  collect_metrics() %>%
+  write_rds("data/ml_reg_lemma_metrics.rds")
+```
+
+```{r scotuslemmavis, include = FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
+lemma_metrics <- read_rds("data/ml_reg_lemma_metrics.rds")
+lemma_predictions %>%
+  ggplot(aes(penalty, mean, color = .metric)) +
+  geom_errorbar(aes(
+    ymin = mean - std_err,
+    ymax = mean + std_err
+  ),
+  alpha = 0.5
+  ) +
+  geom_line(size = 1.5) +
+  facet_wrap(~.metric, scales = "free", nrow = 2) +
+  scale_x_log10() +
+  theme(legend.position = "none") +
+  labs(y = "RMSE",
+       title = "Lasso model performance using lemmatization",
+       subtitle = "Performance metrics indicate that lemmatization improves model performance")
+```
+
+
 What is the best model, using lemmatization?
 
-```{r dependson="scotustuners"}
+```{r dependson="scotustuners", eval = !online}
 lemma_rs %>%
   show_best("rmse")
 ```
@@ -791,14 +817,12 @@ lemma_rs %>%
   write_rds("data/ml_reg_lemma_best.rds")
 ```
 
-```{r lemmatuners, include = FALSE}
-lemma_rs <- read_rds("data/ml_reg_lemma_rs.rds")
-lemma_rs
+```{r include = FALSE}
+lemma_best <- read_rds("data/ml_reg_lemma_best.rds")
+lemma_best
 ```
 
-
-
-The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
+The best value for RMSE at `r lemma_best %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
 
 ## What evaluation metrics are appropiate?
 
