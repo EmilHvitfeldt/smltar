@@ -536,14 +536,17 @@ smart_metrics
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
-TODO: add number of words in lexicon to plot
-
 ```{r snowballrmseoffline, dependson="stopwordsres", eval = !online}
+word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
+  mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
+
 list(snowball = snowball_rs, 
      smart = smart_rs, 
      `stopwords-iso` = stopwords_iso_rs) %>%
   map_dfr(show_best, "rmse", .id = "name") %>%
-  ggplot(aes(name, mean, color = name)) +
+  left_join(word_counts) %>%
+  mutate(name = paste0(name, " (", words, " words)")) %>%
+  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
@@ -559,9 +562,14 @@ list(snowball = snowball_rs,
 ```
 
 ```{r snowballrmse, include = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
+word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
+  mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
+
 stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
 stopword_results %>%
-  ggplot(aes(name, mean, color = name)) +
+  left_join(word_counts) %>%
+  mutate(name = paste0(name, " (", words, " words)")) %>%
+  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
