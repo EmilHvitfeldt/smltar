@@ -2,7 +2,7 @@
 
 ```{r setup, include = FALSE}
 library(knitr)
-opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = FALSE,
+opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
                tidy = "styler", fig.width = 8, fig.height = 5)
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
@@ -10,7 +10,11 @@ options(crayon.enabled = FALSE)
 doParallel::registerDoParallel()
 
 ## for Julia's local environment
-## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
+spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
+online <- FALSE
+
+## for GH actions
+# online <- TRUE
 ``` 
 
 In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
@@ -177,7 +181,7 @@ lasso_rs %>%
   collect_metrics()
 ```
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r #collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` years.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r collect_metrics(lasso_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` years.
 
 ```{block, type = "rmdnote"}
 The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
@@ -253,7 +257,6 @@ After the tuning process, we can select a single best numeric value.
 Think of `tune()` here as a placeholder for the regularization penalty.
 ```
 
-
 We can create a regular grid of values to try, using a convenience function for `penalty()`.
 
 ```{r scotuslambdagrid}
@@ -272,7 +275,7 @@ Tuning a model uses a similar syntax compared to fitting a model to a set of res
 
 We add our tuneable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
 
-```{r scotustuners, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec")}
+```{r scotustunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval = !online}
 set.seed(2020)
 tune_rs <- tune_grid(
   scotus_wf %>% add_model(tune_spec),
@@ -281,6 +284,15 @@ tune_rs <- tune_grid(
   control = control_resamples(save_pred = TRUE)
 )
 
+tune_rs
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(tune_rs, "data/ml_reg_tune_rs.rds")
+```
+
+```{r scotustuners, include = FALSE}
+tune_rs <- read_rds("data/ml_reg_tune_rs.rds")
 tune_rs
 ```
 
@@ -318,7 +330,7 @@ tune_rs %>%
   show_best("rmse")
 ```
 
-The best value for RMSE from this tuning run is `r #show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(1)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
+The best value for RMSE from this tuning run is `r show_best(tune_rs, "rmse") %>% pull(mean) %>% min() %>% round(1)`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
 
 ```{r scotuslowestrmse, dependson="scotustuners"}
 lowest_rmse <- tune_rs %>%
@@ -329,7 +341,7 @@ lowest_rmse
 
 Next, let's finalize our tuneable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
 
-```{r}
+```{r dependson=c("scotuslowestrmse", "scotustuners")}
 final_lasso <- finalize_workflow(
   scotus_wf %>% add_model(tune_spec),
   lowest_rmse
@@ -338,7 +350,7 @@ final_lasso <- finalize_workflow(
 final_lasso
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r #round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
 
 ## Compare to a random forest model {#comparerf}
 
@@ -350,6 +362,8 @@ First, let's build a random forest model specification, using the ranger impleme
 rf_spec <- rand_forest(trees = 1000) %>%
   set_engine("ranger") %>%
   set_mode("regression")
+
+rf_spec
 ```
 
 Now we can fit this random forest model. Let's use `fit_resamples()` again, so we can evaluate the model performance. We will use three arguments to this function:
@@ -358,7 +372,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
+```{r scotusrfrsoffline, dependson=c("scotuswf", "scotusfolds", "scotusrfspec"), eval = !online}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -370,16 +384,47 @@ rf_rs
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
 
-```{r dependson="scotusrfrs"}
+```{r rfmetricsoffline, dependson="scotusrfrsoffline", eval=!online}
+collect_metrics(rf_rs)
+```
+
+```{r, dependson="rfmetricsoffline", include = FALSE, eval = !online}
 rf_rs %>%
-  collect_metrics()
+  collect_metrics() %>%
+  write_rds("data/ml_reg_rf_metrics.rds")
+```
+
+```{r rfmetrics, include = FALSE}
+rf_metrics <- read_rds("data/ml_reg_rf_metrics.rds")
+rf_metrics
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredict, dependson="scotusrfrs", fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization", eval = !online}
 rf_rs %>%
   collect_predictions() %>%
+  ggplot(aes(year, .pred, color = id)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_point(alpha = 0.5) +
+  labs(
+    x = "Truth",
+    y = "Predicted year",
+    color = NULL,
+    title = "Predicted and true years for Supreme Court opinions using a random forest model",
+    subtitle = "Each cross-validation fold is shown in a different color"
+  )
+```
+
+```{r, dependson="rfpredictoffline", include = FALSE, eval = !online}
+rf_rs %>%
+  collect_predictions() %>%
+  write_rds("data/ml_reg_rf_predictions.rds")
+```
+
+```{r rfpredict, include = FALSE, fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
+rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
   geom_point(alpha = 0.5) +
@@ -399,16 +444,6 @@ Models that work best with text tend to be models designed for or otherwise appr
 ```
 
 Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
-
-## Compare to a ??? model
-
-Lasso regression works extremely well with text data, but it is not the only option.
-
-Choose one more to demonstrate in this chapter:
-
-- SVM
-- Naive Bayes (used in classification chapter -- probably not)
-- knn
 
 ## Case study: removing stop words {#casestudystopwords}
 
@@ -458,7 +493,7 @@ Now we can put this all together and tune these models which include stop word r
 - The same cross-validation folds we created earlier
 - Our new grid of values for the regularization parameter
 
-```{r stopwordsres, dependson=c("gridtwenty", "tuneablewf", "stopwordrec", "scotusfolds")}
+```{r stopwordsresoffline, dependson=c("gridtwenty", "tuneablewf", "stopwordrec", "scotusfolds"), eval = !online}
 set.seed(123)
 snowball_rs <- tune_grid(
   tuneable_wf %>% add_recipe(stopword_rec("snowball")),
@@ -481,21 +516,51 @@ stopwords_iso_rs <- tune_grid(
 )
 ```
 
+
 After fitting models for each of possible regularization values to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.
 
-```{r dependson="stopwordsres"}
+```{r dependson="stopwordsresoffline", eval = !online}
 collect_metrics(smart_rs)
+```
+
+```{r, dependson="stopwordsresoffline", include = FALSE, eval = !online}
+smart_rs %>%
+  collect_metrics() %>%
+  write_rds("data/ml_reg_smart_metrics.rds")
+```
+
+```{r smartmetrics, include = FALSE}
+smart_metrics <- read_rds("data/ml_reg_smart_metrics.rds")
+smart_metrics
 ```
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
 TODO: add number of words in lexicon to plot
 
-```{r snowballrmse, dependson="stopwordsres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
+```{r snowballrmseoffline, dependson="stopwordsres", eval = !online}
 list(snowball = snowball_rs, 
      smart = smart_rs, 
      `stopwords-iso` = stopwords_iso_rs) %>%
   map_dfr(show_best, "rmse", .id = "name") %>%
+  ggplot(aes(name, mean, color = name)) +
+  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
+  labs(x = NULL, y = "mean RMSE for five best models",
+       title = "Model performance for three stop word lexicons",
+       subtitle = "For this dataset, the Snowball lexicon performed best")
+```
+
+```{r, dependson="snowballrmseoffline", include = FALSE, eval = !online}
+list(snowball = snowball_rs, 
+     smart = smart_rs, 
+     `stopwords-iso` = stopwords_iso_rs) %>%
+  map_dfr(show_best, "rmse", .id = "name") %>%
+  write_rds("data/ml_reg_stopword_results.rds")
+```
+
+```{r snowballrmse, include = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
+stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
+stopword_results %>%
   ggplot(aes(name, mean, color = name)) +
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
@@ -565,7 +630,7 @@ With this helper function, let's try out predicting the year of Supreme Court op
 - bigrams and unigrams
 - trigrams, bigrams, and unigrams
 
-```{r ngramres, dependson=c("tunengram")}
+```{r ngramresoffline, dependson=c("tunengram"), eval = !online}
 set.seed(123)
 unigram_rs <- tune_ngram(list(n = 1))
 
@@ -578,18 +643,49 @@ trigram_rs <- tune_ngram(list(n = 3, n_min = 1))
 
 These sets of results contain metrics computed for the model with that tokenization strategy.
 
-```{r dependson="ngramres"}
+```{r dependson="ngramresoffline", eval = !online}
 collect_metrics(bigram_rs)
+```
+
+```{r, dependson="ngramresoffline", include = FALSE, eval = !online}
+bigram_rs %>%
+  collect_metrics() %>%
+  write_rds("data/ml_reg_bigram_metrics.rds")
+```
+
+```{r bigrammetrics, include = FALSE}
+bigram_metrics <- read_rds("data/ml_reg_bigram_metrics.rds")
+bigram_metrics
 ```
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
-```{r ngramrmse, dependson="ngramres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
+```{r ngramrmseoffline, dependson="ngramres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams", eval = !online}
 list(`1` = unigram_rs, 
      `1 and 2` = bigram_rs, 
      `1, 2, and 3` = trigram_rs) %>%
   map_dfr(collect_metrics, .id = "name") %>%
   filter(.metric == "rmse") %>%
+  ggplot(aes(name, mean, fill = name)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", binpositions="all",
+               show.legend = FALSE) +
+  labs(x = "Degree of n-grams", y = "mean RMSE",
+       title = "Model performance for different degrees of n-gram tokenization",
+       subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
+```
+
+```{r, dependson="ngramrmseoffline", include = FALSE, eval = !online}
+list(`1` = unigram_rs, 
+     `1 and 2` = bigram_rs, 
+     `1, 2, and 3` = trigram_rs) %>%
+  map_dfr(collect_metrics, .id = "name") %>%
+  filter(.metric == "rmse") %>%
+  write_rds("data/ml_reg_ngram_results.rds")
+```
+
+```{r ngramrmse, include = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
+ngram_results <- read_rds("data/ml_reg_ngram_results.rds")
+ngram_results %>%
   ggplot(aes(name, mean, fill = name)) +
   geom_dotplot(binaxis = "y", stackdir = "center", binpositions="all",
                show.legend = FALSE) +
@@ -623,7 +719,7 @@ Using lemmatization instead of a more straightforward tokenization strategy is s
 
 Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.
 
-```{r lemmarec, dependson="scotussplit", message=FALSE}
+```{r lemmarec, dependson="scotussplit", message=FALSE, eval=online}
 spacyr::spacy_initialize(entity = FALSE)
 
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
@@ -632,11 +728,24 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
+
+lemma_rec
+```
+
+```{r lemmarecoffline, dependson="scotussplit", include = FALSE, eval = !online}
+lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text, engine = "spacyr") %>%
+  step_lemma(text) %>%
+  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
+
+lemma_rec
 ```
 
 Let's combine this lemmatized text with our tuneable workflow and grid of possible parameter values. We can then tune our workflow and identify the best model for the lemmatized text.
 
-```{r, message=FALSE, eval=FALSE}
+```{r, lemmatunersoffline, dependson=c("gridtwenty", "tuneablewf", "lemmarecoffline", "scotusfolds"), eval = !online}
 set.seed(123)
 lemma_rs <- tune_grid(
   tuneable_wf %>% add_recipe(lemma_rec),
@@ -647,14 +756,6 @@ lemma_rs <- tune_grid(
 lemma_rs
 ```
 
-```{r, eval=FALSE, echo=FALSE}
-write_rds(lemma_rs, "data/ml_reg_lemma_rs.rds")
-```
-
-```{r lemmatuners, echo=FALSE}
-lemma_rs <- read_rds("data/ml_reg_lemma_rs.rds")
-lemma_rs
-```
 
 Let's visualize the performance metrics, RMSE and $R^2$, in Figure \@ref(fig:scotuslemmavis) to see what the best model using lemmas is, much like we did in Figure \@ref(fig:scotustunevis).
 
@@ -684,7 +785,20 @@ lemma_rs %>%
   show_best("rmse")
 ```
 
-The best value for RMSE at `r #show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
+```{r, dependson="lemmatunersoffline", include = FALSE, eval = !online}
+lemma_rs %>%
+  show_best("rmse") %>%
+  write_rds("data/ml_reg_lemma_best.rds")
+```
+
+```{r lemmatuners, include = FALSE}
+lemma_rs <- read_rds("data/ml_reg_lemma_rs.rds")
+lemma_rs
+```
+
+
+
+The best value for RMSE at `r show_best(lemma_rs, "rmse") %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance. However, this comes at a cost of slower training because of the procedure involved in identifying lemmas.
 
 ## What evaluation metrics are appropiate?
 
@@ -767,6 +881,8 @@ final_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
+
+final_rec
 ```
 
 
@@ -827,7 +943,7 @@ Throughout this chapter, we have used `grid_regular()` where we fit a model at e
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
 
-```{r, eval = FALSE}
+```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds"), eval = !online}
 final_rs <- tune_grid(
   tune_wf,
   scotus_folds,
@@ -839,11 +955,11 @@ final_rs <- tune_grid(
 final_rs
 ```
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, dependson="finalscotusrsoffline", eval=!online, include=FALSE}
 write_rds(final_rs, "data/ml_reg_final_rs.rds")
 ```
 
-```{r finalscotusrs, echo=FALSE}
+```{r finalscotusrs, include=FALSE}
 final_rs <- read_rds("data/ml_reg_final_rs.rds")
 final_rs
 ```
