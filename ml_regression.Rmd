@@ -10,11 +10,11 @@ options(crayon.enabled = FALSE)
 doParallel::registerDoParallel()
 
 ## for Julia's local environment
-# spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
-# online <- FALSE
+spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
+online <- FALSE
 
 ## for GH actions
-online <- TRUE
+# online <- TRUE
 ``` 
 
 In the previous chapter, we focused on using modeling to predict *labels* on documents, such as what kind of financial product a CFPB complaint was discussing. These are examples of classification models. We can also use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
@@ -786,7 +786,7 @@ lemma_rs %>%
 
 ```{r scotuslemmavis, include = FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
 lemma_metrics <- read_rds("data/ml_reg_lemma_metrics.rds")
-lemma_predictions %>%
+lemma_metrics %>%
   ggplot(aes(penalty, mean, color = .metric)) +
   geom_errorbar(aes(
     ymin = mean - std_err,
