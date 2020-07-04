@@ -52,6 +52,8 @@ Notice that in either case, our final data structure is incredibly sparse and of
 
 **SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE**
 
+As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
+
 ```{r sparsityram, dependson="complaints", fig.cap="Memory requirements and sparsity increase with corpus size"}
 get_dfm <- function(frac) {
   complaints %>% 
@@ -80,8 +82,6 @@ tibble(frac = 2 ^ seq(-16, -6, 2)) %>%
   labs(x = "Number of unique words in corpus (log scale)",
        y = NULL)
 ```
-
-As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
 
 Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called **word embeddings**.
 
@@ -285,14 +285,14 @@ These hundred features are the word embeddings we learned from the text data its
 
 If our word embeddings are of high quality, this translation of the high-dimensional space of words to the lower-dimensional space of the word embeddings allows our modeling based on such an input matrix to take advantage of the semantic meaning captured in the embeddings.
 
-This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the [text2vec](http://text2vec.org/) package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [Bojanowski2016]. 
+This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the [text2vec](http://text2vec.org/) package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [@Bojanowski2016]. 
 
 ## Use pre-trained word embeddings {#glove}
 
 If your dataset is too small, you typically cannot train reliable word embeddings. 
 
 ```{block, type = "rmdwarning"}
-How small is too small? It is hard to make definitive statements because being able to determind useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
+How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of *how* words are used in any given dataset. However, it may be unreasonable to expect good results with datasets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 ```
 
 In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own dataset. Instead, we can turn to **pre-trained** word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the [textdata](https://cran.r-project.org/package=textdata) package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
@@ -334,7 +334,7 @@ nearest_neighbors <- function(df, token) {
 }
 ```
 
-Pre-trained word embeddings are trained based on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) (what we are using here) and [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to `"error"` in the GloVe embeddings?
+Pre-trained word embeddings are trained on very large, general purpose English language datasets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) are based on the Google News dataset, and commonly used [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) (what we are using here) and [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to `"error"` in the GloVe embeddings?
 
 ```{r dependson=c("tidyglove", "nearestsynonyms2")}
 tidy_glove %>%
@@ -398,7 +398,7 @@ Embeddings are trained or learned from a large corpus of text data, and whatever
 
 This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
 
-- African American first names are associated with more unpleasant feelings than European American first names.
+- Typically Black first names are associated with more unpleasant feelings than typically white first names.
 - Women's first names are more associated with family and men's first names are more associated with career.
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
