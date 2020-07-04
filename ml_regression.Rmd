@@ -553,7 +553,7 @@ list(snowball = snowball_rs,
        subtitle = "For this dataset, the Snowball lexicon performed best")
 ```
 
-```{r, dependson="snowballrmseoffline", include = FALSE, eval = !online}
+```{r, dependson="snowballrmseoffline", echo = FALSE, eval = !online}
 list(snowball = snowball_rs, 
      smart = smart_rs, 
      `stopwords-iso` = stopwords_iso_rs) %>%
@@ -561,7 +561,7 @@ list(snowball = snowball_rs,
   write_rds("data/ml_reg_stopword_results.rds")
 ```
 
-```{r snowballrmse, include = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
+```{r snowballrmse, echo = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
@@ -655,13 +655,13 @@ These sets of results contain metrics computed for the model with that tokenizat
 collect_metrics(bigram_rs)
 ```
 
-```{r, dependson="ngramresoffline", include = FALSE, eval = !online}
+```{r, dependson="ngramresoffline", echo = FALSE, eval = !online}
 bigram_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_bigram_metrics.rds")
 ```
 
-```{r bigrammetrics, include = FALSE}
+```{r bigrammetrics, echo = FALSE}
 bigram_metrics <- read_rds("data/ml_reg_bigram_metrics.rds")
 bigram_metrics
 ```
@@ -682,7 +682,7 @@ list(`1` = unigram_rs,
        subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
 ```
 
-```{r, dependson="ngramrmseoffline", include = FALSE, eval = !online}
+```{r, dependson="ngramrmseoffline", echo = FALSE, eval = !online}
 list(`1` = unigram_rs, 
      `1 and 2` = bigram_rs, 
      `1, 2, and 3` = trigram_rs) %>%
@@ -691,7 +691,7 @@ list(`1` = unigram_rs,
   write_rds("data/ml_reg_ngram_results.rds")
 ```
 
-```{r ngramrmse, include = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
+```{r ngramrmse, echo = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
 ngram_results <- read_rds("data/ml_reg_ngram_results.rds")
 ngram_results %>%
   ggplot(aes(name, mean, fill = name)) +
@@ -740,7 +740,7 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
 lemma_rec
 ```
 
-```{r lemmarecoffline, dependson="scotussplit", include = FALSE, eval = !online}
+```{r lemmarecoffline, dependson="scotussplit", echo = FALSE, eval = !online}
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
@@ -786,13 +786,13 @@ lemma_rs %>%
        subtitle = "Performance metrics indicate that lemmatization improves model performance")
 ```
 
-```{r, dependson="scotuslemmavisoffline", include = FALSE, eval = !online}
+```{r, dependson="scotuslemmavisoffline", echo = FALSE, eval = !online}
 lemma_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_lemma_metrics.rds")
 ```
 
-```{r scotuslemmavis, include = FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
+```{r scotuslemmavis, echo = FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
 lemma_metrics <- read_rds("data/ml_reg_lemma_metrics.rds")
 lemma_metrics %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -819,13 +819,13 @@ lemma_rs %>%
   show_best("rmse")
 ```
 
-```{r, dependson="lemmatunersoffline", include = FALSE, eval = !online}
+```{r, dependson="lemmatunersoffline", echo = FALSE, eval = !online}
 lemma_rs %>%
   show_best("rmse") %>%
   write_rds("data/ml_reg_lemma_best.rds")
 ```
 
-```{r include = FALSE}
+```{r echo = FALSE}
 lemma_best <- read_rds("data/ml_reg_lemma_best.rds")
 lemma_best
 ```
