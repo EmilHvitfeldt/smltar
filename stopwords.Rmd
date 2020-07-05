@@ -14,23 +14,23 @@ Once we have split text into tokens, it often becomes clear that not all words c
 The concept of stop words has a long history with Hans Peter Luhn credited with coining the term in 1960 [@Luhn1960]. Examples of these words in English are "a", "the", "of", and "didn't". These words are very common and typically don't add much to the meaning of a text but instead ensure the structure of a sentence is sound. 
 
 ```{block, type = "rmdnote"}
-Thinking of words as being either informative or non-informative is quite limiting, and we prefer to consider words as having a more fluid or continuous amount of information associated with them. This informativeness is context specific as well. In fact, stop words themselves are often important in genre or authorship identification. 
+Categorizing words as either informative or non-informative is limiting, and we prefer to consider words as having a more fluid or continuous amount of information associated with them. This informativeness is context specific as well. In fact, stop words themselves are often important in genre or authorship identification. 
 ```
 
 Historically, one of the main reasons for removing stop words was to decrease computational time for text mining; it can be regarded as a dimensionality reduction of text data and was commonly used in search engines to give better results [@Huston2010].
 
 Stop words can have different roles in a corpus. We generally categorize stop words into three groups: global, subject, and document stop words. 
 
-Global stop words are words which are almost always non-informative in a given language; these are words such as "of" and "and" in English which are needed to glue text together. These words are likely a safe bet for removal but they are small in number. You can find some global stop words in pre-made stop word lists (Section \@ref(premadestopwords)).
+Global stop words are words which are almost always low in meaning in a given language; these are words such as "of" and "and" in English which are needed to glue text together. These words are likely a safe bet for removal but they are small in number. You can find some global stop words in pre-made stop word lists (Section \@ref(premadestopwords)).
 
 Next up are subject-specific stop words. These words are uninformative for a given subject area. Subjects can be broad like finance and medicine, or can be more specific like obituaries, health code violations, and job listings for librarians in Kansas.
-Words like "bath", "bedroom", and "entryway" are generally not considered stop words in English, but they don't provide very much information in suburban house listings and could be subject stop words for a certain analysis. You will likely need to manually construct such a stop word list (Section \@ref(homemadestopwords)). These kinds of stop words may improve your performance if you have the domain expertise to create a good list.
+Words like "bath", "bedroom", and "entryway" are generally not considered stop words in English, but they may not provide much information for differentiating suburban house listings and could be subject stop words for a certain analysis. You will likely need to manually construct such a stop word list (Section \@ref(homemadestopwords)). These kinds of stop words may improve your performance if you have the domain expertise to create a good list.
 
 Lastly, we have document stop words. These words do not provide any or much information for a given document. These are difficult to classify and won't be worth the trouble to identify. Even if you can find document stop words, it is not obvious how to incorporate this kind of information in a regression or classification task.
 
 ## Using premade stop word lists {#premadestopwords}
 
-A quick option for using stop words is to get a list that has already been created. This is appealing because it is not difficult, but be aware that not all lists are created equal. @nothman-etal-2018-stop found some alarming results in a study of 52 stop word lists available in open source software packages. Their unexpected findings included how different stop word lists have a varying number of words depending on the specificity of the list. Among some of the more grave issues were misspellings ("fify" instead of "fifty"), the inclusion of clearly informative words such as "computer" and "cry", and internal inconsistencies such as including the word "has" but not the word "does". This is not to say that you should never use a stop word list that has been included in an open source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn't changed since you used it last, and also to check that it is appropriate for your use case.
+A quick option for using stop words is to get a list that has already been created. This is appealing because it is not difficult, but be aware that not all lists are created equal. @nothman-etal-2018-stop found some alarming results in a study of 52 stop word lists available in open source software packages. Among some of the more grave issues were misspellings ("fify" instead of "fifty"), the inclusion of clearly informative words such as "computer" and "cry", and internal inconsistencies such as including the word "has" but not the word "does". This is not to say that you should never use a stop word list that has been included in an open source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn't changed since you used it last, and also to check that it is appropriate for your use case.
 
 There is a broad selection of stop word lists available today. For the purpose of this chapter we will focus on three of the lists of English stop words provided by the **stopwords** package [@R-stopwords]. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. The second is the English Snowball stop word list [@porter2001snowball], and the last is the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stop word lists are all considered general purpose and not domain specific.
 
@@ -43,7 +43,7 @@ length(stopwords(source = "snowball"))
 length(stopwords(source = "stopwords-iso"))
 ```
 
-The length of these lists are quite different, with the longest list being over seven times longer than the shortest! Let's examine the overlap of the words that appear in the three lists in an UpSet plot in Figure \@ref(fig:stopwordoverlap). An UpSet plot [@Lex2017] visualizes intersections and aggregates of intersections of sets using a matrix layout, presenting the number of elements as well as summary statistics.
+The length of these lists are quite different, with the longest list being over seven times longer than the shortest! Let's examine overlap of the words that appear in the three lists in an UpSet plot in Figure \@ref(fig:stopwordoverlap). An UpSet plot [@Lex2014] visualizes intersections and aggregates of intersections of sets using a matrix layout, presenting the number of elements as well as summary statistics.
 
 ```{r stopwordoverlap, echo=FALSE, fig.cap="Set intersections for three common stop word lists visualized as an UpSet plot"}
 library(UpSetR)
@@ -60,13 +60,13 @@ setdiff(stopwords(source = "snowball"),
         stopwords(source = "smart"))
 ```
 
-All these words are contractions. This is *not* because the SMART lexicon doesn't include contractions, because if we look there are almost fifty of them.
+All these words are contractions. This is *not* because the SMART lexicon doesn't include contractions; if we look, there are almost fifty of them.
 
 ```{r}
 str_subset(stopwords(source = "smart"), "'")
 ```
 
-We seem to have stumbled upon an inconsistency; why does SMART include `"he's"` but not `"she's"`? It is hard to say, but this would be worth rectifying before applying these stop word lists to an analysis or model preprocessing. It is likely that this stop word list was generated by selecting the most frequent words across a large corpus of text that had more representation for text about men than women. This is once again a reminder that we should always look carefully at any premade word list or other artifact we use to make sure it works well with our needs. 
+We seem to have stumbled upon an inconsistency; why does SMART include `"he's"` but not `"she's"`? It is hard to say, but this could be worth rectifying before applying these stop word lists to an analysis or model preprocessing. It is likely that this stop word list was generated by selecting the most frequent words across a large corpus of text that had more representation for text about men than women. This is once again a reminder that we should always look carefully at any premade word list or other artifact we use to make sure it works well with our needs. 
 
 ```{block, type = "rmdwarning"}
 It is perfectly acceptable to start with a premade word list and remove or append additional words according to your particular use case. 
@@ -125,7 +125,7 @@ tidy_fir_tree %>%
   labs(title = 'Most frequent tokens in "The Fir Tree"')
 ```
 
-We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see `"tree"` at 3, `"fir"` at 12 and `"little"` at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a **corpus** of documents, not individual documents. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well. 
+We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see `"tree"` at 3, `"fir"` at 12 and `"little"` at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a **corpus** of documents, not an individual document. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well. 
 
 ```{block, type = "rmdnote"}
 In NLP, a corpus is a set of texts or documents. The set of Hans Christian Andersen's fairy tales can be considered a corpus, with each fairy tale a document within that corpus. The set of United States Supreme Court opinions can be considered a different corpus, with each written opinion being a document within *that* corpus.
@@ -152,13 +152,13 @@ hcandersen_en %>%
 
 This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine apriori how many different "meaningless" words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose. 
 
-It is worth keeping in mind that such a list is not perfect. Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased since all the fairy tales were written by the same European white male from the early 1800s. 
+It is worth keeping in mind that such a list is not perfect. Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased. In our example here, all the fairy tales were written by the same European white man from the early 1800s. 
 
 ```{block, type = "rmdnote"}
 This bias can be minimized by removing words we would expect to be over-represented or to add words we expect to be under-represented.
 ```
 
-Easy examples are to include the complements to the words in the lists if they are not present. Include `"big"` if `"small"` is present, `"old"` if `"young"` is present. This example list has words associated with women often listed lower in rank than words associated with men. With `"man"` being at rank 79 but `"woman"` at rank `r hcandersenr::hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()`, choosing a threshold of 100 would lead to only one of these words being included. Depending on how important you think such nouns are going to be in your texts, consider either adding `"woman"` or deleting `"man"`.^[On the other hand, the more biased stop word list may be helpful when modeling a corpus with gender imbalance, depending on your goal; words like "she" and "her" can identify where women are mentioned.]
+Easy examples are to include the complements to the words in the list if they are not already present. Include "big" if "small" is present, "old" if "young" is present. This example list has words associated with women often listed lower in rank than words associated with men. With `"man"` being at rank 79 but `"woman"` at rank `r hcandersenr::hcandersen_en %>% unnest_tokens(word, text) %>% count(word, sort = TRUE) %>% pull(word) %>% magrittr::equals("woman") %>% which()`, choosing a threshold of 100 would lead to only one of these words being included. Depending on how important you think such nouns are going to be in your texts, consider either adding `"woman"` or deleting `"man"`.^[On the other hand, the more biased stop word list may be helpful when modeling a corpus with gender imbalance, depending on your goal; words like "she" and "her" can identify where women are mentioned.]
 
 Figure \@ref(fig:genderrank) shows how the words associated with men have higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.
 
@@ -200,13 +200,13 @@ gender_words_plot %>%
   scale_color_distiller(type = "div", limit = limit) +
   guides(color = "none") +
   theme(panel.border = element_blank(), panel.grid.major.x = element_blank()) +
-  labs(x = NULL, y = "Word Rank (log scale)") +
-  labs(title = "Masculine gendered words appeared more often in H.C. Andersen's fairy tales")
+  labs(x = NULL, y = "Word rank (log scale)") +
+  labs(title = "Masculine gendered words appear more often in H.C. Andersen's fairy tales")
 ```
 
 Imagine now we would like to create a stop word list that spans multiple different genres, in such a way that the subject-specific stop words don't overlap. For this case, we would like words to be denoted as a stop word only if it is a stop word in all the genres. You could find the words individually in each genre and use the right intersections. However, that approach might take a substantial amount of time.
 
-Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the [inverse document frequency](https://www.tidytextmining.com/tfidf.html) (IDF) of each word. The *inverse document frequency* of a word is a quantity that is low for commonly used words and high for words not used often in a collection of documents. It is typically defined as
+Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the [*inverse document frequency*](https://www.tidytextmining.com/tfidf.html) (IDF) of each word. The inverse document frequency of a word is a quantity that is low for commonly used words in a collection of documents and high for words not used often in a collection of documents. It is typically defined as
 
 $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$
 
@@ -273,7 +273,7 @@ This time we get better results. The list starts with "a", "the", "and", and "to
 
 ## All stop word lists are context specific
 
-Since context is so important in text modeling, it is important to make sure that the stop word list you use reflects the word space that you are planning on using it on. One common concern to consider is how pronouns bring information to your text. Pronouns are included in many different stop word lists (although inconsistently) and they will often *not* be noise in text data.
+Context is important in text modeling, so it is important to ensure that the stop word lexicon you use reflects the word space that you are planning on using it in. One common concern to consider is how pronouns bring information to your text. Pronouns are included in many different stop word lists (although inconsistently) but they will often *not* be noise in text data.
 
 On the other hand, sometimes you will have to add in words yourself, depending on the domain. If you are working with texts for dessert recipes, certain ingredients (sugar, eggs, water) and actions (whisking, baking, stirring) may be frequent enough to pass your stop word threshold, but it's possible you will want to keep them as they may be informative. Throwing away "eggs" as a common word would make it harder or downright impossible to determine if certain recipes are vegan or not, while whisking and stirring may be fine to remove as distinguishing between recipes that do and don't require a whisk might not be that big of a deal.
 
@@ -310,7 +310,7 @@ plotting_data %>%
        subtitle = "Each vertical trio of points represents an H.C. Andersen fairy tale")
 ```
 
-We notice, as we would predict, that larger stop word lists remove more words then shorter stop word lists. In this example with fairy tales, over half of the words have been removed, with the largest list removing over 80% of the words. We observe that shorter texts have a lower percentage of stop words. Since we are looking at fairy tales, this could be explained by the fact that a story has to be told regardless of the length of the fairy tale, so shorter texts are going to be more dense with more informative words.
+We notice, as we would predict, that larger stop word lists remove more words than shorter stop word lists. In this example with fairy tales, over half of the words have been removed, with the largest list removing over 80% of the words. We observe that shorter texts have a lower percentage of stop words. Since we are looking at fairy tales, this could be explained by the fact that a story has to be told regardless of the length of the fairy tale, so shorter texts are going to be more dense with more informative words.
 
 Another problem you may face is dealing with misspellings. 
 
@@ -320,15 +320,15 @@ Most premade stop word lists assume that all the words are spelled correctly.
 
 Handling misspellings when using premade lists can be done by manually adding common misspellings. You could imagine creating all words that are a certain string distance away from the stop words, but we do not recommend this as you would quickly include informative words this way.
 
-One of the downsides of creating your own stop word lists using frequencies is that you are limited to using words that you have already observed. It could happen that `"she'd"` is included in your training corpus but the word `"he'd"` did not reach the threshold This is a case where you need to look at your words and adjust accordingly. Here the large premade stop word lists can serve as inspiration for missing words.
+One of the downsides of creating your own stop word lists using frequencies is that you are limited to using words that you have already observed. It could happen that "she'd" is included in your training corpus but the word "he'd" did not reach the threshold. This is a case where you need to look at your words and adjust accordingly. Here the large premade stop word lists can serve as inspiration for missing words.
 
-In Section \@ref(casestudystopwords) we investigate the influence of removing stop words in the context of modeling. Given the right list of words, you see no harm to the model performance, and may even see improvement in result due to noise reduction [@Feldman2007].
+In Section \@ref(casestudystopwords) we investigate the influence of removing stop words in the context of modeling. Given the right list of words, we see no harm to the model performance, and may even find improvement in due to noise reduction [@Feldman2007].
 
 ## Stop words in languages other than English
 
-So far in this chapter, we have been spent the majority of the time on the English language, but English is not representative of every language. The stop word lists we examined in this chapter have been English and the notion of "short" and "long" lists we have used here are specific to English as a language. You should expect different languages to have a varying number of "uninformative" words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.
+So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of "short" and "long" lists we have used so far are specific to English as a language. You should expect different languages to have a different number of "uninformative" words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.
 
-Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are a couple of diagrams showing the use of definite and indefinite articles in German. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered as stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German or any other language where the grammatical case is reflected in the text.
+Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are a couple of diagrams showing the use of definite and indefinite articles in German. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.
 
 ```{r, echo=FALSE}
 library(magrittr)
