@@ -48,7 +48,7 @@ tidy_fir_tree %>%
   count(stem, sort = TRUE)
 ```
 
-Take a look at those stems. Notice that we do now have 88 incidences of "tree". Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both "story" and "stories" as "stori", not a regular English word but instead a special stem object.
+Take a look at those stems. Notice that we do now have 88 incidences of `"tree"`. Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both `"story"` and `"stories"` as `"stori"`, not a regular English word but instead a special stem object.
 
 ```{block2, type = "rmdnote"}
 If you want to tokenize *and* stem your text data, you can try out the function `tokenize_word_stems()` from the tokenizers package, which implements Porter stemming just like what we demonstrated here. For more on tokenization, see Chapter \@ref(tokenization).
@@ -89,7 +89,7 @@ tidy_by_lang %>%
   ungroup %>%
   ggplot(aes(n, fct_reorder(stem, n), fill = language)) +
   geom_col(show.legend = FALSE) +
-  facet_wrap(~language, scales = "free_y") +
+  facet_wrap(~language, scales = "free_y", ncol = 2) +
   labs(x = "Frequency", y = NULL)
 ```
 
@@ -164,7 +164,7 @@ Most common stemming algorithms you are likely to encounter will successfully re
 - likely, like, liking
 - university and universe
 
-In a supervised machine learning context, this affects a model's positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter \@ref(classification), we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model's ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints _not_ about mortgages, correctly.
+In a supervised machine learning context, this affects a model's positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter \@ref(mlclassification), we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model's ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints _not_ about mortgages, correctly.
 
 ## Understand a stemming algorithm
 
