@@ -11,19 +11,16 @@ theme_set(theme_light())
 online <- TRUE
 ```
 
-In the last section, we talked about the many ways preprocessing affects the numerical representation of the text. 
-In and the following chapters will we use these numerical representation of the data to aid the prediction of some quantity.
-This chapter focuses on classification, which is the act of assigning an observation to one or more labels.
+In the previous chapter, we focused on using modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For example, let's consider the dataset of consumer complaints submitted to the US Consumer Finance Protecton Bureau. The dataset contains a text field with the complaint along with information regarding what it was for,
+how it was filed, and the response. 
+In this chapter, we will build models to predict what type of product the complaints are referring to, a label or categorical variable. 
+
 
 ## A first classification model {#classfirstattemptlookatdata}
 
-We are going to be working with US consumer complaints on financial products and company responses.
-It contains a text field containing the complaint along with information regarding what it was for,
-how it was filed and the response. 
-In this chapter, we will try to predict what type of product the complaints are referring to. 
-We will for the duration of this chapter limit ourselves to binary classification and will see if a complaint is about "Credit reporting, credit repair services, or other personal consumer reports" or not.
+For most of this chapter, we will focus on binary classification and whether a submitted complaint is about "Credit reporting, credit repair services, or other personal consumer reports" or not.
 
-We can read in the complaint data \@ref(us-consumer-finance-complaints) with `read_csv()`.
+Let's read in the complaint data (\@ref(us-consumer-finance-complaints)) with `read_csv()`.
 
 ```{r complaints, message=FALSE}
 library(textrecipes)
@@ -36,7 +33,7 @@ library(readr)
 complaints <- read_csv("data/complaints.csv.gz")
 ```
 
-then we will start by taking a quick look at the data to see what we have to work with
+We can start by taking a quick `glimpse()` at the data to see what we have to work with.
 
 ```{r, dependson="complaints"}
 glimpse(complaints)
