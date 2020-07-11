@@ -6,7 +6,8 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
                tidy = "styler", fig.width = 8, fig.height = 5)
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
-quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
+library(quanteda)
+quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 
 ## for Julia's local environment
 ## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
@@ -75,7 +76,7 @@ tidy_by_lang <- hca_fairytales() %>%
 
 Then we can remove stop words (using `get_stopwords(language = "da")` and similar for each language) and stem with the language-specific Porter algorithm. What are the top 20 stems for "The Fir-Tree" in each of these five languages, after removing the Snowball stop words for that language?
 
-```{r porterlanguages, dependson="tidybylang", fig.width=10, fig.height=7, fig.cap="Porter stemming results in five languages"}
+```{r porterlanguages, dependson="tidybylang", fig.height=10, fig.width=7, fig.cap="Porter stemming results in five languages"}
 tidy_by_lang %>%
   inner_join(stopword_df) %>%
   mutate(data = map2(
