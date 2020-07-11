@@ -1028,30 +1028,31 @@ To do this will we use `step_textfeature()` to calculate custom text features fo
 We create a list of the custom text features we want to include and pass it to `step_textfeature()` using the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
 
-
 ```{r complaintrecfinal2, dependson="complaintrecfinal1"}
-extract_funs <- list(creditcard_count, procent_censoring, max_money)
+extract_funs <- list(creditcard_count = creditcard_count, 
+                     procent_censoring = procent_censoring, 
+                     max_money = max_money)
 
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_mutate(narrative_copy = consumer_complaint_narrative) %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization and stop word removal will commence like normal, however, this time will we count bi-grams instead of unigrams.
+The tokenization and stop word removal will commence like normal, however, this time will we include trigrams, bigrams and unigrams in the model.
 Last time we only included 100 tokens which aren't that many. 
 Let us treat the number of parameters as a hyperparameter that we will vary when we tune the final model.
 I have also set the `min_times` argument to 50, this will throw away tokens if they appeared less then 50 times in the entire corpus.
 We want the model to be robust and a token needs to appear a certain number of times before it turns from noise to signal.
 
 ```{block, type = "rmdnote"}
-This dataset has much more than 50 of the most common 1000 tokens. It is still a good practice to specify to be safe. 50 is also an arbitrary choice and needs to be picked depending on your preferences on the robustness of your model.
+This dataset has much more than 50 of the most common 2000 tokens. It is still a good practice to specify to be safe. 50 is also an arbitrary choice and needs to be picked depending on your preferences on the robustness of your model.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
-  step_ngram(consumer_complaint_narrative, num_tokens = 2) %>%
+  step_ngram(consumer_complaint_narrative, num_tokens = 3, min_num_tokens = 1) %>%
   step_tokenfilter(consumer_complaint_narrative, 
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1074,7 +1075,7 @@ We create a grid of possible hyperparameter values using `grid_regular()` from t
 The levels is set to 5 to give us 5 possible values of the maximum number of tokens.
 
 ```{r}
-param_grid <- grid_regular(max_tokens(range = c(250, 1500)),
+param_grid <- grid_regular(max_tokens(range = c(500, 2000)),
                            levels = 5)
 
 param_grid
