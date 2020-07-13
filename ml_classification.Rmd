@@ -808,7 +808,7 @@ max_money(dollar_texts)
 
 Now that we have created some feature engineering functions, we can use them to (hopefully) make our classification model better.
 
-## Case Study: feature hashing
+## Case study: feature hashing
 
 So far we have been very specific with creating the tokens to have meaning and be different from each other when they need to be.
 A second consideration is how we are going to represent these values in our final data.
@@ -964,9 +964,9 @@ Luckily this is easily fixed by using `stri_trans_nfc()` on our text columns bef
 
 ## What evaluation metrics are appropriate?
 
-We have so far used [accuracy](https://en.wikipedia.org/wiki/Accuracy_and_precision#In_binary_classification) and the area under the receiver operator curve (roc_auc) for hours models so far, these are the defaults used in classification tasks in tidymodels. These are not the only kind of metrics you can use and the choise will depend on how much you value false positives and false negatives.
+We have focused on using accuracy and ROC AUC as metrics for our classification models so far, along with sensitivity and specificity in Section \@ref(comparetosvm). These are not the only classification metrics available and your choice will often depend on how much you care about false positives compared to false negatives.
 
-If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for recall (`recall`) and precision (`precision`).
+If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`.
 
 ```{r, eval = FALSE}
 nb_rs <- fit_resamples(
@@ -978,14 +978,14 @@ nb_rs <- fit_resamples(
 
 If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. 
 
-Let's go back to the lasso model we tuned in Section \@ref(classfirstmodel), with results in `nb_rs`. We can compute the [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
+Let's go back to the naive Bayes model we tuned in Section \@ref(classfirstmodel), with predictions stored in `nb_rs_predictions`. We can compute the overall [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
 
 ```{r}
 nb_rs_predictions %>%
   recall(product, .pred_class)
 ```
 
-We can also compute the recall for each resample by using `group_by()` to calculate inside each resample.
+We can also compute the recall for each resample using `group_by()`.
 
 ```{r}
 nb_rs_predictions %>%
@@ -993,8 +993,8 @@ nb_rs_predictions %>%
   recall(product, .pred_class)
 ```
 
-Many of the matrics used for classification is some function of the true positive, true negative, false positive and false negative rates. 
-We can take a look at the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix) to look at the contingency table between observed classes and predicted classes.
+Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
+The confusion matrix, the contingency table of observed classes and predicted classes, gives us information on these rates directly.
 
 ```{r}
 nb_rs_predictions %>%
@@ -1002,31 +1002,31 @@ nb_rs_predictions %>%
   conf_mat(product, .pred_class)
 ```
 
-It is possible to archive high accuracy with a bad model just by predicting the majority class. This is not favorable as we are not using any information from the data to guide our predictions.
+It is possible with many datasets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
 
 ```{block, type = "rmdnote"}
-For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
+For the full set of classification metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
 ```
 
 
-## The full game
+## The full game: classification
 
-We have come a long way since our first model \ref(classfirstmodel) and it is time to see how we can use what we have learned about our data to improve it.
-We started this chapter with a simple Naive Bayes model and n-gram counts.
-Since then have we looked at different models, preprocessing techniques, and domain-specific feature extractions.
-For our final model, let's use some of the domain-specific features we developed in \@ref(custumfeatures) along with n-grams. The model we are using doesn't have any significant hyperparameters we can tune but we can tune the number of tokens we will include in our model. For this final model will we:
+We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
+We started this chapter with a simple naive Bayes model and n-gram token counts.
+Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
+For our final model, let's use some of the domain-specific features we developed in Section \@ref(custumfeatures) along with n-grams. Our model doesn't have any significant hyperparameters to tune but we will tune the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - tune the number of tokens used in the model,
-- include bigrams,
-- include custom made features,
-- remove the Snowball stop word lexicon,
+- include trigrams, bigrams, and unigrams,
+- include custom-engineered features,
+- remove the Snowball stop word lexicon, and
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
 
-We start by creating a new recipe. 
-We are using the same predictors as the first time and the way we are handling `date_received` and `tags` will stay the same.
+We start by creating a new preprocessing recipe. 
+Let's use the same predictors and handle `date_received` and `tags` in the same way.
 
 ```{r complaintrecfinal1, dependson="complaintssplit"}
 complaints_rec_v2 <- 
@@ -1039,9 +1039,9 @@ complaints_rec_v2 <-
   step_dummy(tags)
 ```
 
-After exploring the data more in \ref(custumfeatures) it seems appropriate to add these features in our final model.
-To do this will we use `step_textfeature()` to calculate custom text features for our data. 
-We create a list of the custom text features we want to include and pass it to `step_textfeature()` using the `extract_functions` argument. 
+After exploring this text data more in Section \@ref(custumfeatures), we want to add these custom features to our final model.
+To do this, we use `step_textfeature()` to compute custom text features. 
+We create a list of the custom text features and pass this list to `step_textfeature()` via the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
 
 ```{r complaintrecfinal2, dependson="complaintrecfinal1"}
@@ -1054,14 +1054,13 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization and stop word removal will commence like normal, however, this time will we include trigrams, bigrams and unigrams in the model.
-Last time we only included 100 tokens which aren't that many. 
-Let us treat the number of parameters as a hyperparameter that we will vary when we tune the final model.
-I have also set the `min_times` argument to 50, this will throw away tokens if they appeared less then 50 times in the entire corpus.
-We want the model to be robust and a token needs to appear a certain number of times before it turns from noise to signal.
+The tokenization and stop word removal will be similar to the other models in this chapter, but this time we'll include trigrams, bigrams, and unigrams in the model.
+In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
+Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
+We want our model to be robust and a token needs to appear enough times before we include it.
 
 ```{block, type = "rmdnote"}
-This dataset has much more than 50 of the most common 2000 tokens. It is still a good practice to specify to be safe. 50 is also an arbitrary choice and needs to be picked depending on your preferences on the robustness of your model.
+This dataset has many more than 50 of the most common 2000 tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
@@ -1074,11 +1073,9 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
-### Specifying models
+### Specify the model
 
-We will be using the Support Vector Machine model since it showed some promise in \@ref(comparetosvm).
-
-We can reuse parts of the old workflow and simply update the recipe specificatioon
+We use the Support Vector Machine model since it performed well in Section \@ref(comparetosvm). We can reuse parts of the old workflow and update the recipe specification.
 
 ```{r nbwf2, dependson=c("svmspec", "complaintrecfinal3")}
 svm_wf_v2 <- svm_wf %>%
@@ -1087,8 +1084,8 @@ svm_wf_v2 <- svm_wf %>%
 svm_wf_v2
 ```
 
-We create a grid of possible hyperparameter values using `grid_regular()` from the dials package. 
-The levels is set to 5 to give us 5 possible values of the maximum number of tokens.
+Let's create a grid of possible hyperparameter values using `grid_regular()` from the dials package. 
+With `levels = 5`, we have five possible values to try for the maximum number of tokens to include in the model.
 
 ```{r}
 param_grid <- grid_regular(max_tokens(range = c(500, 2000)),
@@ -1096,6 +1093,8 @@ param_grid <- grid_regular(max_tokens(range = c(500, 2000)),
 
 param_grid
 ```
+
+Now it's time to set up our tuning grid. Let’s save the predictions so we can explore them in more detail, and let's also set the same custom metrics for this SVM model.
 
 ```{r, message=FALSE, eval=!online}
 set.seed(2020)
@@ -1117,14 +1116,18 @@ write_rds(tune_rs, "data/ml_class_final_tune.rds")
 tune_rs <- read_rds("data/ml_class_final_tune.rds")
 ```
 
-now that the hyper parameter tuning is finished we can take a look at the best performing sets
+We have fitted these classification models!
+
+### Evaluate the modeling
+
+Now that the tuning is finished, we can take a look at the best performing results.
 
 ```{r}
 show_best(tune_rs, metric = "accuracy")
 ```
 
-it appears that 550 tokens is a good middleground before we get to overfitting.
-We can extract the best hyperparameters and use it to finalize the workflow by setting the
+We see that `r select_best(tune_rs, metric = "accuracy") %>% pull(max_tokens)` tokens is a good middle ground before we start to overfit.
+We can extract the best hyperparameter and use it to finalize the workflow.
 
 ```{r}
 best_accuracy <- select_best(tune_rs, "accuracy")
@@ -1137,14 +1140,24 @@ svm_wf_final <- finalize_workflow(
 svm_wf_final
 ```
 
-lastly, we will do a list fit and see how well the final model did on our testing data:
+The `svm_wf_final` workflow now has a finalized value for `max_tokens`.
+
+We can now fit this finalized workflow on training data. For example, **TODO model-agnostic variable importance**
+
+Finally, let's return to our testing data.
+
+```{block, type = "rmdwarning"}
+The test set is a precious resource that can only be used to estimate performance of your final model on new data. We did not use the test set to compare or tune models, but we use it now that our model is finalized.
+```
+
+We can use the function `last_fit()` to **fit** our model to our training data and **evaluate** our model on our testing data.
 
 ```{r finalres}
 final_res <- svm_wf_final %>%
   last_fit(complaints_split, metrics = metric_set(accuracy))
 ```
 
-We will again extract the relevant information using `collect_metrics()` and `collect_predictions()`
+Let's explore our results using `collect_metrics()` and `collect_predictions()`.
 
 ```{r finalresmetrics, dependson="finalres", eval = !online}
 final_res_metrics <- collect_metrics(final_res)
@@ -1161,17 +1174,17 @@ final_res_metrics <- read_rds("data/ml_class_final_res_metrics.rds")
 final_res_predictions <- read_rds("data/ml_class_final_res_predictions.rds")
 ```
 
-If we take a look at the metrics we did pretty good
+How does the final model performance on the testing data look?
 
 ```{r}
 final_res_metrics
 ```
 
-And it is worth noting that it isn't much different from what we saw in the training dataset. This is good and an indication that our model was able to generalize well enough.
+This is pretty good, and we note that this result is close to what we saw from the training dataset. This is an indication that our model is not overfit and is able to generalize well enough.
 
-Taking a look at the confusion matrix in figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence in the diagonal showing us that there isn't any strong bias one towards either of the classes.
+The confusion matrix on the testing data in Figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn't any strong bias towards either of the classes.
 
-```{r, finalheatmap, fig.cap="Confusion matrix for final Support Vector Machine classifier"}
+```{r, finalheatmap, fig.cap="Confusion matrix on the test set for final Support Vector Machine classifier"}
 final_res_predictions %>% 
   conf_mat(truth = product, estimate = .pred_class) %>%
   autoplot(type = "heatmap")
@@ -1179,18 +1192,17 @@ final_res_predictions %>%
 
 ## Summary
 
-You can use classification modeling to predict classes from a dataset, including datasets that have text in them.
-Naive Bayes models perform reasonably well since each feature and token is handled independently and can, therefore, handle many variables with computationally ease.
-This is a useful feature as we sometimes want thousands of tokens in our bag-of-word model.
-We also saw that Support Vector Machines performed well with keeping the classes separated.
-We also saw how handcrafted features can help improve your model.
-By using resampling data sets of the training set can we explore the space of hyperparameters to find the most performant model all without using the testing dataset. Keeping the testing dataset for a final evaluation.
+You can use classification modeling to predict labels or categorical variables from a dataset, including datasets that include text.
+Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
+This is important as bag-of-word text models can involve thousands of tokens.
+We also saw that Support Vector Machine models perform well for text data.
+Your own domain knowledge about your text data is incredibly valuable, and using that knowledge in careful engineering of custom features can improve your model.
 
 ### In this chapter, you learned:
 
-- how text can be used to enhance a classification model
-- to tune the hyperparameters in the preprocessing stage
+- how text data can be used in a classification model
+- to tune hyperparameters in the data preprocessing stage
 - how to compare different model types
 - how feature hashing can be used as a fast alternative to bag-of-words
-- about how to look at the data and construct custom features
+- about engineering custom features for machine learning
 - about performance metrics for classification models
