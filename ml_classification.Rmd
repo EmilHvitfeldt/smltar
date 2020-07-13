@@ -50,7 +50,7 @@ It is always a good idea to look at your data, as much as possible. Here is the 
 head(complaints$consumer_complaint_narrative)
 ```
 
-The complaint narratives contain many series of capital `"X"`'s. These strings (like `"XX/XX"` or `"XXXX XXXX XXXX XXXX"`) are used to to protect personally identifiable information (PII) in this publically available dataset. This is not a universal censoring mechanism and can vary from source to source; hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
+The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publically available dataset. This is not a universal censoring mechanism and can vary from source to source; hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
 
 We also see that monetary amounts are surrounded by curly brackets (like `"{$21.00}"`); this is another text preprocessing step that has been taken care of for us. We can craft a regular expression to extract all the dollar amounts.
 
@@ -527,14 +527,14 @@ We can look at different models or model engines that might be able to more easi
 
 Now that we have an idea of where the model isn't working, we can look more closely at the data to create features that could distinguish between these classes. In Section \@ref(custumfeatures) will we demonstrate how you can create custom features.
 
-## Case study: what happens if you don't censor your data?
+## Case study: data censoring
 
-The complaints data already have sensitive information censored out with XXXX and XX.
-This can be seen as a kind of annotation, we don't get to know the specific account numbers and birthday which would be mostly unique anyways and filtered out.
+The complaints dataset already has sensitive information (PII) censored or protected using strings such as "XXXX" and "XX".
+This data censoring can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
 
-In figure \@ref(fig:censoredtrigram) below we have is the most frequent trigrams [#tokenizing-by-n-grams] from our training dataset.
+Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizing-by-n-grams)) in our training dataset.
 
-```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored words"}
+```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored information"}
 complaints_train %>%
   slice(1:1000) %>%
   unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
@@ -548,11 +548,11 @@ complaints_train %>%
   labs(y = "Trigrams", x = "Count")
 ```
 
-As you see the vast majority includes one or more censored words.
-Not only does the most used trigrams include some kind of censoring, 
-but the censored words include some signal as they are not used uniformly between the products.
-In the following figure \@ref(fig:trigram25), we take the top 25 most frequent trigrams that includes one of more censoring,
-and plot the proportions of the usage in "Credit" and "Other".
+The vast majority of trigrams in Figure \@ref(fig:censoredtrigram) include one or more censored words.
+Not only do the most used trigrams include some kind of censoring, 
+but the censoring itself is informative as it is not used uniformly across the product classes.
+In Figure \@ref(fig:trigram25), we take the top 25 most frequent trigrams that include censoring,
+and plot the proportions for "Credit" and "Other".
 
 ```{r trigram25, fig.cap="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class"}
 top_censored_trigrams <- complaints_train %>%
@@ -574,14 +574,13 @@ plot_data %>%
   geom_col(position = "fill")
 ```
 
-There is a good spread in the proportions, tokens like "on xx xx" and "of xx xx" are used when referencing to a date, eg "we had a problem on 06/25 2012".
-Remember that the current tokenization engine strips the punctuation before tokenizing. 
-This means that the above examples are being turned into "we had a problem on 06 25 2012" before creating n-grams.
+There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
+Remember that the current tokenization engine strips punctuation before tokenizing. 
+This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams.
 
-We can as a practical example replace all cases of XX and XXXX with random integers to crudely simulate what the data might look like before it was censored. 
-This is going a bit overboard since dates will be given values between 00 and 99 which would not be right, 
-and that we don't know if only numerics have been censored.
-Below is a simple function `uncesor_vec()` that locates all instances of `XX` and replaces them with a number between 11 and 99.
+To crudely simulate what the data might look like before it was censored, we can replace all cases of "XX" and "XXXX" with random integers. 
+This isn't quite right since dates will be given values between `00` and `99` and we don't know for sure that only numerals have been censored, but it gives us a place to start.
+Below is a simple function `uncensor_vec()` that locates all instances of `"XX"` and replaces them with a number between 11 and 99.
 We don't need to handle the special case of `XXXX` as it automatically being handled.
 
 ```{r uncensor_vec}
@@ -601,13 +600,13 @@ uncensor_vec <- function(x) {
 }
 ```
 
-And we can run a quick test to see if it works.
+We can run a quick test to see how it works.
 
 ```{r, dependson="uncesor_vec"}
 uncensor_vec("In XX/XX/XXXX I leased a XXXX vehicle")
 ```
 
-Now we try to produce the same chart as \@ref(fig:censoredtrigram) but with the only difference being that we apply our uncensoring function to the text before tokenizing.
+Now we can produce the same visualization as Figure \@ref(fig:censoredtrigram) but also applying our uncensoring function to the text before tokenizing.
 
 ```{r uncensoredtrigram, dependson=c("complaintssplit", "uncensor_vec"), fig.cap="Trigrams without numbers float to the top as the uncensored tokens are too spread out"}
 complaints_train %>%
@@ -624,30 +623,32 @@ complaints_train %>%
   labs(y = "Trigrams", x = "Count")
 ```
 
-The same trigrams that appear in the last chart appeared in this one as well, 
-but none of the uncensored words appear in the top which is what is to be expected.
-This is expected because while `xx xx 2019` appears towards the top in the first as it indicates a date in the year 2019, having that uncensored would split it into 365 buckets.
-Having dates being censored gives more power to pick up the signal of a date as a general construct giving it a higher chance of being important.
-But it also blinds us to the possibility that certain dates and months are more prevalent.
+Here in Figure \@ref(fig:uncensoredtrigram), we see the same trigrams that appeared in Figure \@ref(fig:censoredtrigram).
+However, none of the uncensored words appear, because of our uncensoring function.
+This is expected, because while `"xx xx 2019"` appears in the first plot indicating a date in the year 2019, after we uncensor it, it is split into 365 buckets (actually more, since we used numerical values between `00` and `99`).
+Censoring the dates in these complaints gives more power to a date as a general construct.
 
-We have talked a lot about censoring data in this section.
-Another way to look at this is a form of preprocessing in your data pipeline.
-It is very unlikely that you want any specific person's social security number, credit card number or any other kind of personally identifiable information ([PII](https://en.wikipedia.org/wiki/Personal_data)) imbedded into your model.
-Not only is it likely to provide a useful signal as they appear so rarely and most likely highly correlated with other known variables in your database.
-More importantly, that information can become embedded in your model and begin to leak if you are not careful as showcased by @carlini2018secret, @Fredrikson2014 and @Fredrikson2015.
-Both of these issues are important, and one of them could land you in a lot of legal trouble if you are not careful. 
-
-If for example, you have a lot of social security numbers you should definitely not pass them on to your model, but there is no hard in annotation the presence of a social security number. 
-Since a social security number has a very specific form we can easily construct a regular expression \@ref(regexp) to locate them.
-
-```{block, type = "rmdnote"}
-A social security number comes in the form AAA-BB-CCCC where AAA is a number between 001 and 899 excluding 666, BB is a number between 01 and 99 and CCCC is a number between 0001 and 9999. This gives us the following regex
-
-(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}
+```{block, type = "rmdwarning"}
+What happens when we use these censored dates as a feature in supervised machine learning? We have a higher chance of understanding if dates in the complaint text are important to predicting the class, but we are blinded to the possibility that certain dates and months are more important.
 ```
 
-We can use a replace function to replace it with something that can be picked up by later preprocessing steps. 
-A good idea is to replace it with a "word" that won't be accidentally broken up by a tokenizer.
+Data censoring can be a form of preprocessing in your data pipeline.
+For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model.
+Such values appear rarely and are most likely highly correlated with other known variables in your dataset.
+More importantly, that information can become embedded in your model and begin to leak as demonstrated by @carlini2018secret, @Fredrikson2014, and @Fredrikson2015.
+Both of these issues are important, and one of them could land you in a lot of legal trouble. 
+
+If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the _presence_ of a social security number. 
+Since a social security number has a very specific form, we can easily construct a regular expression (Appendix \@ref(regexp)) to locate them.
+
+```{block, type = "rmdnote"}
+A social security number comes in the form `AAA-BB-CCCC` where `AAA` is a number between `001` and `899` excluding `666`, `BB` is a number between `01` and `99` and `CCCC` is a number between `0001` and `9999`. This gives us the following regex:
+
+`(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}`
+```
+
+We can use a function to replace each social security number with an indicator that can be detected later by preprocessing steps. 
+It's a good idea to use a "word" that won't be accidentally broken up by a tokenizer.
 
 ```{r}
 ssn_text <- c("My social security number is 498-08-6333",
@@ -661,7 +662,7 @@ str_replace_all(string = ssn_text,
                 replacement = "ssnindicator")
 ```
 
-This technique isn't just useful for personally identifiable information but can be used anytime you want to intentionally but similar words in the same bucket, hashtags, emails, and usernames can sometimes also benefit from being annotated.
+This technique isn't useful only for personally identifiable information but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
 
 ## Case study: adding custom features {#custumfeatures}
 
