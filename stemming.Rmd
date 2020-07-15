@@ -7,7 +7,6 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 library(quanteda)
-quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 
 ## for Julia's local environment
 ## spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
@@ -134,7 +133,7 @@ tidy_scotus %>%
 
 There are `r scales::comma(n_distinct(tidy_scotus$word))` distinct words in this dataset we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [quanteda](https://cran.r-project.org/package=quanteda) package).
 
-```{r dependson="tidy_scotus"}
+```{r dependson="tidy_scotus", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
 tidy_scotus %>%
   count(case_name, word) %>%
   cast_dfm(case_name, word, n)
@@ -144,7 +143,7 @@ Look at the sparsity of this matrix. It's high! Think of this sparsity as the sp
 
 What if instead we use stemming as a preprocessing step here?
 
-```{r dependson="tidy_hca"}
+```{r dependson="tidy_hca", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
 tidy_scotus %>%
   mutate(stem = wordStem(word)) %>%
   count(case_name, stem) %>%
