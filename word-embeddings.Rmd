@@ -7,7 +7,6 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
-quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 ``` 
 
 > You shall know a word by the company it keeps.
@@ -15,7 +14,7 @@ quanteda::quanteda_options(print_dfm_max_ndoc = 0, print_dfm_max_nfeat = 0)
 
 So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling. An example of such a data structure is a sparse matrix. Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), we would start with straightforward word counts. Let's create a sparse matrix where the matrix elements are the counts of words in each document.
 
-```{r complaints}
+```{r complaints, R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
 library(tidyverse)
 library(tidytext)
 library(SnowballC)
@@ -38,7 +37,7 @@ $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents co
 
 These two quantities can be combined to calculate a term's [tf-idf](https://www.tidytextmining.com/tfidf.html) (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
 
-```{r dependson="complaints"}
+```{r dependson="complaints", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
 complaints %>% 
   unnest_tokens(word, consumer_complaint_narrative) %>% 
   anti_join(get_stopwords()) %>%  
