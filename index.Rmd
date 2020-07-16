@@ -37,14 +37,18 @@ Modeling as a statistical practice can encompass a wide variety of activities. T
 
 Supervised machine learning using text data involves building a statistical model to estimate some output from input that includes language. The two types of models we train in this book are regression and classification. Think of regression models as predicting numeric or continuous outputs, such as predicting the year of a United States Supreme Court opinion from the text of that opinion. Think of classification models as predicting outputs that are discrete quantities or class labels, such as predicting whether a GitHub issue is about documentation or not from the text of the issue. Models like these can be used to make predictions for new observations, to understand what features or characteristics contribute to differences in the output, and more. We can evaluate our models using performance metrics to determine which are best, which are acceptable for our specific context, and even which are fair.
 
-Text data is important for many domains, from healthcare to marketing to the digital humanities, but specialized approaches are necessary to create features (predictors) for machine learning from language. Natural language that we as speakers and/or writers use must be dramatically transformed into a machine-readable, numeric representation ready for computation. In this book, we explore typical text preprocessing steps from the ground up, and consider the effects of these steps. We also show how to conveniently use the [textrecipes](https://textrecipes.tidymodels.org/) R package [@textrecipes] to prepare text data within a modeling pipeline.
+```{block, type = "rmdnote"}
+Text data is important for many domains, from healthcare to marketing to the digital humanities, but specialized approaches are necessary to create features (predictors) for machine learning from language.
+```
+
+Natural language that we as speakers and/or writers use must be dramatically transformed to a machine-readable, numeric representation to be ready for computation. In this book, we explore typical text preprocessing steps from the ground up, and consider the effects of these steps. We also show how to fluently use the [textrecipes](https://textrecipes.tidymodels.org/) R package [@textrecipes] to prepare text data within a modeling pipeline.
 
 @Silge2017 provides a practical introduction to text mining with R using tidy data principles, based on the [tidytext](https://github.com/juliasilge/tidytext) package. If you have already started on the path of gaining insight from your text data, a next step is using that text directly in predictive modeling. Text data contains within it latent information that can be used for insight, understanding, and better decision-making, and predictive modeling with text can bring that information and insight to light. If you have already explored how to analyze text as demonstrated in @Silge2017, this book will move one step further to show you how to *learn and make predictions* from that text data with supervised models. If you are unfamiliar with this previous work, this book will still provide a robust introduction to how text can be represented in useful ways for modeling and a diverse set of supervised modeling approaches for text.
 
 
 ## Outline {-}
 
-The book is divided into three sections. We make a (perhaps arbitrary) distinction between *machine learning methods* and *deep learning methods* by defining deep learning as any kind of multi-layer neural network (LSTM, bi-LSTM, CNN) and machine learning as anything else (regularized regression, Bayes, SVM, random forest). We make this distinction both because these different methods use separate software packages and modeling infrastructure, and from a pragmatic point of view, it is helpful to split up the chapters this way. 
+The book is divided into three sections. We make a (perhaps arbitrary) distinction between *machine learning methods* and *deep learning methods* by defining deep learning as any kind of multi-layer neural network (LSTM, bi-LSTM, CNN) and machine learning as anything else (regularized regression, naive Bayes, SVM, random forest). We make this distinction both because these different methods use separate software packages and modeling infrastructure, and from a pragmatic point of view, it is helpful to split up the chapters this way. 
 
 - **Natural language features:** How do we transform text data into a representation useful for modeling? In these chapters, we explore the most common preprocessing steps for text, when they are helpful, and when they are not.
 
@@ -52,7 +56,7 @@ The book is divided into three sections. We make a (perhaps arbitrary) distincti
 
 - **Deep learning methods:** Given more time and resources, we see what is possible once we turn to neural networks. 
 
-Some of the topics in the second and third sections will overlap as these provide different approaches to the same tasks.
+Some of the topics in the second and third sections overlap as they provide different approaches to the same tasks.
 
 Throughout the book, we will demonstrate with examples and build models using a selection of text datasets. A description of these datasets can be found in Appendix \@ref(appendixdata).
 
@@ -72,15 +76,15 @@ This book serves as a thorough introduction to prediction and modeling with text
 
 This book is designed to provide practical guidance and directly applicable knowledge for data scientists and analysts who want to integrate text into their modeling pipelines. 
 
-We assume that the reader is somewhat familiar with R, predictive modeling concepts for non-text data, and the [tidyverse](https://www.tidyverse.org/) family of packages. For users who don't have this background with tidyverse code, we recommend [*R for Data Science*](http://r4ds.had.co.nz/) [@Wickham2017]. Helpful resources for getting started with modeling and machine learning include a [free interactive course](https://supervised-ml-course.netlify.com/) developed by one of the authors (JS) and [*Hands-On Machine Learning with R*](https://bradleyboehmke.github.io/HOML/) [@Boehmke2019], as well as [*An Introduction to Statistical Learning*](http://faculty.marshall.usc.edu/gareth-james/ISL/) [@James2013].  We don't assume an extensive background in text analysis, but [*Text Mining with R*](https://www.tidytextmining.com/) [@Silge2017], by one of the authors (JS) and David Robinson, provides helpful skills in exploratory data analysis for text that will promote successful text modeling.
+We assume that the reader is somewhat familiar with R, predictive modeling concepts for non-text data, and the [tidyverse](https://www.tidyverse.org/) family of packages. For users who don't have this background with tidyverse code, we recommend [*R for Data Science*](http://r4ds.had.co.nz/) [@Wickham2017]. Helpful resources for getting started with modeling and machine learning include a [free interactive course](https://supervised-ml-course.netlify.com/) developed by one of the authors (JS) and [*Hands-On Machine Learning with R*](https://bradleyboehmke.github.io/HOML/) [@Boehmke2019], as well as [*An Introduction to Statistical Learning*](http://faculty.marshall.usc.edu/gareth-james/ISL/) [@James2013].  
 
-This book is more advanced than *Text Mining with R* and will help practitioners use their text data in ways not covered in that book.
+We don't assume an extensive background in text analysis, but [*Text Mining with R*](https://www.tidytextmining.com/) [@Silge2017], by one of the authors (JS) and David Robinson, provides helpful skills in exploratory data analysis for text that will promote successful text modeling. This book is more advanced than *Text Mining with R* and will help practitioners use their text data in ways not covered in that book.
 
 ## Acknowledgements {-}
 
 We are so thankful for the contributions, help, and perspectives of people who have supported us in this project. There are several we would like to thank in particular.
 
-We would like to thank David Robinson for his collaboration on the tidytext package, Max Kuhn and Davis Vaughan for their investment in the tidymodels packages, the anonymous technical reviewers for their substantive and insightful feedback, and Desirée De Leon for the site design for this online work.
+We would like to thank Max Kuhn and Davis Vaughan for their investment in the tidymodels packages, David Robinson for his collaboration on the tidytext package, the anonymous technical reviewers for their substantive and insightful feedback, and Desirée De Leon for the site design for this online work.
 
 ```{r, eval = FALSE, echo = FALSE}
 library(tidyverse)
