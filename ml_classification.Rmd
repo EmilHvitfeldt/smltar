@@ -504,7 +504,9 @@ To get a more detailed view of how our classifier is performing, let us look at 
 multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
-  autoplot(type = "heatmap")
+  autoplot(type = "heatmap") +
+  scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, 20))
 ```
 
 The diagonal is fairly well populated, which is a good sign. This means that the model generally predicted the right class.
@@ -517,7 +519,9 @@ multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
   conf_mat(product, .pred_class) %>%
-  autoplot(type = "heatmap")
+  autoplot(type = "heatmap") +
+  scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, 20))
 ```
 
 Now we can more clearly see where our model breaks down in Figure \@ref(fig:multiheatmapminusdiag). One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. That is not hard to understand since both deal with credit and do have overlap in vocabulary.
