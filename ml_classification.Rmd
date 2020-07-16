@@ -529,7 +529,7 @@ Knowing what the problem is helps us figure out how to improve our model.
 The first step for improving our model is to revisit the data preprocessing steps and model selection.
 We can look at different models or model engines that might be able to more easily separate the classes. The `svm_rbf()` model has a `cost` argument that determines the penalization of wrongly predicted classes that might be worth looking at.
 
-Now that we have an idea of where the model isn't working, we can look more closely at the data to create features that could distinguish between these classes. In Section \@ref(custumfeatures) will we demonstrate how you can create custom features.
+Now that we have an idea of where the model isn't working, we can look more closely at the data to create features that could distinguish between these classes. In Section \@ref(customfeatures) will we demonstrate how you can create custom features.
 
 ## Case study: data censoring
 
@@ -668,7 +668,7 @@ str_replace_all(string = ssn_text,
 
 This technique isn't useful only for personally identifiable information but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
 
-## Case study: custom features {#custumfeatures}
+## Case study: custom features {#customfeatures}
 
 Most of what we have looked at so far has boiled down to counting tokens and weighting them in one way or another.
 This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your dataset that you should use in feature engineering.
@@ -1021,7 +1021,7 @@ For the full set of classification metric options, see the [yardstick documentat
 We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
 We started this chapter with a simple naive Bayes model and n-gram token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features we developed in Section \@ref(custumfeatures) along with n-grams. Our model doesn't have any significant hyperparameters to tune but we will tune the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with n-grams. Our model doesn't have any significant hyperparameters to tune but we will tune the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - tune the number of tokens used in the model,
@@ -1046,7 +1046,7 @@ complaints_rec_v2 <-
   step_dummy(tags)
 ```
 
-After exploring this text data more in Section \@ref(custumfeatures), we want to add these custom features to our final model.
+After exploring this text data more in Section \@ref(customfeatures), we want to add these custom features to our final model.
 To do this, we use `step_textfeature()` to compute custom text features. 
 We create a list of the custom text features and pass this list to `step_textfeature()` via the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
