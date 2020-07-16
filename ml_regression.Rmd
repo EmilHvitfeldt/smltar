@@ -216,8 +216,7 @@ A null model is a simple, non-informative model that always predicts the largest
 
 We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
 
-```{r nullrs, eval = FALSE, dependson=c("scotuswf", "scotusfolds")}
-## not running until this change is on CRAN: https://github.com/tidymodels/tune/pull/207
+```{r nullrs, dependson=c("scotuswf", "scotusfolds")}
 null_regression <- null_model() %>% 
   set_engine("parsnip") %>%
   set_mode("regression")
@@ -232,7 +231,7 @@ null_rs
 
 What results do we obtain from the null model, in terms of performance metrics?
 
-```{r, eval = FALSE, dependson="nullrs"}
+```{r, dependson="nullrs"}
 null_rs %>%
   collect_metrics()
 ```
