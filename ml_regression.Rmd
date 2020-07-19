@@ -23,7 +23,7 @@ In this chapter, we will use machine learning to predict *continuous values* tha
 library(tidyverse)
 library(scotus)
 
-scotus_sample %>%
+scotus_filtered %>%
   as_tibble()
 ```
 
@@ -44,7 +44,7 @@ In text modeling, we use text data (such as the text of the court opinions), som
 Let's build our first regression model using this sample of Supreme Court opinions. Before we start, let's check out how many opinions we have over time in Figure \@ref(fig:scotushist).
 
 ```{r scotushist, dependson="scotussample", fig.cap="Supreme Court opinions per decade in sample"}
-scotus_sample %>%
+scotus_filtered %>%
   mutate(year = as.numeric(year),
          year = 10 * (year %/% 10)) %>%
   count(year) %>%
@@ -62,7 +62,7 @@ Our first step in building a model is to split our data into training and testin
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
 set.seed(1234)
-scotus_split <- scotus_sample %>%
+scotus_split <- scotus_filtered %>%
   mutate(year = as.numeric(year),
          text = str_remove_all(text, "'")) %>%
   initial_split()
