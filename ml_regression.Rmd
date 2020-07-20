@@ -75,7 +75,7 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
-- Next, we filter to only keep the top 500 tokens by term frequency, after removing stop words.
+- Next, we filter to only keep the top 1000 tokens by term frequency, after removing stop words.
 - The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
 - As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
 
@@ -84,7 +84,7 @@ library(textrecipes)
 
 scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
-  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tokenfilter(text, max_tokens = 1e3) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
 
@@ -449,7 +449,7 @@ stopword_rec <- function(stopword_name) {
   recipe(year ~ text, data = scotus_train) %>%
     step_tokenize(text) %>%
     step_stopwords(text, stopword_source = stopword_name) %>%
-    step_tokenfilter(text, max_tokens = 500) %>%
+    step_tokenfilter(text, max_tokens = 1e3) %>%
     step_tfidf(text) %>%
     step_normalize(all_predictors())
 }
@@ -527,7 +527,7 @@ smart_metrics <- read_rds("data/ml_reg_smart_metrics.rds")
 smart_metrics
 ```
 
-We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()` and a dot plot.
+We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
 ```{r snowballrmseoffline, dependson="stopwordsres", eval = !online}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
@@ -540,10 +540,7 @@ list(snowball = snowball_rs,
   left_join(word_counts) %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
   ggplot(aes(fct_reorder(name, words), mean, color = name)) +
-  geom_dotplot(
-    binaxis = "y", stackdir = "center", binpositions = "all", 
-    show.legend = FALSE
-    ) +
+  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
        subtitle = "For this dataset, the Snowball lexicon performed best")
@@ -566,10 +563,7 @@ stopword_results %>%
   left_join(word_counts) %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
   ggplot(aes(fct_reorder(name, words), mean, fill = name)) +
-  geom_dotplot(
-    binaxis = "y", stackdir = "center", binpositions = "all", 
-    show.legend = FALSE
-    ) +
+  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
        subtitle = "For this dataset, the Snowball lexicon performed best")
@@ -593,7 +587,7 @@ This is another part of data preprocessing, so we again define this step as part
 ngram_rec <- function(ngram_options) {
   recipe(year ~ text, data = scotus_train) %>%
     step_tokenize(text, token = "ngrams", options = ngram_options) %>%
-    step_tokenfilter(text, max_tokens = 500) %>%
+    step_tokenfilter(text, max_tokens = 1e3) %>%
     step_tfidf(text) %>%
     step_normalize(all_predictors())
 }
@@ -701,7 +695,7 @@ ngram_results %>%
        subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
 ```
 
-Each of these models was trained with `max_tokens = 500`, i.e., including only the top 500 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much.
+Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much.
 
 ## Case study: lemmatization {#mlregressionlemmatization}
 
@@ -732,7 +726,7 @@ spacyr::spacy_initialize(entity = FALSE)
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
-  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tokenfilter(text, max_tokens = 1e3) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
 
@@ -743,7 +737,7 @@ lemma_rec
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
-  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tokenfilter(text, max_tokens = 1e3) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
 
@@ -957,7 +951,7 @@ Let's include seven possible values for each parameter, for a combination of 49 
 ```{r finalscotusgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(500, 5000)),
+  max_tokens(range = c(1e3, 1e4)),
   levels = 7
 )
 
