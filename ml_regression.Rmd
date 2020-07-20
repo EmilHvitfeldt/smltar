@@ -17,7 +17,7 @@ doParallel::registerDoParallel()
 online <- TRUE
 ``` 
 
-In this chapter, we will use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
+In this chapter, we will use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a filtered sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
 
 ```{r scotussample}
 library(tidyverse)
@@ -27,7 +27,7 @@ scotus_filtered %>%
   as_tibble()
 ```
 
-This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the year that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
+This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the `year` that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
 
 ```{block, type = "rmdnote"}
 If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
@@ -53,7 +53,7 @@ scotus_filtered %>%
   labs(x = "Year", y = "Number of opinions per decade")
 ```
 
-This sample of opinions reflects the true distribution over time of available opinions for analysis; there are many more opinions per year in this dataset after about 1990 than before. We will need to account for that in our modeling.
+This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this dataset after about 1850 than before. We will need to account for that in our modeling.
 
 ### Building our first regression model {#firstregression}
 
@@ -79,8 +79,6 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 - The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
 - As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
 
-Finally, we `prep()` the recipe. This means we compute values for all these steps using our training data; we estimate the required parameters from `scotus_train` to implement these steps so this whole sequence can be applied later to another dataset, such as resampled folds or testing data.
-
 ```{r scotusrec, dependson="scotussplit"}
 library(textrecipes)
 
@@ -90,9 +88,7 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
 
-scotus_prep <- prep(scotus_rec)
-
-scotus_prep
+scotus_rec
 ```
 
 Let's create a `workflow()` to bundle together this recipe with any model specifications we may want to create later. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
@@ -136,7 +132,7 @@ We see here, printing out for the most regularized examples, what contributes to
 
 ### Evaluation {#firstregressionevaluation}
 
-One option for our evaluating our model is to predict one time on the testing set to measure performance. 
+One option for evaluating our model is to predict one time on the testing set to measure performance. 
 
 ```{block, type = "rmdwarning"}
 The testing set is extremely valuable data, however, and in real world situations, you can only use this precious resource one time (or at most, twice). 
@@ -189,12 +185,12 @@ The lower RMSE is, the better; the closer $R^2$ is to one, the better.
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
 
-```{r firstregpredict, dependson="lassors", fig.width=7, fig.height=6, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
+```{r firstregpredict, dependson="lassors", fig.width=7, fig.height=5.5, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
     y = "Predicted year",
@@ -377,8 +373,6 @@ rf_rs <- fit_resamples(
   scotus_folds,
   control = control_resamples(save_pred = TRUE)
 )
-
-rf_rs
 ```
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
@@ -393,19 +387,19 @@ rf_rs %>%
   write_rds("data/ml_reg_rf_metrics.rds")
 ```
 
-```{r rfmetrics, include = FALSE}
+```{r rfmetrics, echo = FALSE}
 rf_metrics <- read_rds("data/ml_reg_rf_metrics.rds")
 rf_metrics
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=6, eval = !online}
+```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=5.5, eval = !online}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
     y = "Predicted year",
@@ -421,12 +415,12 @@ rf_rs %>%
   write_rds("data/ml_reg_rf_predictions.rds")
 ```
 
-```{r rfpredict, echo = FALSE, fig.width=7, fig.height=6, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, echo = FALSE, fig.width=7, fig.height=5.5, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
 rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
 rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
     y = "Predicted year",
@@ -436,7 +430,7 @@ rf_predictions %>%
   )
 ```
 
-Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted model. This model learned to predict the large number of opinions in 1999 and 2000 very accurately, but at the expense of all other years. One of the defining characteristics of text data is that it is **sparse**, and tree-based models such as random forests may not be well-suited to sparse data. 
+Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted model. The overall performance metrics look pretty good, but predictions are too high and too low around certain threshold years. One of the defining characteristics of text data is that it is **sparse**, and tree-based models such as random forests may not be well-suited to sparse data. 
 
 ```{block, type = "rmdnote"}
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
@@ -528,12 +522,12 @@ smart_rs %>%
   write_rds("data/ml_reg_smart_metrics.rds")
 ```
 
-```{r smartmetrics, include = FALSE}
+```{r smartmetrics, echo = FALSE}
 smart_metrics <- read_rds("data/ml_reg_smart_metrics.rds")
 smart_metrics
 ```
 
-We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
+We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()` and a dot plot.
 
 ```{r snowballrmseoffline, dependson="stopwordsres", eval = !online}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
@@ -546,7 +540,10 @@ list(snowball = snowball_rs,
   left_join(word_counts) %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
   ggplot(aes(fct_reorder(name, words), mean, color = name)) +
-  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
+  geom_dotplot(
+    binaxis = "y", stackdir = "center", binpositions = "all", 
+    show.legend = FALSE
+    ) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
        subtitle = "For this dataset, the Snowball lexicon performed best")
@@ -568,8 +565,11 @@ stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
 stopword_results %>%
   left_join(word_counts) %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
-  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
-  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
+  ggplot(aes(fct_reorder(name, words), mean, fill = name)) +
+  geom_dotplot(
+    binaxis = "y", stackdir = "center", binpositions = "all", 
+    show.legend = FALSE
+    ) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
        subtitle = "For this dataset, the Snowball lexicon performed best")
@@ -581,7 +581,7 @@ The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig
 This result is not generalizable to all data sets and contexts, but the approach outlined in this section **is** generalizable. 
 ```
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is at least somewhat lower than _without_ removing stop words for all stop word lexicons (compare to Figure \@ref(fig:scotustunevis) and following), indicating that removing stop words is a good choice. This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice also that the resulting RMSE is at least somewhat lower than _without_ removing stop words for all stop word lexicons (compare to Figure \@ref(fig:scotustunevis) and following: TODO CHECK), indicating that removing stop words is a good choice. This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
 
 ## Case study: varying n-grams 
 
@@ -759,8 +759,6 @@ lemma_rs <- tune_grid(
   scotus_folds,
   grid = grid_twenty
 )
-
-lemma_rs
 ```
 
 
@@ -979,8 +977,7 @@ final_rs <- tune_grid(
   tune_wf,
   scotus_folds,
   grid = final_grid,
-  metrics = metric_set(rmse, mae, mape),
-  control = control_resamples(save_pred = TRUE)
+  metrics = metric_set(rmse, mae, mape)
 )
 
 final_rs
@@ -990,7 +987,7 @@ final_rs
 write_rds(final_rs, "data/ml_reg_final_rs.rds")
 ```
 
-```{r finalscotusrs, include=FALSE}
+```{r finalscotusrs, echo=FALSE}
 final_rs <- read_rds("data/ml_reg_final_rs.rds")
 final_rs
 ```
@@ -1103,7 +1100,7 @@ final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
     y = "Predicted year",
