@@ -562,7 +562,7 @@ stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
 stopword_results %>%
   left_join(word_counts) %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
-  ggplot(aes(fct_reorder(name, words), mean, fill = name)) +
+  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
