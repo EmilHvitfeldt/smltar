@@ -118,12 +118,12 @@ We have **two** stems! This stemmer works differently; it uses both morphologica
 
 You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.
 
-Why does stemming often help, if you are training a machine learning model for text? Stemming **reduces the sparsity** of text data. Let's see this in action, with a dataset of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard dataset of stopwords?
+Why does stemming often help, if you are training a machine learning model for text? Stemming **reduces the feature space** of text data. Let's see this in action, with a dataset of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard dataset of stopwords?
 
 ```{r tidy_hca}
 library(scotus)
 
-tidy_scotus <- scotus_sample %>% 
+tidy_scotus <- scotus_filtered %>% 
   unnest_tokens(word, text) %>%
   anti_join(get_stopwords())
 
@@ -150,7 +150,7 @@ tidy_scotus %>%
   cast_dfm(case_name, stem, n)
 ```
 
-We reduced the number of word features by many thousands, and the sparsity of our data by about 0.1%. Why is it possibly helpful to make our data more dense? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
+We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
