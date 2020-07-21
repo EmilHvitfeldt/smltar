@@ -951,8 +951,8 @@ Let's include seven possible values for each parameter, for a combination of 49 
 ```{r finalscotusgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(1e3, 1e4)),
-  levels = 7
+  max_tokens(range = c(1e3, 6e3)),
+  levels = 6
 )
 
 
@@ -1060,7 +1060,7 @@ final_wf %>%
        subtitle = "These features are the most importance in predicting the year of an opinion")
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction are associated with higher, later years and those that contribute in the negative direction are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "equal protection" and "sixth amendment", are associated with higher, later years and those that contribute in the negative direction, like "founded" and "dollars", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
 Some of these features are unigrams and some are bigrams, but notice that none include stop words included in the Snowball lexicon because we moved them.
