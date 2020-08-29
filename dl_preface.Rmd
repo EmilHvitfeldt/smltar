@@ -1,14 +1,29 @@
 # (PART) Deep Learning Methods {-}
 
-# Foreword for deep learning methods {-}
+# Foreword {dlforeword .unnumbered}
 
-In this last section of the book we will follow the same style as the previous section as we are still trying to create accurate predictions, 
-but we are switching our attention to deep neural networks.
+In Chapters \@ref(mlregression) and \@ref(mlclassification), we use algorithms such as regularized linear models, support vector machines, and naive Bayes models to predict outcomes from predictors including text data. Deep learning models approach the same tasks and have the same goals, but the algorithms involved are different. Deep learning models are "deep" in the sense that they use multiple layers to learn how to map from input features to output outcomes; this is in contrast to the kinds of models we used in the previous two chapters which use a shallow (single) mapping. 
 
-This section will focus on bag-of-words and word embeddings using CNN, RNN and LSTMs.
+```{block, type = "rmdnote"}
+Deep learning models can be effective for text prediction problems because they use these multiple layers to capture complex relationships in language.
+```
+
+The layers in a deep learning model are connected in a network and these models are called **neural networks**, although they do not work much like a human brain. The layers can be connected in different configurations called network architectures. Three of the most common architectures used for text data are a recurrent neural network (RNN), a convolutional neural network (CNN), and long short-term memory (LSTM)^[In other situations, when modeling tabular data, time series data, etc., you may need to use a different architecture.]. These architectures sometimes incorporate word embeddings, as described in Chapter \@ref(embeddings).
 
 TODO: Algorithmic bias specific to deep learning or similar
 
-For the following chapters, we will use tensorflow with keras framework to do preprocessing, modeling and evaluation.
+For the following chapters, we will use tensorflow with keras framework to do preprocessing, modeling, and evaluation.
 
-TODO: add pro and cons table for differences between deep learning and non-deep learning
+Table \@ref(tab:comparedlml) presents some key differences between deep learning and what, in this book, we call machine learning methods.
+
+```{r comparedlml, echo=FALSE}
+tibble::tribble(
+  ~`Machine learning`, ~`Deep learning`,
+  "Faster to train", "Takes more time to train",
+  "Software is typically easier to install", "Software can be more challenging to install",
+  "Can achieve good performance with less data", "Requires more data for good performance",
+  "Depends on preprocessing to model more than very simple relationships", "Can model highly complex relationships"
+) %>% 
+  knitr::kable(caption = 'All meta characters')
+```
+
