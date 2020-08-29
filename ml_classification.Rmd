@@ -44,13 +44,13 @@ This kind of "yes or no" binary classification model is both common and useful i
 
 The outcome variable `product` contains more categories than this, so we need to transform this variable to only contains the values "Credit reporting, credit repair services, or other personal consumer reports" and "Other".
 
-It is always a good idea to look at your data, as much as possible. Here is the first six complaints:
+It is always a good idea to look at your data, as much as possible. Here are the first six complaints:
 
 ```{r, dependson="complaints"}
 head(complaints$consumer_complaint_narrative)
 ```
 
-The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publically available dataset. This is not a universal censoring mechanism and can vary from source to source; hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
+The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publicly available dataset. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
 
 We also see that monetary amounts are surrounded by curly brackets (like `"{$21.00}"`); this is another text preprocessing step that has been taken care of for us. We can craft a regular expression to extract all the dollar amounts.
 
@@ -64,7 +64,7 @@ complaints$consumer_complaint_narrative %>%
 
 ### Building our first classification model {#classfirstmodel}
 
-We are building a model from a complete dataset, including annotations and labels from the CFPB, but we need to ensure that only information that would be available at the time of prediction is included in the model.
+We are building a model from a dataset that includes annotations and labels added by the CFPB, but we need to ensure that only information that would be available at the time of prediction is included in the model.
 Otherwise we we will be very disappointed once our model is used to predict on new data!
 The variables we identify as available for use as predictors are:
 
@@ -78,7 +78,6 @@ The variables we identify as available for use as predictors are:
 - `tags`
 - `submitted_via`
 
-Many of these variables have many unique values.
 To start, we will include `date_received` for our modeling, along with the text variable `consumer_complaint_narrative` and `tags`.
 The `submitted_via` variable could have been a viable candidate, but all the entries are "web".
 The other variables like ZIP code could be of use too, but they are categorical variables with many values so we will exclude them for now.
@@ -108,7 +107,7 @@ dim(complaints_train)
 dim(complaints_test)
 ```
 
-Next we need to do some model preprocessing, because the models we want to use only support numeric data. We have text data, and we need to build numeric features for machine learning from that text
+Next we need to do some model preprocessing, because the models we want to use only support numeric data. We have text data, and we need to build numeric features for machine learning from that text.
 
 ```{block, type = "rmdwarning"}
 Some models are able to handle factor variables and missing data, but it may be in your best interest to manually specify how to preprocess your data so you know how such issues are handled.
@@ -145,7 +144,7 @@ complaints_rec <- complaints_rec %>%
   step_dummy(tags)
 ```
 
-Now we come to dealing with the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`; by default this uses `tokenizers::tokenize_words()`.
+Now we come to dealing with the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
 Next we remove stop words with `step_stopwords()`; the default choice is the Snowball stop word list, but custom lists can be provided too. Before we calculate the tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables. To finish, we use `step_tfidf()` to compute tf-idf.
 
 ```{r complaintrec4, dependson="complaintrec3"}
@@ -169,8 +168,8 @@ complaint_wf <- workflow() %>%
   add_recipe(complaints_rec)
 ```
 
-Let's start with a naive Bayes model [@kim2006] [@Kibriya2005] [@Eibe2006].
-One of the main advantages of naive Bayes is its ability to handle a large number of features, such as those we deal with when using word count methods.
+Let's start with a naive Bayes model [@kim2006, @Kibriya2005, @Eibe2006].
+One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would be able to handle it well. For now, we will limit the model to a moderate number of tokens.
 
 ```{r nbspec}
@@ -271,7 +270,7 @@ nb_rs_predictions %>%
 The area under each of these curves is the `roc_auc` metric we have computed. If the curve was close to the diagonal line, then the model's predictions would be no better then random guessing.
 
 Another way to evaluate our model is to evaluate the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). A confusion matrix visualizes a model's false positives and false negatives for each class.
-There is not a trivial way to visualize multiple confusion matrices, so we will look at them individually for each fold.
+There is not a trivial way to visualize multiple confusion matrices, so we can look at them individually for a single fold.
 
 ```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for first naive Bayes classifier, showing some bias towards predicting 'Credit'"}
 nb_rs_predictions %>%
@@ -361,7 +360,7 @@ One of the main benefits of a Support Vector Machine model is its support for sp
 
 Most of this chapter focuses on [binary classification](https://en.wikipedia.org/wiki/Binary_classification), where we have two classes in our outcome variable (such as "Credit" and "Other") and each observation can either be one or the other. This is a simple scenario with straightforward evaluation strategies because the results only have a two-by-two contingency matrix.
 However, it is not always possible to limit a modeling question to two classes. Let's explore how to deal with situations where we have more then two classes.
-The CFPB complaints dataset we have been working with so far has nine different `product` classes. In decreasing frequency, they are:
+The CFPB complaints dataset we have been working with has nine different `product` classes. In decreasing frequency, they are:
 
 - Credit reporting, credit repair services, or other personal consumer reports
 - Debt collection
@@ -457,7 +456,7 @@ multi_svm_wf
 Notice that you don't have to specify anything to perform multiclass classification in this case. The modeling packages will infer this from the number of classes in the outcome variable.
 ```
 
-Now we have everything we need to put it into `fit_resamples()` to fit all the models. Note that we specify `save_pred = TRUE`, so we can create a confusion matrix later. This is especially beneficial for multiclass classification.
+Now we have everything we need for `fit_resamples()` to fit all the models. Note that we specify `save_pred = TRUE`, so we can create a confusion matrix later. This is especially beneficial for multiclass classification.
 We again specify the `metric_set()` since liquidSVM doesn't support class probabilities.
 
 ```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval= !online}
@@ -498,7 +497,7 @@ The accuracy metric naturally extends to multiclass tasks, but it appears quite 
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier, with most of the classifications along the diagonal"}
+```{r multiheatmap, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier, with most of the classifications along the diagonal", fig.width=10, fig.height=8}
 multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
@@ -512,7 +511,7 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r multiheatmapminusdiag, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier without diagonal"}
+```{r multiheatmapminusdiag, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier without diagonal", fig.width=10, fig.height=8}
 multi_svm_rs_predictions %>%
   filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
@@ -534,7 +533,7 @@ Now that we have an idea of where the model isn't working, we can look more clos
 The complaints dataset already has sensitive information (PII) censored or protected using strings such as "XXXX" and "XX".
 This data censoring can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
 
-Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizing-by-n-grams)) in our training dataset.
+Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training dataset.
 
 ```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored information"}
 complaints_train %>%
