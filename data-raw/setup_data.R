@@ -15,7 +15,8 @@ library(tidyverse)
 
 out <- stream_in(file("data-raw/combined.json")) %>% 
   as_tibble() %>%
-  mutate(agency = map_chr(components, `[`, 1)) %>%
+  mutate(agency = map_chr(components, `[`, 1),
+         date = as.Date(date)) %>%
   select(date, agency, title, contents)
 
 out %>%
