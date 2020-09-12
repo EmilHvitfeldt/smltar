@@ -1,6 +1,59 @@
 # Regression {#dlregression}
 
-How are we handling this differently then classification in deep learning settings.
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+options(crayon.enabled = FALSE)
+doParallel::registerDoParallel()
+
+## for Julia's local environment
+#spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
+#online <- FALSE
+
+## for GH actions
+online <- TRUE
+``` 
+
+In this chapter, we will predict continuous values, much like we did in Chapter \@ref(mlregression), but we will use deep learning methods instead of methods such as regularized linear regression. Let's consider a dataset of press releases from the United States Department of Justice (DOJ), which [they release on their website](https://www.justice.gov/news).
+
+```{r doj}
+library(tidyverse)
+
+doj_press <- read_csv("data/press_releases.csv.gz")
+doj_press
+```
+
+We know the `date` that each of these press releases was published, and predicting this date from other characteristics of the press releases, such as the main agency within the DOJ involved, the `title`, and the main `contents` of the press release, is a regression problem.
+
+```{r dojhist, dependson="doj", fig.cap="Distribution of Department of Justice press releases over time"}
+library(lubridate)
+
+doj_press %>%
+  count(month = floor_date(date, unit = "months"), name = "releases") %>%
+  ggplot(aes(month, releases)) +
+  geom_area(alpha = 0.8) +
+  geom_smooth() +
+  labs(x = NULL, y = "Releases per month")
+```
+
+This dataset includes all press releases from the DOJ from the beginning of 2009 through July 2018. There is some month-to-month variation and an overall increase in releases, but there is good coverage over the timeframe for which we would like to build a model.
+
+There are `r n_distinct(doj_press$agency)` distinct main agencies associated with these releases, but some press releases have no agency associated with them. A few agencies, such as the Criminal Division, Civil Right Division, and Tax Division, account for many more press releases than other agencies.
+
+```{r agencycounts, dependson="doj", fig.cap="Main agency associated with Department of Justice press releases"}
+doj_press %>%
+  count(agency) %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(n, fct_reorder(agency, n))) +
+  geom_col() +
+  labs(x = "Number of press releases", y = NULL)
+```
+
+
+
 
 ## First attempt
 
@@ -11,9 +64,6 @@ How are we handling this differently then classification in deep learning settin
 ### Evaluation
 
 ## Preprocessing
-
-Mostly the same, we still want to end with all numerics. 
-Use keras/tensorflow to do preprocessing as an example.
 
 ## putting your layers together
 
