@@ -28,7 +28,9 @@ out %>%
 dir_ls(c("~/Downloads/Kickstarter_2016-01-28T09_15_08_781Z", 
          "~/Downloads/Kickstarter_2016-03-22T07_41_08_591Z/")) %>%
   map_dfr(read_csv, col_types = cols_only(blurb = col_character(),
-                                          state = col_character())) %>%
+                                          state = col_character(),
+                                          created_at = col_integer())) %>%
   filter(state %in% c("failed", "successful")) %>%
   mutate(state = as.numeric(state == "successful")) %>%
+  mutate(created_at = as.Date(as.POSIXct(created_at, origin = "1970-01-01"))) %>%
   write_csv("data/kickstarter.csv.gz")
