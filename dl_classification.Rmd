@@ -1,6 +1,114 @@
 # Classification {#dlclassification}
 
-## First attempt
+```{r setup, include = FALSE}
+library(knitr)
+opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
+               tidy = "styler", fig.width = 8, fig.height = 5)
+suppressPackageStartupMessages(library(tidyverse))
+theme_set(theme_light())
+options(crayon.enabled = FALSE)
+doParallel::registerDoParallel()
+
+## for Julia's local environment
+#spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
+#online <- FALSE
+
+## for GH actions
+online <- TRUE
+``` 
+
+In this chapter, we will predict binary values, much like we did in Chapter \@ref(mlclassification), but we will use deep learning methods instead. We will be using a dataset of fundraising campaigns from [Kickstarter](https://www.kickstarter.com/).
+
+```{r kickstarter}
+library(tidyverse)
+
+kickstarter <- read_csv("data/kickstarter.csv.gz")
+kickstarter
+```
+
+we are working with fairly short texts for this dataset. less than a couple of hundred characters. We can look at the distribution 
+
+```{r kickstartercharhist, dependson="kickstarter", fig.cap="Distribution of character count for Kickstarter campaign blurbs"}
+kickstarter %>%
+  ggplot(aes(nchar(blurb))) +
+  geom_histogram(binwidth = 1) +
+  labs(x = "Number of characters per campaign blurb",
+       y = "Number of campaign blurbs")
+```
+
+it is rightly skewed which is to be expected. Since you don't have have much space to make your impression most people choose to use most of it. There is one odd thing happening in this chart. There is a drop somewhere between 130 and 140. Let us investigate to see if we can find the reason.
+
+We can use `count()` to find the most common `blurb` length.
+
+```{r}
+kickstarter %>%
+  count(nchar(blurb), sort = TRUE)
+```
+
+it appears to be 135 which in and of itself doesn't tell us much. It might be a glitch in the data collection process. Let us put our own eyes to look at what happens around this cutoff point. We can use `slice_sample()` to draw a random sample of the data.
+
+We start by looking at `blurb`s with exactly 135 characters, this is done so that we can identify if the `blurb`s where cut short at 135 characters.
+
+```{r}
+set.seed(1)
+kickstarter %>%
+  filter(nchar(blurb) == 135) %>%
+  slice_sample(n = 5) %>%
+  pull(blurb)
+```
+
+It doesn't appear to be the case as all of these `blurb`s appear coherent and some of them even end with a period to end the sentence. Let us now look at `blurb`s with more then 135 characters if these are different.
+
+```{r}
+set.seed(1)
+kickstarter %>%
+  filter(nchar(blurb) > 135) %>%
+  slice_sample(n = 5) %>%
+  pull(blurb)
+```
+
+All of these `blurb`s also look good so it doesn't look like a data collection issue.
+The `kickstarter` dataset also includes a `created_at` variable. Let us see what we can gather with that new information.
+
+Below is a heatmap of the lengths of `blurb`s and the time the campaign was posted.
+
+```{r kickstarterheatmap, dependson="kickstarter", fig.cap="Distribution of character count for Kickstarter campaign blurbs over time"}
+kickstarter %>%
+  ggplot(aes(created_at, nchar(blurb))) +
+  geom_bin2d() +
+  labs(x = NULL,
+       y = "Number of characters per campaign blurb")
+```
+
+We see a trend right here. it appears that at the end of 2010 there was a change in policy to have the blurb length shortened from 150 characters to 135 characters.
+
+```{r}
+kickstarter %>%
+  filter(nchar(blurb) > 135) %>%
+  summarise(max(created_at))
+```
+
+We can't tell for sure if the change happened at 2010-10-20, but that is the last day a campaign was launched with more then 135 characters.
+
+## A first classification model {#firstdlclassification}
+
+Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
+This data will be hard to work with since we don't have much information to work with.
+
+We use `initial_split()` to define the training/testing split. We will focus on modeling the `blurb` alone in this chapter. We will restict the data to only include `blurb`s with more then 15 characters. The short `blurb`s tend to uninformative single words.
+
+```{r dojsplit, dependson="doj"}
+library(tidymodels)
+set.seed(1234)
+kickstarter_split <- kickstarter %>%
+  filter(nchar(blurb) >= 15) %>%
+  initial_split()
+
+kickstarter_train <- training(kickstarter_split)
+kickstarter_test <- testing(kickstarter_split)
+```
+
+There are `r comma(nrow(kickstarter_train))` press releases in the training set and `r comma(nrow(kickstarter_test))` in the testing set.
 
 ### Look at the data
 
