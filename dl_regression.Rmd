@@ -65,7 +65,7 @@ doj_press %>%
        y = "Number of press releases")
 ```
 
-Compared to the documents we built deep learning models for in Chapter \@ref(dlclassification), these press releases are long, with a median character count of `r comma(median(nchar(doj_press$contents), na.rm = TRUE))` for the `contents` of the press releases. We can use deep learning models to model these longer sequences.
+Compared to the documents we built deep learning models for in Chapter \@ref(dlclassification), these press releases are long, with a median character count of `r scales::comma(median(nchar(doj_press$contents), na.rm = TRUE))` for the `contents` of the press releases. We can use deep learning models to model these longer sequences.
 
 Some examples, such as this press release from the end of 2016, are quite short:
 
@@ -93,7 +93,7 @@ doj_train <- training(doj_split)
 doj_test <- testing(doj_split)
 ```
 
-There are `r comma(nrow(doj_train))` press releases in the training set and `r comma(nrow(doj_test))` in the testing set.
+There are `r scales::comma(nrow(doj_train))` press releases in the training set and `r scales::comma(nrow(doj_test))` in the testing set.
 
 
 
