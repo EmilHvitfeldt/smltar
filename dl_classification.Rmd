@@ -90,7 +90,25 @@ kickstarter %>%
 
 We can't tell for sure if the change happened at 2010-10-20, but that is the last day a campaign was launched with more then 135 characters.
 
-## First attempt
+## A first classification model {#firstdlclassification}
+
+Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
+This data will be hard to work with since we don't have much information to work with.
+
+We use `initial_split()` to define the training/testing split. We will focus on modeling the `blurb` alone in this chapter. We will restict the data to only include `blurb`s with more then 15 characters. The short `blurb`s tend to uninformative single words.
+
+```{r dojsplit, dependson="doj"}
+library(tidymodels)
+set.seed(1234)
+kickstarter_split <- kickstarter %>%
+  filter(nchar(blurb) >= 15) %>%
+  initial_split()
+
+kickstarter_train <- training(kickstarter_split)
+kickstarter_test <- testing(kickstarter_split)
+```
+
+There are `r comma(nrow(kickstarter_train))` press releases in the training set and `r comma(nrow(kickstarter_test))` in the testing set.
 
 ### Look at the data
 
