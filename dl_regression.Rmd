@@ -52,7 +52,20 @@ doj_press %>%
   labs(x = "Number of press releases", y = NULL)
 ```
 
+```{block, type = "rmdnote"}
+The DOJ press releases are relatively _long_ documents; we will take this into consideration as we build neural network architectures for modeling.
+```
 
+```{r agencycounts, dependson="doj", fig.cap="Distribution of character count for Department of Justice press releases"}
+doj_press %>%
+  ggplot(aes(nchar(contents))) +
+  geom_histogram(bins = 25, alpha = 0.8) +
+  scale_x_log10(labels = scales::comma_format()) +
+  labs(x = "Number of characters per press release",
+       y = "Number of press releases")
+```
+
+Compared to the documents we built deep learning models for in Chapter \@ref(dlclassification), these press releases are long, with a median character count of `r median(nchar(doj_press$contents), na.rm = TRUE)` for the `contents` of the press releases. We can use deep learning models to model these longer sequences.
 
 
 ## First attempt
