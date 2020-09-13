@@ -65,12 +65,38 @@ doj_press %>%
        y = "Number of press releases")
 ```
 
-Compared to the documents we built deep learning models for in Chapter \@ref(dlclassification), these press releases are long, with a median character count of `r median(nchar(doj_press$contents), na.rm = TRUE)` for the `contents` of the press releases. We can use deep learning models to model these longer sequences.
+Compared to the documents we built deep learning models for in Chapter \@ref(dlclassification), these press releases are long, with a median character count of `r comma(median(nchar(doj_press$contents), na.rm = TRUE))` for the `contents` of the press releases. We can use deep learning models to model these longer sequences.
+
+Some examples, such as this press release from the end of 2016, are quite short:
+
+> Deputy Attorney General Sally Q. Yates released the following statement after President Obama granted commutation of sentence to 153 individuals: "Today, another 153 individuals were granted commutations by the President.  Over the last eight years, President Obama has given a second chance to over 1,100 inmates who have paid their debt to society.  Our work is ongoing and we look forward to additional announcements from the President before the end of his term."
 
 
-## First attempt
+## A first regression model {#firstdlregression}
 
-### Look at the data
+```{block, type = "rmdnote"}
+As we walk through building a deep learning model, notice which steps are different and which steps are the same now that we use a neural network architecture.
+```
+
+Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
+
+We use `initial_split()` to define the training/testing split, after removing examples that have a `title` but no `contents` in the press release. We will focus mainly on modeling the `contents` in this chapter, althought the title is also text that could be handled in a deep learning model.
+
+```{r dojsplit, dependson="doj"}
+library(tidymodels)
+set.seed(1234)
+doj_split <- doj_press %>%
+  filter(!is.na(contents)) %>%
+  initial_split()
+
+doj_train <- training(doj_split)
+doj_test <- testing(doj_split)
+```
+
+There are `r comma(nrow(doj_train))` press releases in the training set and `r comma(nrow(doj_test))` in the testing set.
+
+
+
 
 ### Modeling
 
