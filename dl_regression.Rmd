@@ -56,12 +56,15 @@ doj_press %>%
 The DOJ press releases are relatively _long_ documents; we will take this into consideration as we build neural network architectures for modeling.
 ```
 
-```{r dojlength, dependson="doj", fig.cap="Distribution of character count for Department of Justice press releases"}
+```{r dojlength, dependson="doj", fig.cap="Distribution of word count for Department of Justice press releases"}
+library(tidytext)
 doj_press %>%
-  ggplot(aes(nchar(contents))) +
+  unnest_tokens(word, contents) %>%
+  count(title) %>%
+  ggplot(aes(n)) +
   geom_histogram(bins = 25, alpha = 0.8) +
   scale_x_log10(labels = scales::comma_format()) +
-  labs(x = "Number of characters per press release",
+  labs(x = "Number of words per press release",
        y = "Number of press releases")
 ```
 
@@ -89,7 +92,7 @@ set.seed(1234)
 doj_split <- doj_press %>%
   filter(!is.na(contents),
          nchar(contents) > 5e2, nchar(contents) < 5e4) %>%
-  mutate(date = as.numeric(date)) %>%  ## can convert back with origin = "1970-01-01"
+  mutate(date = as.numeric(date) / 1e4) %>%  ## can convert back with origin = "1970-01-01"
   initial_split()
 
 doj_train <- training(doj_split)
@@ -102,37 +105,106 @@ There are `r scales::comma(nrow(doj_train))` press releases in the training set 
 We converted the `date` variable to its underlying numeric representation so we can more easily train any kind of regression model we want. To go from an object that has R's date type to a numeric, use `as.numeric(date)`. To convert back from this numeric representation to a date, use `as.Date(date, origin = "1970-01-01")`. That special date is the "origin" (like zero) for the numbering system used by R's date types.
 ```
 
-## Preprocessing for deep learning
+Notice that we also scaled (divided) the `date` outcome by a constant factor so all the values are closer to one. Deep learning models sometimes do not perform well when dealing with very large numeric values.
+
+### Preprocessing for deep learning
 
 The preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlclassification) and \@ref(mlregression). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we put a filter on how many words we'll keep in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this dataset.
 
 ```{r dojrec, dependson="dojsplit"}
 library(textrecipes)
 
-max_words <- 20000
-max_length <- 500
+max_words <- 2e4
+max_length <- 1e3
 
-doj_rec <- recipe(date ~ contents, data = doj_train) %>%
+doj_rec <- recipe(~ contents, data = doj_train) %>%
   step_tokenize(contents) %>%
   step_tokenfilter(contents, max_tokens = max_words) %>%
-  step_sequence_onehot(contents, sequence_length = max_length)
+  step_sequence_onehot(contents, sequence_length = max_length,
+                       truncating = "post", padding = "post")
 
 doj_rec
 ```
 
+After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words with integers representing each token in the vocabulary of `r scales::comma(max_words)` words. This is different than the representations we used in Chapters \@ref(mlclassification) and \@ref(mlregression), mainly because all the information about word sequence is encoded in this representation.
 
+```{block, type = "rmdwarning"}
+Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).
+```
+
+The DOJ press releases have a wide spread in document length, and we have to make a decision about how long of a sequence to include in our preprocessing. 
+
+- If we choose the longest document, all the shorter documents will be "padded" with zeroes indicating no words or tokens in those empty spaces and our feature space will grow very large. 
+- If we choose the shortest document as our sequence length, our feature space will be more manageable but all the longer documents will get cut off and we won't include any of that information in our model. 
+
+In a situation like this, it's can often work well to choose a medium sequence length, like `r max_length` words in this case, that involves truncating the longest documents and padding the shortest documents. We also center and scale the input data with `step_normalize()` because neural networks tend to work better this way.
+
+In previous chapters, we used a preprocessing recipe like `doj_rec` in a tidymodels workflow but for our neural network models, we don't have that option. We need to be able to work with the keras modeling functions directly because of the flexible options needed to build many neural network architectures. We need to execute our preprocessing recipe, using first `prep()` and then `bake()`. 
+
+```{block, type = "rmdnote"}
+When we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a dataset, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a dataset like a tibble or a matrix.
+```
+
+We could have applied these functions to any preprocessing recipes in previous chapters, but we didn't need to because our modeling workflows automated these steps.
 
 ```{r dojmatrix, dependson="dojrec"}
-doj_matrix <- prep(doj_rec) %>%
-  bake(new_data = NULL, composition = "matrix")
+doj_prep <- prep(doj_rec)
+doj_matrix <- bake(doj_prep, new_data = NULL, composition = "matrix")
 
 dim(doj_matrix)
 ```
 
+Here we use `composition = "matrix"` because the keras modeling functions operate on matrices.
 
 
+### Recurrent neural network
 
-### Modeling
+
+```{r}
+library(keras)
+
+rnn_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
+  layer_simple_rnn(units = 16) %>%
+  layer_dense(units = 1)
+
+rnn_mod
+```
+
+Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for this numeric representation of date.
+
+
+```{r}
+rnn_mod %>% 
+  compile(
+    optimizer = "rmsprop",
+    loss = "mse",
+    metrics = c("mean_squared_error")
+  )
+```
+
+
+```{r eval=FALSE}
+history <- rnn_mod %>% 
+  fit(
+    doj_matrix, 
+    doj_train$date,
+    epochs = 10,
+    batch_size = 128,
+    validation_split = 0.2
+  )
+```
+
+
+```{r eval=FALSE}
+rnn_mod %>%
+  evaluate(
+    bake(doj_prep, doj_test, composition = "matrix"),
+    doj_test$date
+  )
+```
+
+
 
 ### Evaluation
 
@@ -204,7 +276,7 @@ lasso_rs %>%
   ggplot(aes(x = date, y = .pred, color = id)) + 
   geom_abline(lty = 2, color = "gray50") + 
   geom_point(alpha = 0.3) 
-  #ylim(min(doj_press$date), max(doj_press$date))
+#ylim(min(doj_press$date), max(doj_press$date))
 
 ```
 
