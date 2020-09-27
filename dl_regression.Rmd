@@ -80,13 +80,16 @@ As we walk through building a deep learning model, notice which steps are differ
 
 Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
 
-We use `initial_split()` to define the training/testing split, after removing examples that have a `title` but no `contents` in the press release. We will focus mainly on modeling the `contents` in this chapter, althought the title is also text that could be handled in a deep learning model.
+We use `initial_split()` to define the training/testing split, after removing examples that have a `title` but no `contents` in the press release. We will focus mainly on modeling the `contents` in this chapter, although the title is also text that could be handled in a deep learning model. Almost all of the press releases have character counts between 500 and 50,000, but let's exclude the ones that don't because they will represent a challenge for the preprocessing required for deep learning models.
 
 ```{r dojsplit, dependson="doj"}
 library(tidymodels)
+library(lubridate)
 set.seed(1234)
 doj_split <- doj_press %>%
-  filter(!is.na(contents)) %>%
+  filter(!is.na(contents),
+         nchar(contents) > 5e2, nchar(contents) < 5e4) %>%
+  mutate(date = as.numeric(date)) %>%  ## can convert back with origin = "1970-01-01"
   initial_split()
 
 doj_train <- training(doj_split)
@@ -94,6 +97,37 @@ doj_test <- testing(doj_split)
 ```
 
 There are `r scales::comma(nrow(doj_train))` press releases in the training set and `r scales::comma(nrow(doj_test))` in the testing set.
+
+```{block, type = "rmdwarning"}
+We converted the `date` variable to its underlying numeric representation so we can more easily train any kind of regression model we want. To go from an object that has R's date type to a numeric, use `as.numeric(date)`. To convert back from this numeric representation to a date, use `as.Date(date, origin = "1970-01-01")`. That special date is the "origin" (like zero) for the numbering system used by R's date types.
+```
+
+## Preprocessing for deep learning
+
+The preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlclassification) and \@ref(mlregression). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we put a filter on how many words we'll keep in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this dataset.
+
+```{r dojrec, dependson="dojsplit"}
+library(textrecipes)
+
+max_words <- 20000
+max_length <- 500
+
+doj_rec <- recipe(date ~ contents, data = doj_train) %>%
+  step_tokenize(contents) %>%
+  step_tokenfilter(contents, max_tokens = max_words) %>%
+  step_sequence_onehot(contents, sequence_length = max_length)
+
+doj_rec
+```
+
+
+
+```{r dojmatrix, dependson="dojrec"}
+doj_matrix <- prep(doj_rec) %>%
+  bake(new_data = NULL, composition = "matrix")
+
+dim(doj_matrix)
+```
 
 
 
@@ -115,3 +149,64 @@ Express difference from classification model.
 ## Full game
 
 All bells and whistles.
+
+```{r}
+knitr::knit_exit()
+```
+
+
+```{r eval=FALSE}
+## baseline lasso model
+set.seed(123)
+doj_folds <- vfold_cv(doj_train)
+
+doj_rec <- recipe(date ~ contents, data = doj_train) %>%
+  step_tokenize(contents) %>%
+  step_tokenfilter(contents, max_tokens = 5e3) %>%
+  step_tfidf(contents) %>%
+  step_normalize(all_predictors())
+
+doj_rec
+
+lasso_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
+lasso_spec
+
+lambda_grid <- grid_regular(penalty(), levels = 20)
+lambda_grid
+
+doj_wf <- workflow() %>%
+  add_recipe(doj_rec) %>%
+  add_model(lasso_spec)
+
+doj_wf
+
+doParallel::registerDoParallel()
+set.seed(2020)
+lasso_rs <- tune_grid(
+  doj_wf,
+  doj_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+
+autoplot(lasso_rs)
+
+show_best(lasso_rs, "rmse")   ## rmse ~ 550 for date transformed to numeric
+show_best(lasso_rs, "rsq")    ## rsq ~ 0.7
+
+lasso_rs %>%
+  collect_predictions() %>%
+  inner_join(select_best(lasso_rs, "rmse")) %>%
+  mutate(date = as.Date(date, origin = "1970-01-01"),
+         .pred = as.Date(.pred, origin = "1970-01-01")) %>%
+  ggplot(aes(x = date, y = .pred, color = id)) + 
+  geom_abline(lty = 2, color = "gray50") + 
+  geom_point(alpha = 0.3) 
+  #ylim(min(doj_press$date), max(doj_press$date))
+
+```
+
+
+
