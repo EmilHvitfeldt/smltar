@@ -42,12 +42,13 @@ jobs:
         run: |
           R -e 'remotes::install_deps(dependencies = TRUE)'
 
-      - name: Install spacy
+      - name: Install spacy + tensorflow
         run: |
           Rscript -e "reticulate::install_miniconda()"
           echo "options(reticulate.conda_binary = reticulate:::miniconda_conda())" >> .Rprofile
           Rscript -e "reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')"
           Rscript -e "spacyr::spacy_install(prompt = FALSE)"
+          Rscript -e "tensorflow::install_tensorflow(version='1.14.0')"
           
       - name: Session info
         run: |
