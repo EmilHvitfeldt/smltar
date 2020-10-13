@@ -979,13 +979,13 @@ Before we tune the model, we need to set up a set of possible parameter values t
 There are _two_ tunable parameters in this model, the regularization parameter and the maximum number of tokens included in the model. 
 ```
 
-Let's include six possible values for each parameter, for a combination of 36 models.
+Let's include different possible values for each parameter, for a combination of 120 models.
 
 ```{r finalscotusgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
   max_tokens(range = c(1e3, 6e3)),
-  levels = 6
+  levels = c(penalty = 20, max_tokens = 6)
 )
 
 
@@ -1036,7 +1036,7 @@ final_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = as.factor(max_tokens))) +
   geom_line(size = 1.5, alpha = 0.5) +
-  geom_point(size = 3, alpha = 0.9) +
+  geom_point(size = 2, alpha = 0.9) +
   facet_wrap(~.metric, scales = "free_y") +
   scale_x_log10() +
   labs(color = "Number of tokens",
@@ -1071,11 +1071,15 @@ We can now fit this finalized workflow on training data. For example, we can use
 ```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.width=8, fig.height=5, fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
 library(vip)
 
-final_wf %>%
+scotus_imp <- final_wf %>%
   fit(scotus_train) %>%
   pull_workflow_fit() %>%
-  vi(lambda = lowest_mae$penalty) %>%
+  vi(lambda = lowest_mae$penalty) 
+
+scotus_imp %>%
   mutate(
+    Sign = case_when(Sign == "POS" ~ "Later (after mean year)",
+                     Sign == "NEG" ~ "Earlier (before mean year)",),
     Importance = abs(Importance),
     Variable = str_remove_all(Variable, "tfidf_text_")
   ) %>%
@@ -1096,7 +1100,7 @@ final_wf %>%
 The tokens (unigrams or bigrams) that contribute in the positive direction, like "equal protection" and "sixth amendment", are associated with higher, later years and those that contribute in the negative direction, like "founded" and "dollars", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
-Some of these features are unigrams and some are bigrams, but notice that none include stop words included in the Snowball lexicon because we removed them. The bigram "opinion court" likely mostly represents the phrase "opinion of the court".
+Some of these features are unigrams and some are bigrams, but notice that none include stop words included in the Snowball lexicon because we removed them. The bigram "opinion court" is largely representing the phrase "opinion of the court".
 ```
 
 
