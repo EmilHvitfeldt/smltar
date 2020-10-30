@@ -1,4 +1,5 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/1f6443b9-c220-47cb-b8b4-2cda9f24a302/deploy-status)](https://app.netlify.com/sites/inspiring-kepler-2ccad1/deploys)
+[![Build Status](https://github.com/EmilHvitfeldt/smltar/workflows/bookdown/badge.svg)](https://github.com/EmilHvitfeldt/smltar/actions)
+
 
 This is the repository for the book [**Supervised Machine Learning for Text Analysis in R**](https://smltar.com/), by Emil Hvitfeldt and Julia Silge.
 
