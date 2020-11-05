@@ -15,6 +15,8 @@ doParallel::registerDoParallel()
 
 ## for GH actions
 online <- TRUE
+
+sparse_bp <- hardhat::default_recipe_blueprint(composition = "dgCMatrix")
 ``` 
 
 In this chapter, we will use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a filtered sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
@@ -472,6 +474,94 @@ Models that work best with text tend to be models designed for or otherwise appr
 
 Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
 
+## Case study: sparse encoding {#casestudysparseencoding}
+
+Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been using in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix, rather than a dense data frame or tibble representation.
+
+To keep our text data sparse in the sense of having many zero values, we need to create a slightly different preprocessing recipe.
+
+```{r tfidfrec, dependson="scotussplit"}
+tfidf_rec <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text) %>%
+  step_tokenfilter(text, max_tokens = 1e3) %>%
+  step_tfidf(text) 
+
+tfidf_rec
+```
+
+How is this recipe different from `scotus_rec`? It does not include a step to center and scale the predictors with `step_normalize()`, instead relying on the "normalization" of weighting by tf-idf. Regularized models do require that all predictors are on the same scale, but weighting by tf-idf can often provide this for text data, without a final centering and scaling.
+
+The next step to use the sparse capabilities of `set_engine("glmnet")` is to explicitly set a non-default preprocessing blueprint, using the package hardhat.
+
+```{block, type = "rmdwarning"}
+The [hardhat](https://hardhat.tidymodels.org/) package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
+```
+
+```{r sparsebp}
+library(hardhat)
+sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
+```
+
+This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type (from the Matrix package, @R-Matrix) used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
+
+```{r sparsewf, dependson=c("scotustunespec", "tfidfrec", "sparsebp")}
+sparse_wf <- workflow() %>%
+  add_recipe(tfidf_rec, blueprint = sparse_bp) %>%
+  add_model(tune_spec)
+
+sparse_wf
+```
+
+The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
+
+```{r gridtwenty}
+grid_twenty <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
+
+grid_twenty
+```
+
+We can tune this lasso regression model, in the same way that we did in Section \@ref(tunelasso). We will fit and assess each possible regularization parameter on each resampling fold, to find the best amount of regularization.
+
+```{r sparsetunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval = !online}
+set.seed(2020)
+sparse_rs <- tune_grid(
+  sparse_wf,
+  scotus_folds,
+  grid = grid_twenty
+)
+
+sparse_rs
+```
+
+```{r, include = FALSE, eval = !online}
+write_rds(sparse_rs, "data/ml_reg_sparse_rs.rds")
+```
+
+```{r sparsetuners, include = FALSE}
+sparse_rs <- read_rds("data/ml_reg_sparse_rs.rds")
+sparse_rs
+```
+
+How did this model turn out, especially compared to the tuned model that included centering/scaling and did not use the sparse capabilities of `set_engine("glmnet")`?
+
+```{r dependson="sparsetuners"}
+sparse_rs %>%
+  show_best("rmse")
+```
+
+The best RMSE is nearly identical; the best RMSE for the non-sparse tuned lasso model in Section \@ref(tunelasso) was `r tune_rs_rmse`. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was `r round(lowest_rmse$penalty, 3)`) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
+
+Importantly, this tuning also took a bit less time to complete. 
+
+- The _preprocessing_ was only a little bit faster, because tokenization and computing tf-idf take a long time, compared to `step_normalize()` that we removed. 
+- The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
+
+Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint; depending on how computationally expensive your preprocessing is relative to your model or how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
+
+```{block, type = "rmdnote"}
+Since our model performance is about the same and we see gains in training time, let's use this sparse representation for the rest of this chapter.
+```
+
 ## Case study: removing stop words {#casestudystopwords}
 
 We did not remove stop words (Chapter \@ref(stopwords)) in any of our models so far in this chapter. What impact will removing stop words have, and how do we know which stop word list is the best to use? The best way to answer these questions is with experimentation. 
@@ -486,8 +576,7 @@ stopword_rec <- function(stopword_name) {
     step_tokenize(text) %>%
     step_stopwords(text, stopword_source = stopword_name) %>%
     step_tokenfilter(text, max_tokens = 1e3) %>%
-    step_tfidf(text) %>%
-    step_normalize(all_predictors())
+    step_tfidf(text)
 }
 ```
 
@@ -508,38 +597,30 @@ tunable_wf
 
 Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same tunable lasso model specification that we used in Section \@ref(tunelasso) but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
 
-The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
-
-```{r gridtwenty}
-grid_twenty <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
-
-grid_twenty
-```
-
 Now we can put this all together and tune these models which include stop word removal. We could create a little helper function for tuning like we did for the recipe, but we have printed out all three calls to `tune_grid()` for extra clarity. Notice for each one that there are three arguments:
 
 - A tunable workflow, which consists of the tunable lasso model specification and a data preprocessing recipe with stop word removal
 - The same cross-validation folds we created earlier
-- Our new grid of values for the regularization parameter
+- The same grid of values for the regularization parameter that we used in the previous case study
 
 ```{r stopwordsresoffline, dependson=c("gridtwenty", "tunablewf", "stopwordrec", "scotusfolds"), eval = !online}
 set.seed(123)
 snowball_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("snowball")),
+  tunable_wf %>% add_recipe(stopword_rec("snowball"), blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
 
 set.seed(234)
 smart_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("smart")),
+  tunable_wf %>% add_recipe(stopword_rec("smart"), blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
 
 set.seed(345)
 stopwords_iso_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("stopwords-iso")),
+  tunable_wf %>% add_recipe(stopword_rec("stopwords-iso"), blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
@@ -626,8 +707,7 @@ ngram_rec <- function(ngram_options) {
   recipe(year ~ text, data = scotus_train) %>%
     step_tokenize(text, token = "ngrams", options = ngram_options) %>%
     step_tokenfilter(text, max_tokens = 1e3) %>%
-    step_tfidf(text) %>%
-    step_normalize(all_predictors())
+    step_tfidf(text)
 }
 ```
 
@@ -652,7 +732,7 @@ We can reuse the same components `tunable_wf` and `grid_twenty` from our earlier
 ```{r tunengram, dependson=c("gridtwenty", "tunablewf", "ngramrec", "scotusfolds")}
 tune_ngram <- function(ngram_options) {
   tune_grid(
-    tunable_wf %>% add_recipe(ngram_rec(ngram_options)),
+    tunable_wf %>% add_recipe(ngram_rec(ngram_options), blueprint = sparse_bp),
     scotus_folds,
     grid = grid_twenty
   )
@@ -767,8 +847,7 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
   step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text) %>%
-  step_normalize(all_predictors())
+  step_tfidf(text)
 
 lemma_rec
 ```
@@ -778,8 +857,7 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
   step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text) %>%
-  step_normalize(all_predictors())
+  step_tfidf(text)
 
 lemma_rec
 ```
@@ -789,7 +867,7 @@ Let's combine this lemmatized text with our tunable workflow and grid of possibl
 ```{r, lemmatunersoffline, dependson=c("gridtwenty", "tunablewf", "lemmarecoffline", "scotusfolds"), eval = !online}
 set.seed(123)
 lemma_rs <- tune_grid(
-  tunable_wf %>% add_recipe(lemma_rec),
+  tunable_wf %>% add_recipe(lemma_rec, blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
@@ -942,8 +1020,7 @@ final_rec <- recipe(year ~ text, data = scotus_train) %>%
                    stopwords = stopwords::stopwords(source = "snowball"))
   ) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
-  step_tfidf(text) %>%
-  step_normalize(all_predictors())
+  step_tfidf(text)
 
 final_rec
 ```
@@ -965,7 +1042,7 @@ We can combine the preprocessing recipe and the model specification in a tunable
 
 ```{r tunescotuswf, dependson=c("finalscotusrec", "scotustunespec2")}
 tune_wf <- workflow() %>%
-  add_recipe(final_rec) %>%
+  add_recipe(final_rec, blueprint = sparse_bp) %>%
   add_model(tune_spec)
 
 tune_wf
@@ -1066,14 +1143,28 @@ final_wf
 
 The `final_wf` workflow now has finalized values for `max_tokens` and `penalty`.
 
-We can now fit this finalized workflow on training data. For example, we can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
+We can now fit this finalized workflow on training data and finally return to our testing data. 
+
+```{block, type = "rmdwarning"}
+Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. 
+```
+
+We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
+
+```{r scotusfinalfitted, dependson=c("scotusfinalwf", "scotussplit")}
+final_fitted <- last_fit(final_wf, scotus_split) 
+
+collect_metrics(final_fitted)
+```
+
+The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
+
+The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
 
 ```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.width=8, fig.height=5, fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
 library(vip)
 
-scotus_imp <- final_wf %>%
-  fit(scotus_train) %>%
-  pull_workflow_fit() %>%
+scotus_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
   vi(lambda = lowest_mae$penalty) 
 
 scotus_imp %>%
@@ -1097,32 +1188,11 @@ scotus_imp %>%
        subtitle = "These features are the most importance in predicting the year of an opinion")
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "equal protection" and "sixth amendment", are associated with higher, later years and those that contribute in the negative direction, like "founded" and "dollars", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "see supra" and "scalia", are associated with higher, later years and those that contribute in the negative direction, like "years ago" and "founded", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
 Some of these features are unigrams and some are bigrams, but notice that none include stop words included in the Snowball lexicon because we removed them. The bigram "opinion court" is largely representing the phrase "opinion of the court".
 ```
-
-
-Finally, let's return to our testing data. 
-
-```{block, type = "rmdwarning"}
-Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. 
-```
-
-We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
-
-```{r dependson=c("scotusfinalwf", "scotussplit")}
-final_fitted <- last_fit(
-  final_wf,
-  scotus_split
-) 
-
-final_fitted %>%
-  collect_metrics()
-```
-
-The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year.
 
