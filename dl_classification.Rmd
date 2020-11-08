@@ -174,7 +174,7 @@ The `terms` columns refer to the column we have applied `step_sequence_onehot()`
 
 If we take a look at the resulting matrix we have 1 row per observation. The first row starts with some padded zeroes but turns into 3, 11, 14, which when matched with the vocabulary can construct the original sentence.
 
-```{r sequence_onhot_rec_matrix, dependson="sequence_onhot_rec"}
+```{r sequence_onhot_rec_matrix1, dependson="sequence_onhot_rec"}
 small_spec %>%
   juice(composition = "matrix")
 ```
@@ -187,9 +187,109 @@ But wait, the 4th line should have started with a 4 since the sentence starts wi
 
 Choosing the right length is a balancing act. You want the length to be long enough such that you don't truncate too much of your text data, but still short enough to keep the size of the data down and to avoid excessive padding. Truncating, having large data output and excessive padding all lead to worse model performance. This parameter is controlled by the `sequence_length` argument in `step_sequence_onehot()`. If the sequence is too long then we need to truncate it, this can be done by removing values from the beginning ("pre") or the end ("post") of the sequence. This choice is mostly influenced by the data, and you need to evaluate where most of the extractable information of the text is located. News articles typically start with the main points and then go into detail. If your goal is to detect the broad category then you properly want to keep the beginning of the texts, whereas if you are working with speeches or conversational text, then you might find that the last thing to be said carries more information and this would lead us to truncate from the beginning. Lastly, we need to decide how the padding should be done if the sentence is too short. Pre-padding tends to be more popular, especially when working with RNN and LSTM models since having post-padding could result in the hidden states getting flushed out by the zeroes before getting to the text itself.
 
-`step_sequence_onehot()` defaults to `sequence_length = 100`, `padding = "pre"` and `truncating = "pre"`.
+`step_sequence_onehot()` defaults to `sequence_length = 100`, `padding = "pre"` and `truncating = "pre"`. If we change the truncation to happen at the end
 
-### Look at the data
+```{r sequence_onhot_rec_matrix2, dependson="sequence_onhot_rec"}
+recipe( ~ text, data = small_data) %>%
+  step_tokenize(text) %>%
+  step_sequence_onehot(text, sequence_length = 6, prefix = "", 
+                       padding = "pre", truncating = "post") %>%
+  prep() %>%
+  juice(composition = "matrix")
+```
+
+then we see the 4 at the beginning of the last row representing the "I". The starting points are not aligned since we are still padding on the left side. We left-align all the sequences by setting `padding = "post"`.
+
+```{r sequence_onhot_rec_matrix3, dependson="sequence_onhot_rec"}
+recipe( ~ text, data = small_data) %>%
+  step_tokenize(text) %>%
+  step_sequence_onehot(text, sequence_length = 6, prefix = "", 
+                       padding = "post", truncating = "post") %>%
+  prep() %>%
+  juice(composition = "matrix")
+```
+
+Now we have that all the 4s neatly aligned in the first column.
+
+### Simple Flattened Dense network
+
+The model we will be starting with a model that embeds sentences in sequences of vectors, flattening them, and and then trains a dense layer on top.
+
+```{r}
+library(keras)
+
+model <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, 
+                  output_dim = 12,
+                  input_length = max_length) %>%
+  layer_flatten() %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+model
+```
+
+Let us step through this model specification one layer at a time.
+We start the keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
+Our first layer is an embedding layer via `layer_embedding()` This layer is e equipped to handle preprocessed data we have in `prepped_training`. It will take each observation/row in `prepped_traning` and embed each token to an embedding vector. This will result in each observation being turned into an (embedding_dim x sequence_length) matrix witch would be a (12 x 30) matrix with our settings, creating a (number of observations x embedding_dim x sequence_length) tensor.
+The `layer_flatten()` layer that follows takes the 2 dimensional tensors for each observation and flattens it down into 1 dimension. This will create a `30 * 12 = 360` tensor for each observation. Lastly, we have 2 densely connected layers with the last layer having a sigmoid activation function to give us a number between 0 and 1.
+
+Now that we have specified the architecture of the model we still have a couple of things left to add to the model before we can fit it to the data. A keras model requires an optimizer and a loss function to be able to compile. When the neural network finished passing a batch of data through the network it needs to find a way to use the difference between the predicted values and true values too update the weights. the algorithm that determines those weights is known as the optimization algorithm. keras comes pre-loaded with many optimizers^[https://keras.io/api/optimizers/] and you can even create custom optimizers if what you need isn't on the list. We will start by using the rmsprop optimizer.
+
+```{block, type = "rmdnote"}
+An optimizer can either be set with the name of the optimizer as a character, or by supplying the function `optimizer_*()` where `*` is the name of the optimizer. If you use the function then you are able specify parameters for the optimizer.
+```
+
+During training we need to calculate a quantity which we want to have minimized. This is the loss function, keras comes pre-loaded with many loss functions^[https://keras.io/api/losses/]. These loss function will typically take in two values, typically the true value and the predicted value, and return a measure of how close they are. 
+Since we are working on a binary classification task and have the final layer of the network return a probability, then we find binary crossentropy to be an appropriate loss function. Binary crossentropy does well at dealing with probabilities as it measures the “distance” between probability distributions. which would in our case be between the ground-truth distribution and the predictions.
+
+We can also add any number of `metrics`^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you the user how well the model is performing. We will select accuracy as our metric for now. We can now set these 3 options; optimizer, loss and metrics using the `compile()` function
+
+```{r, eval=FALSE}
+model %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+```{block, type = "rmdnote"}
+Notice how the `compile()` function modifies the network in place. This is different then what is conventionally done in R where a new network object would have been returned.
+```
+
+Finally we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
+This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly we set `validation_split = 0.2` to sprecify a internal validation split for when the metrics are calculated.
+
+```{r, eval=FALSE}
+history <- model %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+```
+
+We can visualize the results of the training loop by `plot()`ing the `history.
+
+```{r, eval=FALSE}
+plot(history)
+```
+
+
+Now that we have the fitted model can we apply the model to our testing dataset to see how well the model performs on data it hasn't seen.
+
+```{r, eval=FALSE}
+model %>%
+  evaluate(
+    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
+```
+
+we see that the accuracy very closely resembles the val_accuracy from the training loop, suggesting that we didn't overfit our model.
+
+# Use this model
 
 ### Modeling
 
