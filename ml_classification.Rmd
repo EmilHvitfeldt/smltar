@@ -837,7 +837,7 @@ We will use the 32-bit version of MurmurHash3 [@appleby2008] here.
 Hashing functions are typically very fast and have certain properties. For example, the output of a hash function is expected to be uniform, with the whole output space filled evenly. The "avalanche effect" describes how similar strings are hashed in such a way that their hashes are not similar in the output space.
 ```
 
-```{r}
+```{r eval=FALSE}
 library(hashFunction)
 countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina", "Mayotte", 
                "Bouvet Island", "South Korea", "San Marino", "American Samoa")
@@ -848,13 +848,13 @@ map_int(countries, murmur3.32)
 Since MurmurHash uses 32 bits, the number of possible values is `2^32 = 4294967296`, which is admittedly not much of an improvement over ten country names.
 Let's take the modulo of these big integer values to project them down to a more manageable space.
 
-```{r}
+```{r eval=FALSE}
 map_int(countries, murmur3.32) %% 24
 ```
 
 Now we can use these values as indices when creating a matrix.
 
-```{r, echo=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 Matrix::sparseMatrix(1:10, map_int(countries, murmur3.32) %% 24, 
                      dims = c(10, 24),
                      dimnames = list(countries, NULL))
@@ -887,19 +887,19 @@ This feature hashing method is used because of its speed and scalability, not be
 
 Feature hashing on tokens is available in tidymodels using the `step_texthash()` step from textrecipes.
 
-```{r complaintshash, dependson="complaintssplit"}
+```{r complaintshash, eval=FALSE, dependson="complaintssplit"}
 complaints_hash <- recipe(product ~ consumer_complaint_narrative, data = complaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_texthash(consumer_complaint_narrative, signed = TRUE, num_terms = 512) %>%
   prep() %>%
-  juice()
+  bake(new_data = NULL)
 
 dim(complaints_hash)
 ```
 
 There are many columns in the results. Let's take a `glimpse()` at the first ten columns.
 
-```{r dependson="complaintshash"}
+```{r eval=FALSE, dependson="complaintshash"}
 complaints_hash %>% 
   select(consumer_complaint_narrative_hash001:consumer_complaint_narrative_hash010) %>% 
   glimpse()
@@ -937,7 +937,7 @@ s1 == s2
 
 This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will results in these two words (which should be identical) hashing to completely different values.
 
-```{r}
+```{r eval=FALSE}
 murmur3.32(s1)
 murmur3.32(s2)
 ```
@@ -946,7 +946,7 @@ We can deal with this problem by performing **text normalization** on our text b
 One library to perform text normalization is the **stringi** package which includes many different text normalization methods.
 How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön" equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition.
 
-```{r}
+```{r eval=FALSE}
 library(stringi)
 
 stri_trans_nfc(s1) == stri_trans_nfc(s2)
