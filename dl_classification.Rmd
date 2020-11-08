@@ -36,7 +36,7 @@ kickstarter %>%
        y = "Number of campaign blurbs")
 ```
 
-it is rightly skewed which is to be expected. Since you don't have have much space to make your impression most people choose to use most of it. There is one odd thing happening in this chart. There is a drop somewhere between 130 and 140. Let us investigate to see if we can find the reason.
+it is rightly skewed which is to be expected. Since you don't have much space to make your impression most people choose to use most of it. There is one odd thing happening in this chart. There is a drop somewhere between 130 and 140. Let us investigate to see if we can find the reason.
 
 We can use `count()` to find the most common `blurb` length.
 
@@ -47,7 +47,7 @@ kickstarter %>%
 
 it appears to be 135 which in and of itself doesn't tell us much. It might be a glitch in the data collection process. Let us put our own eyes to look at what happens around this cutoff point. We can use `slice_sample()` to draw a random sample of the data.
 
-We start by looking at `blurb`s with exactly 135 characters, this is done so that we can identify if the `blurb`s where cut short at 135 characters.
+We start by looking at `blurb`s with exactly 135 characters, this is done so that we can identify if the `blurb`s were cut short at 135 characters.
 
 ```{r}
 set.seed(1)
@@ -57,7 +57,7 @@ kickstarter %>%
   pull(blurb)
 ```
 
-It doesn't appear to be the case as all of these `blurb`s appear coherent and some of them even end with a period to end the sentence. Let us now look at `blurb`s with more then 135 characters if these are different.
+It doesn't appear to be the case as all of these `blurb`s appear coherent and some of them even end with a period to end the sentence. Let us now look at `blurb`s with more than 135 characters if these are different.
 
 ```{r}
 set.seed(1)
@@ -79,7 +79,7 @@ kickstarter %>%
        y = "Number of characters per campaign blurb")
 ```
 
-We see a trend right here. it appears that at the end of 2010 there was a change in policy to have the blurb length shortened from 150 characters to 135 characters.
+We see a trend right here. it appears that at the end of 2010 there was a policy change to have the blurb length shortened from 150 characters to 135 characters.
 
 ```{r}
 kickstarter %>%
@@ -87,13 +87,13 @@ kickstarter %>%
   summarise(max(created_at))
 ```
 
-We can't tell for sure if the change happened at 2010-10-20, but that is the last day a campaign was launched with more then 135 characters.
+We can't tell for sure if the change happened in 2010-10-20, but that is the last day a campaign was launched with more than 135 characters.
 
 ## A first classification model {#firstdlclassification}
 
 Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever. This data will be hard to work with since we don't have much information to work with.
 
-We use `initial_split()` to define the training/testing split. We will focus on modeling the `blurb` alone in this chapter. We will restict the data to only include `blurb`s with more then 15 characters. The short `blurb`s tend to uninformative single words.
+We use `initial_split()` to define the training/testing split. We will focus on modeling the `blurb` alone in this chapter. We will restrict the data to only include `blurb`s with more than 15 characters. The short `blurb`s tend to uninformative single words.
 
 ```{r dojsplit, dependson="doj"}
 library(tidymodels)
@@ -112,7 +112,7 @@ There are `r scales::comma(nrow(kickstarter_train))` press releases in the train
 
 The way we will be doing preprocessing requires a hyperparameter denoting the length of sequences we would like to include. We need to select this value such that we don't overshoot and introduce a lot of padded zeroes which would make the model hard to train, and we also need to avoid picking too short of a range.
 
-We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram. Notice how we are only using the training dataset to avoid data leakage whe selecting this value.
+We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram. Notice how we are only using the training dataset to avoid data leakage when selecting this value.
 
 ```{r kickstarterwordlength, fig.cap="Distribution of word count for Kickstarter campaign blurbs"}
 kickstarter_train %>% 
@@ -123,7 +123,7 @@ kickstarter_train %>%
        y = "Number of campaign blurbs")
 ```
 
-Given that we don't have many words to begin with it make sense to err on the side of longer sequences since we don't want to lose valuable data. I would suppose that 30 would be a good cutoff point.
+Given that we don't have many words, to begin with, it makes sense to err on the side of longer sequences since we don't want to lose valuable data. I would suppose that 30 would be a good cutoff point.
 
 ```{r}
 library(textrecipes)
@@ -213,7 +213,7 @@ Now we have that all the 4s neatly aligned in the first column.
 
 ### Simple Flattened Dense network
 
-The model we will be starting with a model that embeds sentences in sequences of vectors, flattening them, and and then trains a dense layer on top.
+The model we will be starting with a model that embeds sentences in sequences of vectors, flattening them, and then trains a dense layer on top.
 
 ```{r}
 library(keras)
@@ -232,18 +232,18 @@ model
 Let us step through this model specification one layer at a time.
 We start the keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
 Our first layer is an embedding layer via `layer_embedding()` This layer is e equipped to handle preprocessed data we have in `prepped_training`. It will take each observation/row in `prepped_traning` and embed each token to an embedding vector. This will result in each observation being turned into an (embedding_dim x sequence_length) matrix witch would be a (12 x 30) matrix with our settings, creating a (number of observations x embedding_dim x sequence_length) tensor.
-The `layer_flatten()` layer that follows takes the 2 dimensional tensors for each observation and flattens it down into 1 dimension. This will create a `30 * 12 = 360` tensor for each observation. Lastly, we have 2 densely connected layers with the last layer having a sigmoid activation function to give us a number between 0 and 1.
+The `layer_flatten()` layer that follows takes the 2-dimensional tensors for each observation and flattens it down into 1 dimension. This will create a `30 * 12 = 360` tensor for each observation. Lastly, we have 2 densely connected layers with the last layer having a sigmoid activation function to give us a number between 0 and 1.
 
-Now that we have specified the architecture of the model we still have a couple of things left to add to the model before we can fit it to the data. A keras model requires an optimizer and a loss function to be able to compile. When the neural network finished passing a batch of data through the network it needs to find a way to use the difference between the predicted values and true values too update the weights. the algorithm that determines those weights is known as the optimization algorithm. keras comes pre-loaded with many optimizers^[https://keras.io/api/optimizers/] and you can even create custom optimizers if what you need isn't on the list. We will start by using the rmsprop optimizer.
+Now that we have specified the architecture of the model we still have a couple of things left to add to the model before we can fit it to the data. A keras model requires an optimizer and a loss function to be able to compile. When the neural network finished passing a batch of data through the network it needs to find a way to use the difference between the predicted values and true values to update the weights. the algorithm that determines those weights is known as the optimization algorithm. keras comes pre-loaded with many optimizers^[https://keras.io/api/optimizers/] and you can even create custom optimizers if what you need isn't on the list. We will start by using the rmsprop optimizer.
 
 ```{block, type = "rmdnote"}
-An optimizer can either be set with the name of the optimizer as a character, or by supplying the function `optimizer_*()` where `*` is the name of the optimizer. If you use the function then you are able specify parameters for the optimizer.
+An optimizer can either be set with the name of the optimizer as a character or by supplying the function `optimizer_*()` where `*` is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
 ```
 
-During training we need to calculate a quantity which we want to have minimized. This is the loss function, keras comes pre-loaded with many loss functions^[https://keras.io/api/losses/]. These loss function will typically take in two values, typically the true value and the predicted value, and return a measure of how close they are. 
-Since we are working on a binary classification task and have the final layer of the network return a probability, then we find binary crossentropy to be an appropriate loss function. Binary crossentropy does well at dealing with probabilities as it measures the “distance” between probability distributions. which would in our case be between the ground-truth distribution and the predictions.
+During training, we need to calculate a quantity that we want to have minimized. This is the loss function, keras comes pre-loaded with many loss functions^[https://keras.io/api/losses/]. These loss function will typically take in two values, typically the true value and the predicted value, and return a measure of how close they are. 
+Since we are working on a binary classification task and have the final layer of the network return a probability, then we find binary cross-entropy to be an appropriate loss function. Binary cross-entropy does well at dealing with probabilities as it measures the “distance” between probability distributions. which would in our case be between the ground-truth distribution and the predictions.
 
-We can also add any number of `metrics`^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you the user how well the model is performing. We will select accuracy as our metric for now. We can now set these 3 options; optimizer, loss and metrics using the `compile()` function
+We can also add any number of `metrics`^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you of the user how well the model is performing. We will select accuracy as our metric for now. We can now set these 3 options; optimizer, loss, and metrics using the `compile()` function
 
 ```{r, eval=FALSE}
 model %>% compile(
@@ -257,8 +257,8 @@ model %>% compile(
 Notice how the `compile()` function modifies the network in place. This is different then what is conventionally done in R where a new network object would have been returned.
 ```
 
-Finally we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
-This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly we set `validation_split = 0.2` to sprecify a internal validation split for when the metrics are calculated.
+Finally, we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
+This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
 
 ```{r, eval=FALSE}
 history <- model %>% fit(
