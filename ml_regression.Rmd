@@ -228,7 +228,7 @@ lasso_rs %>%
 
 The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is `r first_attemp_rmse` years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
 
-## Compare to the null model
+## Compare to the null model {#regnull}
 
 One way to assess a model like this one is to compare its performance to a "null model."
 
@@ -476,7 +476,7 @@ Algorithms that work well with sparse data are less important when text has been
 
 ## Case study: sparse encoding {#casestudysparseencoding}
 
-Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been using in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix, rather than a dense data frame or tibble representation.
+Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix, rather than a dense data frame or tibble representation.
 
 To keep our text data sparse in the sense of having many zero values, we need to create a slightly different preprocessing recipe.
 
@@ -502,7 +502,7 @@ library(hardhat)
 sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
 ```
 
-This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type (from the Matrix package, @R-Matrix) used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
+This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type, from the Matrix package [@R-Matrix], used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
 
 ```{r sparsewf, dependson=c("scotustunespec", "tfidfrec", "sparsebp")}
 sparse_wf <- workflow() %>%
@@ -556,7 +556,7 @@ Importantly, this tuning also took a bit less time to complete.
 - The _preprocessing_ was only a little bit faster, because tokenization and computing tf-idf take a long time, compared to `step_normalize()` that we removed. 
 - The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
 
-Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint; depending on how computationally expensive your preprocessing is relative to your model or how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
+Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
 
 ```{block, type = "rmdnote"}
 Since our model performance is about the same and we see gains in training time, let's use this sparse representation for the rest of this chapter.
@@ -1133,17 +1133,14 @@ lowest_mae
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
 
 ```{r scotusfinalwf, dependson=c("lowestmae", "tunescotuswf")}
-final_wf <- finalize_workflow(
-  tune_wf,
-  lowest_mae
-)
+final_wf <- finalize_workflow(tune_wf, lowest_mae)
 
 final_wf
 ```
 
 The `final_wf` workflow now has finalized values for `max_tokens` and `penalty`.
 
-We can now fit this finalized workflow on training data and finally return to our testing data. 
+We can now fit this finalized workflow on training data and _finally_ return to our testing data. 
 
 ```{block, type = "rmdwarning"}
 Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. 
