@@ -215,7 +215,7 @@ Now we have that all the 4s neatly aligned in the first column.
 
 The model we will be starting with a model that embeds sentences in sequences of vectors, flattening them, and then trains a dense layer on top.
 
-```{r}
+```{r dense_model}
 library(keras)
 
 dense_model <- keras_model_sequential() %>%
@@ -245,7 +245,7 @@ Since we are working on a binary classification task and have the final layer of
 
 We can also add any number of `metrics`^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you of the user how well the model is performing. We will select accuracy as our metric for now. We can now set these 3 options; optimizer, loss, and metrics using the `compile()` function
 
-```{r, eval=FALSE}
+```{r dense_model_compiled, dependson="dense_model", eval=TRUE}
 dense_model %>% compile(
   optimizer = "rmsprop",
   loss = "binary_crossentropy",
@@ -260,7 +260,7 @@ Notice how the `compile()` function modifies the network in place. This is diffe
 Finally, we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
 This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
 
-```{r, eval=FALSE}
+```{r dense_model_history, dependson="dense_model_compiled", eval=TRUE}
 history <- dense_model %>% fit(
   x = prepped_training, 
   y = kickstarter_train$state,
@@ -272,15 +272,15 @@ history <- dense_model %>% fit(
 
 We can visualize the results of the training loop by `plot()`ing the `history.
 
-```{r, eval=FALSE}
+```{r dense_model_history_plot, dependson="dense_model_history", fig.cap="Training and validation metrics for dense network", eval=TRUE}
 plot(history)
 ```
 
 
 Now that we have the fitted model can we apply the model to our testing dataset to see how well the model performs on data it hasn't seen.
 
-```{r, eval=FALSE}
-x <- dense_model %>%
+```{r dense_model_evaluate, dependson="dense_model_compiled", eval=TRUE}
+dense_model %>%
   evaluate(
     bake(prepped_recipe, kickstarter_test, composition = "matrix"),
     kickstarter_test$state
