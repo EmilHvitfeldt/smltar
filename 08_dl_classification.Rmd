@@ -125,7 +125,7 @@ kickstarter_train %>%
 
 Given that we don't have many words, to begin with, it makes sense to err on the side of longer sequences since we don't want to lose valuable data. I would suppose that 30 would be a good cutoff point.
 
-```{r}
+```{r prepped_recipe}
 library(textrecipes)
 
 max_words <- 20000
@@ -261,7 +261,7 @@ Finally, we can fit the model. When we `fit()` a keras model we need to supply i
 This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
 
 ```{r dense_model_history, dependson="dense_model_compiled", eval=FALSE}
-history <- dense_model %>% fit(
+dense_history <- dense_model %>% fit(
   x = prepped_training, 
   y = kickstarter_train$state,
   batch_size = 512,
@@ -270,12 +270,11 @@ history <- dense_model %>% fit(
 )
 ```
 
-We can visualize the results of the training loop by `plot()`ing the `history.
+We can visualize the results of the training loop by `plot()`ing the `dense_history`.
 
 ```{r dense_model_history_plot, dependson="dense_model_history", fig.cap="Training and validation metrics for dense network", eval=FALSE}
-plot(history)
+plot(dense_history)
 ```
-
 
 Now that we have the fitted model can we apply the model to our testing dataset to see how well the model performs on data it hasn't seen.
 
@@ -289,19 +288,102 @@ dense_model %>%
 
 we see that the accuracy very closely resembles the val_accuracy from the training loop, suggesting that we didn't overfit our model.
 
-### Modeling
+## Using pre-trained word embeddings
 
-### Evaluation
+In the last section did we include an embedding layer, and we let the model train the embedding along with it. This is not the only way to handle this task. In chapter \@ref(embeddings) we looked at how embeddings are created and how they are used. Instead of having the embedding layer start at random and have it being trained alongside the other parameters, let us try to supply them our self. 
 
-## Preprocessing
+We start by getting a pre-trained embedding. The glove embedding that we used in section \@ref(glove) will work for now. Setting `dimensions = 12` let up more easily compare the results with the previous sections.
 
-Mostly the same, we still want to end with all numerics. Use keras/tensorflow to do preprocessing as an example.
+```{r eval=FALSE}
+library(textdata)
 
-## putting your layers together
+glove6b <- embedding_glove6b(dimensions = 12)
+glove6b
+```
 
-## Use embedding
+```{r glove6b12d, echo=FALSE, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
+load("data/glove6b.rda")
+glove6b <- glove6b[, 1:13]
+glove6b
+```
 
-## Model tuning
+The `embedding_glove6b()` function returns a tibble which isn't the right format for what keras expects. Also, take notice of how many rows are present in this embedding. Far more than what the trained recipe is expecting to return. The vocabulary can be extracted from the trained recipe using `tidy()`. First, we apply `tidy()` to `prepped_recipe` to get the list of steps that the recipe contains.
+
+```{r, dependson="prepped_recipe"}
+tidy(prepped_recipe)
+```
+
+We see that the 3rd step is the `sequence_onhot` step, so by setting `number = 3` can we extract the vocabulary of transformation.
+
+```{r, dependson="prepped_recipe"}
+tidy(prepped_recipe, number = 3)
+```
+
+This list of tokens can then be `left_join()`ed to the `glove6b` embedding tibble to only keep the tokens of interest. Any tokens from the vocabulary not found in `glove6b` is replaced with 0 using `mutate_all()` and `replace_na()`. The results are turned into a matrix, and a row of zeroes is added at the top of the matrix to account for the out-of-vocabulary words.
+
+```{r glove6b_matrix, dependson=c("glove6b12d", "prepped_recipe"), eval=FALSE}
+glove6b_matrix <- tidy(prepped_recipe, 3) %>%
+  select(token) %>%
+  left_join(glove6b, by = "token") %>%
+  mutate_all(replace_na, 0) %>%
+  select(-token) %>%
+  as.matrix() %>%
+  rbind(0, .)
+```
+
+The way the model is constructed will remain as unchanged as possible. We make sure that the `output_dim` argument is being set to be equal to` ncol(glove6b_matrix)`, this is a way to make sure that all the dimensions will line up nicely. Everything else stays the same.
+
+```{r dense_model_pte, dependson="glove6b_matrix", eval=FALSE}
+dense_model_pte <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, 
+                output_dim = ncol(glove6b_matrix),
+                input_length = max_length) %>%
+  layer_flatten() %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+```
+
+Now we use `get_layer()` to access the first layer which is the embedding layer, then we set the weights with `set_weights()` and lastly we freeze the weights with `freeze_weights()`. 
+Freezing the weights stops them from being updated during the training loop.
+
+```{r dense_model_pte_weights, dependson="dense_model_pte", eval=FALSE}
+dense_model_pte %>%
+  get_layer(index = 1) %>%
+  set_weights(list(glove6b_matrix)) %>%
+  freeze_weights()
+```
+
+Now we will compile and fit the model just like the last one we looked at.
+
+```{r dense_pte_history, dependson="dense_model_pte_weights", eval=FALSE}
+dense_model_pte %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+
+dense_pte_history <- dense_model_pte %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+```
+
+This model is not performing as well as the previous model and the evaluation isn't that much better.
+
+```{r dense_model_evaluate, dependson="dense_pte_history", eval=FALSE}
+dense_model_pte %>%
+  evaluate(
+    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
+```
+
+## Character level CNN
+
+## Using different optimizers
 
 ## Case Study: Vary NN specific parameters
 
