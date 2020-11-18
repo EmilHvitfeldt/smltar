@@ -380,6 +380,72 @@ dense_model_pte %>%
   )
 ```
 
+Why is this happening? Part of the training loop is about adjusting the weights in the network. 
+When we froze the weights in this network it appears that we froze them at values that did not perform very well. 
+This pre-trained glove embedding[@Pennington2014] we are using have been trained on a Wikipedia dump and [Gigaword 5](https://catalog.ldc.upenn.edu/LDC2011T07) which is a comprehensive archive of newswire text. 
+The text contained on Wikipedia and in new articles both follows certain styles and semantics.
+Both will tend to be written formally and in the past tense. 
+They also contain longer and complete sentences. 
+There are many more distinct features of both Wikipedia text and news articles, but the important part is how similar they are to the data we are trying to use.
+These text fields are very short, lack punctuation, stop words, narrative, and tense. Many of them simply try to pack as many buzz words in as possible while keeping the sentence readable.
+It is not surprising that the word embedding doesn't perform well in this model since the text it is trained on is so far removed from the text is it being applied on.
+
+Although this didn't work that well, doesn't mean that using pre-trained word embeddings are useless.
+Sometimes they can perform very well, the important part is how well the embedding fits the data you are using.
+there is one more way we can use this embedding in our network, we can load it in as before but not freeze the weights.
+This allows the models to still adjust the weights to better fit the data, and the hope is that this pre-trained embedding delivers a better starting point than the randomly generated embedding we get if we don't set the weights.
+
+We specify a new model
+
+```{r dense_model_pte2, dependson="glove6b_matrix", eval=FALSE}
+dense_model_pte2 <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, 
+                output_dim = ncol(glove6b_matrix),
+                input_length = max_length) %>%
+  layer_flatten() %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+```
+
+set the weights with `set_weights()` but we don't freeze them
+
+```{r dense_model_pte_weights, dependson="dense_model_pte", eval=FALSE}
+dense_model_pte2 %>%
+  get_layer(index = 1) %>%
+  set_weights(list(glove6b_matrix))
+```
+
+and we compile and fit the model as we did last time
+
+```{r dense_pte_history, dependson="dense_model_pte_weights", eval=FALSE}
+dense_model_pte2 %>% compile(
+  optimizer = "rmsprop",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+
+dense_pte2_history <- dense_model_pte2 %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 40,
+  validation_split = 0.2
+)
+```
+
+```{r dense_model_evaluate, dependson="dense_pte_history", eval=FALSE}
+dense_model_pte2 %>%
+  evaluate(
+    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
+```
+
+This performs quite a bit better than when we froze the weights.
+However, it is training slower than when we didn't set weights since we had to run it for around 40 epochs before we start to overfit.
+
+If you have enough corpus data in the field you are working on, then it would be worth considering training a word embedding that better captures the structure of the domain you are trying to work with.
+
 ## Character level CNN
 
 ## Using different optimizers
