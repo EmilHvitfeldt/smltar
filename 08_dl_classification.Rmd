@@ -258,14 +258,14 @@ Notice how the `compile()` function modifies the network in place. This is diffe
 ```
 
 Finally, we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
-This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 10` to tell the model to pass all the data through the training loop 10 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
+This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 20` to tell the model to pass all the data through the training loop 20 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
 
 ```{r dense_model_history, dependson="dense_model_compiled", eval=FALSE}
 dense_history <- dense_model %>% fit(
   x = prepped_training, 
   y = kickstarter_train$state,
   batch_size = 512,
-  epochs = 10,
+  epochs = 20,
   validation_split = 0.2
 )
 ```
@@ -292,13 +292,12 @@ we see that the accuracy very closely resembles the val_accuracy from the traini
 
 In the last section did we include an embedding layer, and we let the model train the embedding along with it. This is not the only way to handle this task. In chapter \@ref(embeddings) we looked at how embeddings are created and how they are used. Instead of having the embedding layer start at random and have it being trained alongside the other parameters, let us try to supply them our self. 
 
-We start by getting a pre-trained embedding. The glove embedding that we used in section \@ref(glove) will work for now. Setting `dimensions = 12` let up more easily compare the results with the previous sections.
+We start by getting a pre-trained embedding. The glove embedding that we used in section \@ref(glove) will work for now. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models.
 
 ```{r eval=FALSE}
 library(textdata)
 
-glove6b <- embedding_glove6b(dimensions = 12)
-glove6b
+glove6b <- embedding_glove6b(dimensions = 50) %>% select(1:13)
 ```
 
 ```{r glove6b12d, echo=FALSE, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
@@ -366,7 +365,7 @@ dense_pte_history <- dense_model_pte %>% fit(
   x = prepped_training, 
   y = kickstarter_train$state,
   batch_size = 512,
-  epochs = 10,
+  epochs = 20,
   validation_split = 0.2
 )
 ```
