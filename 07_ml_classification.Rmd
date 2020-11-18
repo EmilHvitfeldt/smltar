@@ -249,11 +249,11 @@ In Figure \@ref(fig:firstheatmap), the diagonal squares have darker shades than 
 One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance as it includes rich information.
 ```
 
-Let's move forward and improve this first model.
+This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more "Credit" complaints are correctly identified than "Other" complaints, either for consumers or for policymakers? 
 
 ## Compare to the null model {#classnull}
 
-Like we did in Section \@ref(regnull), we can assess a model like this one by comparing its performance to a "null model" or baseline model, a simple, non-informative model that always predicts the large class for classification.
+Like we did in Section \@ref(regnull), we can assess a model like this one by comparing its performance to a "null model" or baseline model, a simple, non-informative model that always predicts the largest class for classification. Such a model is perhaps the simplest heuristic or rule-based alternative that we can consider as we assess our modeling efforts.
 
 We can build a classification `null_model()` specification and add it to a `workflow()` with the same preprocessing recipe we used in the previous section, to estimate performance.
 
@@ -318,7 +318,7 @@ svm_rs <- fit_resamples(
 
 Let's again extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r svmrsmetrics, eval = !online}
+```{r, eval = !online}
 svm_rs_metrics <- collect_metrics(svm_rs)
 svm_rs_predictions <- collect_predictions(svm_rs)
 ```
@@ -328,7 +328,7 @@ write_rds(svm_rs_metrics, "data/ml_class_first_svm_rs_metrics.rds")
 write_rds(svm_rs_predictions, "data/ml_class_first_svm_rs_predictions.rds")
 ```
 
-```{r, include = FALSE, eval = online}
+```{r svmrsmetrics, include = FALSE, eval = online}
 svm_rs_metrics <- read_rds("data/ml_class_first_svm_rs_metrics.rds")
 svm_rs_predictions <- read_rds("data/ml_class_first_svm_rs_predictions.rds")
 ```
@@ -588,7 +588,7 @@ more_vars_wf
 
 Let's fit this `workflow()` to our resampled datasets and estimate accuracy, sensitivity, and specificity.
 
-```{r svmrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval = !online}
+```{r morevarsrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval = !online}
 set.seed(123)
 more_vars_rs <- fit_resamples(
   more_vars_wf,
@@ -599,7 +599,7 @@ more_vars_rs <- fit_resamples(
 
 We can extract the metrics from these results with `collect_metrics()`.
 
-```{r svmrsmetrics, eval = !online}
+```{r, eval = !online}
 more_vars_metrics <- collect_metrics(more_vars_rs)
 ```
 
@@ -607,20 +607,20 @@ more_vars_metrics <- collect_metrics(more_vars_rs)
 write_rds(more_vars_metrics, "data/ml_class_more_vars_rs_metrics.rds")
 ```
 
-```{r, include = FALSE, eval = online}
+```{r morevarsmetrics, include = FALSE, eval = online}
 more_vars_metrics <- read_rds("data/ml_class_more_vars_rs_metrics.rds")
 ```
 
 How did these three performance metrics turn out for our model that included more than just the text data?
 
-```{r, dependson="svmrsmetrics"}
+```{r, dependson="morevarsmetrics"}
 more_vars_metrics
 ```
 
-We see here that including more predictors improves our model performance.
+We see here that including more predictors improves our model performance. With only text features in Section \@ref(comparetosvm), we achieved an accuracy of `r round(dplyr::filter(svm_rs_metrics, .metric == "accuracy")$mean, 3)`; now by including the features dealing with dates and tags as well, our accuracy is `r round(dplyr::filter(more_vars_metrics, .metric == "accuracy")$mean, 3)`.
 
 ```{block, type = "rmdnote"}
-This whole book focuses on supervised machine learning for text data, but models like the one built in this section can combine _both_ text predictors and other kinds of predictors.
+This whole book focuses on supervised machine learning for text data, but models can combine _both_ text predictors and other kinds of predictors.
 ```
 
 
@@ -673,7 +673,7 @@ plot_data %>%
 
 There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
 Remember that the current tokenization engine strips punctuation before tokenizing. 
-This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams.
+This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.].
 
 To crudely simulate what the data might look like before it was censored, we can replace all cases of "XX" and "XXXX" with random integers. 
 This isn't quite right since dates will be given values between `00` and `99` and we don't know for sure that only numerals have been censored, but it gives us a place to start.
@@ -730,10 +730,10 @@ What happens when we use these censored dates as a feature in supervised machine
 ```
 
 Data censoring can be a form of preprocessing in your data pipeline.
-For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model.
-Such values appear rarely and are most likely highly correlated with other known variables in your dataset.
+For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your dataset.
 More importantly, that information can become embedded in your model and begin to leak as demonstrated by @carlini2018secret, @Fredrikson2014, and @Fredrikson2015.
 Both of these issues are important, and one of them could land you in a lot of legal trouble. 
+Exposing such PII to modeling is an example of where we should all stop to ask, "Should we even be doing this?" as we discussed in the foreword to these chapters.
 
 If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the _presence_ of a social security number. 
 Since a social security number has a very specific form, we can easily construct a regular expression (Appendix \@ref(regexp)) to locate them.
@@ -760,6 +760,12 @@ str_replace_all(string = ssn_text,
 ```
 
 This technique isn't useful only for personally identifiable information but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
+
+
+```{block2, type = "rmdwarning"}
+The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" datasets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as @Sweeney2000, and current best practices to protect against such mining.
+```
+
 
 ## Case study: custom features {#customfeatures}
 
@@ -1115,9 +1121,10 @@ For the full set of classification metric options, see the [yardstick documentat
 We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
 We started this chapter with a simple naive Bayes model and n-gram token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with n-grams. Our model doesn't have any significant hyperparameters to tune but we will tune the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with n-grams, as well as the non-text features. Our model doesn't have any significant hyperparameters to tune but we will tune the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
+- include both text as well as `tags` and date features,
 - tune the number of tokens used in the model,
 - include trigrams, bigrams, and unigrams,
 - include custom-engineered features,
@@ -1294,7 +1301,7 @@ final_res_predictions %>%
 You can use classification modeling to predict labels or categorical variables from a dataset, including datasets that include text.
 Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
 This is important as bag-of-word text models can involve thousands of tokens.
-We also saw that Support Vector Machine models perform well for text data.
+We also saw that support vector machine models perform well for text data.
 Your own domain knowledge about your text data is incredibly valuable, and using that knowledge in careful engineering of custom features can improve your model.
 
 ### In this chapter, you learned:
@@ -1302,6 +1309,7 @@ Your own domain knowledge about your text data is incredibly valuable, and using
 - how text data can be used in a classification model
 - to tune hyperparameters in the data preprocessing stage
 - how to compare different model types
+- that models can combine both text and non-text predictors
 - how feature hashing can be used as a fast alternative to bag-of-words
 - about engineering custom features for machine learning
 - about performance metrics for classification models
