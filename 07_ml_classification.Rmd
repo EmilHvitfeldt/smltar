@@ -632,6 +632,8 @@ This data censoring can be viewed as data _annotation_; specific account numbers
 Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training dataset.
 
 ```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored information"}
+library(tidytext)
+
 complaints_train %>%
   slice(1:1000) %>%
   unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
