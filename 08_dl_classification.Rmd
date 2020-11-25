@@ -531,7 +531,7 @@ simple_cnn_model <- keras_model_sequential() %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 1, activation = "sigmoid")
 
-cnn_model
+simple_cnn_model
 ```
 
 We are using the same embedding layer as we did in the previous networks so there is nothing new there.
@@ -548,13 +548,13 @@ Networks with fewer layers can give good performance and fast since there isn't 
 The compilation and fitting is the same as we have seen before. 
 
 ```{r simple_cnn_model_fit, dependson="simple_cnn_model", eval=FALSE}
-cnn_model %>% compile(
+simple_cnn_model %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
   metrics = c("accuracy")
 )
 
-history <- cnn_model %>% fit(
+history <- simple_cnn_model %>% fit(
   x = prepped_training, 
   y = kickstarter_train$state,
   batch_size = 512,
@@ -566,16 +566,20 @@ history <- cnn_model %>% fit(
 We are using the `"adam"` optimizer since it performs well for this model. 
 
 ```{block, type = "rmdnote"}
-You will have to experiment to find the optimizer that works best for your specific model.
+You will have to experiment to find the optimizer that works best for your specific model. Different optimizers work differently in different situations and it is up to you to find which works the best for your model and data.
 ```
 
+Now that the model is done fitting we can evaluate it on testing data set.
+
 ```{r simple_cnn_model_evaluation, dependson="simple_cnn_model_fit", eval=FALSE}
-cnn_model %>%
+simple_cnn_model %>%
   evaluate(
     bake(prepped_recipe, kickstarter_test, composition = "matrix"),
     kickstarter_test$state
   )
 ```
+
+We are seeing some improvement over the densely connected network. This is a good development, what we hoped to see was an improvement in our model.
 
 ## Character level Convolutional Neural Network
 
