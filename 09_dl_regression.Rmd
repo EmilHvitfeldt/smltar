@@ -366,9 +366,15 @@ lstm_rsq <- lstm_res %>%
   filter(.metric == "rsq") %>% 
   pull(.estimate) %>% 
   round(3)
+
+lstm_rmse <- lstm_res %>% 
+  metrics(date, .pred) %>% 
+  filter(.metric == "rmse") %>% 
+  pull(.estimate) %>% 
+  round(4)
 ```
 
-We can plot these predictions to evaluate the performance across the range of dates. To make an interpretable plot, we need to convert our numeric representation for date back to R's date type.
+We can plot these predictions to evaluate the performance across the range of dates. To make an interpretable plot, we need to convert our numeric representation for date back to R's date type, as we described in Section \@ref(firstdlregression).
 
 ```{r lstmpreds, fig.cap="Predicted and true dates for Department of Justice press releases using an LSTM model"}
 lstm_res %>% 
@@ -380,7 +386,7 @@ lstm_res %>%
   labs(x = "Truth", y = "Predicted date")
 ```
 
-This first LSTM model tends to predict somewhat high at early dates and low at later dates.
+This first LSTM model is still not working very well, and tends to predict high at early dates and low at later dates.
 
 ```{r plotpreds, echo=FALSE}
 plot_preds <- function(res) {
@@ -435,7 +441,7 @@ bilstm_history <- bilstm_mod %>%
 bilstm_history
 ```
 
-This is our best performing model yet, and we are avoiding extreme overfitting by adding some dropout to the LSTM layers. tktk...
+We may have expected this model to perform better than the regular LSTM but tktk...
 
 ```{r}
 bilstm_res <- tibble(date = date_assess,
@@ -485,7 +491,7 @@ stacked_history <- stacked_mod %>%
 stacked_history
 ```
 
-Adding another separate layer in the forward direction appears to have improved the network, more than extending the LSTM layer to handle information in the backward direction as with the bi-LSTM.
+Adding another separate layer in the forward direction appears to have improved the network, more than extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
 
 ```{r}
 stacked_res <- tibble(date = date_assess,
@@ -494,7 +500,7 @@ stacked_res <- tibble(date = date_assess,
 stacked_res %>% metrics(date, .pred)
 ```
 
-This model is still not performing even as well as a well-trained regularized linear model, and it takes much longer to train.
+This model is still not performing even as well as a well-trained regularized linear model, unfortunately.
 
 ## Case study: cross-validation for deep learning
 
@@ -504,27 +510,27 @@ So far, we have relied on the keras' `fit()` method and its internal processes f
 Think of a single validation set as conceptually doing the same thing as multiple iterations of resampling like cross-validation or bootstrap. A validation set provides **one** opportunity to estimate performance, and repeated iterations of resampling provide **multiple** opportunities.
 ```
 
-A single validation set works well when the original data set is quite large. If that original pool of data isn't quite so large, then the set allocated for validation ends up too small to be statistically representative. In such cases, instead of a single validation set, we can use cross-validation resampling.
+A single validation set works well when the original data set is quite large. If that original pool of data isn't quite so large, like in our dataset of DOJ press releases, then the set allocated for validation ends up too small to be statistically representative or the set allocated for training isn't adequate for fitting more complex architectures. In such cases, instead of a single validation set, we can use a resampling strategy like cross-validation.
 
 ```{r dojfolds}
 set.seed(234)
 
-doj_folds <- vfold_cv(doj_train, v = 3, strata = date)
+doj_folds <- vfold_cv(doj_train, v = 5, strata = date)
 doj_folds
 ```
 
-The dataset of DOJ press releases we are using has `r scales::comma(nrow(doj_press))` examples, and we allocated 3/4 of the press releases to training and 1/4 to testing. When we use 5-fold cross-validation, the `r scales::comma(nrow(doj_train))` observations in the training set are divided into five folds; we use four folds for fitting and one fold for evaluation/assessment during each iteration, iterating through the folds.
+The dataset of DOJ press releases we are using has `r scales::comma(nrow(doj_press))` total examples, and we allocated 3/4 of the press releases to training and 1/4 to testing. When we use 5-fold cross-validation, the `r scales::comma(nrow(doj_train))` observations in the training set are divided into five folds; we use four folds for fitting and one fold for evaluation/assessment during each iteration, iterating through the folds.
 
 ```{block, type = "rmdwarning"}
 What does it mean to conduct stratified resampling with a continuous variable like `date`? The `strata` are determined from quantiles of the distribution of `date`.
 ```
 
-Let's use the same bi-LSTM from Section \@ref(mlregbilstm) but give it a different name for reading clarity. 
+Let's use the same LSTM from Section tktk but give it a different name for reading clarity. 
 
 ```{r cvbilstmmod}
 cv_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  bidirectional(layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1)) %>%
+  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
   layer_dense(units = 1) 
 
 cv_mod %>% 
@@ -540,7 +546,7 @@ However, we aren't going to just `fit()` this model; we are going to write a fun
 
 
 ```{block, type = "rmdwarning"}
-Remember that a model like this is **modified in place**, so this process will fit the model for two epochs each on the three cross-validation folds, for a total of six epochs. The function returns the transformed validation data for each split, but the model is being updated.
+Remember that a model like this is **modified in place**, so this process will fit the model for two epochs each on the five cross-validation folds, for a total of ten epochs. The function returns the transformed validation data for each split, but the model is being updated.
 ```
 
 
@@ -569,25 +575,25 @@ fit_split <- function(split, prepped_rec, mod) {
 }
 ```
 
-We can `map()` this function across all our cross-validation folds. The model will be trained for six epochs (2 each for the 3 folds).
+We can `map()` this function across all our cross-validation folds. The model will be trained for ten epochs (2 each for the 5 folds).
 
 ```{r}
-doj_fitted <- doj_folds %>%
+cv_fitted <- doj_folds %>%
   mutate(validation = map(splits, fit_split, doj_prep, cv_mod))
 
-doj_fitted
+cv_fitted
 ```
 
 Now we can compute model performance metrics using our trained model `cv_mod`.
 
 ```{r}
-doj_metrics <- doj_fitted %>%
+cv_metrics <- cv_fitted %>%
   mutate(truth = map(splits, ~ assessment(.) %>% pull(date)),
          .pred = map(validation, ~ predict(cv_mod, .)[,1]),
          rmse = map2_dbl(truth, .pred, rmse_vec),
          rsq  = map2_dbl(truth, .pred, rsq_vec))
 
-doj_metrics %>%
+cv_metrics %>%
   select(splits, id, rmse, rsq)
 ```
 
@@ -626,15 +632,14 @@ Being able to flexibly use a resampling strategy like cross-validation is an imp
 padding_rec <- recipe(~ contents, data = doj_train) %>%
   step_tokenize(contents) %>%
   step_tokenfilter(contents, max_tokens = max_words) %>%
-  step_sequence_onehot(contents, sequence_length = max_length,
-                       padding = "post")
+  step_sequence_onehot(contents, sequence_length = max_length, padding = "post")
 
 padding_prep <- prep(padding_rec)
 padding_matrix <- bake(padding_prep, new_data = NULL, composition = "matrix")
 dim(padding_matrix)
 ```
 
-This matrix has the same dimensions as `doj_matrix` but instead of padding with zeroes and truncating at the beginning of these DOJ press releases, this matrix is padded with zeroes at the end and truncates at the end.
+This matrix has the same dimensions as `doj_matrix` but instead of padding with zeroes at the beginning of these DOJ press releases, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
 
 ```{r padanalysis, dependson=c("padrec", "dojval")}
 pad_analysis <- bake(padding_prep, new_data = analysis(doj_val$splits[[1]]), 
@@ -647,7 +652,7 @@ pad_assess <- bake(padding_prep, new_data = assessment(doj_val$splits[[1]]),
 ```{r}
 padding_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  bidirectional(layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1)) %>%
+  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
   layer_dense(units = 1) 
 
 padding_mod %>% 
@@ -677,11 +682,7 @@ padding_res <- tibble(date = date_assess,
 padding_res %>% metrics(date, .pred)
 ```
 
-This padding strategy results in noticeably worse performance.
-
-```{r padpreds, echo = FALSE, fig.cap="Predicted and true dates for Department of Justice press releases with a different padding strategy"}
-plot_preds(padding_res)
-```
+This padding strategy results in...
 
 ```{block, type = "rmdwarning"}
 Different preprocessing strategies have a huge impact on deep learning results. 
@@ -693,6 +694,8 @@ Different preprocessing strategies have a huge impact on deep learning results.
 
 ## The full game: regression {#dlregfull}
 
+- Let's create a new validation split with a new seed from the training data, since we've been using the first one so much.
+- Since padding _after_ the sequences appeared to work better, let's choose that padding strategy.
 
 ```{r}
 set.seed(345)
@@ -700,7 +703,7 @@ doj_val <- validation_split(doj_train, strata = date)
 doj_rec <- recipe(~ contents, data = doj_train) %>%
   step_tokenize(contents) %>%
   step_tokenfilter(contents, max_tokens = max_words) %>%
-  step_sequence_onehot(contents, sequence_length = max_length)
+  step_sequence_onehot(contents, sequence_length = max_length, padding = "post")
 
 doj_prep <- prep(doj_rec)
 
@@ -711,15 +714,22 @@ doj_assess <- bake(doj_prep, new_data = assessment(doj_val$splits[[1]]),
                    composition = "matrix")
 ```
 
+Let's increase the number of cross-validation folds to 10. If we don't change anything about the function `fit_split()`, this will mean we fit our model for 20 epochs.
 
 ```{r dojfolds}
 set.seed(234)
 
-doj_folds <- vfold_cv(doj_train, v = 5, strata = date)
+doj_folds <- vfold_cv(doj_train, v = 10, strata = date)
 doj_folds
 ```
 
-```{r cvbilstmmod}
+We've learned a lot about how to model this dataset over the course of this chapter.
+
+- We can use `dropout` to reduce overfitting.
+- Let's stack several layers together, and in fact increase the number of LSTM layers to three.
+- Our bidirectional LSTM did not perform well with a single validation split, but let's try it here with cross-validation folds.
+
+```{r dlregfinalmod}
 bistack_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
   bidirectional(layer_lstm(
