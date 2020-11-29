@@ -454,6 +454,8 @@ Patterns can be encoded as n-grams\@ref(tokenizingngrams), but this presents pro
 
 The convolutional neural network (CNN) architecture is the most complicated network architecture we have seen so far, so we will take some time to review the construction, the different features, and the hyperparameters you can tune. The goal of this section is to give you an intuition on how each aspect of the CNN affects the behavior. CNNs are well suited to pick up on spatial structures within the data, this is a powerful feature for working with text since text typically contains a good amount of local structure within the text, especially when characters are used as the token. CNNs become efficient layers by having a small number of weights which is used to scan the input tensor, the output tensor that is produced then hopefully can represent specific structures in the data.
 
+It is worth noting that a CNN isn't trying to learn long term structure, but rather detect local patterns along the sequence.
+
 CNNs can work with 1, 2, 3-dimensional data, but it will mostly involve only 1 dimension when we are using it on text, the following illustrations and explanations will be done in 1 dimension to closely match the use-case we are looking at for this book. 
 Figure \@ref(fig:cnn-architecture) illustrates a stereotypical CNN architecture.
 You start with your input sequence, this example uses characters as the token, but it could just as well be words.
