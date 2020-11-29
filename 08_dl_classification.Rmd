@@ -585,6 +585,61 @@ We are seeing some improvement over the densely connected network. This is a goo
 
 ## Character level Convolutional Neural Network
 
+In our models so far we have used "words" as the token of interest. Another choice of token could be "character". Since this data set contains very short texts then we don't have many words to work with. We have filtered the data set to have a minimum text length of 15 and while that helps it doesn't stop the fact that many of the texts will have 1 or 2 words in total.
+
+The idea of using character-level CNNs is nothing new, they have been explored by @Zhang2015 and work quite well on small shorter texts such as headlines and tweets[@Vosoughi2016].
+These kinds of models will be able to detect patterns of the characters inside the words, which means that these models can have very favorable performance in languages with rich morphology all while having a low number of trainable parameters.
+
+We need to remind ourselves that these models don't contain any linguistic knowledge at all, they only "know" the patterns of sequences of characters in the training set. This is not to say the models are useless, but to set our expectations of what the model is capable of, namely pattern detection.
+
+Since we are using a completely different preprocessing setup we need to specify a new recipe. This recipe should tokenize to characters and instead of specifying the maximal number of tokens we want, we instead specify the tokens directly. These tokens will be our alphabet.
+The paper by @Zhang2015 uses an alphabet consisting of 70 characters, including 26 English letters, 10 digits, 33 other characters, and the new line character.
+
+```{text, eval=FALSE}
+abcdefghijklmnopqrstuvwxyz0123456789
+-,;.!?:’’’/\|_@#$%ˆ&*˜‘+-=<>()[]{}
+```
+
+A model using this alphabet would properly work but we should tailor it more to the data we have at hand. Many of the "other" characters are used for punctuation, something that these blurbs don't contain much of. Neither are numbers used much. Let's go simple and only use the 26 letters and spaces.
+Before we move on we can double-check that this is a reasonable choice by using the `unnest_characters()` function from the tidytext package to tokenize to characters and then count the different characters.
+
+```{r}
+library(tidytext)
+kickstarter_train %>%
+  unnest_characters(char, blurb, strip_non_alphanum = FALSE) %>%
+  count(char, sort = TRUE)
+```
+
+If you dig in this list then you find that the frequencies quickly drop off once you get past the letters. We are turning all characters to lowercase, while case does matter some in the text, doubling the alphabet size does not seem worth it.
+
+```{r}
+charlevel_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb, token = "characters", 
+                options = list(strip_non_alphanum = FALSE)) %>%
+  step_sequence_onehot(blurb, 
+                       sequence_length = 70, 
+                       vocabulary = c(letters, " "))%>%
+  prep()
+
+charlevel_training <- charlevel_recipe %>%
+  bake(new_data = NULL, composition = "matrix")
+```
+
+We can confirm that this is working by looking at the first observation. 
+The leading zeroes are happening because we are pre-padding with zeroes
+
+```{r}
+unname(charlevel_training[1, ])
+```
+
+to understand what the indices mean we can extract the vocabulary of `step_sequence_onehot()` using `tidy()` on the prepped recipe.
+
+```{r}
+tidy(charlevel_recipe, 2)
+```
+
+And we are lucky in this case since the vocabulary is in alphabetical order.
+
 ## Using different optimizers
 
 ## Case Study: Vary NN specific parameters
