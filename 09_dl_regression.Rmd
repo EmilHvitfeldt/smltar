@@ -88,20 +88,22 @@ set.seed(1234)
 doj_split <- doj_press %>%
   filter(!is.na(contents),
          nchar(contents) > 5e2, nchar(contents) < 5e4) %>%
-  mutate(date = as.numeric(date) / 1e4) %>%  ## can convert back with origin = "1970-01-01"
+  mutate(date = (as.numeric(date) - 1.6e4) / 1e3) %>%  ## can convert back with origin = "1970-01-01"
   initial_split(strata = date)
 
 doj_train <- training(doj_split)
 doj_test <- testing(doj_split)
 ```
 
-There are `r scales::comma(nrow(doj_train))` press releases in the training set and `r scales::comma(nrow(doj_test))` in the testing set.
-
-```{block, type = "rmdwarning"}
+```{block, type = "rmdnote"}
 We converted the `date` variable to its underlying numeric representation so we can more easily train any kind of regression model we want. To go from an object that has R's date type to a numeric, use `as.numeric(date)`. To convert back from this numeric representation to a date, use `as.Date(date, origin = "1970-01-01")`. That special date is the "origin" (like zero) for the numbering system used by R's date types.
 ```
 
-Notice that we also scaled (divided) the `date` outcome by a constant factor so all the values are closer to one. Deep learning models sometimes do not perform well when dealing with very large numeric values.
+There are `r scales::comma(nrow(doj_train))` press releases in the training set and `r scales::comma(nrow(doj_test))` in the testing set.
+
+```{block, type = "rmdwarning"}
+Notice that we also shifted (subtracted) and scaled (divided) the `date` outcome by constant factors so all the values are close to one and centered around zero. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
+```
 
 ### Preprocessing for deep learning
 
@@ -110,7 +112,7 @@ The preprocessing needed for deep learning network architectures is somewhat dif
 ```{r dojrec, dependson="dojsplit"}
 library(textrecipes)
 
-max_words <- 2e4
+max_words <- 5e3
 max_length <- 500
 
 doj_rec <- recipe(~ contents, data = doj_train) %>%
@@ -149,7 +151,7 @@ doj_matrix <- bake(doj_prep, new_data = NULL, composition = "matrix")
 dim(doj_matrix)
 ```
 
-Here we use `composition = "matrix"` because the keras modeling functions operate on matrices.
+Here we use `composition = "matrix"` because the keras modeling functions operate on matrices, rather than a dataframe or tibble.
 
 
 ### Recurrent neural network
@@ -162,8 +164,8 @@ The keras library has convenient functions for broadly used architectures like R
 library(keras)
 
 rnn_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_simple_rnn(units = 32) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_simple_rnn(units = 64) %>%
   layer_dense(units = 1)
 
 rnn_mod
@@ -174,13 +176,13 @@ Because we are training a regression model, there is no activation function for 
 Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
 
 ```{block, type = "rmdnote"}
-A good default optimizer for text regression problems is `"rmsprop"`, and a good loss function for regression is mean squared error, `"mse"`.
+A good default optimizer for text regression problems is `"adam"`, and a good loss function for regression is mean squared error, `"mse"`.
 ```
 
 ```{r rnnmodcompile}
 rnn_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -208,22 +210,15 @@ rnn_history <- rnn_mod %>%
 rnn_history
 ```
 
-The loss on the training data (called `loss` here) is significant better than the loss on the validation data (`val_loss`), indicating that we are overfitting.
+The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well.
 
 ```{r}
 plot(rnn_history)
 ```
 
-This may be hard to see from how this plot is printed, but the difference between the training and validation loss is lowest at around epoch 6 and then starts to increase, indicating _increasing_ overfitting. This is typical for neural networks without some protections in place; the longer you train, the more overfit your model will be. If we wanted to use this model, we should train it for fewer than ten epochs.
-
-```{block, type = "rmdwarning"}
-This model is doing much better on the validation data than the training data in early epochs! This is because, for the validation data, the loss and model metrics are evaluated at the _end_ of each epoch. The model is improving a lot in those first few epochs, leading to this effect. 
-```
-
-
 ### Evaluation {#dlregevaluation}
 
-We used some keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can instead the `validation_data` argument and send in our own validation set.
+We used some keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can instead use the `validation_data` argument and send in our own validation set.
 
 ```{r dojval}
 set.seed(234)
@@ -252,7 +247,7 @@ date_analysis <- analysis(doj_val$splits[[1]]) %>% pull(date)
 date_assess <- assessment(doj_val$splits[[1]]) %>% pull(date)
 ```
 
-Let's also think about our model architecture. We saw evidence for overfitting, and we can counteract that by including dropout in our RNN, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
+Let's also think about our model architecture. We saw evidence for significant overfitting with our first RNN, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
 
 ```{block, type = "rmdwarning"}
 When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting.
@@ -260,13 +255,13 @@ When we include some dropout, we temporarily remove some units together with the
 
 ```{r}
 rnn_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_simple_rnn(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_simple_rnn(units = 64, dropout = 0.3, recurrent_dropout = 0.3) %>%
   layer_dense(units = 1) 
 
 rnn_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -284,15 +279,13 @@ val_history <- rnn_mod %>%
 val_history
 ```
 
-The overfitting has improved, because we added some dropout; we could increase the dropout more, or expose more data at each gradient update by increasing `batch_size`.
+Instead of overfitting, now we are underfitting, with higher training loss than validation loss. This is too much dropout for this model architecture and this dataset.
 
 ```{r}
-as_tibble(val_history$metrics) %>% 
-  select(contains("loss")) %>%
-  kable()
+plot(val_history)
 ```
 
-The performance of this model on the validation data stops improving after about five epochs, indicating that we don't need to keep training beyond then. Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.
+Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.
 
 ```{r}
 val_res <- tibble(date = date_assess,
@@ -301,7 +294,7 @@ val_res <- tibble(date = date_assess,
 val_res %>% metrics(date, .pred)
 ```
 
-These results are pretty disappointing overall! Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions or units usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section tktk [@Minaee2020], or other machine learning approaches like regularized linear models with good preprocessing. For example, a regularized linear model for this dataset of DOJ press releases results in an RMSE of 0.0516 and an $R^2$ of 0.73. 
+These results are pretty disappointing overall! Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions or units usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section tktk [@Minaee2020], or other machine learning approaches like regularized linear models with good preprocessing. For example, a regularized linear model for this dataset of DOJ press releases results in an RMSE of 0.517 and an $R^2$ of 0.73. 
 
 Fortunately, we can build on the ideas of a simple RNN to build better performing models.
 
@@ -317,13 +310,13 @@ LSTMs are useful in text modeling because of this memory through long sequences;
 
 ```{r lstmmod}
 lstm_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3) %>%
   layer_dense(units = 1) 
 
 lstm_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -341,15 +334,13 @@ lstm_history <- lstm_mod %>%
 lstm_history
 ```
 
-The loss, both for the training and validation data, is lower, indicating that the LSTM architecture is better for modeling these DOJ press releases than the RNN architecture. This is generally true for basically all text data.
+The loss, both for the training and validation data, is lower than in the previous sections, indicating that the LSTM architecture is better for modeling these DOJ press releases than the RNN architecture. This is generally true for basically all text data.
 
 ```{r}
-as_tibble(lstm_history$metrics) %>% 
-  select(contains("loss")) %>%
-  kable()
+plot(lstm_history)
 ```
 
-We can compute any metrics for our validation data that we need to, because we have them available in `doj_assess` and `date_assess`.
+The performance of this model on the validation data stops improving after about five or six epochs, indicating that we don't need to keep training beyond then. This is typical for neural networks; the longer you train, the more overfit your model will be. We can compute any metrics for our validation data that we need to, because we have them available in `doj_assess` and `date_assess`.
 
 ```{r}
 lstm_res <- tibble(date = date_assess,
@@ -357,8 +348,6 @@ lstm_res <- tibble(date = date_assess,
 
 lstm_res %>% metrics(date, .pred)
 ```
-
-These results are much better, but tktk...
 
 ```{r echo=FALSE}
 lstm_rsq <- lstm_res %>% 
@@ -374,29 +363,30 @@ lstm_rmse <- lstm_res %>%
   round(4)
 ```
 
-We can plot these predictions to evaluate the performance across the range of dates. To make an interpretable plot, we need to convert our numeric representation for date back to R's date type, as we described in Section \@ref(firstdlregression).
+These results are much better than the RNNs, although not close to the regularized linear results of RMSE of 0.517 and an $R^2$ of 0.73. We can plot these predictions for the validation set to evaluate the performance across the range of dates. To make an interpretable plot, we need to convert our numeric representation for date back to R's date type, as we described in Section \@ref(firstdlregression).
 
 ```{r lstmpreds, fig.cap="Predicted and true dates for Department of Justice press releases using an LSTM model"}
 lstm_res %>% 
-  mutate(date = as.Date(date * 1e4, origin = "1970-01-01"),
-         .pred = as.Date(.pred * 1e4, origin = "1970-01-01")) %>%
+  mutate(date = as.Date(date * 1e3 + 1.6e4, origin = "1970-01-01"),
+         .pred = as.Date(.pred * 1e3 + 1.6e4, origin = "1970-01-01")) %>%
   ggplot(aes(date, .pred)) + 
   geom_abline(lty = 2, color = "gray20", size = 1.5, alpha = 0.8) + 
   geom_point(alpha = 0.2, color = "#4070a0") +
   labs(x = "Truth", y = "Predicted date")
 ```
 
-This first LSTM model is still not working very well, and tends to predict high at early dates and low at later dates.
+This first LSTM model is still not working very well, especially at the more recent dates.
 
 ```{r plotpreds, echo=FALSE}
 plot_preds <- function(res) {
   res %>% 
-    mutate(date = as.Date(date * 1e4, origin = "1970-01-01"),
-           .pred = as.Date(.pred * 1e4, origin = "1970-01-01")) %>%
+    mutate(date = as.Date(date * 1e3 + 1.6e4, origin = "1970-01-01"),
+           .pred = as.Date(.pred * 1e3 + 1.6e4, origin = "1970-01-01")) %>%
     ggplot(aes(date, .pred)) + 
     geom_abline(lty = 2, color = "gray20", size = 1.5, alpha = 0.9) + 
     geom_point(alpha = 0.2, color = "#4070a0") +
-    labs(x = "Truth", y = "Predicted date")
+    labs(x = "Truth", y = "Predicted date") +
+    coord_fixed()
 }
 ```
 
@@ -417,13 +407,13 @@ The input sequences are passed through the network in two directions, both forwa
 
 ```{r}
 bilstm_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  bidirectional(layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1)) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  bidirectional(layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3)) %>%
   layer_dense(units = 1) 
 
 bilstm_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -441,7 +431,8 @@ bilstm_history <- bilstm_mod %>%
 bilstm_history
 ```
 
-We may have expected this model to perform better than the regular LSTM but tktk...
+The bidirectional LSTM is theoretically more able to represent the data well, but with the same amount of dropout, the result is more dramatic overfitting; there is not much improvement on the validation set. When moving to a more complex network, we will need to take more steps to reduce overfitting.
+
 
 ```{r}
 bilstm_res <- tibble(date = date_assess,
@@ -450,10 +441,10 @@ bilstm_res <- tibble(date = date_assess,
 bilstm_res %>% metrics(date, .pred)
 ```
 
-The bidirectional LSTM, able to learn both forward and backward text structures, is now tktk...
+This bidirectional LSTM, able to learn both forward and backward text structures, is not much of an improvement over the regular LSTM on the validation set (which had an RMSE of `r lstm_rmse`) because of the overfitting. 
 
 
-## Case study: stacking RNN layers
+## Case study: stacking LSTM layers
 
 Deep learning architectures can be built up to create extremely complex networks. For example, RNN and LSTM layers can be stacked on top of each other. The idea of this stacking is to increase the ability of a network to represent the data well. 
 
@@ -465,15 +456,15 @@ Let's start by adding one single additional layer.
 
 ```{r stackmod}
 stacked_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1, 
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3, 
              return_sequences = TRUE) %>%
-  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
+  layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3) %>%
   layer_dense(units = 1) 
 
 stacked_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -529,13 +520,13 @@ Let's use the same LSTM from Section tktk but give it a different name for readi
 
 ```{r cvbilstmmod}
 cv_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3) %>%
   layer_dense(units = 1) 
 
 cv_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -546,7 +537,7 @@ However, we aren't going to just `fit()` this model; we are going to write a fun
 
 
 ```{block, type = "rmdwarning"}
-Remember that a model like this is **modified in place**, so this process will fit the model for two epochs each on the five cross-validation folds, for a total of ten epochs. The function returns the transformed validation data for each split, but the model is being updated.
+Remember that a model like this is **modified in place**, so this process will fit the model for one epoch each on the five cross-validation folds, for a total of five epochs. The function returns the transformed validation data for each split, but the model is being updated.
 ```
 
 
@@ -565,7 +556,7 @@ fit_split <- function(split, prepped_rec, mod) {
     fit(
       x_train, 
       y_train,
-      epochs = 2,
+      epochs = 1,
       validation_data = list(x_val, y_val),
       batch_size = 64,
       verbose = FALSE
@@ -575,7 +566,7 @@ fit_split <- function(split, prepped_rec, mod) {
 }
 ```
 
-We can `map()` this function across all our cross-validation folds. The model will be trained for ten epochs (2 each for the 5 folds).
+We can `map()` this function across all our cross-validation folds. The model will be trained for five epochs (1 each for the 5 folds).
 
 ```{r}
 cv_fitted <- doj_folds %>%
@@ -597,7 +588,7 @@ cv_metrics %>%
   select(splits, id, rmse, rsq)
 ```
 
-Using cross-validation results in much better model performance compared to using a validation set alone. The amount of data we have in these DOJ press releases requires a more complex resampling strategy for fitting neural networks, rather than a single validation set.
+These are metrics computed on the assessment set of each resample. They look very promising!
 
 ```{block, type = "rmdnote"}
 The functions `rmse_vec()` and `rsq_vec()` from yardstick are for situations when the true and predicted values are stored in a vector rather than dataframe or tibble, like we have here. All yardstick metrics have vector versions of functions.
@@ -612,13 +603,13 @@ cv_res <- tibble(date = date_assess,
 cv_res %>% metrics(date, .pred)
 ```
 
-Finally we have trained a deep learning model that performs better than a straightforward linear model. Remember that we reported in Section \@ref(dlregevaluation) that such a model has an RMSE of 0.0516 and an $R^2$ of 0.73. 
+Finally we have trained a deep learning model that performs better than a straightforward linear model. Remember that we reported in Section \@ref(dlregevaluation) that such a model has an RMSE of 0.517 and an $R^2$ of 0.73. Using cross-validation results in much better model performance compared to using a single validation set alone. The amount of data we have in these DOJ press releases requires a more complex resampling strategy for fitting neural networks, rather than a single validation set.
 
-```{r cvpreds, fig.cap="Predicted and true dates for Department of Justice press releases using a bi-LSTM and cross-validation"}
+
+```{r cvpreds, fig.cap="Predicted and true dates for Department of Justice press releases using an LSTM and cross-validation"}
 plot_preds(cv_res)
 ```
 
-Being able to flexibly use a resampling strategy like cross-validation is an important piece of your machine learning toolkit. 
 
 ```{block, type = "rmdnote"}
 Being able to flexibly use a resampling strategy like cross-validation is an important piece of your machine learning toolkit. 
@@ -651,13 +642,13 @@ pad_assess <- bake(padding_prep, new_data = assessment(doj_val$splits[[1]]),
 
 ```{r}
 padding_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_lstm(units = 32, dropout = 0.1, recurrent_dropout = 0.1) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(units = 64, dropout = 0.3, recurrent_dropout = 0.3) %>%
   layer_dense(units = 1) 
 
 padding_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
@@ -674,6 +665,7 @@ padding_history <- padding_mod %>%
 
 padding_history
 ```
+This padding strategy results in much worse performance than the default option!
 
 ```{r}
 padding_res <- tibble(date = date_assess,
@@ -682,7 +674,7 @@ padding_res <- tibble(date = date_assess,
 padding_res %>% metrics(date, .pred)
 ```
 
-This padding strategy results in...
+The same model architecture with default padding preprocessing resulted in an RMSE of `r lstm_rmse` and an $R^2$ of `r lstm_rsq`; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity.
 
 ```{block, type = "rmdwarning"}
 Different preprocessing strategies have a huge impact on deep learning results. 
@@ -694,97 +686,91 @@ Different preprocessing strategies have a huge impact on deep learning results.
 
 ## The full game: regression {#dlregfull}
 
-- Let's create a new validation split with a new seed from the training data, since we've been using the first one so much.
-- Since padding _after_ the sequences appeared to work better, let's choose that padding strategy.
-
-```{r}
-set.seed(345)
-doj_val <- validation_split(doj_train, strata = date)
-doj_rec <- recipe(~ contents, data = doj_train) %>%
-  step_tokenize(contents) %>%
-  step_tokenfilter(contents, max_tokens = max_words) %>%
-  step_sequence_onehot(contents, sequence_length = max_length, padding = "post")
-
-doj_prep <- prep(doj_rec)
-
-doj_analysis <- bake(doj_prep, new_data = analysis(doj_val$splits[[1]]), 
-                     composition = "matrix")
-
-doj_assess <- bake(doj_prep, new_data = assessment(doj_val$splits[[1]]), 
-                   composition = "matrix")
-```
-
-Let's increase the number of cross-validation folds to 10. If we don't change anything about the function `fit_split()`, this will mean we fit our model for 20 epochs.
-
-```{r dojfolds}
-set.seed(234)
-
-doj_folds <- vfold_cv(doj_train, v = 10, strata = date)
-doj_folds
-```
-
 We've learned a lot about how to model this dataset over the course of this chapter.
 
-- We can use `dropout` to reduce overfitting.
+- We can use `dropout` and cross-validation to reduce overfitting.
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
-- Our bidirectional LSTM did not perform well with a single validation split, but let's try it here with cross-validation folds.
+- We have still been overfitting significantly with our model architectures, so let's try increasing the dropout more.
 
 ```{r dlregfinalmod}
-bistack_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  bidirectional(layer_lstm(
-    units = 32, dropout = 0.1, recurrent_dropout = 0.1, 
+final_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(
+    units = 64, dropout = 0.4, recurrent_dropout = 0.4, 
     return_sequences = TRUE
-  )) %>%
-  bidirectional(layer_lstm(
-    units = 32, dropout = 0.1, recurrent_dropout = 0.1, 
+  ) %>%
+  layer_lstm(
+    units = 64, dropout = 0.4, recurrent_dropout = 0.4, 
     return_sequences = TRUE
-  )) %>%
-  bidirectional(layer_lstm(
-    units = 32, dropout = 0.1, recurrent_dropout = 0.1
-  )) %>%
+  ) %>%
+  layer_lstm(
+    units = 64, dropout = 0.4, recurrent_dropout = 0.4
+  ) %>%
   layer_dense(units = 1) 
 
-bistack_mod %>% 
+final_mod %>% 
   compile(
-    optimizer = "rmsprop",
+    optimizer = "adam",
     loss = "mse",
     metrics = c("mean_squared_error")
   )
 ```
 
+Like we did in Section tktk, we can `map()` our function `fit_split()` across our five cross-validation folds, training for one epoch on each fold.
 
 ```{r}
-bistack_fitted <- doj_folds %>%
-  mutate(validation = map(splits, fit_split, doj_prep, bistack_mod))
+final_fitted <- doj_folds %>%
+  mutate(validation = map(splits, fit_split, doj_prep, final_mod))
 
-bistack_fitted
+final_fitted
 ```
 
+Remember that `final_mod` is modified in place so as this process fits the model for one epoch each on the five cross-validation folds, the model is being updated. Once finished, we can compute model performance metrics using our now-trained model `final_mod`.
 
 ```{r}
-bistack_metrics <- bistack_fitted %>%
+final_metrics <- final_fitted %>%
   mutate(truth = map(splits, ~ assessment(.) %>% pull(date)),
-         .pred = map(validation, ~ predict(bistack_mod, .)[,1]),
-         rmse = map2_dbl(truth, .pred, rmse_vec),
-         rsq  = map2_dbl(truth, .pred, rsq_vec))
+         .pred = map(validation, ~ predict(final_mod, .)[,1]),
+         rmse  = map2_dbl(truth, .pred, rmse_vec),
+         rsq   = map2_dbl(truth, .pred, rsq_vec))
 
-bistack_metrics %>%
+final_metrics %>%
   select(splits, id, rmse, rsq)
 ```
 
-```{r}
-bistack_res <- tibble(date = date_assess,
-                 .pred = predict(bistack_mod, doj_assess)[,1])
+These are metrics computed on the assessment set of each resample, created from the training set. Let's finally turn to the testing set to evaluate this last model on data that has never been touched as part of the fitting process. First, the testing data needs to be preprocessed using the prepared recipe `doj_prep`.
 
-bistack_res %>% metrics(date, .pred)
+```{r}
+doj_testing <- bake(doj_prep, new_data = doj_test, composition = "matrix")
+dim(doj_testing)
+```
+
+Now we can predict on the preprocessed training data `doj_testing` used the fitted model `final_mod` that was trained using cross-validation.
+
+```{r}
+final_res <- tibble(date = doj_test$date,
+                      .pred = predict(final_mod, doj_testing)[,1])
+
+final_res %>% metrics(date, .pred)
 ```
 
 
 ```{r}
-plot_preds(bistack_res)
+plot_preds(final_res)
 ```
 
+## Summary {#dlregressionsummary}
+
+Neural networks don't always perform better than more straightforward models...
+
+### In this chapter, you learned:
+
+- how to preprocess text data for deep learning models
+- about the importance of centering and scaling regression outcomes for neural networks
+- about RNN, LSTM, and bidirectional LSTM network architectures
+- that network layers like RNNs and LSTMs can be stacked for greater network capacity
+- about resampling strategies for deep learning models
+- how to evaluate deep learning regression models for text
 
 
 ```{r echo=FALSE}
@@ -832,14 +818,14 @@ lasso_rs <- tune_grid(
 
 autoplot(lasso_rs)
 
-show_best(lasso_rs, "rmse")   ## rmse ~ .0516 for date transformed to numeric
+show_best(lasso_rs, "rmse")   ## rmse ~ .517 for date transformed to numeric
 show_best(lasso_rs, "rsq")    ## rsq ~ 0.73
 
 lasso_rs %>%
   collect_predictions() %>%
   inner_join(select_best(lasso_rs, "rmse")) %>%
-  mutate(date = as.Date(date * 1e4, origin = "1970-01-01"),
-         .pred = as.Date(.pred * 1e4, origin = "1970-01-01")) %>%
+  mutate(date = as.Date(date * 1e3 + 1.6e4, origin = "1970-01-01"),
+         .pred = as.Date(.pred * 1e3 + 1.6e4, origin = "1970-01-01")) %>%
   ggplot(aes(x = date, y = .pred, color = id)) + 
   geom_abline(lty = 2, color = "gray50", size = 1.5, alpha = 0.8) + 
   geom_point(alpha = 0.3) +
