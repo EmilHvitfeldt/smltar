@@ -94,34 +94,6 @@ Notice how the choice of the token will affect how we think about kernel size.
 For character level tokens a kernel size of 5 will in early layers find patterns in parts of words more often than patterns across words since 5 characters aren't enough the adequately span multiple words. 
 Where on the other hand a kernel size of 5 for word-level tokens will find patterns in parts of sentences instead. Kernels most have an odd length.
 
-### Stride
-
-The stride is the second big hyperparameter that controls the kernels in a CNN. The stride length determines how much the kernel moves along the sequence between each calculation. A stride length of 1 means that the kernel moves over one place at a time, this way we get maximal overlap.
-
-```{r cnn-stride, echo= FALSE, fig.cap="The stride length affects the size of the resulting tensor. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting tensor by skipping windows."}
-knitr::include_graphics("diagram-files/cnn-stride.png")
-```
-
-In figure \@ref(fig:cnn-stride) we see that if the kernel size and stride length are equal then there is no overlap. We can decrease the size of the output tensor by increasing the stride length. Be careful not to set the stride length to be larger than the kernel size, otherwise, then you will skip over some of the information.
-
-### Dilation
-
-The dilation controls how the kernel is applied to the input tensor.
-So far we have shown examples where the dilation is equal to 1. This means that each value from the input tensor will be spaced 1 distance apart from each other.
-
-```{r cnn-dilation, echo= FALSE, fig.cap="The dilation affects the size of the resulting tensor. When dilation = 1 then consecutive values are taking from the input. Increasing the dilation leaves gaps between input values and decreases the resulting tensor."}
-knitr::include_graphics("diagram-files/cnn-dilation.png")
-```
-
-If we increase the dilation then can see in figure \@ref(fig:cnn-dilation) that there will be spaces or gaps between the input values. This allows the kernel to find large spatial patterns that span many tokens.
-This is a useful trick to be able to extract features and structure from long sequences. Dilated convolutional layers when put in succession will be able to find patterns in very large sequences.
-
-### Padding
-
-The last hyperparameter we will talk about is padding.
-One of the downsides to how the kernels are being used in the previous figures is how it handles the edge of the sequence.
-Padding is the act of putting something before and after the sequence when the convolution is taking place to be able to extract more information from the first and last tokens in the sequence. Padding will lead to larger output tensors since they we let the kernel move more.
-
 ### Simple CNN
 
 We will start with a fairly standard CNN specification that closely follows what we saw in figure \@ref(fig:cnn-architecture).
@@ -244,3 +216,36 @@ tidy(charlevel_recipe, 2)
 ```
 
 And we are lucky in this case since the vocabulary is in alphabetical order.
+
+
+```{r, include=FALSE}
+knitr::knit_exit()
+```
+
+### Stride
+
+The stride is the second big hyperparameter that controls the kernels in a CNN. The stride length determines how much the kernel moves along the sequence between each calculation. A stride length of 1 means that the kernel moves over one place at a time, this way we get maximal overlap.
+
+```{r cnn-stride, echo= FALSE, fig.cap="The stride length affects the size of the resulting tensor. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting tensor by skipping windows."}
+knitr::include_graphics("diagram-files/cnn-stride.png")
+```
+
+In figure \@ref(fig:cnn-stride) we see that if the kernel size and stride length are equal then there is no overlap. We can decrease the size of the output tensor by increasing the stride length. Be careful not to set the stride length to be larger than the kernel size, otherwise, then you will skip over some of the information.
+
+### Dilation
+
+The dilation controls how the kernel is applied to the input tensor.
+So far we have shown examples where the dilation is equal to 1. This means that each value from the input tensor will be spaced 1 distance apart from each other.
+
+```{r cnn-dilation, echo= FALSE, fig.cap="The dilation affects the size of the resulting tensor. When dilation = 1 then consecutive values are taking from the input. Increasing the dilation leaves gaps between input values and decreases the resulting tensor."}
+knitr::include_graphics("diagram-files/cnn-dilation.png")
+```
+
+If we increase the dilation then can see in figure \@ref(fig:cnn-dilation) that there will be spaces or gaps between the input values. This allows the kernel to find large spatial patterns that span many tokens.
+This is a useful trick to be able to extract features and structure from long sequences. Dilated convolutional layers when put in succession will be able to find patterns in very large sequences.
+
+### Padding
+
+The last hyperparameter we will talk about is padding.
+One of the downsides to how the kernels are being used in the previous figures is how it handles the edge of the sequence.
+Padding is the act of putting something before and after the sequence when the convolution is taking place to be able to extract more information from the first and last tokens in the sequence. Padding will lead to larger output tensors since they we let the kernel move more.
