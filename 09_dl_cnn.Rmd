@@ -17,8 +17,8 @@ doParallel::registerDoParallel()
 online <- TRUE
 ```
 
-The first networks we have shown in this chapter doesn't take advantage of the sequential patterns.
-Text can have patterns of varying length, and this can be hard for a simple dense network to pick up on and learn.
+The first networks\@ref(dldnn) we have shown in this section doesn't take advantage of the sequential patterns.
+Text can have patterns of varying length, and this can be hard for a simple densely connected network to pick up on and learn.
 Patterns can be encoded as n-grams\@ref(tokenizingngrams), but this presents problems if you want to encode these n-grams directly since the dimensionality of the vocabulary shoots up even we just try to capture `n = 2` and `n = 3`.
 
 The convolutional neural network (CNN) architecture is the most complicated network architecture we have seen so far, so we will take some time to review the construction, the different features, and the hyperparameters you can tune. The goal of this section is to give you an intuition on how each aspect of the CNN affects the behavior. CNNs are well suited to pick up on spatial structures within the data, this is a powerful feature for working with text since text typically contains a good amount of local structure within the text, especially when characters are used as the token. CNNs become efficient layers by having a small number of weights which is used to scan the input tensor, the output tensor that is produced then hopefully can represent specific structures in the data.
