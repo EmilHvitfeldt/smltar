@@ -17,6 +17,42 @@ doParallel::registerDoParallel()
 online <- TRUE
 ```
 
+```{r}
+library(tidyverse)
+
+kickstarter <- read_csv("data/kickstarter.csv.gz")
+kickstarter
+```
+
+```{r}
+library(tidymodels)
+set.seed(1234)
+kickstarter_split <- kickstarter %>%
+  filter(nchar(blurb) >= 15) %>%
+  initial_split()
+
+kickstarter_train <- training(kickstarter_split)
+kickstarter_test <- testing(kickstarter_split)
+```
+
+```{r}
+library(textrecipes)
+
+max_words <- 20000
+max_length <- 30
+
+prepped_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = max_words) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length) %>%
+  prep()
+
+prepped_training <- prepped_recipe %>%
+  bake(new_data = NULL, composition = "matrix")
+```
+
+
+
 The first networks we have shown in this chapter doesn't take advantage of the sequential patterns.
 Text can have patterns of varying length, and this can be hard for a simple dense network to pick up on and learn.
 Patterns can be encoded as n-grams\@ref(tokenizingngrams), but this presents problems if you want to encode these n-grams directly since the dimensionality of the vocabulary shoots up even we just try to capture `n = 2` and `n = 3`.
