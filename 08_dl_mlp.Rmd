@@ -1,4 +1,4 @@
-# Multilayer Perceptron {#dlmlp}
+# Deep Neural Network {#dldnn}
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -16,6 +16,12 @@ doParallel::registerDoParallel()
 ## for GH actions
 online <- TRUE
 ```
+
+This is the first chapter in the deep learning section of this book. These chapters are broken up by model architecture instead of by outcome as we did in chapter \@ref(mlclassification) and \@ref(mlregression).
+This chapter will explore the relatively simple deep neural networks. This chapter will be our first look at using keras [@R-keras]. keras is a well-established framework for deep learning with bindings in Python and R.
+While keras provides a nice framework for setting up deep learning models, its tools for resampling and preprocessing are not very tidy so we will be using the tidymodels packages for these tasks. This is a good example of the modularity of the tidymodels framework, we can just use it for the tasks we need without having to fully commit.
+
+## Kickstarter data {#kickstarter}
 
 In this chapter, we will predict binary values, much like we did in Chapter \@ref(mlclassification), but we will use deep learning methods instead. We will be using a dataset of fundraising campaigns from [Kickstarter](https://www.kickstarter.com/).
 
