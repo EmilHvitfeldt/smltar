@@ -294,6 +294,72 @@ dense_model %>%
 
 we see that the accuracy very closely resembles the val_accuracy from the training loop, suggesting that we didn't overfit our model.
 
+### Evaluate Keras predictions
+
+At the end of the last sub-section we used `evaluate()` to see how well our model is performing.
+If you want to use the yardstick package we would have to make some transformations since yardstick needs its input to be data.frames and keras mostly works with matrices and arrays.
+The following function create a little brigde between the two frameworks. It allows us to combine a keras model, recipes recipe along with the data, and return the predictions in a tibble format.
+
+```{r}
+library(dplyr)
+keras_predict <- function(model, recipe, data, response) {
+  baked_data <- bake(recipe, data, composition = "matrix")
+  prediction <- predict(model, baked_data)[, 1]
+  
+  data %>%
+    mutate(
+      .pred_prop = prediction,
+      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
+    ) %>%
+  mutate(across(c({{ response }}, .pred_class), 
+                ~ factor(.x, levels = c(1, 0))))
+}
+```
+
+It is worth noting that this function only works with simple binary classification models that take in its data as a matrix and return a single probability for each observation.
+The function is in addition to returning the predicted probability also returning the predicted class based on a 50% cut-off. The function is also making sure that the class and predicted class are both factors with matching levels.
+
+Using this function will allow us to get prediction results that seamlessly connects with yardstick.
+
+```{r}
+dense_model_predictions <- keras_predict(
+    dense_model, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  )
+
+dense_model_predictions
+```
+
+We can calculate the standard metrics with `matrics()` 
+
+```{r}
+library(yardstick)
+metrics(dense_model_predictions, state, .pred_class)
+```
+
+and we see that they match the results we got from `evaluate()`. Since we have access to yardsticks full capacities we can also calculates confusion matrices and ROC curves.
+Looking at the heatmap in Figure \@ref(fig:dnnheatmap), we are happy to see that there isn't any glaring bias in how the model performs. The model is perfect, it is still only working on around a little over `r scales::percent_format()(floor(100 * accuracy(dense_model_predictions, state, .pred_class)$.estimate) / 100)`, bu is is more or less evenly god at prediction both classes.
+
+```{r dnnheatmap, dependson="nbrs", fig.cap="Confusion matrix for first DNN model predictions of Kickstarter state"}
+dense_model_predictions %>%
+  conf_mat( state, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+The ROC curve in Figure \@ref(fig:dnnroccurve) also looks just as good as we would suspect from the other metrics we have calculated so far. Nothing alarming is standing out for us.
+
+```{r dnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first DNN model predictions of Kickstarter state"}
+dense_model_predictions %>%
+  roc_curve(truth = state, .pred_prop) %>%
+  autoplot() +
+  labs(
+    title = "Receiver operator curve for Kickstarter blurbs"
+  )
+```
+
+
 ## Using pre-trained word embeddings
 
 In the last section did we include an embedding layer, and we let the model train the embedding along with it. This is not the only way to handle this task. In chapter \@ref(embeddings) we looked at how embeddings are created and how they are used. Instead of having the embedding layer start at random and have it being trained alongside the other parameters, let us try to supply them our self. 
