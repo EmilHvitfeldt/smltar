@@ -392,7 +392,7 @@ tidy(prepped_recipe, number = 3)
 
 This list of tokens can then be `left_join()`ed to the `glove6b` embedding tibble to only keep the tokens of interest. Any tokens from the vocabulary not found in `glove6b` is replaced with 0 using `mutate_all()` and `replace_na()`. The results are turned into a matrix, and a row of zeroes is added at the top of the matrix to account for the out-of-vocabulary words.
 
-```{r glove6b_matrix, dependson=c("glove6b12d", "prepped_recipe"), eval=FALSE}
+```{r glove6b_matrix, dependson=c("glove6b12d", "prepped_recipe")}
 glove6b_matrix <- tidy(prepped_recipe, 3) %>%
   select(token) %>%
   left_join(glove6b, by = "token") %>%
@@ -404,7 +404,7 @@ glove6b_matrix <- tidy(prepped_recipe, 3) %>%
 
 The way the model is constructed will remain as unchanged as possible. We make sure that the `output_dim` argument is being set to be equal to` ncol(glove6b_matrix)`, this is a way to make sure that all the dimensions will line up nicely. Everything else stays the same.
 
-```{r dense_model_pte, dependson="glove6b_matrix", eval=FALSE}
+```{r dense_model_pte, dependson="glove6b_matrix"}
 dense_model_pte <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, 
                 output_dim = ncol(glove6b_matrix),
@@ -417,7 +417,7 @@ dense_model_pte <- keras_model_sequential() %>%
 Now we use `get_layer()` to access the first layer which is the embedding layer, then we set the weights with `set_weights()` and lastly we freeze the weights with `freeze_weights()`. 
 Freezing the weights stops them from being updated during the training loop.
 
-```{r dense_model_pte_weights, dependson="dense_model_pte", eval=FALSE}
+```{r dense_model_pte_weights, dependson="dense_model_pte"}
 dense_model_pte %>%
   get_layer(index = 1) %>%
   set_weights(list(glove6b_matrix)) %>%
@@ -426,7 +426,7 @@ dense_model_pte %>%
 
 Now we will compile and fit the model just like the last one we looked at.
 
-```{r dense_pte_history, dependson="dense_model_pte_weights", eval=FALSE}
+```{r dense_pte_history, dependson="dense_model_pte_weights"}
 dense_model_pte %>% compile(
   optimizer = "rmsprop",
   loss = "binary_crossentropy",
@@ -444,7 +444,7 @@ dense_pte_history <- dense_model_pte %>% fit(
 
 This model is not performing as well as the previous model and the evaluation isn't that much better.
 
-```{r dense_pte_evaluate, dependson="dense_pte_history", eval=FALSE}
+```{r dense_pte_evaluate, dependson="dense_pte_history"}
 dense_model_pte %>%
   evaluate(
     bake(prepped_recipe, kickstarter_test, composition = "matrix"),
@@ -469,7 +469,7 @@ This allows the models to still adjust the weights to better fit the data, and t
 
 We specify a new model
 
-```{r dense_model_pte2, dependson="glove6b_matrix", eval=FALSE}
+```{r dense_model_pte2, dependson="glove6b_matrix"}
 dense_model_pte2 <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, 
                 output_dim = ncol(glove6b_matrix),
@@ -481,7 +481,7 @@ dense_model_pte2 <- keras_model_sequential() %>%
 
 set the weights with `set_weights()` but we don't freeze them
 
-```{r dense_model_pte_noweights, dependson="dense_model_pte", eval=FALSE}
+```{r dense_model_pte_noweights, dependson="dense_model_pte"}
 dense_model_pte2 %>%
   get_layer(index = 1) %>%
   set_weights(list(glove6b_matrix))
@@ -489,7 +489,7 @@ dense_model_pte2 %>%
 
 and we compile and fit the model as we did last time
 
-```{r dense_pte_noweights_history, dependson="dense_model_pte_noweights", eval=FALSE}
+```{r dense_pte_noweights_history, dependson="dense_model_pte_noweights"}
 dense_model_pte2 %>% compile(
   optimizer = "rmsprop",
   loss = "binary_crossentropy",
@@ -505,7 +505,7 @@ dense_pte2_history <- dense_model_pte2 %>% fit(
 )
 ```
 
-```{r dense_pte_noweights_evaluate, dependson="dense_pte_noweights_history", eval=FALSE}
+```{r dense_pte_noweights_evaluate, dependson="dense_pte_noweights_history"}
 dense_model_pte2 %>%
   evaluate(
     bake(prepped_recipe, kickstarter_test, composition = "matrix"),
