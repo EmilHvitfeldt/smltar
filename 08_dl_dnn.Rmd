@@ -516,8 +516,54 @@ dense_model_pte2 %>%
 This performs quite a bit better than when we froze the weights.
 However, it is training slower than when we didn't set weights since we had to run it for around 40 epochs before we start to overfit.
 
+```{block, type = "rmdnote"}
 If you have enough corpus data in the field you are working on, then it would be worth considering training a word embedding that better captures the structure of the domain you are trying to work with.
+```
 
+We can combine all the predictions on these last 3 models to more easily compare the results between them
+
+```{r}
+all_dense_model_predictions <- bind_rows(
+  keras_predict(
+    dense_model, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "dense"),
+  keras_predict(
+    dense_model_pte, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "pte (locked weights)"),
+  keras_predict(
+    dense_model_pte2, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "pte (not locked weights)")
+)
+```
+
+Now that the results are combined in `all_dense_model_predictions` we can calculate group-wise evaluation statistics by grouping by the `model` variable.
+
+```{r}
+all_dense_model_predictions %>%
+  group_by(model) %>%
+  metrics(state, .pred_class)
+```
+
+We can also do this for ROC-curves. Figure \@ref(fig:alldnnroccurve) shows the 3 different ROC-curves together in 1 chart. As we know the model using pre-trained word embeddings with locked weights didn't perform very well and its ROC-curve is the lowest of the 3. The other two models perform more similar but the self-trained model ends up beating the pre-trained model after all.
+
+```{r alldnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for all DNN models' predictions of Kickstarter state"}
+all_dense_model_predictions %>%
+  group_by(model) %>%
+  roc_curve(truth = state, .pred_prop) %>%
+  autoplot() +
+  labs(
+    title = "Receiver operator curve for Kickstarter blurbs"
+  )
+```
 
 ```{r echo=FALSE}
 knitr::knit_exit()
