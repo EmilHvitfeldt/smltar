@@ -92,37 +92,33 @@ prepped_training <- prepped_recipe %>%
   bake(new_data = NULL, composition = "matrix")
 ```
 
-We will start with a fairly standard CNN specification that closely follows what we saw in figure \@ref(fig:cnn-architecture).
-We start with an embedding layer followed by a sequence of 1 dimensional convolution layers `layer_conv_1d()`, followed by a global max pooling layer `layer_global_max_pooling_1d()` and a dense layer with a sigmoid activation function to give us 1 value between 0 and 1 to use in our classification.
+We will start with a simple CNN specification that follows what we saw in figure \@ref(fig:cnn-architecture).
+We start with an embedding layer followed by one 1 dimensional convolution layers `layer_conv_1d()`, followed by a global max pooling layer `layer_global_max_pooling_1d()` and a densely connected layer and ending with a dense layer with a sigmoid activation function to give us 1 value between 0 and 1 to use in our classification.
 
-```{r simple_cnn_model, eval=FALSE}
+```{r simple_cnn_model}
+library(keras)
 simple_cnn_model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 16, kernel_size = 11, activation = "relu") %>%
-  layer_conv_1d(filter = 32, kernel_size = 9, activation = "relu") %>%
-  layer_conv_1d(filter = 64, kernel_size = 7, activation = "relu") %>%
-  layer_conv_1d(filter = 128, kernel_size = 5, activation = "relu") %>%
+  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
 
 simple_cnn_model
 ```
 
 We are using the same embedding layer as we did in the previous networks so there is nothing new there.
-We are having 4 convolutional layers. And there are some things to take note off here.
-The model is using an increasing number of filters in each layer, doubling the number of filters for each layer. This is to make sure that there are more filter latter on to capture enough of the global information.
-The kernel size in this model starts kinda high and then slowly decreases. This model will be able to find quite large patterns in the data.
 We use a `layer_global_max_pooling_1d()` layer to transform to collapse the remaining CNN output into 1 dimension and we finish it off with a densely connected layer and a sigmoid activation function.
 
 This might not end up being the best CNN configuration, but it is a good starting point.
-One of the challenges when working with CNNS is to make sure that you manage the dimensionality correctly.
-You will have to handle the trade-off between having a small number of layers with hyperparameters that are set to decrease the dimensions drastically, or having a larger amount of layers where each output is only slightly smaller then the previous.
-Networks with fewer layers can give good performance and fast since there isn't that many weights to train, but you need to be careful that you construct the layers to correctly capture the patterns you want.
+One of the challenges when working with CNNS is to make sure that you manage the dimensionality correctly. The length of the sequence decrease by `(kernel_size - 1)` for each layer. For this input where we have a sequence of length 30, which is decreased by `(5 - 1) = 4` resulting in a sequence of 30. We could in theory have 7 layers with `kernel_size = 5` since we would end with `30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2` elements in the resulting sequence. However, we would not be able to do a network with 3 layers of 
+`kernel_size = 7` followed by 3 layers of `kernel_size = 5` since the resulting sequence would be `30 - 6 - 6 - 6 - 4 - 4 - 4 = 0` and we need a positive length in our sequence.
+Remember that `kernel_size` is not the only argument that will change the length of the resulting sequence. Constructing a sequence layer by layer while having keras print the configurations is a great idea of how you can make sure your architecture is valid.
 
 The compilation and fitting is the same as we have seen before. 
 
-```{r simple_cnn_model_fit, dependson="simple_cnn_model", eval=FALSE}
+```{r simple_cnn_model_fit, dependson="simple_cnn_model"}
 simple_cnn_model %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -146,7 +142,7 @@ You will have to experiment to find the optimizer that works best for your speci
 
 Now that the model is done fitting we can evaluate it on testing data set.
 
-```{r simple_cnn_model_evaluation, dependson="simple_cnn_model_fit", eval=FALSE}
+```{r simple_cnn_model_evaluation, dependson="simple_cnn_model_fit"}
 simple_cnn_model %>%
   evaluate(
     bake(prepped_recipe, kickstarter_test, composition = "matrix"),
