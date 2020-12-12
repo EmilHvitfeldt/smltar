@@ -17,7 +17,7 @@ doParallel::registerDoParallel()
 online <- TRUE
 ```
 
-The first networks\@ref(dldnn) we have shown in this section doesn't take advantage of the sequential patterns.
+The first networks\@ref(dldnn) we have shown in this section don't take advantage of the sequential patterns.
 Text can have patterns of varying length, and this can be hard for a simple densely connected network to pick up on and learn.
 Patterns can be encoded as n-grams\@ref(tokenizingngrams), but this presents problems if you want to encode these n-grams directly since the dimensionality of the vocabulary shoots up even we just try to capture `n = 2` and `n = 3`.
 
@@ -56,7 +56,7 @@ knitr::include_graphics("diagram-files/cnn-kernel-size.png")
 Larger kernels will detect larger and less frequent patterns where smaller kernels will find fine-grained features. 
 Notice how the choice of the token will affect how we think about kernel size. 
 For character level tokens a kernel size of 5 will in early layers find patterns in parts of words more often than patterns across words since 5 characters aren't enough the adequately span multiple words. 
-Where on the other hand a kernel size of 5 for word-level tokens will find patterns in parts of sentences instead. Kernels most have an odd length.
+Where on the other hand a kernel size of 5 for word-level tokens will find patterns in parts of sentences instead. Kernels must have an odd length.
 
 ### Simple CNN
 
@@ -116,7 +116,7 @@ One of the challenges when working with CNNS is to make sure that you manage the
 `kernel_size = 7` followed by 3 layers of `kernel_size = 5` since the resulting sequence would be `30 - 6 - 6 - 6 - 4 - 4 - 4 = 0` and we need a positive length in our sequence.
 Remember that `kernel_size` is not the only argument that will change the length of the resulting sequence. Constructing a sequence layer by layer while having keras print the configurations is a great idea of how you can make sure your architecture is valid.
 
-The compilation and fitting is the same as we have seen before. 
+The compilation and fitting are the same as we have seen before. 
 
 ```{r simple_cnn_model_fit, dependson="simple_cnn_model"}
 simple_cnn_model %>% compile(
@@ -140,7 +140,7 @@ We are using the `"adam"` optimizer since it performs well for this model.
 You will have to experiment to find the optimizer that works best for your specific model. Different optimizers work differently in different situations and it is up to you to find which works the best for your model and data.
 ```
 
-Now that the model is done fitting we can evaluate it on testing data set.
+Now that the model is done fitting we can evaluate it on the testing data set.
 
 ```{r simple_cnn_model_evaluation, dependson="simple_cnn_model_fit"}
 simple_cnn_model %>%
@@ -152,7 +152,7 @@ simple_cnn_model %>%
 
 We are seeing some improvement over the densely connected network. This is a good development, what we hoped to see was an improvement in our model.
 
-## Character level Convolutional Neural Network
+## Character-level Convolutional Neural Network
 
 In our models so far we have used "words" as the token of interest. Another choice of token could be "character". Since this data set contains very short texts then we don't have many words to work with. We have filtered the data set to have a minimum text length of 15 and while that helps it doesn't stop the fact that many of the texts will have 1 or 2 words in total.
 
@@ -179,7 +179,7 @@ kickstarter_train %>%
   count(char, sort = TRUE)
 ```
 
-If you dig in this list then you find that the frequencies quickly drop off once you get past the letters. We are turning all characters to lowercase, while case does matter some in the text, doubling the alphabet size does not seem worth it.
+If you dig in this list then you find that the frequencies quickly drop off once you get past the letters. We are turning all characters to lowercase, while the case does matter some in the text, doubling the alphabet size does not seem worth it.
 
 ```{r}
 charlevel_recipe <- recipe(~blurb, data = kickstarter_train) %>%
@@ -208,7 +208,6 @@ tidy(charlevel_recipe, 2)
 ```
 
 And we are lucky in this case since the vocabulary is in alphabetical order.
-
 
 ```{r, include=FALSE}
 knitr::knit_exit()
