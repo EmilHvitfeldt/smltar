@@ -108,6 +108,10 @@ lstm_mod <- keras_model_sequential() %>%
 lstm_mod
 ```
 
+```{block2, type = "rmdwarning"}
+Notice the number of parameters in this LSTM model, about twice as many as the dense neural networks in Chapter \@ref(dldnn). It is easier to overfit an LSTM model, and it takes more time and memory to train, because of the large number of parameters.
+```
+
 Because we are training a binary classification model, we use `activation = "sigmoid"` for the last layer; we want to fit and predict to class probabilities.
 
 Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
@@ -622,7 +626,7 @@ The relationship between these hyperparameters and model performance is weak, th
 ```
 
 
-## The full game: regression {#lstmfull}
+## The full game: LSTM {#lstmfull}
 
 We've come a long way in this chapter, even though we've focused on a very specific kind of RNN, the LSTM. Let's step back and build on final model, incorporating what we have been able to learn.
 
@@ -631,7 +635,7 @@ We've come a long way in this chapter, even though we've focused on a very speci
 We know that we want to stick with the defaults for padding, and to use a larger vocabulary and sequence length for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
 
 ```{r}
-max_words <- 20000
+max_words <- 2e4
 max_length <- 50
 
 kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
@@ -706,13 +710,13 @@ final_res %>%
   autoplot()
 ```
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. Notice that this final model still does not perform as well as the best models of Chapter \@ref(dldnn).
+We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. Notice that this final model still does not perform as well as any of the best models of Chapter \@ref(dldnn).
 
 ```{block, type = "rmdnote"}
 For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give the best result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
 ```
 
-For the Kickstarter data, these results are likely due to tktk...
+For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
 
 
 ## Summary {#dllstmsummary}
@@ -724,8 +728,7 @@ LSTMs are a specific kind of recurrent neural network that are capable of learni
 - how to preprocess text data for deep learning models
 - about RNN, LSTM, and bidirectional LSTM network architectures
 - how to use dropout to reduce LSTM overfitting
-- that network layers like RNNs and LSTMs can be stacked for greater network capacity
-- about resampling strategies for deep learning models (MOVE TO ANOTHER CHAPTER)
+- that network layers like RNNs and LSTMs can be stacked for greater model capacity
 - about the importance of centering and scaling regression outcomes for neural networks
 - how to evaluate LSTM models for text
 
