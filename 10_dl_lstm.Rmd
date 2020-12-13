@@ -420,7 +420,7 @@ Next, let's build a preprocessing recipe for these Supreme Court decisions. Thes
 
 ```{r}
 max_words <- 2e4
-max_length <- 5e3
+max_length <- 1e3
 
 scotus_rec <- recipe(~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
@@ -448,8 +448,8 @@ Let's create an LSTM and see what we can do. We will need to use higher-dimensio
 
 ```{r}
 scotus_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
-  layer_lstm(units = 64, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
   layer_dense(units = 1)
 
 scotus_mod %>% 
@@ -487,7 +487,11 @@ scotus_res %>% metrics(year, .pred)
 
 ## Case study: padding
 
-Text must be heavily preprocessed 
+One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
+
+Either way, the sequences that are too long must be truncated and the sequences that are too short must be padded, typically with zeroes. This does literally mean that words or tokens are thrown away for the long documents and zeroes are added to the shorter documents, with the goal of creating a rectangular matrix that can be used for computation. The default in textrecipes, as well as most deep learning for text, is `padding = "pre"`, where zeroes are added at the beginning, and `truncating = "pre"`, where values at the beginning are removed.
+
+What happens if we change one of these defaults?
 
 ```{r}
 padding_rec <- recipe(~ blurb, data = kickstarter_train) %>%
@@ -500,7 +504,7 @@ padding_matrix <- bake(padding_prep, new_data = NULL, composition = "matrix")
 dim(padding_matrix)
 ```
 
-This matrix has the same dimensions as `kick_matrix` but instead of padding with zeroes at the beginning of these DOJ press releases, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
+This matrix has the same dimensions as `kick_matrix` but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
 
 ```{r}
 pad_analysis <- bake(padding_prep, new_data = analysis(kick_val$splits[[1]]), 
@@ -537,7 +541,7 @@ padding_history <- padding_mod %>%
 padding_history
 ```
 
-This padding strategy results in much worse performance than the default option!
+This padding strategy results in noticeably worse performance than the default option!
 
 ```{r}
 padding_res <- keras_predict(padding_mod, padding_prep, assessment(kick_val$splits[[1]]), state)
