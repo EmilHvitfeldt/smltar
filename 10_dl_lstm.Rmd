@@ -624,7 +624,11 @@ The relationship between these hyperparameters and model performance is weak, th
 
 ## The full game: regression {#lstmfull}
 
+We've come a long way in this chapter, even though we've focused on a very specific kind of RNN, the LSTM. Let's step back and build on final model, incorporating what we have been able to learn.
+
 ### Preprocess the data {#lstmfullpreprocess}
+
+We know that we want to stick with the defaults for padding, and to use a larger vocabulary and sequence length for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
 
 ```{r}
 max_words <- 20000
@@ -647,8 +651,9 @@ We've learned a lot about how to model this dataset over the course of this chap
 
 - We can use `dropout` and cross-validation to reduce overfitting.
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
-- We have still been overfitting significantly with our model architectures, so let's try increasing the dropout more.
+- The bidirectional LSTM performed than the regular LSTM, so let's set up each LSTM layer to be able to learn sequences in both directions.
 
+Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.25` and let the keras model choose the validation set.
 
 ```{r lstmfinalmod}
 final_mod <- keras_model_sequential() %>%
@@ -686,14 +691,14 @@ final_history <- final_mod %>%
 final_history
 ```
 
-
-Let's finally turn to the testing set to evaluate this last model on data that has never been touched as part of the fitting process.
+This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
 
 ```{r}
 final_res <- keras_predict(final_mod, kick_prep, kickstarter_test, state)
 final_res %>% metrics(state, .pred_class, .pred_prop)
 ```
 
+This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data.
 
 ```{r}
 final_res %>%
@@ -701,6 +706,7 @@ final_res %>%
   autoplot()
 ```
 
+We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. Notice that this final model still does not perform as well as the best models of Chapter \@ref(dldnn). This is likely because tktk
 
 ## Summary {#dllstmsummary}
 
