@@ -15,6 +15,19 @@ doParallel::registerDoParallel()
 
 ## for GH actions
 online <- TRUE
+
+keras_predict <- function(model, recipe, data, response) {
+  baked_data <- bake(recipe, data, composition = "matrix")
+  prediction <- predict(model, baked_data)[, 1]
+  
+  data %>%
+    mutate(
+      .pred_prop = prediction,
+      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
+    ) %>%
+    mutate(across(c({{ response }}, .pred_class), 
+                  ~ factor(.x, levels = c(1, 0))))
+}
 ```
 
 The first networks\@ref(dldnn) we have shown in this section don't take advantage of the sequential patterns.
@@ -152,7 +165,154 @@ simple_cnn_model %>%
 
 We are seeing some improvement over the densely connected network. This is a good development, what we hoped to see was an improvement in our model.
 
-### Adding more layers
+### Case study: Adding more layers
+
+Now that we have the basic structure of a CNN down we can see what happens when we apply some common modifications to it.
+This case study will look at how we can add additional convolutional layers to our base model and how additional dense layers can be added.
+
+We will start by adding another fully connected layer. We take the architecture we used in `simple_cnn_model` and added another `layer_dense()` after the first `layer_dense()` in the model. And we are not going to do more than this.
+Increasing the depth of the model over the fully connected layers allows the model to be able to find move complex patterns. There is however a trade-off. Adding more layers will add more weights to the model making it more complex and harder to train. If you don't have enough data or the patterns you are trying to classify aren't that complex then the model performance will suffer since the model will start overfitting since it starts picking up on patterns in the data that aren't there.
+
+When working with CNNs the different layers perform different tasks. The convolutional layers extract local patterns in the data as it slides along the sequences, whereas the fully connected layers find global patterns. We can think of the convolutional layers as doing preprocessing on the text which is then fed into the deep neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. Yoshua Bengio has a simple rule for this: "Just keep adding layers until the test error does not improve anymore"[@bengio2012practical].
+
+```{r}
+cnn_double_dense <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 16,
+                  input_length = max_length) %>%
+  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+cnn_double_dense
+```
+
+we can compile and fit the new model. We will try to keep as many things as we can constant so we can try to compare the different models.
+
+```{r}
+cnn_double_dense %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+
+history <- cnn_double_dense %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+
+cnn_double_dense %>%
+  evaluate(
+    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
+```
+
+This model performs well, but it is not entirely clear that it is working better than the first CNN model we tried. This could be an indication that the original model had enough fully connected layers for the amount of training data we had available.
+If this is the case and we have two models with identical performance then we should go with the less complex of the two, since they would have faster performance.
+
+We can also try to vary the number of convolutional layers by adding more layers.
+
+```{r}
+library(keras)
+cnn_double_conv <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 16,
+                  input_length = max_length) %>%
+  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_max_pooling_1d(pool_size = 2) %>%
+  layer_conv_1d(filter = 64, kernel_size = 3, activation = "relu") %>%
+  layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+cnn_double_conv
+```
+
+There are a lot of different ways we can extend the network by adding convolutional layers with `layer_conv_1d()`. We have to consider the individual characteristics of each layer, concerning kernel size, stride, padding, and dilation rate. We also have to consider the progression of these layers within the network itself. 
+The model is using an increasing number of filters in each layer, doubling the number of filters for each layer. This is to make sure that there are more filters later on to capture enough of the global information.
+This model is using kernel size 5 twice and there aren't any hard rules about how you structure these kernel sizes, but the sizes you choose will change what features the model can detect. The early layers extract general or low-level features whereas the later layers define finer detail or high-level features in the data. The choice of kernel size determines the size of these features. Having a small kernel size in the first layer will let the model detect low-level features locally.
+
+We are also including a max-pooling layer with `layer_max_pooling_1d()` between the convolutional layers. This layer performs a pooling operation that calculates the maximum values in its pooling window which in this model is set to 2.
+This is done in the hope that the pooled features will be able to perform better by weeding out the small weights.
+This is another thing you can tinker with when you are designing the network concerning the frequency of pooling layers and their parameters.
+
+We compile this model like the other two, again trying to keep as many things as we can constant. The only thing that changed in this model compared to the first is the addition of a `layer_max_pooling_1d()` and a `layer_conv_1d()`.
+
+```{r}
+cnn_double_conv %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+
+history <- cnn_double_conv %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+
+cnn_double_conv %>%
+  evaluate(
+    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
+```
+
+This model also performs admirably compared to the other models. Let us extract the the prediction using `keras_predict()` we defined in \@ref(evaluate-keras-predictions).
+
+```{r}
+all_cnn_model_predictions <- bind_rows(
+  keras_predict(
+    simple_cnn_model, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "Basic CNN"),
+  keras_predict(
+    cnn_double_dense, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "Double Dense"),
+  keras_predict(
+    cnn_double_conv, 
+    prepped_recipe, 
+    kickstarter_test, 
+    state
+  ) %>% mutate(model = "Double Conv")
+)
+
+all_cnn_model_predictions
+```
+
+Now that the results are combined in `all_cnn_model_predictions` we can calculate group-wise evaluation statistics by grouping them by the `model` variable.
+
+```{r}
+all_cnn_model_predictions %>%
+  group_by(model) %>%
+  metrics(state, .pred_class)
+```
+
+We can also do this for ROC-curves. Figure \@ref(fig:allcnnroccurve) shows the 3 different ROC-curves together in 1 chart.
+
+```{r allcnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for 3 varients of CNN models' predictions of Kickstarter state"}
+all_cnn_model_predictions %>%
+  group_by(model) %>%
+  roc_curve(truth = state, .pred_prop) %>%
+  autoplot() +
+  labs(
+    title = "Receiver operator curve for Kickstarter blurbs"
+  )
+```
+
+The curves are very close in this chart. This seems to indicate that we don't have much to gain by adding more layers since they don't add anything to the performance.
+This doesn't mean that we are done with this model. There are still some things we can look at such as different tokenization and hyperparameters that can be trained. We will take a look at this in the following sections.
 
 ## Character-level Convolutional Neural Network
 
