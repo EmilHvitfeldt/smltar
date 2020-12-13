@@ -16,16 +16,15 @@ doParallel::registerDoParallel()
 ## for GH actions
 online <- TRUE
 
-keras_predict <- function(model, recipe, data, response) {
-  baked_data <- bake(recipe, data, composition = "matrix")
-  prediction <- predict(model, baked_data)[, 1]
+keras_predict <- function(model, baked_data, response) {
+  predictions <- predict(model, baked_data)[, 1]
   
-  data %>%
-    mutate(
-      .pred_prop = prediction,
-      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
-    ) %>%
-    mutate(across(c({{ response }}, .pred_class), 
+  tibble(
+    .pred_1 = predictions,
+    .pred_class = if_else(.pred_1 < 0.5, 0, 1),
+    state = response
+  ) %>%
+    mutate(across(c(state, .pred_class), 
                   ~ factor(.x, levels = c(1, 0))))
 }
 ```
@@ -231,8 +230,8 @@ plot(val_history)
 Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.
 
 ```{r}
-val_res <- keras_predict(lstm_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
-val_res %>% metrics(state, .pred_class, .pred_prop)
+val_res <- keras_predict(lstm_mod, kick_assess, state_assess)
+val_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 ```{r echo=FALSE}
@@ -344,8 +343,8 @@ bilstm_history
 The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well. 
 
 ```{r}
-bilstm_res <- keras_predict(bilstm_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
-bilstm_res %>% metrics(state, .pred_class, .pred_prop)
+bilstm_res <- keras_predict(bilstm_mod, kick_assess, state_assess)
+bilstm_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of `r lstm_acc`). 
@@ -392,8 +391,8 @@ stacked_history
 Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
 
 ```{r}
-stacked_res <- keras_predict(stacked_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
-stacked_res %>% metrics(state, .pred_class, .pred_prop)
+stacked_res <- keras_predict(stacked_mod, kick_assess, state_assess)
+stacked_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 We can gradually improve a model by changing and adding to its architecture.
@@ -457,8 +456,8 @@ padding_history
 This padding strategy results in noticeably worse performance than the default option!
 
 ```{r}
-padding_res <- keras_predict(padding_mod, padding_prep, assessment(kick_val$splits[[1]]), state)
-padding_res %>% metrics(state, .pred_class, .pred_prop)
+padding_res <- keras_predict(padding_mod, pad_assess, state_assess)
+padding_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 The same model architecture with default padding preprocessing resulted in an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity.
@@ -615,8 +614,8 @@ smaller_history
 How did this smaller model, based on a smaller vocabulary and keeping shorter sequences in the model, perform?
 
 ```{r}
-smaller_res <- keras_predict(smaller_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
-smaller_res %>% metrics(state, .pred_class, .pred_prop)
+smaller_res <- keras_predict(smaller_mod, kick_assess, state_assess)
+smaller_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 The original LSTM model with the larger vocabulary and longer sequences of 50 words had an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary and sequence information does result in a corresponding reduction in model performance. Notice that it is certainly 
@@ -698,8 +697,10 @@ final_history
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
 
 ```{r}
-final_res <- keras_predict(final_mod, kick_prep, kickstarter_test, state)
-final_res %>% metrics(state, .pred_class, .pred_prop)
+kick_matrix_test <- bake(kick_prep, new_data = kickstarter_test, 
+                         composition = "matrix")
+final_res <- keras_predict(final_mod, kick_matrix_test, kickstarter_test$state)
+final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data.
@@ -710,7 +711,15 @@ final_res %>%
   autoplot()
 ```
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. Notice that this final model still does not perform as well as any of the best models of Chapter \@ref(dldnn).
+We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well.
+
+```{r}
+final_res %>%
+  conf_mat(state, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+Notice that this final model still does not perform as well as any of the best models of Chapter \@ref(dldnn).
 
 ```{block, type = "rmdnote"}
 For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give the best result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
