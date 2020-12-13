@@ -1,4 +1,4 @@
-# Long short-term memory (LSTM)  {#dllstm}
+# Long short-term memory (LSTM) networks  {#dllstm}
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -15,4 +15,747 @@ doParallel::registerDoParallel()
 
 ## for GH actions
 online <- TRUE
+
+keras_predict <- function(model, recipe, data, response) {
+  baked_data <- bake(recipe, data, composition = "matrix")
+  prediction <- predict(model, baked_data)[, 1]
+  
+  data %>%
+    mutate(
+      .pred_prop = prediction,
+      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
+    ) %>%
+    mutate(across(c({{ response }}, .pred_class), 
+                  ~ factor(.x, levels = c(1, 0))))
+}
 ```
+
+
+In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple" dense network architectures. These architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlclassification) and \@ref(mlregression), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs).
+
+## A first LSTM model {#firstlstm}
+
+We will be using the same data from the previous chapter, described in Section \@ref(kickstarter). This data contains short text blurbs for prospective crowdfunding campaigns and if they were successful or not. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let's start by splitting our training and testing sets.
+
+```{r}
+library(tidyverse)
+
+kickstarter <- read_csv("data/kickstarter.csv.gz")
+kickstarter
+
+library(tidymodels)
+set.seed(1234)
+kickstarter_split <- kickstarter %>%
+  filter(nchar(blurb) >= 15) %>%
+  mutate(state = as.integer(state)) %>%
+  initial_split()
+
+kickstarter_train <- training(kickstarter_split)
+kickstarter_test <- testing(kickstarter_split)
+```
+
+Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlclassification) and \@ref(mlregression). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter how many words we'll keep in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this dataset.
+
+```{r}
+library(textrecipes)
+
+max_words <- 2e4
+max_length <- 50
+
+kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = max_words) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length)
+```
+
+After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words with integers representing each token in the vocabulary of `r scales::comma(max_words)` words. This is different than the representations we used in Chapters \@ref(mlclassification) and \@ref(mlregression), mainly because all the information about word sequence is encoded in this representation.
+
+```{block, type = "rmdwarning"}
+Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).
+```
+
+There are `r scales::comma(nrow(kickstarter_train))` press releases in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
+
+```{block, type = "rmdwarning"}
+When we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a dataset, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a dataset like a tibble or a matrix.
+```
+
+We could have applied these functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
+
+```{r}
+kick_prep <- prep(kick_rec)
+kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+
+dim(kick_matrix)
+```
+
+Here we use `composition = "matrix"` because the keras modeling functions operate on matrices, rather than a dataframe or tibble.
+
+### Building an LSTM
+
+An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to understand text as a sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
+
+The keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
+
+```{r}
+library(keras)
+
+lstm_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_lstm(units = 32) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+lstm_mod
+```
+
+Because we are training a binary classification model, we use `activation = "sigmoid"` for the last layer; we want to fit and predict to class probabilities.
+
+Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
+
+```{block, type = "rmdnote"}
+A good default optimizer for many problems is `"adam"`, and a good loss function for binary classification is `"binary_crossentropy"`.
+```
+
+```{r}
+lstm_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+```
+
+```{block, type = "rmdwarning"}
+As we noted in Chapter \@ref(dldnn), the neural network model is modified **in place**; the object `lstm_mod` is different after we compile it, even those we didn't assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
+```
+
+After the model is compiled, we can fit it. The `fit()` method for keras models has an argument `validation_split` that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the _end_ of each epoch.
+
+```{r}
+lstm_history <- lstm_mod %>% 
+  fit(
+    kick_matrix, 
+    kickstarter_train$state,
+    epochs = 10,
+    validation_split = 0.25,
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+lstm_history
+```
+
+The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well.
+
+```{r firstlstm}
+plot(lstm_history)
+```
+
+```{block, type = "rmdnote"}
+Remember that lower loss indicates a better fitting model, and higher accuracy (closer to 1) indicates a better model.
+```
+
+This model continues to improve epoch after epoch on the training data, but performs much worse on the validation set after the first epoch or so, demonstrating how extremely it is overfitting to the training data. This is very common for powerful deep learning models, including LSTMs.
+
+### Evaluation {#lstmevaluation}
+
+We used some keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can instead use the `validation_data` argument and send in our own validation set creating with rsample.
+
+```{r lstmval}
+set.seed(234)
+kick_val <- validation_split(kickstarter_train, strata = state)
+kick_val
+```
+
+We can access the two datasets specified by this `split` via the functions `analysis()` (the analog to training) and `assessment()` (the analog to testing). We need to apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
+
+```{r}
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+                      composition = "matrix")
+dim(kick_analysis)
+
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+                    composition = "matrix")
+dim(kick_assess)
+```
+
+These are each matrices appropriate for a keras model. We will also need the outcome variables for both sets.
+
+```{r}
+state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
+state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
+```
+
+Let's also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
+
+```{block, type = "rmdwarning"}
+When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting.
+```
+
+```{r}
+lstm_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+lstm_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+val_history <- lstm_mod %>% 
+  fit(
+    kick_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+val_history
+```
+
+The overfitting has been reduced, and the difference between our model's performance on training and validation data is now smaller.
+
+```{r lstmvalhistory}
+plot(val_history)
+```
+
+Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.
+
+```{r}
+val_res <- keras_predict(lstm_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
+val_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+```{r echo=FALSE}
+lstm_acc <- val_res %>% 
+  accuracy(state, .pred_class) %>% 
+  pull(.estimate) %>% 
+  round(3)
+
+lstm_auc <- val_res %>% 
+  roc_auc(state, .pred_prop) %>% 
+  pull(.estimate) %>% 
+  round(3)
+```
+
+A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752. This first LSTM with dropout is already performing better than such a linear model. We can plot the receive operator characteristic curve to evaluate the performance across the range of thresholds. 
+
+```{r}
+val_res %>%
+  roc_curve(state, .pred_prop) %>%
+  autoplot()
+```
+
+
+## Compare to a recurrent neural network
+
+An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops that allow information to persist through steps but do not have memory cells like LSTMs. RNNs are sometimes used in domains like speech recognition. 
+
+```{block, type = "rmdwarning"}
+Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
+```
+
+Let's train an RNN to see how it compares to the LSTM.
+
+```{r rnnmod}
+rnn_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_simple_rnn(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+rnn_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+rnn_history <- rnn_mod %>% 
+  fit(
+    kick_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+rnn_history
+```
+
+Looks like more overfitting! We can see this by plotting the history as well.
+
+```{r}
+plot(rnn_history)
+```
+
+These results are pretty disappointing overall. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section tktk [@Minaee2020], or even other machine learning approaches like regularized linear models with good preprocessing. 
+
+Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better performing models.
+
+## Case study: bidirectional LSTM {#bilstm}
+
+The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward _only_. In language, the structures move both directions, though; the words that come _after_ a given structure or word can be just as important for understanding it as the ones that come before it.
+
+We can build this into our neural network architecture with a **bidirectional** wrapper for RNNs or LSTMs. 
+
+```{block, type = "rmdnote"}
+A bidirectional LSTM allows the network to have both the forward and backward information about the sequences at each step.
+```
+
+The input sequences are passed through the network in two directions, both forward and backward, allowing the network to learn more context, structures, and dependencies.
+
+
+```{r}
+bilstm_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  bidirectional(layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4)) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+bilstm_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+bilstm_history <- bilstm_mod %>% 
+  fit(
+    kick_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+bilstm_history
+```
+
+The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well. 
+
+```{r}
+bilstm_res <- keras_predict(bilstm_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
+bilstm_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of `r lstm_acc`). 
+
+
+## Case study: stacking LSTM layers
+
+Deep learning architectures can be built up to create extremely complex networks. For example, RNN and/or LSTM layers can be stacked on top of each other, or together with other kinds of layers. The idea of this stacking is to increase the ability of a network to represent the data well. 
+
+```{block, type = "rmdwarning"}
+Intermediate layers must be set up to return sequences (with `return_sequences = TRUE`) instead of the last output for each sequence.
+```
+
+Let's start by adding one single additional layer.
+
+```{r stackmod}
+stacked_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4, 
+             return_sequences = TRUE) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+stacked_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+stacked_history <- stacked_mod %>% 
+  fit(
+    kick_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+stacked_history
+```
+
+Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
+
+```{r}
+stacked_res <- keras_predict(stacked_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
+stacked_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+We can gradually improve a model by changing and adding to its architecture.
+
+## Case study: training a regression model
+
+All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, text classification is more common than regression problems with text data, but these techniques can be used for either kind of supervised machine learning question. Let's return to the regression problem of Chapter \@ref(mlregression) and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.
+
+```{r}
+library(scotus)
+set.seed(1234)
+scotus_split <- scotus_filtered %>%
+  mutate(
+    year = (as.numeric(year) - 1920) / 50,
+    text = str_remove_all(text, "'")
+  ) %>%
+  initial_split(strata = year)
+
+scotus_train <- training(scotus_split)
+scotus_test <- testing(scotus_split)
+```
+
+```{block, type = "rmdwarning"}
+Notice that we also shifted (subtracted) and scaled (divided) the `year` outcome by constant factors so all the values are close to one and centered around zero. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
+```
+
+Next, let's build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let's try keeping the size of our vocabulary the same (`max_words`) but we will need to increase the sequence length information we store (`max_length`) by a great deal.
+
+```{r}
+max_words <- 2e4
+max_length <- 5e3
+
+scotus_rec <- recipe(~ text, data = scotus_train) %>%
+  step_tokenize(text) %>%
+  step_tokenfilter(text, max_tokens = max_words) %>%
+  step_sequence_onehot(text, sequence_length = max_length)
+
+scotus_prep <- prep(scotus_rec)
+scotus_train_baked <- bake(scotus_prep, 
+                           new_data = scotus_train, 
+                           composition = "matrix")
+scotus_test_baked <- bake(scotus_prep, 
+                          new_data = scotus_test, 
+                          composition = "matrix")
+```
+
+What does our training data look like now?
+
+```{r}
+dim(scotus_train_baked)
+```
+
+We only have `r nrow(scotus_train_baked)` rows of training data, and because these documents are so long, the training data has `r ncol(scotus_train_baked)` columns. You are probably starting to guess that we are going to run into problems.
+
+Let's create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer, and we probably will want to increase the number of `units` as well. Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.
+
+```{r}
+scotus_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 128) %>%
+  layer_lstm(units = 64, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1)
+
+scotus_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "mse",
+    metrics = c("mean_squared_error")  
+  )
+
+scotus_history <- scotus_mod %>% 
+  fit(
+    scotus_train_baked, 
+    scotus_train$year,
+    epochs = 10,
+    verbose = FALSE
+  )
+```
+
+```{block, type = "rmdnote"}
+A good loss function for regression is mean squared error, `"mse"`.
+```
+
+
+```{r}
+plot(scotus_history)
+```
+
+```{r}
+scotus_res <- tibble(year = scotus_test$year,
+                  .pred = predict(bigger_mod, scotus_test_baked)[,1])
+
+scotus_res %>% metrics(year, .pred)
+```
+
+
+## Case study: padding
+
+Text must be heavily preprocessed 
+
+```{r}
+padding_rec <- recipe(~ blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = max_words) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length, padding = "post")
+
+padding_prep <- prep(padding_rec)
+padding_matrix <- bake(padding_prep, new_data = NULL, composition = "matrix")
+dim(padding_matrix)
+```
+
+This matrix has the same dimensions as `kick_matrix` but instead of padding with zeroes at the beginning of these DOJ press releases, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
+
+```{r}
+pad_analysis <- bake(padding_prep, new_data = analysis(kick_val$splits[[1]]), 
+                     composition = "matrix")
+pad_assess <- bake(padding_prep, new_data = assessment(kick_val$splits[[1]]), 
+                   composition = "matrix")
+```
+
+Now, let's create and fit an LSTM to this preprocessed data.
+
+```{r}
+padding_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+padding_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+padding_history <- padding_mod %>% 
+  fit(
+    pad_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(pad_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+padding_history
+```
+
+This padding strategy results in much worse performance than the default option!
+
+```{r}
+padding_res <- keras_predict(padding_mod, padding_prep, assessment(kick_val$splits[[1]]), state)
+padding_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+The same model architecture with default padding preprocessing resulted in an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity.
+
+```{block, type = "rmdwarning"}
+Different preprocessing strategies have a huge impact on deep learning results. 
+```
+
+
+
+## Case study: number of words and sequence length
+
+```{r}
+max_words <- 1e4
+max_length <- 30
+
+smaller_rec <- recipe(~ blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = max_words) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length)
+
+kick_prep <- prep(smaller_rec)
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+                      composition = "matrix")
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+                    composition = "matrix")
+```
+
+
+```{r}
+smaller_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+smaller_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+smaller_history <- smaller_mod %>% 
+  fit(
+    kick_analysis, 
+    state_analysis,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+smaller_history
+```
+
+```{r}
+smaller_res <- keras_predict(smaller_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
+smaller_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+
+## The full game: regression {#lstmfull}
+
+### Preprocess the data {#lstmfullpreprocess}
+
+```{r}
+max_words <- 20000
+max_length <- 50
+
+kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = max_words) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length)
+
+kick_prep <- prep(kick_rec)
+kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+
+dim(kick_matrix)
+```
+
+### Specify the model {lstmfullmodel}
+
+We've learned a lot about how to model this dataset over the course of this chapter.
+
+- We can use `dropout` and cross-validation to reduce overfitting.
+- Let's stack several layers together, and in fact increase the number of LSTM layers to three.
+- We have still been overfitting significantly with our model architectures, so let's try increasing the dropout more.
+
+
+```{r lstmfinalmod}
+final_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
+  bidirectional(layer_lstm(
+    units = 32, dropout = 0.4, recurrent_dropout = 0.4, 
+    return_sequences = TRUE
+  )) %>%
+  bidirectional(layer_lstm(
+    units = 32, dropout = 0.4, recurrent_dropout = 0.4, 
+    return_sequences = TRUE
+  )) %>%
+  bidirectional(layer_lstm(
+    units = 32, dropout = 0.4, recurrent_dropout = 0.4
+  )) %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+final_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "binary_crossentropy",
+    metrics = c("accuracy")
+  )
+
+final_history <- final_mod %>% 
+  fit(
+    kick_matrix, 
+    kickstarter_train$state,
+    epochs = 10,
+    validation_split = 0.25,
+    batch_size = 512,
+    verbose = FALSE
+  )
+
+final_history
+```
+
+
+Let's finally turn to the testing set to evaluate this last model on data that has never been touched as part of the fitting process.
+
+```{r}
+final_res <- keras_predict(final_mod, kick_prep, kickstarter_test, state)
+final_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+
+```{r}
+final_res %>%
+  roc_curve(state, .pred_prop) %>%
+  autoplot()
+```
+
+
+## Summary {#dllstmsummary}
+
+Neural networks don't always perform better than more straightforward models...
+
+### In this chapter, you learned:
+
+- how to preprocess text data for deep learning models
+- about RNN, LSTM, and bidirectional LSTM network architectures
+- that network layers like RNNs and LSTMs can be stacked for greater network capacity
+- about resampling strategies for deep learning models (MOVE TO ANOTHER CHAPTER)
+- about the importance of centering and scaling regression outcomes for neural networks
+- how to evaluate deep learning regression models for text
+
+
+
+```{r echo=FALSE}
+knitr::knit_exit()
+```
+
+
+```{r eval = FALSE}
+library(hardhat)
+sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
+
+new_kick_train <- kickstarter_train %>%
+  mutate(state = factor(state))
+
+## baseline lasso model
+set.seed(123)
+kick_folds <- vfold_cv(new_kick_train)
+
+kick_rec <- recipe(state ~ blurb, data = new_kick_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = 5e3) %>%
+  step_tfidf(blurb)
+
+kick_rec
+
+lasso_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+lasso_spec
+
+lambda_grid <- grid_regular(penalty(), levels = 20)
+lambda_grid
+
+kick_wf <- workflow() %>%
+  add_recipe(kick_rec, blueprint = sparse_bp) %>%
+  add_model(lasso_spec)
+
+kick_wf
+
+doParallel::registerDoParallel()
+set.seed(2020)
+lasso_rs <- tune_grid(
+  kick_wf,
+  kick_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+
+autoplot(lasso_rs)
+
+show_best(lasso_rs, "accuracy")   ## accuracy ~ 0.684
+show_best(lasso_rs, "roc_auc")    ## ROC ~ 0.752
+
+lasso_rs %>%
+  collect_predictions() %>%
+  inner_join(select_best(lasso_rs, "roc_auc")) %>%
+  roc_curve(state, .pred_0) %>%
+  autoplot()
+
+```
+
+
+
