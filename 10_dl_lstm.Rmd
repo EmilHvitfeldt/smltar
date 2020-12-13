@@ -394,97 +394,6 @@ stacked_res %>% metrics(state, .pred_class, .pred_prop)
 
 We can gradually improve a model by changing and adding to its architecture.
 
-## Case study: training a regression model
-
-All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, text classification is more common than regression problems with text data, but these techniques can be used for either kind of supervised machine learning question. Let's return to the regression problem of Chapter \@ref(mlregression) and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.
-
-```{r}
-library(scotus)
-set.seed(1234)
-scotus_split <- scotus_filtered %>%
-  mutate(
-    year = (as.numeric(year) - 1920) / 50,
-    text = str_remove_all(text, "'")
-  ) %>%
-  initial_split(strata = year)
-
-scotus_train <- training(scotus_split)
-scotus_test <- testing(scotus_split)
-```
-
-```{block, type = "rmdwarning"}
-Notice that we also shifted (subtracted) and scaled (divided) the `year` outcome by constant factors so all the values are close to one and centered around zero. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
-```
-
-Next, let's build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let's try keeping the size of our vocabulary the same (`max_words`) but we will need to increase the sequence length information we store (`max_length`) by a great deal.
-
-```{r}
-max_words <- 2e4
-max_length <- 1e3
-
-scotus_rec <- recipe(~ text, data = scotus_train) %>%
-  step_tokenize(text) %>%
-  step_tokenfilter(text, max_tokens = max_words) %>%
-  step_sequence_onehot(text, sequence_length = max_length)
-
-scotus_prep <- prep(scotus_rec)
-scotus_train_baked <- bake(scotus_prep, 
-                           new_data = scotus_train, 
-                           composition = "matrix")
-scotus_test_baked <- bake(scotus_prep, 
-                          new_data = scotus_test, 
-                          composition = "matrix")
-```
-
-What does our training data look like now?
-
-```{r}
-dim(scotus_train_baked)
-```
-
-We only have `r nrow(scotus_train_baked)` rows of training data, and because these documents are so long, the training data has `r ncol(scotus_train_baked)` columns. You are probably starting to guess that we are going to run into problems.
-
-Let's create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer, and we probably will want to increase the number of `units` as well. Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.
-
-```{r}
-scotus_mod <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
-  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
-  layer_dense(units = 1)
-
-scotus_mod %>% 
-  compile(
-    optimizer = "adam",
-    loss = "mse",
-    metrics = c("mean_squared_error")  
-  )
-
-scotus_history <- scotus_mod %>% 
-  fit(
-    scotus_train_baked, 
-    scotus_train$year,
-    epochs = 10,
-    verbose = FALSE
-  )
-```
-
-```{block, type = "rmdnote"}
-A good loss function for regression is mean squared error, `"mse"`.
-```
-
-
-```{r}
-plot(scotus_history)
-```
-
-```{r}
-scotus_res <- tibble(year = scotus_test$year,
-                  .pred = predict(bigger_mod, scotus_test_baked)[,1])
-
-scotus_res %>% metrics(year, .pred)
-```
-
-
 ## Case study: padding
 
 One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
@@ -554,6 +463,101 @@ The same model architecture with default padding preprocessing resulted in an ac
 Different preprocessing strategies have a huge impact on deep learning results. 
 ```
 
+
+## Case study: training a regression model
+
+All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, text classification is more common than regression problems with text data, but these techniques can be used for either kind of supervised machine learning question. Let's return to the regression problem of Chapter \@ref(mlregression) and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.
+
+```{r}
+library(scotus)
+set.seed(1234)
+scotus_split <- scotus_filtered %>%
+  mutate(
+    year = (as.numeric(year) - 1920) / 50,
+    text = str_remove_all(text, "'")
+  ) %>%
+  initial_split(strata = year)
+
+scotus_train <- training(scotus_split)
+scotus_test <- testing(scotus_split)
+```
+
+```{block, type = "rmdwarning"}
+Notice that we also shifted (subtracted) and scaled (divided) the `year` outcome by constant factors so all the values are close to one and centered around zero. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
+```
+
+Next, let's build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let's try keeping the size of our vocabulary the same (`max_words`) but we will need to increase the sequence length information we store (`max_length`) by a great deal.
+
+```{r}
+max_words <- 2e4
+max_length <- 1e3
+
+scotus_rec <- recipe(~ text, data = scotus_train) %>%
+  step_tokenize(text) %>%
+  step_tokenfilter(text, max_tokens = max_words) %>%
+  step_sequence_onehot(text, sequence_length = max_length)
+
+scotus_prep <- prep(scotus_rec)
+scotus_train_baked <- bake(scotus_prep, 
+                           new_data = scotus_train, 
+                           composition = "matrix")
+scotus_test_baked <- bake(scotus_prep, 
+                          new_data = scotus_test, 
+                          composition = "matrix")
+```
+
+What does our training data look like now?
+
+```{r}
+dim(scotus_train_baked)
+```
+
+We only have `r nrow(scotus_train_baked)` rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has `r ncol(scotus_train_baked)` columns. You are probably starting to guess that we are going to run into problems.
+
+Let's create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer (we may want to increase the number of `units` as well, but will leave that out for the time being). Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.
+
+```{block, type = "rmdnote"}
+A good loss function for regression is mean squared error, `"mse"`.
+```
+
+```{r}
+scotus_mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
+  layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
+  layer_dense(units = 1)
+
+scotus_mod %>% 
+  compile(
+    optimizer = "adam",
+    loss = "mse",
+    metrics = c("mean_squared_error")  
+  )
+
+scotus_history <- scotus_mod %>% 
+  fit(
+    scotus_train_baked, 
+    scotus_train$year,
+    epochs = 10,
+    validation_split = 0.25,
+    verbose = FALSE
+  )
+```
+
+How does this model perform on the test data? Let's transform back to real values for `year` so our metrics will be on the same scale as in Chapter \@ref(mlregression).
+
+```{r}
+scotus_res <- tibble(year = scotus_test$year,
+                     .pred = predict(scotus_mod, scotus_test_baked)[,1]) %>%
+  mutate(across(everything(), ~ . * 50 + 1920))
+
+scotus_res %>% metrics(year, .pred)
+```
+
+This is much, much worse than the final regularized linear model trained in Section \@ref(mlregressionfull), with an RMSE over a decade worth of years worse. It's possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline. 
+
+```{block, type = "rmdwarning"}
+The main problem with this regression model is that there isn't that much data to start with; this is an example where a deep learning model is **not** a good choice and we should stick with a different machine learning algorithm like regularized regression.
+```
 
 
 ## Case study: number of words and sequence length
