@@ -562,6 +562,8 @@ The main problem with this regression model is that there isn't that much data t
 
 ## Case study: number of words and sequence length
 
+In this chapter so far, we've used a longer sequence length of 50, compared to 30 in Chapter \@ref(dldnn), and we've worked with a vocabulary of 20,000 words or tokens. These are _hyperparameters_ of the model, and could be tuned as shown in Section tktk. Instead of tuning, let's try some smaller values, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
+
 ```{r}
 max_words <- 1e4
 max_length <- 30
@@ -578,6 +580,7 @@ kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]),
                     composition = "matrix")
 ```
 
+Once our preprocessing is done and applied to our validation split `kick_val`, we can set up our model, another straightforward LSTM neural network.
 
 ```{r}
 smaller_mod <- keras_model_sequential() %>%
@@ -605,9 +608,17 @@ smaller_history <- smaller_mod %>%
 smaller_history
 ```
 
+How did this smaller model, based on a smaller vocabulary and keeping shorter sequences in the model, perform?
+
 ```{r}
 smaller_res <- keras_predict(smaller_mod, kick_prep, assessment(kick_val$splits[[1]]), state)
 smaller_res %>% metrics(state, .pred_class, .pred_prop)
+```
+
+The original LSTM model with the larger vocabulary and longer sequences of 50 words had an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary and sequence information does result in a corresponding reduction in model performance. Notice that it is certainly 
+
+```{block, type = "rmdnote"}
+The relationship between these hyperparameters and model performance is weak, though. Notice that we cut the vocabulary in half and the sequence length by almost half, and saw almost modest reductions in accuracy.
 ```
 
 
