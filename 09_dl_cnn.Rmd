@@ -314,62 +314,139 @@ all_cnn_model_predictions %>%
 The curves are very close in this chart. This seems to indicate that we don't have much to gain by adding more layers since they don't add anything to the performance.
 This doesn't mean that we are done with this model. There are still some things we can look at such as different tokenization and hyperparameters that can be trained. We will take a look at this in the following sections.
 
-## Character-level Convolutional Neural Network
+## Case study: Byte Pair Encoding
 
-In our models so far we have used "words" as the token of interest. Another choice of token could be "character". Since this data set contains very short texts then we don't have many words to work with. We have filtered the data set to have a minimum text length of 15 and while that helps it doesn't stop the fact that many of the texts will have 1 or 2 words in total.
+In our models in this chapter so far we have used "words" as the token of interest. We saw in chapter \@ref(mlclassification) and \@ref(mlregression) how n-grams could be used as well.
+One of the reasons why the Kickstarter dataset is hard to work with is because the text is quite short so we don't get that many individual tokens to work with.
+Another choice of token is "subwords", which is where we split the text into smaller units and some longer words will be constructed of multiple of these subword units. One of the ways to tokenize text into subword units is [Byte Pair Encoding](https://en.wikipedia.org/wiki/Byte_pair_encoding) proposed by @Gage1994ANA.
+This algorithm has been repurposed to work on text by iteratively merging frequently occurring subword pairs.
+Using subwords in text is used in methods such as [BERT](https://github.com/google-research/bert) and [GPT-2](https://openai.com/blog/better-language-models/) with great success.
+The Byte Pair encoding algorithm has a hyperparameter controlling the size of the vocabulary. Setting it to higher values allows up to find more rarely used character sequences in the text.
+One of the great benefits of using byte pair encoding is that it offers a good trade-off between character level and word level information. It is additionally helpful since it can encode unknown words. For example, suppose that the model is aware of the word "priest", a simple tokenizer we used before would have to put a word such as "priesthood" into an unknown bucket or ignore it completely, whereas the byte pair encoding should be able to pick up on the subwords "priest" and "hood" (or "priest", "h", and "ood", depending on if the model found "hood" as a common enough subword).
+Using a subword tokenizer such as byte pair encoding should let us see the text with more granularity since we will have more and smaller tokens for each observation.
 
-The idea of using character-level CNNs is nothing new, they have been explored by @Zhang2015 and work quite well on small shorter texts such as headlines and tweets[@Vosoughi2016].
-These kinds of models will be able to detect patterns of the characters inside the words, which means that these models can have very favorable performance in languages with rich morphology all while having a low number of trainable parameters.
+```{block, type = "rmdnote"}
+Character level CNN has also seen success in the literature. They have been explored by @Zhang2015 and work quite well on small shorter texts such as headlines and tweets[@Vosoughi2016]
+```
 
 We need to remind ourselves that these models don't contain any linguistic knowledge at all, they only "know" the patterns of sequences of characters in the training set. This is not to say the models are useless, but to set our expectations of what the model is capable of, namely pattern detection.
 
-Since we are using a completely different preprocessing setup we need to specify a new recipe. This recipe should tokenize to characters and instead of specifying the maximal number of tokens we want, we instead specify the tokens directly. These tokens will be our alphabet.
-The paper by @Zhang2015 uses an alphabet consisting of 70 characters, including 26 English letters, 10 digits, 33 other characters, and the new line character.
-
-```{text, eval=FALSE}
-abcdefghijklmnopqrstuvwxyz0123456789
--,;.!?:’’’/\|_@#$%ˆ&*˜‘+-=<>()[]{}
-```
-
-A model using this alphabet would properly work but we should tailor it more to the data we have at hand. Many of the "other" characters are used for punctuation, something that these blurbs don't contain much of. Neither are numbers used much. Let's go simple and only use the 26 letters and spaces.
-Before we move on we can double-check that this is a reasonable choice by using the `unnest_characters()` function from the tidytext package to tokenize to characters and then count the different characters.
+Since we are using a completely different preprocessing setup we need to specify a new recipe. textrecipes has a tokenization engine to perform byte pair encoding, but we need to determine the vocabulary size and the appropriate sequence length. This function here takes a character vector and a vocabulary size and returns a data.frame with the number of tokens in each observation.
 
 ```{r}
-library(tidytext)
-kickstarter_train %>%
-  unnest_characters(char, blurb, strip_non_alphanum = FALSE) %>%
-  count(char, sort = TRUE)
+library(textrecipes)
+get_bpe_token_dist <- function(vocab_size, x) {
+  recipe(~text, data = tibble(text = x)) %>%
+    step_mutate(text = tolower(text)) %>%
+    step_tokenize(text, 
+                  engine = "tokenizers.bpe",
+                  training_options = list(vocab_size = vocab_size)) %>%
+    prep() %>%
+    bake(new_data = NULL) %>%
+    transmute(n_tokens = lengths(textrecipes:::get_tokens(text)),
+              vocab_size = vocab_size)
+}
 ```
 
-If you dig in this list then you find that the frequencies quickly drop off once you get past the letters. We are turning all characters to lowercase, while the case does matter some in the text, doubling the alphabet size does not seem worth it.
+We can use `map()` to try a handful of different vocabulary sizes
 
 ```{r}
-charlevel_recipe <- recipe(~blurb, data = kickstarter_train) %>%
-  step_tokenize(blurb, token = "characters", 
-                options = list(strip_non_alphanum = FALSE)) %>%
-  step_sequence_onehot(blurb, 
-                       sequence_length = 70, 
-                       vocabulary = c(letters, " "))%>%
+bpe_token_dist <- map_dfr(
+  c(2500, 5000, 10000, 20000), 
+  get_bpe_token_dist,
+  kickstarter_train$blurb
+)
+bpe_token_dist
+```
+
+If we compare with the word count distribution we saw in \@ref(fig:kickstarterwordlength) then we see in \@ref(fig:kickstartersubwordlength) that any of these choices of vocabulary sizes will result in more tokens.
+
+```{r kickstartersubwordlength, fig.cap="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes"}
+bpe_token_dist %>%
+  ggplot(aes(n_tokens)) +
+  geom_bar() +
+  facet_wrap(~vocab_size) +
+  labs(x = "Number of subwords per campaign blurb",
+       y = "Number of campaign blurbs")
+```
+Let us pick a vocabulary size to be 10,000 and a corresponding sequence length to be 50. To use byte pair encoding as a tokenizer in textrecipes set `engine = "tokenizers.bpe"` and the vocabulary size can be denoted using the `training_options` argument. Everything else in the recipe stays the same.
+
+```{r}
+max_subwords <- 10000
+max_length <- 50
+
+bpe_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+  step_mutate(blurb = tolower(blurb)) %>%
+  step_tokenize(blurb, 
+                engine = "tokenizers.bpe",
+                training_options = list(vocab_size = max_subwords)) %>%
+  step_sequence_onehot(blurb, sequence_length = max_length) %>%
   prep()
 
-charlevel_training <- charlevel_recipe %>%
+prepped_bpe <- bpe_recipe %>%
   bake(new_data = NULL, composition = "matrix")
 ```
 
-We can confirm that this is working by looking at the first observation. 
-The leading zeroes are happening because we are pre-padding with zeroes
+The model we will be using will be very similar to the baseline CNN model we explore earlier, this time we have used a larger kernel size of 7 to account for the finer detail in the tokens.
 
 ```{r}
-unname(charlevel_training[1, ])
+cnn_pte <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 16,
+                  input_length = max_length) %>%
+  layer_conv_1d(filter = 32, kernel_size = 7, activation = "relu") %>%
+  layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+cnn_pte
 ```
 
-to understand what the indices mean we can extract the vocabulary of `step_sequence_onehot()` using `tidy()` on the prepped recipe.
+And we can compile and train like we have done so many times now.
 
 ```{r}
-tidy(charlevel_recipe, 2)
+cnn_pte %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+
+history <- cnn_pte %>% fit(
+  x = prepped_bpe, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+
+cnn_pte %>%
+  evaluate(
+    bake(bpe_recipe, kickstarter_test, composition = "matrix"),
+    kickstarter_test$state
+  )
 ```
 
-And we are lucky in this case since the vocabulary is in alphabetical order.
+The performance is doing quite well, which is a pleasant surprise and in line with what we hoped would happen if we switched to a higher detail tokenizer.
+
+
+to understand what the subword the models used are, we can extract them from `step_sequence_onehot()` using `tidy()` on the prepped recipe. All the tokens that start with an `"h"` are seen here
+
+```{r}
+tidy(bpe_recipe, 3) %>%
+  filter(str_detect(token, "^h")) %>%
+  pull(token)
+```
+
+Notice how some of these subword tokens are full words and some are part of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
+We can also look at common long words
+
+```{r}
+tidy(bpe_recipe, 3) %>%
+  arrange(desc(nchar(token))) %>%
+  slice_head(n = 25) %>%
+  pull(token)
+```
+
+These 25 words were common enough to get their own subword token. looking at the longest subword tokens gives you a good look into the data you are looking at.
 
 ## Explainability with lime
 
