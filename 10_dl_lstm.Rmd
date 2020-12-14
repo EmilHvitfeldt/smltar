@@ -241,7 +241,7 @@ lstm_acc <- val_res %>%
   round(3)
 
 lstm_auc <- val_res %>% 
-  roc_auc(state, .pred_prop) %>% 
+  roc_auc(state, .pred_1) %>% 
   pull(.estimate) %>% 
   round(3)
 ```
@@ -250,7 +250,7 @@ A regularized linear model trained on this dataset achieved results of accuracy 
 
 ```{r lstmvalroc}
 val_res %>%
-  roc_curve(state, .pred_prop) %>%
+  roc_curve(state, .pred_1) %>%
   autoplot()
 ```
 
@@ -707,7 +707,7 @@ This is our best performing model in this chapter on LSTM models, although not b
 
 ```{r lstmfinalroc}
 final_res %>%
-  roc_curve(state, .pred_prop) %>%
+  roc_curve(state, .pred_1) %>%
   autoplot()
 ```
 
