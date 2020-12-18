@@ -1,4 +1,4 @@
-# Deep Neural Network {#dldnn}
+# Dense neural networks {#dldnn}
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -17,13 +17,20 @@ doParallel::registerDoParallel()
 online <- TRUE
 ```
 
-This is the first chapter in the deep learning section of this book. These chapters are broken up by model architecture instead of by outcome as we did in chapter \@ref(mlclassification) and \@ref(mlregression).
-This chapter will explore the relatively simple deep neural networks. This chapter will be our first look at using keras [@R-keras]. keras is a well-established framework for deep learning with bindings in Python and R.
-While keras provides a nice framework for setting up deep learning models, its tools for resampling and preprocessing are not very tidy so we will be using the tidymodels packages for these tasks. This is a good example of the modularity of the tidymodels framework, we can just use it for the tasks we need without having to fully commit.
+These chapters on deep learning are broken up by network architecture instead of by outcome as we did in Chapters \@ref(mlclassification) and \@ref(mlregression).
+We'll use Keras [@R-keras] with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
+Keras provides extensive support for creating and training many kinds of deep learning models, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 
+
+```{block, type = "rmdnote"}
+The tidymodels framework is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.
+```
+
+
+This chapter explores one of the most straightforward configurations for a deep learning model, a densely connected neural network. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
 
 ## Kickstarter data {#kickstarter}
 
-In this chapter, we will predict binary values, much like we did in Chapter \@ref(mlclassification), but we will use deep learning methods instead. We will be using a dataset of fundraising campaigns from [Kickstarter](https://www.kickstarter.com/).
+For all our chapters on deep learning, we will build binary classification models, much like we did in Chapter \@ref(mlclassification), but we will use neural networks instead of shallow learning models. As we discussed in the [preface to these deep learning chapters](https://smltar.com/dlforeword.html), much of the overall model process will look the same, but we will use a different kind of algorithm. We will use a dataset of descriptions or "blurbs" for campaigns from the crowdfunding platform [Kickstarter](https://www.kickstarter.com/).
 
 ```{r kickstarter}
 library(tidyverse)
@@ -32,28 +39,28 @@ kickstarter <- read_csv("data/kickstarter.csv.gz")
 kickstarter
 ```
 
-we are working with fairly short texts for this dataset. less than a couple of hundred characters. We can look at the distribution
+The text for these models, contained in blurb, are short, less than a few hundred characters. What is the distribution of characters?
 
 ```{r kickstartercharhist, dependson="kickstarter", fig.cap="Distribution of character count for Kickstarter campaign blurbs"}
 kickstarter %>%
   ggplot(aes(nchar(blurb))) +
-  geom_histogram(binwidth = 1) +
+  geom_histogram(binwidth = 1, alpha = 0.8) +
   labs(x = "Number of characters per campaign blurb",
        y = "Number of campaign blurbs")
 ```
 
-it is rightly skewed which is to be expected. Since you don't have much space to make your impression most people choose to use most of it. There is one odd thing happening in this chart. There is a drop somewhere between 130 and 140. Let us investigate to see if we can find the reason.
+Figure \@ref(fig:kickstartercharhist) shows that the distribution of characters per blurb is right-skewed, with thresholds. Individuals creating campaigns don't have much space to make an impression, so most people choose to use most of it! There is an oddity in this chart, a steep drop somewhere between 130 and 140 with another threshold around 150 characters. Let's investigate to see if we can find the reason.
 
-We can use `count()` to find the most common `blurb` length.
+We can use `count()` to find the most common blurb length.
 
 ```{r}
 kickstarter %>%
   count(nchar(blurb), sort = TRUE)
 ```
 
-it appears to be 135 which in and of itself doesn't tell us much. It might be a glitch in the data collection process. Let us put our own eyes to look at what happens around this cutoff point. We can use `slice_sample()` to draw a random sample of the data.
+Let's use our own eyes to see what happens around this cutoff point. We can use `slice_sample()` to draw a few random blurbs.
 
-We start by looking at `blurb`s with exactly 135 characters, this is done so that we can identify if the `blurb`s were cut short at 135 characters.
+Were the blurbs truncated at 135 characters? Let's look at some blurbs with exactly 135 characters.
 
 ```{r}
 set.seed(1)
@@ -63,7 +70,7 @@ kickstarter %>%
   pull(blurb)
 ```
 
-It doesn't appear to be the case as all of these `blurb`s appear coherent and some of them even end with a period to end the sentence. Let us now look at `blurb`s with more than 135 characters if these are different.
+All of these blurbs appear coherent and some of them even end with a period to end the sentence. Let's now look at blurbs with more than 135 characters to see if they are different.
 
 ```{r}
 set.seed(1)
@@ -73,9 +80,9 @@ kickstarter %>%
   pull(blurb)
 ```
 
-All of these `blurb`s also look good so it doesn't look like a data collection issue. The `kickstarter` dataset also includes a `created_at` variable. Let us see what we can gather with that new information.
+All of these blurbs also look fine so the strange distribution doesn't seem like a data collection issue. 
 
-Below is a heatmap of the lengths of `blurb`s and the time the campaign was posted.
+The `kickstarter` dataset also includes a `created_at` variable; let's explore that next. Figure \@ref(fig:kickstarterheatmap) is a heatmap of the lengths of blurbs and the time the campaign was posted.
 
 ```{r kickstarterheatmap, dependson="kickstarter", fig.cap="Distribution of character count for Kickstarter campaign blurbs over time"}
 kickstarter %>%
@@ -85,7 +92,7 @@ kickstarter %>%
        y = "Number of characters per campaign blurb")
 ```
 
-We see a trend right here. it appears that at the end of 2010 there was a policy change to have the blurb length shortened from 150 characters to 135 characters.
+That looks like the explanation! It appears that at the end of 2010 there was a policy change in the blurb length, shortening from 150 characters to 135 characters.
 
 ```{r}
 kickstarter %>%
@@ -93,13 +100,17 @@ kickstarter %>%
   summarise(max(created_at))
 ```
 
-We can't tell for sure if the change happened in 2010-10-20, but that is the last day a campaign was launched with more than 135 characters.
+We can't say for sure if the change happened on 2010-10-20, but that is the last day a campaign was launched with more than 135 characters.
 
-## A first classification model {#firstdlclassification}
+## A first deep learning model {#firstdlclassification}
 
-Much like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data. It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever. This data will be hard to work with since we don't have much information to work with.
+Like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data.  
 
-We use `initial_split()` to define the training/testing split. We will focus on modeling the `blurb` alone in this chapter. We will restrict the data to only include `blurb`s with more than 15 characters. The short `blurb`s tend to uninformative single words.
+```{block, type = "rmdwarning"}
+It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
+```
+
+We use `initial_split()` to define the training and testing splits. We will focus on modeling the blurb alone in these deep learning chapters. Also, we will restrict our modeling analysis to only include blurbs with more than 15 characters, because the shortest blurbs tend to consist of uninformative single words.
 
 ```{r}
 library(tidymodels)
@@ -112,11 +123,14 @@ kickstarter_train <- training(kickstarter_split)
 kickstarter_test <- testing(kickstarter_split)
 ```
 
-There are `r scales::comma(nrow(kickstarter_train))` press releases in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
+There are `r scales::comma(nrow(kickstarter_train))` blurbs in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
 
 ### Preprocessing for deep learning
 
-The way we will be doing preprocessing requires a hyperparameter denoting the length of sequences we would like to include. We need to select this value such that we don't overshoot and introduce a lot of padded zeroes which would make the model hard to train, and we also need to avoid picking too short of a range.
+Preprocessing for deep learning models is different than preprocessing for most other text models. These neural networks model _sequences_, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away) and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model and we need to select this value such that we don't: 
+
+- overshoot and introduce a lot of padded zeroes which would make the model hard to train, or 
+- undershoot and cut off too much informative text from our documents.
 
 We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram. Notice how we are only using the training dataset to avoid data leakage when selecting this value.
 
@@ -129,29 +143,35 @@ kickstarter_train %>%
        y = "Number of campaign blurbs")
 ```
 
-Given that we don't have many words, to begin with, it makes sense to err on the side of longer sequences since we don't want to lose valuable data. I would suppose that 30 would be a good cutoff point.
+Given that we don't have many words for this particular dataset to begin with, let's err on the side of longer sequences so we don't lose valuable data. Let's try 30 words for our threshold `max_length`, and let's include 20,000 words in our vocabulary.
 
 ```{r prepped_recipe}
 library(textrecipes)
 
-max_words <- 20000
+max_words <- 2e4
 max_length <- 30
 
-prepped_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+kick_rec <- recipe(~blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
   step_tokenfilter(blurb, max_tokens = max_words) %>%
-  step_sequence_onehot(blurb, sequence_length = max_length) %>%
-  prep()
+  step_sequence_onehot(blurb, sequence_length = max_length) 
 
-prepped_training <- prepped_recipe %>%
-  bake(new_data = NULL, composition = "matrix")
+kick_rec
 ```
+
+This preprocessing recipe tokenizes our text (Chapter \@ref(tokenization)) and filters to keep only the top 20,000 words, but then it transforms the tokenized text in a new way to prepare for deep learning that we have not used in this book before, using `step_sequence_onehot()`.
 
 ### One-hot sequence embedding of text
 
-We have used `step_sequence_onehot()` to transforms the tokens into a numerical format, the main difference here is that this format takes into account the order of the tokens, unlike `step_tf()` and `step_tfidf()` which doesn't take order into account. `step_tf()` and `step_tfidf()` are called bag-of-words for this reason. Let us take a closer look at how `step_sequence_onehot()` works and how its parameters will change the output.
+The function `step_sequence_onehot()` transforms tokens into a numeric format appropriate for modeling, like `step_tf()` and `step_tfidf()`. However, it is different in that it takes into account the order of the tokens, unlike `step_tf()` and `step_tfidf()` which do not take order into account. 
 
-When we are using `step_sequence_onehot()` two things are happening. First, each word is being assigned an integer index. You can think of this as key-index pair of the vocabulary. Next, the sequence of tokens will be replaced with their corresponding index and it is this sequence of integers that make up the final numerical representation. To illustrate here is a small example:
+```{block, type = "rmdnote"}
+Steps like `step_tf()` and `step_tfidf()` are used for approaches called "bag of words", meaning the words are treated like they are just thrown in a bag without attention paid to their order. 
+```
+
+Let's take a closer look at how `step_sequence_onehot()` works and how its parameters will change the output.
+
+When we use `step_sequence_onehot()`, two things happen. First, each word is assigned an _integer index_. You can think of this as a key-value pair of the vocabulary. Next, the sequence of tokens is replaced with the corresponding indices; this sequence of integers makes up the final numeric representation. Let's illustrate with a small example:
 
 ```{r sequence_onhot_rec}
 small_data <- tibble(
@@ -163,37 +183,46 @@ small_data <- tibble(
 
 small_spec <- recipe( ~ text, data = small_data) %>%
   step_tokenize(text) %>%
-  step_sequence_onehot(text, sequence_length = 6, prefix = "") %>%
-  prep()
+  step_sequence_onehot(text, sequence_length = 6, prefix = "") 
+
+prep(small_spec)
 ```
 
-Once we have the `prep()`ed recipe then we can `tidy()` it to extract the vocabulary. It is being represented in the `vocabulary` and `token` columns.
+```{block, type = "rmdwarning"}
+What does the function `prep()` do? Before when we have used recipes, we put them in a `workflow()` which handles low-level processing. The `prep()` will compute or estimate statistics from the training set; the output of `prep()` is a prepped recipe. 
+```
+
+Once we have the prepped recipe then we can `tidy()` it to extract the vocabulary, represented in the `vocabulary` and `token` columns^[The `terms` columns refer to the column we have applied `step_sequence_onehot()` to and `id` is its unique identifier. Note that textrecipes allows `step_sequence_onehot()` to be applied to multiple text variables independently and they will have their own vocabularies.].
 
 ```{r sequence_onhot_rec_vocab, dependson="sequence_onhot_rec"}
-small_spec %>%
+prep(small_spec) %>%
  tidy(2)
 ```
 
-```{block, type = "rmdnote"}
-The `terms` columns refer to the column we have applied `step_sequence_onehot()` to and `id` is its unique identifier. Note that textrecipes allow `step_sequence_onehot()` to be applied to multiple text variables independently and they will have their own vocabularies.
-```
-
-If we take a look at the resulting matrix we have 1 row per observation. The first row starts with some padded zeroes but turns into 3, 11, 14, which when matched with the vocabulary can construct the original sentence.
+If we take a look at the resulting matrix, we have one row per observation. The first row starts with some padded zeroes but then contains 1, 4, and 5, which we can use together with the vocabulary to construct the original sentence.
 
 ```{r sequence_onhot_rec_matrix1, dependson="sequence_onhot_rec"}
-small_spec %>%
-  juice(composition = "matrix")
+prep(small_spec) %>%
+  bake(new_data = NULL, composition = "matrix")
 ```
 
-But wait, the 4th line should have started with a 4 since the sentence starts with "I" but the first number is 13. This is happening because the sentence is too long to fit inside the specified length. This leads us to ask 3 questions before using `step_sequence_onehot()`
+```{block, type = "rmdwarning"}
+When we `bake()` a prepped recipe, we apply the preprocessing to a dataset. We can get out the training set that we started with by specifying `new_data = NULL` or apply it to another set via `new_data = my_other_data_set`. The output of `bake()` is a dataset like a tibble or a matrix, depending on the `composition` argument.
+```
+
+But wait, the 4th line should have started with an 11 since the sentence starts with "monsters"! The entry in `_text_1` is 6 instead. This is happening because the sentence is too long to fit inside the specified sequence length. We must answer three questions before using `step_sequence_onehot()`:
 
 1.  How long should the output sequence be?
-2.  What happens to too long sequences?
-3.  What happens to too short sequences?
+2.  What happens to sequences that are too long?
+3.  What happens to sequences that are too short?
 
-Choosing the right length is a balancing act. You want the length to be long enough such that you don't truncate too much of your text data, but still short enough to keep the size of the data down and to avoid excessive padding. Truncating, having large data output and excessive padding all lead to worse model performance. This parameter is controlled by the `sequence_length` argument in `step_sequence_onehot()`. If the sequence is too long then we need to truncate it, this can be done by removing values from the beginning ("pre") or the end ("post") of the sequence. This choice is mostly influenced by the data, and you need to evaluate where most of the extractable information of the text is located. News articles typically start with the main points and then go into detail. If your goal is to detect the broad category then you properly want to keep the beginning of the texts, whereas if you are working with speeches or conversational text, then you might find that the last thing to be said carries more information and this would lead us to truncate from the beginning. Lastly, we need to decide how the padding should be done if the sentence is too short. Pre-padding tends to be more popular, especially when working with RNN and LSTM models since having post-padding could result in the hidden states getting flushed out by the zeroes before getting to the text itself.
+Choosing the right sequence length is a balancing act. You want the length to be long enough such that you don't truncate too much of your text data, but still short enough to keep the size of the data manageable and to avoid excessive padding. Truncating, having large training data, and excessive padding all lead to worse model performance. This parameter is controlled by the `sequence_length` argument in `step_sequence_onehot()`. 
 
-`step_sequence_onehot()` defaults to `sequence_length = 100`, `padding = "pre"` and `truncating = "pre"`. If we change the truncation to happen at the end
+If the sequence is too long, then it must be truncated. This can be done by removing values from the beginning (`"pre"`) or the end (`"post"`) of the sequence. This choice is mostly influenced by the data, and you need to evaluate where most of the useful information of the text is located. News articles typically start with the main points and then go into detail. If your goal is to detect the broad category, then you may want to keep the beginning of the texts, whereas if you are working with speeches or conversational text, then you might find that the last thing to be said carries more information. 
+
+Lastly, we need to decide how to pad a document that is too short. Pre-padding tends to be more popular, especially when working with RNN and LSTM models (Chapter \@ref(dllstm)) since having post-padding could result in the hidden states getting flushed out by the zeroes before getting to the text itself (Section \@ref(lstmpadding)).
+
+The defaults for `step_sequence_onehot()` are `sequence_length = 100`, `padding = "pre"`, and `truncating = "pre"`. If we change the truncation to happen at the end with:
 
 ```{r sequence_onhot_rec_matrix2, dependson="sequence_onhot_rec"}
 recipe( ~ text, data = small_data) %>%
@@ -201,10 +230,10 @@ recipe( ~ text, data = small_data) %>%
   step_sequence_onehot(text, sequence_length = 6, prefix = "", 
                        padding = "pre", truncating = "post") %>%
   prep() %>%
-  juice(composition = "matrix")
+  bake(new_data = NULL, composition = "matrix")
 ```
 
-then we see the 4 at the beginning of the last row representing the "I". The starting points are not aligned since we are still padding on the left side. We left-align all the sequences by setting `padding = "post"`.
+then we see the 11 at the beginning of the last row representing the "monsters". The starting points are not aligned since we are still padding on the left side. We can left-align all the sequences by setting `padding = "post"`.
 
 ```{r sequence_onhot_rec_matrix3, dependson="sequence_onhot_rec"}
 recipe( ~ text, data = small_data) %>%
@@ -212,10 +241,21 @@ recipe( ~ text, data = small_data) %>%
   step_sequence_onehot(text, sequence_length = 6, prefix = "", 
                        padding = "post", truncating = "post") %>%
   prep() %>%
-  juice(composition = "matrix")
+  bake(new_data = NULL, composition = "matrix")
 ```
 
-Now we have that all the 4s neatly aligned in the first column.
+Now we have that all digits representing the first characters neatly aligned in the first column.
+
+Let's now prepare and apply our feature engineering recipe `kick_rec` so we can use it in for our deep learning model.
+
+```{r}
+kick_prep <-  prep(kick_rec)
+kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
+dim(kick_train)
+```
+
+The matrix `kick_train` has `r comma(dim(kick_train)[1])` rows for the rows of the training data and `r dim(kick_train)[2]` columns, corresponding to our chosen sequence length.
+
 
 ### Simple Flattened Dense network
 
@@ -589,6 +629,7 @@ The feature engineering is not completely out of our hands since we can still af
 - how to build and train a deep neural network with keras
 - How to tokenize text in a way that retains the order of the tokens
 - how to train word embeddings alongside your model
+- about resampling strategies for deep learning models
 - about how deep learning models have low interpretability
 - How to use pre-trained word embeddings in a neural network
 
