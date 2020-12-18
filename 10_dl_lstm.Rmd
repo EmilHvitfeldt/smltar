@@ -88,13 +88,13 @@ kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
 dim(kick_matrix)
 ```
 
-Here we use `composition = "matrix"` because the keras modeling functions operate on matrices, rather than a dataframe or tibble.
+Here we use `composition = "matrix"` because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.
 
 ### Building an LSTM
 
 An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to understand text as a sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
 
-The keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
+The Keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
 
 ```{r}
 library(keras)
@@ -132,7 +132,7 @@ lstm_mod %>%
 As we noted in Chapter \@ref(dldnn), the neural network model is modified **in place**; the object `lstm_mod` is different after we compile it, even those we didn't assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
 ```
 
-After the model is compiled, we can fit it. The `fit()` method for keras models has an argument `validation_split` that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the _end_ of each epoch.
+After the model is compiled, we can fit it. The `fit()` method for Keras models has an argument `validation_split` that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the _end_ of each epoch.
 
 ```{r}
 lstm_history <- lstm_mod %>% 
@@ -162,7 +162,7 @@ This model continues to improve epoch after epoch on the training data, but perf
 
 ### Evaluation {#lstmevaluation}
 
-We used some keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can instead use the `validation_data` argument and send in our own validation set creating with rsample.
+We used some Keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can use the `validation_data` argument and send in our own validation set creating with rsample.
 
 ```{r lstmval}
 set.seed(234)
@@ -182,7 +182,7 @@ kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]),
 dim(kick_assess)
 ```
 
-These are each matrices appropriate for a keras model. We will also need the outcome variables for both sets.
+These are each matrices appropriate for a Keras model. We will also need the outcome variables for both sets.
 
 ```{r}
 state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
@@ -257,7 +257,7 @@ val_res %>%
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops that allow information to persist through steps but do not have memory cells like LSTMs. RNNs are sometimes used in domains like speech recognition. 
+An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. RNNs are sometimes used in domains like speech recognition. 
 
 ```{block, type = "rmdwarning"}
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
@@ -397,7 +397,7 @@ stacked_res %>% metrics(state, .pred_class, .pred_1)
 
 We can gradually improve a model by changing and adding to its architecture.
 
-## Case study: padding
+## Case study: padding {#lstmpadding}
 
 One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
 
@@ -460,7 +460,7 @@ padding_res <- keras_predict(padding_mod, pad_assess, state_assess)
 padding_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
-The same model architecture with default padding preprocessing resulted in an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity.
+The same model architecture with default padding preprocessing resulted in an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
 
 ```{block, type = "rmdwarning"}
 Different preprocessing strategies have a huge impact on deep learning results. 
@@ -656,7 +656,7 @@ We've learned a lot about how to model this dataset over the course of this chap
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
 - The bidirectional LSTM performed than the regular LSTM, so let's set up each LSTM layer to be able to learn sequences in both directions.
 
-Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.25` and let the keras model choose the validation set.
+Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.25` and let the Keras model choose the validation set.
 
 ```{r lstmfinalmod}
 final_mod <- keras_model_sequential() %>%
