@@ -59,7 +59,7 @@ This sample of opinions reflects the distribution over time of available opinion
 
 ### Building our first regression model {#firstregression}
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref{comparerf}, does not handle special characters in columns names well.] we want to try out.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
