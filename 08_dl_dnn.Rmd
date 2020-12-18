@@ -39,7 +39,7 @@ kickstarter <- read_csv("data/kickstarter.csv.gz")
 kickstarter
 ```
 
-The text for these models, contained in blurb, are short, less than a few hundred characters. What is the distribution of characters?
+The `state` of each observation records whether the campaign was successful in its crowdfunding goal; a value of 1 means it was successful and a value of 0 means it was not successful. The text for these models, contained in `blurb`, are short, less than a few hundred characters. What is the distribution of characters?
 
 ```{r kickstartercharhist, dependson="kickstarter", fig.cap="Distribution of character count for Kickstarter campaign blurbs"}
 kickstarter %>%
@@ -179,7 +179,7 @@ small_data <- tibble(
            "Spooky Dice Game",
            "Illustrated Book of Monsters",
            "Monsters, Ghosts, Goblins, Me, Myself and I")
-  )
+)
 
 small_spec <- recipe( ~ text, data = small_data) %>%
   step_tokenize(text) %>%
@@ -196,7 +196,7 @@ Once we have the prepped recipe then we can `tidy()` it to extract the vocabular
 
 ```{r sequence_onhot_rec_vocab, dependson="sequence_onhot_rec"}
 prep(small_spec) %>%
- tidy(2)
+  tidy(2)
 ```
 
 If we take a look at the resulting matrix, we have one row per observation. The first row starts with some padded zeroes but then contains 1, 4, and 5, which we can use together with the vocabulary to construct the original sentence.
@@ -254,12 +254,12 @@ kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
 dim(kick_train)
 ```
 
-The matrix `kick_train` has `r comma(dim(kick_train)[1])` rows for the rows of the training data and `r dim(kick_train)[2]` columns, corresponding to our chosen sequence length.
+The matrix `kick_train` has `r comma(dim(kick_train)[1])` rows, corresponding to the rows of the training data, and `r dim(kick_train)[2]` columns, corresponding to our chosen sequence length.
 
 
-### Simple Flattened Dense network
+### Simple flattened dense network
 
-The model we will be starting with a model that embeds sentences in sequences of vectors, flattening them, and then trains a dense layer on top.
+Our first deep learning model embeds these Kickstarter blurbs in sequences of vectors, flattens them, and then trains a dense network layer to predict whether the campaign was successful or not.
 
 ```{r dense_model}
 library(keras)
@@ -276,135 +276,198 @@ dense_model
 ```
 
 Let us step through this model specification one layer at a time.
-We start the keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
-Our first layer is an embedding layer via `layer_embedding()` This layer is e equipped to handle preprocessed data we have in `prepped_training`. It will take each observation/row in `prepped_traning` and embed each token to an embedding vector. This will result in each observation being turned into an (embedding_dim x sequence_length) matrix witch would be a (12 x 30) matrix with our settings, creating a (number of observations x embedding_dim x sequence_length) tensor.
-The `layer_flatten()` layer that follows takes the 2-dimensional tensors for each observation and flattens it down into 1 dimension. This will create a `30 * 12 = 360` tensor for each observation. Lastly, we have 2 densely connected layers with the last layer having a sigmoid activation function to give us a number between 0 and 1.
 
-Now that we have specified the architecture of the model we still have a couple of things left to add to the model before we can fit it to the data. A keras model requires an optimizer and a loss function to be able to compile. When the neural network finished passing a batch of data through the network it needs to find a way to use the difference between the predicted values and true values to update the weights. the algorithm that determines those weights is known as the optimization algorithm. keras comes pre-loaded with many optimizers^[https://keras.io/api/optimizers/] and you can even create custom optimizers if what you need isn't on the list. We will start by using the rmsprop optimizer.
+- We initiate the Keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
+- Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` tensor.
+- The next `layer_flatten()` layer takes the two-dimensional tensors for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` tensor for each observation. 
+- Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.
+
+We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an **optimizer** and a **loss function** to be able to compile. 
+
+When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network's weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself^[https://keras.io/api/optimizers/]; you can even create custom optimizers if what you need isn't on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.
 
 ```{block, type = "rmdnote"}
 An optimizer can either be set with the name of the optimizer as a character or by supplying the function `optimizer_*()` where `*` is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
 ```
 
-During training, we need to calculate a quantity that we want to have minimized. This is the loss function, keras comes pre-loaded with many loss functions^[https://keras.io/api/losses/]. These loss function will typically take in two values, typically the true value and the predicted value, and return a measure of how close they are. 
-Since we are working on a binary classification task and have the final layer of the network return a probability, then we find binary cross-entropy to be an appropriate loss function. Binary cross-entropy does well at dealing with probabilities as it measures the “distance” between probability distributions. which would in our case be between the ground-truth distribution and the predictions.
+During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras^[https://keras.io/api/losses/]. These loss function typically has two arguments, the true value and the predicted value, and returns a measure of how close they are. 
+Since we are working on a binary classification task and the final layer of the network returns a probability, then binary cross-entropy is an appropriate loss function. Binary cross-entropy does well at dealing with probabilities because it measures the “distance” between probability distributions. In our case, this would be the ground-truth distribution and the predictions.
 
-We can also add any number of `metrics`^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you of the user how well the model is performing. We will select accuracy as our metric for now. We can now set these 3 options; optimizer, loss, and metrics using the `compile()` function
+We can also add any number of metrics^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics job is to report back a single number that will inform you how well the model is performing. We will select accuracy as our metric for now. 
+
+Let's set these 3 options (`optimizer`, `loss`, and `metrics`) using the `compile()` function:
 
 ```{r dense_model_compiled}
 dense_model %>% compile(
-  optimizer = "rmsprop",
+  optimizer = "adam",
   loss = "binary_crossentropy",
   metrics = c("accuracy")
 )
 ```
 
 ```{block, type = "rmdnote"}
-Notice how the `compile()` function modifies the network in place. This is different then what is conventionally done in R where a new network object would have been returned.
+Notice how the `compile()` function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code.
 ```
 
-Finally, we can fit the model. When we `fit()` a keras model we need to supply it with the data we are having the model train on. We need to supply this a matrix of predictors `x` and a numeric vector of labels `y`.
-This is sufficient information to start training the model. We are going to specify a couple more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 20` to tell the model to pass all the data through the training loop 20 times. Lastly, we set `validation_split = 0.2` to specify an internal validation split for when the metrics are calculated.
+Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
+This is sufficient information to get started training the model, but we are going to specify a few more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 20` to tell the model to pass all the training data through the training loop 20 times. Lastly, we set `validation_split = 0.25` to specify an internal validation split; this will keep 25% of the data for validation.
 
 ```{r dense_model_history}
-dense_history <- dense_model %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
-  batch_size = 512,
-  epochs = 20,
-  validation_split = 0.2
-)
+dense_history <- dense_model %>% 
+  fit(
+    x = kick_train, 
+    y = kickstarter_train$state,
+    batch_size = 512,
+    epochs = 20,
+    validation_split = 0.25,
+    verbose = FALSE
+  )
 ```
 
-We can visualize the results of the training loop by `plot()`ing the `dense_history`.
+We can visualize the results of the training loop by plotting the `dense_history` in Figure \@ref(fig:dense_model_history_plot).
 
 ```{r dense_model_history_plot, fig.cap="Training and validation metrics for dense network"}
 plot(dense_history)
 ```
 
-Now that we have the fitted model can we apply the model to our testing dataset to see how well the model performs on data it hasn't seen.
-
-```{r dense_model_evaluate}
-dense_model %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
-  )
+```{block, type = "rmdnote"}
+We have dealt with accuracy in other chapters; remember that a higher value (a value near one) is better. Loss is new in these deep learning chapters, and a lower value is better.
 ```
 
-we see that the accuracy very closely resembles the val_accuracy from the training loop, suggesting that we didn't overfit our model.
+The loss and accuracy both improve with more training epochs on the training data; this dense network more and more closely learns the characteristics of the training data as its trains longer. The same is not true of the validation data, the held-out 25% specified by `validation_split = 0.25`. The performance is worse on the validation data than the testing data, and _degrades_ somewhat as training continues. If we wanted to use this model, we would want to only train it about 7 or 8 epochs.
 
-### Evaluate Keras predictions {#evaluate-keras-predictions}
+### Evaluation {#evaluate-dnn}
 
-At the end of the last sub-section we used `evaluate()` to see how well our model is performing.
-If you want to use the yardstick package we would have to make some transformations since yardstick needs its input to be data.frames and keras mostly works with matrices and arrays.
-The following function create a little brigde between the two frameworks. It allows us to combine a keras model, recipes recipe along with the data, and return the predictions in a tibble format.
+For our first deep learning model, we used the Keras defaults for creating a validation split and tracking metrics, but we can use tidymodels functions to be more specific about these model characteristics. Instead of using the `validation_split` argument to `fit()`, we can create our own validation set using tidymodels and use `validation_data` argument for `fit()`. We create our validation split from the _training_ set.
+
+```{r dnnval}
+set.seed(234)
+kick_val <- validation_split(kickstarter_train, strata = state)
+kick_val
+```
+
+The `split` object contains the information necessary to extract the data we will use for training/analysis and the data we will use for validation/assessment. We can extract these datasets in their raw, unprocessed form from the split using the helper functions `analysis()` and `assessment()`. Then, we can apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
+
+```{r}
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+                      composition = "matrix")
+dim(kick_analysis)
+
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+                    composition = "matrix")
+dim(kick_assess)
+```
+
+These are each matrices now appropriate for a deep learning model like the one we trained in the previous section. We will also need the outcome variables for both sets.
+
+```{r}
+state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
+state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
+```
+
+Let's set up our same dense neural network architecture. 
+
+```{r dense_model2}
+dense_model <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, 
+                  output_dim = 12,
+                  input_length = max_length) %>%
+  layer_flatten() %>%
+  layer_dense(units = 32, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+dense_model %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+Now we can fit this model with dropout to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
+
+```{r val_history}
+val_history <- dense_model %>% 
+  fit(
+    x = kick_analysis, 
+    y = state_analysis,
+    batch_size = 512,
+    epochs = 10,
+    validation_data = list(kick_assess, state_assess),
+    verbose = FALSE
+  )
+
+val_history
+```
+
+Figure \@ref(fig:val_history) still shows that significant overfitting at 10 epochs.
+
+```{r val_history_plot, fig.cap="Training and validation metrics for dense network with validation set"}
+plot(val_history)
+```
+
+Using our own validation set also allows us to flexibly measure performance using tidymodels function from the yardstick package. We do need to set up a few transformations between Keras and tidymodels.
+The following function `keras_predict()` creates a little bridge between the two frameworks, combining a Keras model with baked (i.e. preprocessed) data and returns the predictions in a tibble format.
 
 ```{r}
 library(dplyr)
-keras_predict <- function(model, recipe, data, response) {
-  baked_data <- bake(recipe, data, composition = "matrix")
-  prediction <- predict(model, baked_data)[, 1]
+
+keras_predict <- function(model, baked_data, response) {
+  predictions <- predict(model, baked_data)[, 1]
   
-  data %>%
-    mutate(
-      .pred_prop = prediction,
-      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
-    ) %>%
-  mutate(across(c({{ response }}, .pred_class), 
-                ~ factor(.x, levels = c(1, 0))))
+  tibble(
+    .pred_1 = predictions,
+    .pred_class = if_else(.pred_1 < 0.5, 0, 1),
+    state = response
+  ) %>%
+    mutate(across(c(state, .pred_class),            ## create factors
+                  ~ factor(.x, levels = c(1, 0))))  ## with matching levels
 }
 ```
 
-It is worth noting that this function only works with simple binary classification models that take in its data as a matrix and return a single probability for each observation.
-The function is in addition to returning the predicted probability also returning the predicted class based on a 50% cut-off. The function is also making sure that the class and predicted class are both factors with matching levels.
-
-Using this function will allow us to get prediction results that seamlessly connects with yardstick.
-
-```{r}
-dense_model_predictions <- keras_predict(
-    dense_model, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  )
-
-dense_model_predictions
+```{block, type = "rmdwarning"}
+This function only works with binary classification models that take a preprocessed matrix as input and return a single probability for each observation. It returns both the predicted probability as well as the predicted class, using a 50% probability threshold.
 ```
 
-We can calculate the standard metrics with `matrics()` 
+This function creates prediction results that seamlessly connect with tidymodels and yardstick functions.
 
 ```{r}
-library(yardstick)
-metrics(dense_model_predictions, state, .pred_class)
+val_res <- keras_predict(dense_model, kick_assess, state_assess)
+val_res
 ```
 
-and we see that they match the results we got from `evaluate()`. Since we have access to yardsticks full capacities we can also calculates confusion matrices and ROC curves.
-Looking at the heatmap in Figure \@ref(fig:dnnheatmap), we are happy to see that there isn't any glaring bias in how the model performs. The model is perfect, it is still only working on around a little over `r scales::percent_format()(floor(100 * accuracy(dense_model_predictions, state, .pred_class)$.estimate) / 100)`, bu is is more or less evenly god at prediction both classes.
+We can calculate the standard metrics with `metrics()`.
 
-```{r dnnheatmap, dependson="nbrs", fig.cap="Confusion matrix for first DNN model predictions of Kickstarter state"}
-dense_model_predictions %>%
+```{r}
+metrics(val_res, state, .pred_class)
+```
+
+This matches what we saw when we looked at the output of `val_history`. 
+
+Since we have access to tidymodels' full capacity for model evaluation, we can also compute confusion matrices and ROC curves.
+The heatmap in Figure \@ref(fig:dnnheatmap) shows that there isn't any dramatic bias in how the model performs for the two classes, success and failure for the crowdfunding campaigns. The model certainly isn't perfect; its accuracy is a little over `r scales::percent((floor(100 * accuracy(val_res, state, .pred_class)$.estimate) / 100))`, but at least it is more or less evenly good at predicting both classes.
+
+```{r dnnheatmap, dependson="nbrs", fig.cap="Confusion matrix for first DNN model predictions of Kickstarter campaign success"}
+val_res %>%
   conf_mat( state, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
-The ROC curve in Figure \@ref(fig:dnnroccurve) also looks just as good as we would suspect from the other metrics we have calculated so far. Nothing alarming is standing out for us.
+The ROC curve in Figure \@ref(fig:dnnroccurve) shows how the model performs at different thresholds.
 
-```{r dnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first DNN model predictions of Kickstarter state"}
-dense_model_predictions %>%
-  roc_curve(truth = state, .pred_prop) %>%
+```{r dnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first DNN model predictions of Kickstarter campaign success"}
+val_res %>%
+  roc_curve(truth = state, .pred_1) %>%
   autoplot() +
   labs(
     title = "Receiver operator curve for Kickstarter blurbs"
   )
 ```
 
-
 ## Using pre-trained word embeddings
 
-In the last section did we include an embedding layer, and we let the model train the embedding along with it. This is not the only way to handle this task. In chapter \@ref(embeddings) we looked at how embeddings are created and how they are used. Instead of having the embedding layer start at random and have it being trained alongside the other parameters, let us try to supply them our self. 
+All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings. 
 
-We start by getting a pre-trained embedding. The glove embedding that we used in section \@ref(glove) will work for now. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models.
+We start by obtaining pre-trained embeddings. The GloVe embeddings that we used in Section \@ref(glove) are a good place to start. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models directly.
 
 ```{r eval=FALSE}
 library(textdata)
@@ -418,22 +481,22 @@ glove6b <- glove6b[, 1:13]
 glove6b
 ```
 
-The `embedding_glove6b()` function returns a tibble which isn't the right format for what keras expects. Also, take notice of how many rows are present in this embedding. Far more than what the trained recipe is expecting to return. The vocabulary can be extracted from the trained recipe using `tidy()`. First, we apply `tidy()` to `prepped_recipe` to get the list of steps that the recipe contains.
+The `embedding_glove6b()` function returns a tibble which isn't the right format for what Keras expects. Also, notice how many rows are present in this embedding, far more than what the trained recipe is expecting. The vocabulary can be extracted from the trained recipe using `tidy()`. First, we apply `tidy()` to `kick_prep` to get the list of steps that the recipe contains.
 
 ```{r, dependson="prepped_recipe"}
-tidy(prepped_recipe)
+tidy(kick_prep)
 ```
 
-We see that the 3rd step is the `sequence_onhot` step, so by setting `number = 3` can we extract the vocabulary of transformation.
+We see that the third step is the `sequence_onehot` step, so by setting `number = 3` we can extract the embedding vocabulary.
 
 ```{r, dependson="prepped_recipe"}
-tidy(prepped_recipe, number = 3)
+tidy(kick_prep, number = 3)
 ```
 
-This list of tokens can then be `left_join()`ed to the `glove6b` embedding tibble to only keep the tokens of interest. Any tokens from the vocabulary not found in `glove6b` is replaced with 0 using `mutate_all()` and `replace_na()`. The results are turned into a matrix, and a row of zeroes is added at the top of the matrix to account for the out-of-vocabulary words.
+We can then use `left_join()` to combine these tokens to the `glove6b` embedding tibble and only keep the tokens of interest. Any tokens from the vocabulary not found in `glove6b` is replaced with 0 using `mutate_all()` and `replace_na()`. We can transform the results into a matrix, and add a row of zeroes at the top of the matrix to account for the out-of-vocabulary words.
 
 ```{r glove6b_matrix, dependson=c("glove6b12d", "prepped_recipe")}
-glove6b_matrix <- tidy(prepped_recipe, 3) %>%
+glove6b_matrix <- tidy(kick_prep, 3) %>%
   select(token) %>%
   left_join(glove6b, by = "token") %>%
   mutate_all(replace_na, 0) %>%
@@ -442,20 +505,23 @@ glove6b_matrix <- tidy(prepped_recipe, 3) %>%
   rbind(0, .)
 ```
 
-The way the model is constructed will remain as unchanged as possible. We make sure that the `output_dim` argument is being set to be equal to` ncol(glove6b_matrix)`, this is a way to make sure that all the dimensions will line up nicely. Everything else stays the same.
+We'll keep the model architecture itself as unchanged as possible. The `output_dim` argument is set equal to`ncol(glove6b_matrix)` to make sure that all the dimensions line up correctly, but everything else stays the same.
 
 ```{r dense_model_pte, dependson="glove6b_matrix"}
 dense_model_pte <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, 
-                output_dim = ncol(glove6b_matrix),
-                input_length = max_length) %>%
+                  output_dim = ncol(glove6b_matrix),
+                  input_length = max_length) %>%
   layer_flatten() %>%
   layer_dense(units = 32, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
 ```
 
-Now we use `get_layer()` to access the first layer which is the embedding layer, then we set the weights with `set_weights()` and lastly we freeze the weights with `freeze_weights()`. 
+Now we use `get_layer()` to access the first layer (which is the embedding layer), set the weights with `set_weights()`, and then freeze the weights with `freeze_weights()`. 
+
+```{block, type = "rmdnote"}
 Freezing the weights stops them from being updated during the training loop.
+```
 
 ```{r dense_model_pte_weights, dependson="dense_model_pte"}
 dense_model_pte %>%
@@ -464,62 +530,62 @@ dense_model_pte %>%
   freeze_weights()
 ```
 
-Now we will compile and fit the model just like the last one we looked at.
+Now we compile and fit the model just like the last one we looked at.
 
 ```{r dense_pte_history, dependson="dense_model_pte_weights"}
 dense_model_pte %>% compile(
-  optimizer = "rmsprop",
+  optimizer = "adam",
   loss = "binary_crossentropy",
   metrics = c("accuracy")
 )
 
-dense_pte_history <- dense_model_pte %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
-  batch_size = 512,
-  epochs = 20,
-  validation_split = 0.2
-)
+dense_pte_history <- dense_model_pte %>% 
+  fit(
+    x = kick_analysis, 
+    y = state_analysis,
+    batch_size = 512,
+    epochs = 20,
+    validation_data = list(kick_assess, state_assess),
+    verbose = FALSE
+  )
+
+dense_pte_history
 ```
 
-This model is not performing as well as the previous model and the evaluation isn't that much better.
+This model is not performing well! We can confirm by computing metrics on our validation set.
 
 ```{r dense_pte_evaluate, dependson="dense_pte_history"}
-dense_model_pte %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
-  )
+pte_res <- keras_predict(dense_model_pte, kick_assess, state_assess)
+metrics(pte_res, state, .pred_class)
 ```
 
-Why is this happening? Part of the training loop is about adjusting the weights in the network. 
-When we froze the weights in this network it appears that we froze them at values that did not perform very well. 
-This pre-trained glove embedding[@Pennington2014] we are using have been trained on a Wikipedia dump and [Gigaword 5](https://catalog.ldc.upenn.edu/LDC2011T07) which is a comprehensive archive of newswire text. 
-The text contained on Wikipedia and in new articles both follows certain styles and semantics.
-Both will tend to be written formally and in the past tense. 
-They also contain longer and complete sentences. 
-There are many more distinct features of both Wikipedia text and news articles, but the important part is how similar they are to the data we are trying to use.
-These text fields are very short, lack punctuation, stop words, narrative, and tense. Many of them simply try to pack as many buzz words in as possible while keeping the sentence readable.
-It is not surprising that the word embedding doesn't perform well in this model since the text it is trained on is so far removed from the text is it being applied on.
+Why is this happening? Part of the training loop for a model like this one is typically about _adjusting_ the weights in the network. 
+When we froze the weights in this network, we froze them at values that did not perform very well. 
+These pre-trained glove embeddings [@Pennington2014] are trained on a Wikipedia dump and [Gigaword 5](https://catalog.ldc.upenn.edu/LDC2011T07), a comprehensive archive of newswire text. 
+The text contained on Wikipedia and in news articles both follow certain styles and semantics.
+Both will tend to be written formally and in the past tense, with longer and complete sentences. 
+There are many more distinct features of both Wikipedia text and news articles, but the important part is how similar they are to the data we are trying to model.
+These Kickstarter blurbs are very short, lack punctuation, stop words, narrative, and tense. Many of them simply try to pack as many buzz words as possible into the allowed character count while keeping the sentence readable.
+Perhaps it should not surprise us that these word embeddings don't perform well in this model, since the text used to train the embeddings is so far removed from the text is it being applied on.
 
-Although this didn't work that well, doesn't mean that using pre-trained word embeddings are useless.
-Sometimes they can perform very well, the important part is how well the embedding fits the data you are using.
-there is one more way we can use this embedding in our network, we can load it in as before but not freeze the weights.
-This allows the models to still adjust the weights to better fit the data, and the hope is that this pre-trained embedding delivers a better starting point than the randomly generated embedding we get if we don't set the weights.
+Although this approach with our dataset didn't work that well, that doesn't mean that using pre-trained word embeddings is always a bad idea. 
+The important point is how well the embeddings fit the data you are modeling.
+Also, there is another way we can use these particulat embeddings in our network architecture; we can load them in as a starting as before but _not_ freeze the weights.
+This allows the model to adjust the weights to better fit the data. The intention here is that these pre-trained embeddings deliver a better starting point than the randomly generated embedding we get if we don't set the weights.
 
-We specify a new model
+We specify a new model to get started on this approach.
 
 ```{r dense_model_pte2, dependson="glove6b_matrix"}
 dense_model_pte2 <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, 
-                output_dim = ncol(glove6b_matrix),
-                input_length = max_length) %>%
+                  output_dim = ncol(glove6b_matrix),
+                  input_length = max_length) %>%
   layer_flatten() %>%
   layer_dense(units = 32, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
 ```
 
-set the weights with `set_weights()` but we don't freeze them
+Now, we set the weights with `set_weights()` but we _don't_ freeze them.
 
 ```{r dense_model_pte_noweights, dependson="dense_model_pte"}
 dense_model_pte2 %>%
@@ -527,78 +593,62 @@ dense_model_pte2 %>%
   set_weights(list(glove6b_matrix))
 ```
 
-and we compile and fit the model as we did last time
+We compile and fit the model as before.
 
 ```{r dense_pte_noweights_history, dependson="dense_model_pte_noweights"}
 dense_model_pte2 %>% compile(
-  optimizer = "rmsprop",
+  optimizer = "adam",
   loss = "binary_crossentropy",
   metrics = c("accuracy")
 )
 
 dense_pte2_history <- dense_model_pte2 %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
-  batch_size = 512,
-  epochs = 40,
-  validation_split = 0.2
+    x = kick_analysis, 
+    y = state_analysis,
+    batch_size = 512,
+    epochs = 20,
+    validation_data = list(kick_assess, state_assess),
+    verbose = FALSE
 )
 ```
 
+How did this version of using pre-trained embeddings do?
+
 ```{r dense_pte_noweights_evaluate, dependson="dense_pte_noweights_history"}
-dense_model_pte2 %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
-  )
+pte2_res <- keras_predict(dense_model_pte2, kick_assess, state_assess)
+metrics(pte2_res, state, .pred_class)
 ```
 
-This performs quite a bit better than when we froze the weights.
-However, it is training slower than when we didn't set weights since we had to run it for around 40 epochs before we start to overfit.
+This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
 
 ```{block, type = "rmdnote"}
-If you have enough corpus data in the field you are working on, then it would be worth considering training a word embedding that better captures the structure of the domain you are trying to work with.
+If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with.
 ```
 
 We can combine all the predictions on these last 3 models to more easily compare the results between them
 
 ```{r}
-all_dense_model_predictions <- bind_rows(
-  keras_predict(
-    dense_model, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "dense"),
-  keras_predict(
-    dense_model_pte, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "pte (locked weights)"),
-  keras_predict(
-    dense_model_pte2, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "pte (not locked weights)")
+all_dense_model_res <- bind_rows(
+  val_res %>% mutate(model = "dense"),
+  pte_res %>% mutate(model = "pte (locked weights)"),
+  pte2_res %>% mutate(model = "pte (not locked weights)")
 )
 ```
 
-Now that the results are combined in `all_dense_model_predictions` we can calculate group-wise evaluation statistics by grouping by the `model` variable.
+Now that the results are combined in `all_dense_model_res`, we can calculate group-wise evaluation statistics by grouping by the `model` variable.
 
 ```{r}
-all_dense_model_predictions %>%
+all_dense_model_res %>%
   group_by(model) %>%
   metrics(state, .pred_class)
 ```
 
-We can also do this for ROC-curves. Figure \@ref(fig:alldnnroccurve) shows the 3 different ROC-curves together in 1 chart. As we know the model using pre-trained word embeddings with locked weights didn't perform very well and its ROC-curve is the lowest of the 3. The other two models perform more similar but the self-trained model ends up beating the pre-trained model after all.
+We can also do this for ROC curves. Figure \@ref(fig:alldnnroccurve) shows the three different ROC curves together in one chart. As we know, the model using pre-trained word embeddings with locked weights didn't perform very well at all and its ROC curve is the lowest of the three. The other two models perform more similarly but the model using an embedding learned from scratch ends up being the best.
 
-```{r alldnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for all DNN models' predictions of Kickstarter state"}
-all_dense_model_predictions %>%
+```{r alldnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for all DNN models' predictions of Kickstarter campaign success"}
+all_dense_model_res %>%
   group_by(model) %>%
-  roc_curve(truth = state, .pred_prop) %>%
+  roc_curve(truth = state, .pred_1) %>%
   autoplot() +
   labs(
     title = "Receiver operator curve for Kickstarter blurbs"
