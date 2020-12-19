@@ -559,14 +559,14 @@ pte_res <- keras_predict(dense_model_pte, kick_assess, state_assess)
 metrics(pte_res, state, .pred_class)
 ```
 
-Why is this happening? Part of the training loop for a model like this one is typically about _adjusting_ the weights in the network. 
+Why is this happening? Part of the training loop for a model like this one typically _adjusts_ the weights in the network. 
 When we froze the weights in this network, we froze them at values that did not perform very well. 
 These pre-trained glove embeddings [@Pennington2014] are trained on a Wikipedia dump and [Gigaword 5](https://catalog.ldc.upenn.edu/LDC2011T07), a comprehensive archive of newswire text. 
 The text contained on Wikipedia and in news articles both follow certain styles and semantics.
 Both will tend to be written formally and in the past tense, with longer and complete sentences. 
 There are many more distinct features of both Wikipedia text and news articles, but the important part is how similar they are to the data we are trying to model.
 These Kickstarter blurbs are very short, lack punctuation, stop words, narrative, and tense. Many of them simply try to pack as many buzz words as possible into the allowed character count while keeping the sentence readable.
-Perhaps it should not surprise us that these word embeddings don't perform well in this model, since the text used to train the embeddings is so far removed from the text is it being applied on.
+Perhaps it should not surprise us that these word embeddings don't perform well in this model, since the text used to train the embeddings is so far removed from the text is it being applied on (Section \@ref(glove)).
 
 Although this approach with our dataset didn't work that well, that doesn't mean that using pre-trained word embeddings is always a bad idea. 
 The important point is how well the embeddings fit the data you are modeling.
@@ -622,10 +622,12 @@ metrics(pte2_res, state, .pred_class)
 This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
 
 ```{block, type = "rmdnote"}
-If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with.
+If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with, both for the reasons laid out there and for the issues highlighted in Section \@ref(fairnessembeddings).
 ```
 
-We can combine all the predictions on these last 3 models to more easily compare the results between them
+## Compare and evaluate DNN models
+
+We can combine all the predictions on these last three models to more easily compare the results between them.
 
 ```{r}
 all_dense_model_res <- bind_rows(
@@ -655,33 +657,54 @@ all_dense_model_res %>%
   )
 ```
 
+```{block, type = "rmdnote"}
+Using pre-trained embeddings is not the only way to take advantage of ready-to-use, state-of-the-art deep learning models. You can also use whole pre-trained models in your analyses, such as the `transformers` models available from Hugging Face. Check out [this blog post for a tutorial](https://blogs.rstudio.com/ai/posts/2020-07-30-state-of-the-art-nlp-models-from-r/) on how to use Hugging Face `transfomers` in R with Keras. Large language models like these are subject to many of the same concerns as embeddings discussed in Section \@ref(fairnessembeddings).
+```
+
+We compared these three model options using the validation set we created. Let's return to the testing set now that we know which model we expect to perform best and obtain a final estimate for how we expect it to perform on new data. For this final evaluation, we will:
+
+- preprocess the test data using the feature engineering recipe `kick_prep` so it is in the correct format for our deep learning model,
+- find the predictions for the processed testing data, and
+- compute metrics for these results.
+
+```{r}
+kick_test <- bake(kick_prep, new_data = kickstarter_test, 
+                         composition = "matrix")
+final_res <- keras_predict(dense_model, kick_test, kickstarter_test$state)
+final_res %>% metrics(state, .pred_class, .pred_1)
+```
+
+The metrics we see here are about the same as what we achieved in Section \@ref(evaluate-dnn) on the validation data, so we can be confident that we have not overfit during our training or model choosing process.
+
 ## Limitations of deep learning
 
-Deep learning models can offer excellent performance on many tasks and the flexibility and potential complexity of their architecture is part of the reason why. One of the main downsides of deep learning models is that the interpretability of the models themselves is rather poor, especially for DNNs.
-This means that practitioners that work in fields where interpretability is vital, such as health care, shy away from deep learning models since they are hard to understand and interpret.
-Another limitation of deep learning models is that they do not facilitate a comprehensive theoretical understanding of learning or their inner organization[@shwartzziv2017opening].
-These two points together lead to what is commonly called "black box" models[@shrikumar2019learning], models where is it hard to peek into the inner working to understand how they work.
-The issue of not being able to reason about the inner workings of a model means that we will have a hard time explaining why a model is working well. But it also means it will be hard to remedy a biased model that performs well in some settings but bad in other settings.
-This is a problem since it can hide biases from the training set which may lead to unfair, wrong, or even illegal decisions based on protected classes[@guidotti2018survey].
-Lastly, deep learning models tend to require more training data than traditional statistical machine learning methods. This means that that it can be hard to train a deep learning model if you have a very small data set[@lampinen2018oneshot].
+Deep learning models achieve excellent performance on many tasks; the flexibility and potential complexity of their architecture is part of the reason why. One of the main downsides of deep learning models is that the interpretability of the models themselves is poor.
+This means that practitioners who work in fields where interpretability is vital, such as some parts of health care, shy away from deep learning models since they are hard to understand and interpret.
+Another limitation of deep learning models is that they do not facilitate a comprehensive theoretical understanding or learning of their inner organization [@shwartzziv2017opening].
+These two points together lead to deep learning models often being called "black box" models [@shrikumar2019learning], models where is it hard to peek into the inner workings to understand what they are doing.
+Not being able to reason about the inner workings of a model means that we will have a hard time explaining why a model is working well. It also means it will be hard to remedy a biased model that performs well in some settings but badly in other settings.
+This is a problem since it can hide biases from the training set which may lead to unfair, wrong, or even illegal decisions based on protected classes [@guidotti2018survey].
+Lastly, deep learning models tend to require more training data than traditional statistical machine learning methods. This means that that it can be hard to train a deep learning model if you have a very small data set [@lampinen2018oneshot].
 
 ## Summary {#dldnnsummary}
 
-You can use classification modeling to predict labels or categorical variables from a dataset, including datasets that include text.
-Deep neural networks can be used to fit classification models that work on text features.
-Although these models have many parameters they are able to adequately train.
-We also saw how we can tokenize in a way that depicts the order of the tokens in the text. Doing this can give the model the possibility of finding patterns in the order. This is not possible in the models we saw in chapter \@ref(mlclassification) and \@ref(mlregression) since these models only take a 2 dimensional matrix as input.
-We gave up some of the fine control over feature engineering in the hope that the network would be able to learn the features themselves.
-The feature engineering is not completely out of our hands since we can still affect the tokenization and normalization before the tokens are being passed into the network.
+You can use deep learning to build classification models to predict labels or categorical variables from a dataset, including datasets that include text.
+Dense neural networks are the most straightforward network architecture that can be used to fit classification models for text features.
+These models have many parameters compared to the models we trained in earlier chapters, and require different preprocessing than those models.
+We can tokenize and create features for modeling that capture the order of the tokens in the original text. Doing this can allow a model to learn from patterns in sequences and order, something not possible in the models we saw in Chapters \@ref(mlclassification) and \@ref(mlregression).
+We gave up some of the fine control over feature engineering, such as hand-crafting features using domain knowledge, in the hope that the network could learn important features on its own.
+However, feature engineering is not completely out of our hands as practitioners, since we still make decisions about tokenization and normalization before the tokens are passed into the network.
 
 ### In this chapter, you learned:
 
-- how to build and train a deep neural network with keras
-- How to tokenize text in a way that retains the order of the tokens
+- that you can tokenize and preprocess text to retain the order of the tokens
+- how to build and train a dense neural network with Keras
+- that you can evaluate deep learning models with the same approaches used for other types of models
 - how to train word embeddings alongside your model
+- how to use pre-trained word embeddings in a neural network
 - about resampling strategies for deep learning models
-- about how deep learning models have low interpretability
-- How to use pre-trained word embeddings in a neural network
+- about the low interpretability of deep learning models
+
 
 ```{r echo=FALSE}
 knitr::knit_exit()
