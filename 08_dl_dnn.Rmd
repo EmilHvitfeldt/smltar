@@ -603,12 +603,12 @@ dense_model_pte2 %>% compile(
 )
 
 dense_pte2_history <- dense_model_pte2 %>% fit(
-    x = kick_analysis, 
-    y = state_analysis,
-    batch_size = 512,
-    epochs = 20,
-    validation_data = list(kick_assess, state_assess),
-    verbose = FALSE
+  x = kick_analysis, 
+  y = state_analysis,
+  batch_size = 512,
+  epochs = 20,
+  validation_data = list(kick_assess, state_assess),
+  verbose = FALSE
 )
 ```
 
@@ -626,6 +626,91 @@ If you have enough text data in the field you are working in, then it is worth c
 ```
 
 ## Cross-validation for deep learning models
+
+The Kickstarter dataset we are using is big enough that we have enough data to use a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. In some situations, you may not have that much data or you may want to compute more precise performance metrics. In those cases, it is time to turn to resampling. For example, we can create cross-validation folds.
+
+```{r}
+set.seed(345)
+kick_folds <- vfold_cv(kickstarter_train, v = 5)
+kick_folds
+```
+
+Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures, for more reliability.
+
+In our previous chapters, we used models with full tidymodels support and functions like `add_recipe()` and `workflow()`. Deep learning models are more modular and unique, so we will need to create our own function to handle preprocessing, fitting, and evaluation.
+
+```{r}
+fit_split <- function(split, prepped_rec) {
+  
+  ## preprocessing
+  x_train <- bake(prepped_rec, new_data = analysis(split), 
+                  composition = "matrix")
+  x_val   <- bake(prepped_rec, new_data = assessment(split), 
+                  composition = "matrix")
+  
+  ## create model
+  y_train <- analysis(split) %>% pull(state)
+  y_val   <- assessment(split) %>% pull(state)
+  
+  
+  mod <- keras_model_sequential() %>%
+    layer_embedding(input_dim = max_words + 1, 
+                    output_dim = 12,
+                    input_length = max_length) %>%
+    layer_flatten() %>%
+    layer_dense(units = 32, activation = "relu") %>%
+    layer_dense(units = 1, activation = "sigmoid") %>% compile(
+      optimizer = "adam",
+      loss = "binary_crossentropy",
+      metrics = c("accuracy")
+    )
+  
+  ## fit model
+  mod %>%
+    fit(
+      x_train, 
+      y_train,
+      epochs = 10,
+      validation_data = list(x_val, y_val),
+      batch_size = 512,
+      verbose = FALSE
+    )
+  
+  ## evaluate model
+  keras_predict(mod, x_val, y_val) %>%
+    metrics(state, .pred_class, .pred_1)
+}
+```
+
+We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.
+
+```{r}
+cv_fitted <- kick_folds %>%
+  mutate(validation = map(splits, fit_split, kick_prep))
+
+cv_fitted
+```
+
+Now we can use `unnest()` to find the metrics we computed.
+
+```{r}
+cv_fitted %>%
+  unnest(validation)
+```
+
+We can even create a visualization in Figure \@ref(fig:dnncvmetrics) to see the distribution of these metrics for these five folds.
+
+```{r dnncvmetrics, fig.cap="Dense neutral network performance metrics for cross-validation folds"}
+cv_fitted %>%
+  unnest(validation) %>%
+  mutate(.metric = fct_reorder(.metric, .estimate)) %>%
+  ggplot(aes(.metric, .estimate, color = .metric)) +
+  geom_boxplot() +
+  geom_point(alpha = 0.5) +
+  theme(legend.position = "none")
+```
+
+This dataset is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
 
 ## Compare and evaluate DNN models
 
@@ -671,7 +756,7 @@ We compared these three model options using the validation set we created. Let's
 
 ```{r}
 kick_test <- bake(kick_prep, new_data = kickstarter_test, 
-                         composition = "matrix")
+                  composition = "matrix")
 final_res <- keras_predict(dense_model, kick_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)
 ```
