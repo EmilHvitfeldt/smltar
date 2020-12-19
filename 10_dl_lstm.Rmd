@@ -34,7 +34,7 @@ In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple
 
 ## A first LSTM model {#firstlstm}
 
-We will be using the same data from the previous chapter, described in Section \@ref(kickstarter). This data contains short text blurbs for prospective crowdfunding campaigns and if they were successful or not. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let's start by splitting our training and testing sets.
+We will be using the same data from the previous chapter, described in Section \@ref(kickstarter). This data contains short text blurbs for prospective crowdfunding campaigns and if they were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let's start by splitting our training and testing sets.
 
 ```{r}
 library(tidyverse)
@@ -59,7 +59,7 @@ Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep lea
 library(textrecipes)
 
 max_words <- 2e4
-max_length <- 50
+max_length <- 30
 
 kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
@@ -73,10 +73,10 @@ After tokenizing, the preprocessing is different. We use `step_sequence_onehot()
 Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).
 ```
 
-There are `r scales::comma(nrow(kickstarter_train))` press releases in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
+There are `r scales::comma(nrow(kickstarter_train))` blurbs in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
 
 ```{block, type = "rmdwarning"}
-When we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a dataset, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a dataset like a tibble or a matrix.
+Like we discussed in the last chapter, when we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a dataset, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a dataset like a tibble or a matrix.
 ```
 
 We could have applied these functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
@@ -92,7 +92,7 @@ Here we use `composition = "matrix"` because the Keras modeling functions operat
 
 ### Building an LSTM
 
-An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to understand text as a sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
+An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to understand text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
 
 The Keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
 
@@ -129,7 +129,7 @@ lstm_mod %>%
 ```
 
 ```{block, type = "rmdwarning"}
-As we noted in Chapter \@ref(dldnn), the neural network model is modified **in place**; the object `lstm_mod` is different after we compile it, even those we didn't assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
+As we noted in Chapter \@ref(dldnn), the neural network model is modified **in place**; the object `lstm_mod` is different after we compile it, even though we didn't assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
 ```
 
 After the model is compiled, we can fit it. The `fit()` method for Keras models has an argument `validation_split` that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the _end_ of each epoch.
@@ -148,9 +148,9 @@ lstm_history <- lstm_mod %>%
 lstm_history
 ```
 
-The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well.
+The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
 
-```{r firstlstm}
+```{r firstlstmhistory, fig.cap="Training and validation metrics for LSTM"}
 plot(lstm_history)
 ```
 
@@ -162,7 +162,7 @@ This model continues to improve epoch after epoch on the training data, but perf
 
 ### Evaluation {#lstmevaluation}
 
-We used some Keras defaults for model evaluation in the previous section, but we can take more control if we want or need to. Instead of using the `validation_split` argument, we can use the `validation_data` argument and send in our own validation set creating with rsample.
+We used some Keras defaults for model evaluation in the previous section, but just like we demonstrated in Section \@ref(evaluate-dnn), we can take more control if we want or need to. Instead of using the `validation_split` argument, we can use the `validation_data` argument and send in our own validation set creating with rsample.
 
 ```{r lstmval}
 set.seed(234)
@@ -221,9 +221,9 @@ val_history <- lstm_mod %>%
 val_history
 ```
 
-The overfitting has been reduced, and the difference between our model's performance on training and validation data is now smaller.
+The overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
 
-```{r lstmvalhistory}
+```{r lstmvalhistory, fig.cap="Training and validation metrics for LSTM with dropout"}
 plot(val_history)
 ```
 
@@ -246,9 +246,9 @@ lstm_auc <- val_res %>%
   round(3)
 ```
 
-A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752. This first LSTM with dropout is already performing better than such a linear model. We can plot the receive operator characteristic curve to evaluate the performance across the range of thresholds. 
+A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752. This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
 
-```{r lstmvalroc}
+```{r lstmvalroc, fig.cap="ROC curve for LSTM with dropout predictions of Kickstarter campaign success"}
 val_res %>%
   roc_curve(state, .pred_1) %>%
   autoplot()
@@ -257,7 +257,7 @@ val_res %>%
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. RNNs are sometimes used in domains like speech recognition. 
+An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs.
 
 ```{block, type = "rmdwarning"}
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
@@ -291,13 +291,13 @@ rnn_history <- rnn_mod %>%
 rnn_history
 ```
 
-Looks like more overfitting! We can see this by plotting the history as well.
+Looks like more overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
 
-```{r rnnhistory}
+```{r rnnhistory, fig.cap="Training and validation metrics for RNN"}
 plot(rnn_history)
 ```
 
-These results are pretty disappointing overall. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section tktk [@Minaee2020], or even other machine learning approaches like regularized linear models with good preprocessing. 
+These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section \@ref(firstdlclassification) [@Minaee2020], or even other machine learning approaches like regularized linear models with good preprocessing. 
 
 Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better performing models.
 
@@ -469,7 +469,7 @@ Different preprocessing strategies have a huge impact on deep learning results.
 
 ## Case study: training a regression model
 
-All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, text classification is more common than regression problems with text data, but these techniques can be used for either kind of supervised machine learning question. Let's return to the regression problem of Chapter \@ref(mlregression) and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.
+All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, classification is more common than regression tasks with text data, but these techniques can be used for either kind of supervised machine learning question. Let's return to the regression problem of Chapter \@ref(mlregression) and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.
 
 ```{r}
 library(scotus)
@@ -486,7 +486,7 @@ scotus_test <- testing(scotus_split)
 ```
 
 ```{block, type = "rmdwarning"}
-Notice that we also shifted (subtracted) and scaled (divided) the `year` outcome by constant factors so all the values are close to one and centered around zero. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
+Notice that we also shifted (subtracted) and scaled (divided) the `year` outcome by constant factors so all the values are centered around zero and not too large. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.
 ```
 
 Next, let's build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let's try keeping the size of our vocabulary the same (`max_words`) but we will need to increase the sequence length information we store (`max_length`) by a great deal.
@@ -563,9 +563,9 @@ The main problem with this regression model is that there isn't that much data t
 ```
 
 
-## Case study: number of words and sequence length
+## Case study: vocabulary size
 
-In this chapter so far, we've used a longer sequence length of 50, compared to 30 in Chapter \@ref(dldnn), and we've worked with a vocabulary of 20,000 words or tokens. These are _hyperparameters_ of the model, and could be tuned as shown in Section tktk. Instead of tuning, let's try some smaller values, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
+In this chapter so far, we've worked with a vocabulary of 20,000 words or tokens. This is a _hyperparameter_ of the model, and could be tuned, as we show in detail in Section tktk. Instead of tuning, let's try a smaller value, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
 
 ```{r}
 max_words <- 1e4
@@ -611,31 +611,31 @@ smaller_history <- smaller_mod %>%
 smaller_history
 ```
 
-How did this smaller model, based on a smaller vocabulary and keeping shorter sequences in the model, perform?
+How did this smaller model, based on a smaller vocabulary in the model, perform?
 
 ```{r}
 smaller_res <- keras_predict(smaller_mod, kick_assess, state_assess)
 smaller_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
-The original LSTM model with the larger vocabulary and longer sequences of 50 words had an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary and sequence information does result in a corresponding reduction in model performance. Notice that it is certainly 
+The original LSTM model with the larger vocabulary had an accuracy of `r lstm_acc` and an AUC of `r lstm_auc`. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
 
 ```{block, type = "rmdnote"}
-The relationship between these hyperparameters and model performance is weak, though. Notice that we cut the vocabulary in half and the sequence length by almost half, and saw almost modest reductions in accuracy.
+The relationship between this hyperparameter and model performance is weak. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.
 ```
 
 
 ## The full game: LSTM {#lstmfull}
 
-We've come a long way in this chapter, even though we've focused on a very specific kind of RNN, the LSTM. Let's step back and build on final model, incorporating what we have been able to learn.
+We've come a long way in this chapter, even though we've focused on a very specific kind of recurrent neural network, the LSTM. Let's step back and build one final model, incorporating what we have been able to learn.
 
 ### Preprocess the data {#lstmfullpreprocess}
 
-We know that we want to stick with the defaults for padding, and to use a larger vocabulary and sequence length for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
+We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
 
 ```{r}
 max_words <- 2e4
-max_length <- 50
+max_length <- 30
 
 kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
@@ -652,11 +652,11 @@ dim(kick_matrix)
 
 We've learned a lot about how to model this dataset over the course of this chapter.
 
-- We can use `dropout` and cross-validation to reduce overfitting.
+- We can use `dropout` to reduce overfitting.
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
 - The bidirectional LSTM performed than the regular LSTM, so let's set up each LSTM layer to be able to learn sequences in both directions.
 
-Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.25` and let the Keras model choose the validation set.
+Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.1` and let the Keras model choose the validation set.
 
 ```{r lstmfinalmod}
 final_mod <- keras_model_sequential() %>%
@@ -686,7 +686,7 @@ final_history <- final_mod %>%
     kick_matrix, 
     kickstarter_train$state,
     epochs = 10,
-    validation_split = 0.25,
+    validation_split = 0.1,
     batch_size = 512,
     verbose = FALSE
   )
@@ -703,17 +703,17 @@ final_res <- keras_predict(final_mod, kick_matrix_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
-This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data.
+This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).
 
-```{r lstmfinalroc}
+```{r lstmfinalroc, fig.cap="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   roc_curve(state, .pred_1) %>%
   autoplot()
 ```
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well.
+We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
 
-```{r}
+```{r lstmheatmap, fig.cap="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")
@@ -722,7 +722,7 @@ final_res %>%
 Notice that this final model still does not perform as well as any of the best models of Chapter \@ref(dldnn).
 
 ```{block, type = "rmdnote"}
-For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give the best result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
+For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give a great result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
 ```
 
 For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
@@ -734,7 +734,7 @@ LSTMs are a specific kind of recurrent neural network that are capable of learni
 
 ### In this chapter, you learned:
 
-- how to preprocess text data for deep learning models
+- how to preprocess text data for LSTM models
 - about RNN, LSTM, and bidirectional LSTM network architectures
 - how to use dropout to reduce LSTM overfitting
 - that network layers like RNNs and LSTMs can be stacked for greater model capacity
