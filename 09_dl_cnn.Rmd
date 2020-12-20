@@ -369,11 +369,11 @@ bpe_token_dist %>%
   labs(x = "Number of subwords per campaign blurb",
        y = "Number of campaign blurbs")
 ```
-Let us pick a vocabulary size to be 10,000 and a corresponding sequence length to be 50. To use byte pair encoding as a tokenizer in textrecipes set `engine = "tokenizers.bpe"` and the vocabulary size can be denoted using the `training_options` argument. Everything else in the recipe stays the same.
+Let us pick a vocabulary size to be 10,000 and a corresponding sequence length to be 40. To use byte pair encoding as a tokenizer in textrecipes set `engine = "tokenizers.bpe"` and the vocabulary size can be denoted using the `training_options` argument. Everything else in the recipe stays the same.
 
 ```{r}
 max_subwords <- 10000
-max_length <- 50
+max_length <- 40
 
 bpe_recipe <- recipe(~blurb, data = kickstarter_train) %>%
   step_mutate(blurb = tolower(blurb)) %>%
@@ -390,7 +390,7 @@ prepped_bpe <- bpe_recipe %>%
 The model we will be using will be very similar to the baseline CNN model we explore earlier, this time we have used a larger kernel size of 7 to account for the finer detail in the tokens.
 
 ```{r}
-cnn_pte <- keras_model_sequential() %>%
+cnn_bpe <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
   layer_conv_1d(filter = 32, kernel_size = 7, activation = "relu") %>%
@@ -398,19 +398,19 @@ cnn_pte <- keras_model_sequential() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
 
-cnn_pte
+cnn_bpe
 ```
 
 And we can compile and train like we have done so many times now.
 
 ```{r}
-cnn_pte %>% compile(
+cnn_bpe %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
   metrics = c("accuracy")
 )
 
-history <- cnn_pte %>% fit(
+history <- cnn_bpe %>% fit(
   x = prepped_bpe, 
   y = kickstarter_train$state,
   batch_size = 512,
@@ -418,7 +418,7 @@ history <- cnn_pte %>% fit(
   validation_split = 0.2
 )
 
-cnn_pte %>%
+cnn_bpe %>%
   evaluate(
     bake(bpe_recipe, kickstarter_test, composition = "matrix"),
     kickstarter_test$state
@@ -427,7 +427,17 @@ cnn_pte %>%
 
 The performance is doing quite well, which is a pleasant surprise and in line with what we hoped would happen if we switched to a higher detail tokenizer.
 
+Looking at the confusion matrix in \@ref(bpeheatmap) also gives us the clear thatt there isn't much bias going on.
 
+```{r bpeheatmap, dependson="nbrs", fig.cap="Confusion matrix CNN model using byte pair encoding tokenization"}
+bpe_assess <- bake(bpe_recipe, kickstarter_test, composition = "matrix")
+
+val_res <- keras_predict(cnn_bpe, bpe_assess, kickstarter_test$state)
+
+val_res %>%
+  conf_mat( state, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
 to understand what the subword the models used are, we can extract them from `step_sequence_onehot()` using `tidy()` on the prepped recipe. All the tokens that start with an `"h"` are seen here
 
 ```{r}
@@ -663,6 +673,8 @@ best_runs
 There isn't a lot of performance difference between the different choices but using kernel size of `r best_runs$flag_kernel_size1[1]` and stride length of `r best_runs$flag_strides1[1]` narrowly came on top.
 
 ## Cross validation for evaluation
+
+
 
 ## Limitations of Covolution Neural Networks
 
