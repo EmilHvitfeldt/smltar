@@ -71,7 +71,7 @@ Notice how the choice of the token will affect how we think about kernel size.
 For character level tokens a kernel size of 5 will in early layers find patterns in parts of words more often than patterns across words since 5 characters aren't enough the adequately span multiple words. 
 Where on the other hand a kernel size of 5 for word-level tokens will find patterns in parts of sentences instead. Kernels must have an odd length.
 
-### Simple CNN
+### Simple CNN {#simplecnn}
 
 We will be using the same data and recipe which we looked at and created in section \@ref(kickstarter). This data contains short text blurbs for prospective crowdfunding campaigns and if they were successful or not. Our goal of this modeling is to be able to predict successful campaigns by the text contained in the blurb.
 
@@ -672,9 +672,93 @@ best_runs
 
 There isn't a lot of performance difference between the different choices but using kernel size of `r best_runs$flag_kernel_size1[1]` and stride length of `r best_runs$flag_strides1[1]` narrowly came on top.
 
-## Cross validation for evaluation
+## Cross-validation for evaluation
 
+In section \@ref(dnncross) we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter dataset we are using is big enough that we have enough data to use a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics.
 
+```{r}
+set.seed(345)
+kick_folds <- vfold_cv(kickstarter_train, v = 5)
+kick_folds
+```
+
+Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures, for more reliability.
+
+Last time we saw how to create a custom function to handle preprocessing, fitting, and evaluation. We will use the same aproch of creating the function, but this time use the model specification from section \@ref(simplecnn).
+
+```{r}
+fit_split <- function(split, prepped_rec) {
+  
+  ## preprocessing
+  x_train <- bake(prepped_rec, new_data = analysis(split), 
+                  composition = "matrix")
+  x_val   <- bake(prepped_rec, new_data = assessment(split), 
+                  composition = "matrix")
+  
+  ## create model
+  y_train <- analysis(split) %>% pull(state)
+  y_val   <- assessment(split) %>% pull(state)
+  
+  
+  mod <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 16,
+                  input_length = 30) %>%
+  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid") %>% 
+    compile(
+      optimizer = "adam",
+      loss = "binary_crossentropy",
+      metrics = c("accuracy")
+    )
+  
+  ## fit model
+  mod %>%
+    fit(
+      x_train, 
+      y_train,
+      epochs = 10,
+      validation_data = list(x_val, y_val),
+      batch_size = 512,
+      verbose = FALSE
+    )
+  
+  ## evaluate model
+  keras_predict(mod, x_val, y_val) %>%
+    metrics(state, .pred_class, .pred_1)
+}
+```
+
+We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.
+
+```{r}
+cv_fitted <- kick_folds %>%
+  mutate(validation = map(splits, fit_split, prepped_recipe))
+
+cv_fitted
+```
+
+Now we can use `unnest()` to find the metrics we computed.
+
+```{r}
+cv_fitted %>%
+  unnest(validation)
+```
+
+We can even create a visualization in Figure \@ref(fig:cnncvmetrics) to see the distribution of these metrics for these five folds.
+
+```{r cnncvmetrics, fig.cap="CNN performance metrics for cross-validation folds"}
+cv_fitted %>%
+  unnest(validation) %>%
+  mutate(.metric = fct_reorder(.metric, .estimate)) %>%
+  ggplot(aes(.metric, .estimate, color = .metric)) +
+  geom_boxplot() +
+  geom_point(alpha = 0.5) +
+  theme(legend.position = "none")
+```
+
+The metrics have little variance just like they did last time, which is reassuring that our model is somehow robust with respect to the evaluation metrics. 
 
 ## Limitations of Covolution Neural Networks
 
