@@ -105,6 +105,7 @@ kick_rec <- recipe(~blurb, data = kickstarter_train) %>%
 set.seed(234)
 kick_val <- validation_split(kickstarter_train, strata = state)
 
+kick_prep <- prep(kick_rec)
 kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
                       composition = "matrix")
 
@@ -856,9 +857,9 @@ final_res %>%
   autoplot()
 ```
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model's performance using a confusion matrix as well, in Figure \@ref(fig:cnnmheatmap).
+We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model's performance using a confusion matrix as well, in Figure \@ref(fig:cnnheatmapfinal).
 
-```{r cnnheatmap, fig.cap="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success"}
+```{r cnnheatmapfinal, fig.cap="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")
