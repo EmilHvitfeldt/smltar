@@ -19,17 +19,16 @@ use_session_with_seed(1234)
 ## for GH actions
 online <- TRUE
 
-keras_predict <- function(model, recipe, data, response) {
-  baked_data <- bake(recipe, data, composition = "matrix")
-  prediction <- predict(model, baked_data)[, 1]
+keras_predict <- function(model, baked_data, response) {
+  predictions <- predict(model, baked_data)[, 1]
   
-  data %>%
-    mutate(
-      .pred_prop = prediction,
-      .pred_class = if_else(.pred_prop < 0.5, 0, 1)
-    ) %>%
-    mutate(across(c({{ response }}, .pred_class), 
-                  ~ factor(.x, levels = c(1, 0))))
+  tibble(
+    .pred_1 = predictions,
+    .pred_class = if_else(.pred_1 < 0.5, 0, 1),
+    state = response
+  ) %>%
+    mutate(across(c(state, .pred_class),            ## create factors
+                  ~ factor(.x, levels = c(1, 0))))  ## with matching levels
 }
 ```
 
@@ -98,14 +97,22 @@ library(textrecipes)
 max_words <- 20000
 max_length <- 30
 
-prepped_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+kick_rec <- recipe(~blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
   step_tokenfilter(blurb, max_tokens = max_words) %>%
-  step_sequence_onehot(blurb, sequence_length = max_length) %>%
-  prep()
+  step_sequence_onehot(blurb, sequence_length = max_length)
 
-prepped_training <- prepped_recipe %>%
-  bake(new_data = NULL, composition = "matrix")
+set.seed(234)
+kick_val <- validation_split(kickstarter_train, strata = state)
+
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+                      composition = "matrix")
+
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+                    composition = "matrix")
+
+state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
+state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 ```
 
 We will start with a simple CNN specification that follows what we saw in figure \@ref(fig:cnn-architecture).
@@ -142,11 +149,11 @@ simple_cnn_model %>% compile(
 )
 
 history <- simple_cnn_model %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
+  x = kick_analysis, 
+  y = state_analysis,
   batch_size = 512,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(kick_assess, state_assess)
 )
 ```
 
@@ -158,15 +165,36 @@ You will have to experiment to find the optimizer that works best for your speci
 
 Now that the model is done fitting we can evaluate it on the testing data set.
 
-```{r simple_cnn_model_evaluation, dependson="simple_cnn_model_fit"}
-simple_cnn_model %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
-  )
+```{r}
+val_res <- keras_predict(simple_cnn_model, kick_assess, state_assess)
+val_res
 ```
 
+We can calculate the standard metrics with `metrics()`.
+
+```{r}
+metrics(val_res, state, .pred_class)
+```
 We are seeing some improvement over the densely connected network. This is a good development, what we hoped to see was an improvement in our model.
+
+The heatmap in Figure \@ref(fig:cnnheatmap) shows that there isn't any dramatic bias in how the model performs for the two classes, success and failure for the crowdfunding campaigns. The model certainly isn't perfect; its accuracy is a little over `r scales::percent((floor(100 * accuracy(val_res, state, .pred_class)$.estimate) / 100))`, it is more or less evenly good at predicting both classes and we are getting fairly good result from a baseline CNN model.
+
+```{r cnnheatmap, fig.cap="Confusion matrix for first CNN model predictions of Kickstarter campaign success"}
+val_res %>%
+  conf_mat( state, .pred_class) %>%
+  autoplot(type = "heatmap")
+```
+
+The ROC curve in Figure \@ref(fig:cnnroccurve) shows how the model performs at different thresholds.
+
+```{r cnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first CNN model predictions of Kickstarter campaign success"}
+val_res %>%
+  roc_curve(truth = state, .pred_1) %>%
+  autoplot() +
+  labs(
+    title = "Receiver operator curve for Kickstarter blurbs"
+  )
+```
 
 ### Case study: Adding more layers
 
@@ -201,18 +229,20 @@ cnn_double_dense %>% compile(
 )
 
 history <- cnn_double_dense %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
+  x = kick_analysis, 
+  y = state_analysis,
   batch_size = 512,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(kick_assess, state_assess)
 )
 
-cnn_double_dense %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
+val_res_double_dense <- keras_predict(
+    cnn_double_dense, 
+    kick_assess, 
+    state_assess
   )
+
+metrics(val_res_double_dense, state, .pred_class)
 ```
 
 This model performs well, but it is not entirely clear that it is working better than the first CNN model we tried. This could be an indication that the original model had enough fully connected layers for the amount of training data we had available.
@@ -253,42 +283,29 @@ cnn_double_conv %>% compile(
 )
 
 history <- cnn_double_conv %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
+  x = kick_analysis, 
+  y = state_analysis,
   batch_size = 512,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(kick_assess, state_assess)
 )
 
-cnn_double_conv %>%
-  evaluate(
-    bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
+val_res_double_conv <- keras_predict(
+    cnn_double_conv, 
+    kick_assess, 
+    state_assess
   )
+
+metrics(val_res_double_conv, state, .pred_class)
 ```
 
 This model also performs admirably compared to the other models. Let us extract the the prediction using `keras_predict()` we defined in \@ref(evaluate-keras-predictions).
 
 ```{r}
 all_cnn_model_predictions <- bind_rows(
-  keras_predict(
-    simple_cnn_model, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "Basic CNN"),
-  keras_predict(
-    cnn_double_dense, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "Double Dense"),
-  keras_predict(
-    cnn_double_conv, 
-    prepped_recipe, 
-    kickstarter_test, 
-    state
-  ) %>% mutate(model = "Double Conv")
+  mutate(val_res, model = "Basic CNN"),
+  mutate(val_res_double_dense, model = "Double Dense"),
+  mutate(val_res_double_conv, model = "Double Conv")
 )
 
 all_cnn_model_predictions
@@ -307,7 +324,7 @@ We can also do this for ROC-curves. Figure \@ref(fig:allcnnroccurve) shows the 3
 ```{r allcnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for 3 varients of CNN models' predictions of Kickstarter state"}
 all_cnn_model_predictions %>%
   group_by(model) %>%
-  roc_curve(truth = state, .pred_prop) %>%
+  roc_curve(truth = state, .pred_1) %>%
   autoplot() +
   labs(
     title = "Receiver operator curve for Kickstarter blurbs"
@@ -378,16 +395,19 @@ Let us pick a vocabulary size to be 10,000 and a corresponding sequence length t
 max_subwords <- 10000
 bpe_max_length <- 40
 
-bpe_recipe <- recipe(~blurb, data = kickstarter_train) %>%
+bpe_rec <- recipe(~blurb, data = kickstarter_train) %>%
   step_mutate(blurb = tolower(blurb)) %>%
   step_tokenize(blurb, 
                 engine = "tokenizers.bpe",
                 training_options = list(vocab_size = max_subwords)) %>%
-  step_sequence_onehot(blurb, sequence_length = bpe_max_length) %>%
-  prep()
+  step_sequence_onehot(blurb, sequence_length = bpe_max_length)
 
-prepped_bpe <- bpe_recipe %>%
-  bake(new_data = NULL, composition = "matrix")
+bpe_prep <- prep(bpe_rec)
+
+bpe_analysis <- bake(bpe_prep, new_data = analysis(kick_val$splits[[1]]), 
+                     composition = "matrix")
+bpe_assess <- bake(bpe_prep, new_data = assessment(kick_val$splits[[1]]), 
+                   composition = "matrix")
 ```
 
 The model we will be using will be very similar to the baseline CNN model we explore earlier, this time we have used a larger kernel size of 7 to account for the finer detail in the tokens.
@@ -413,19 +433,16 @@ cnn_bpe %>% compile(
   metrics = c("accuracy")
 )
 
-history <- cnn_bpe %>% fit(
-  x = prepped_bpe, 
-  y = kickstarter_train$state,
-  batch_size = 512,
+bpe_history <- cnn_bpe %>% fit(
+  bpe_analysis, 
+  state_analysis,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(bpe_assess, state_assess),
+  batch_size = 512
 )
 
-cnn_bpe %>%
-  evaluate(
-    bake(bpe_recipe, kickstarter_test, composition = "matrix"),
-    kickstarter_test$state
-  )
+bpe_history
+
 ```
 
 The performance is doing quite well, which is a pleasant surprise and in line with what we hoped would happen if we switched to a higher detail tokenizer.
@@ -433,18 +450,18 @@ The performance is doing quite well, which is a pleasant surprise and in line wi
 Looking at the confusion matrix in \@ref(bpeheatmap) also gives us the clear thatt there isn't much bias going on.
 
 ```{r bpeheatmap, dependson="nbrs", fig.cap="Confusion matrix CNN model using byte pair encoding tokenization"}
-bpe_assess <- bake(bpe_recipe, kickstarter_test, composition = "matrix")
+val_res_bpe <- keras_predict(cnn_bpe, bpe_assess, state_assess)
 
-val_res <- keras_predict(cnn_bpe, bpe_assess, kickstarter_test$state)
-
-val_res %>%
+val_res_bpe %>%
   conf_mat( state, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 to understand what the subword the models used are, we can extract them from `step_sequence_onehot()` using `tidy()` on the prepped recipe. All the tokens that start with an `"h"` are seen here
 
 ```{r}
-tidy(bpe_recipe, 3) %>%
+bpe_rec %>%
+  prep() %>%
+  tidy(3) %>%
   filter(str_detect(token, "^h")) %>%
   pull(token)
 ```
@@ -453,7 +470,9 @@ Notice how some of these subword tokens are full words and some are part of word
 We can also look at common long words
 
 ```{r}
-tidy(bpe_recipe, 3) %>%
+bpe_rec %>%
+  prep() %>%
+  tidy(3) %>%
   arrange(desc(nchar(token))) %>%
   slice_head(n = 25) %>%
   pull(token)
@@ -468,9 +487,11 @@ We noted in section \@ref(dllimitations) that one of the limitations of deep lea
 To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. `model` is the trained model we are trying to explain. `lime()` works out of the box with keras models so we should be good to go. `x` is the training data used for training the model. This is where we need to to create a helper function, it would be good for some of the functions in the lime package if we can make `x` be a character vector. If we create a function that takes a character vector as input and returns the matrix the keras model is expecting so we are good, which is what the following function is doing
 
 ```{r}
+kick_preppe_rec <- prep(kick_rec)
+
 text_to_matrix <- function(x) {
   bake(
-    prepped_recipe,
+    kick_preppe_rec,
     new_data = tibble(blurb = x), 
     composition = "matrix"
   )
@@ -613,18 +634,17 @@ Lastly, we have to specify how is trained and evaluated.
 
 ```{r, eval=FALSE}
 history <- model %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
+  x = kick_analysis, 
+  y = state_analysis,
   batch_size = 512,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(kick_assess, state_assess)
 )
 
 plot(history)
 
 score <- model %>% evaluate(
-  bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-  kickstarter_test$state
+  kick_assess, state_assess
 )
 
 cat('Test accuracy:', score$acc, '\n')
@@ -737,7 +757,7 @@ We can `map()` this function across all our cross-validation folds. This takes l
 
 ```{r}
 cv_fitted <- kick_folds %>%
-  mutate(validation = map(splits, fit_split, prepped_recipe))
+  mutate(validation = map(splits, fit_split, kick_prep))
 
 cv_fitted
 ```
