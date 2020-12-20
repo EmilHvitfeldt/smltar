@@ -556,6 +556,112 @@ It is these kinds of correlated patterns that can make deep learning models hard
 
 ## Hyper Parameter search
 
+So far have we only used one configuration of hyperparameters. But sometimes we want to try different hyperparameters out and find what works best for our model like we did in \@ref(mlclassificationfull) and \@ref(mlregressionfull) using the tune package. We will use the [tfruns](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple keras models and compare the results.
+
+This workflow will be a little different than what we have seen in the book so far since we will have to create a .R file that contain the necessary modeling steps and then we use that file to run multiple files. A file named "cnn-spec.R" is created and you can see the raw file [here](https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R). The first thing we need to do is specify what hyperparameters we want to change. By convention, we name this object `FLAGS` and is created using the `flags()` function. For each parameter we we want to change you add a corresponding `flag_*()` function, which can be `flag_integer()`, `flag_boolean()`, `flag_numeric()`, or `flag_string()` depending on what you need to tune.
+
+```{block, type "rmdwarning"}
+Make sure you are using the right type for each of these flags as keras is quite picky. If keras is expecting an integer and gets a numeric then you will get an error.
+```
+
+```{r, eval=FALSE}
+FLAGS <- flags(
+  flag_integer('kernel_size1', 5),
+  flag_integer('strides1', 1)
+)
+```
+
+Notice how we are giving each flag a name and a possible value. The value doesn't actually do anything as it is not being used once we start running multiple models, but needs to be the right type for the model we are using.
+
+Next, we specify the keras model we want to run.
+
+```{r, eval=FALSE}
+model <- keras_model_sequential() %>%
+  layer_embedding(input_dim = max_words + 1, output_dim = 16,
+                  input_length = 30) %>%
+  layer_conv_1d(filter = 32, 
+                kernel_size = FLAGS$kernel_size1,
+                strides = FLAGS$strides1,
+                activation = "relu") %>%
+  layer_global_max_pooling_1d() %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+model %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+We specify the hyperparameters we want to change by marking them as `FLAGS$name`. So in this model, we are trying different values of `kernel_size` and `strides` which are denoted by the `kernel_size1` and `strides1` flag respectively.
+
+Lastly, we have to specify how is trained and evaluated.
+
+```{r, eval=FALSE}
+history <- model %>% fit(
+  x = prepped_training, 
+  y = kickstarter_train$state,
+  batch_size = 512,
+  epochs = 10,
+  validation_split = 0.2
+)
+
+plot(history)
+
+score <- model %>% evaluate(
+  bake(prepped_recipe, kickstarter_test, composition = "matrix"),
+  kickstarter_test$state
+)
+
+cat('Test accuracy:', score$acc, '\n')
+```
+
+This is mostly the same as what we have seen before. When we are running these different models the scripts will be run in the environment they are initialed from, so the models will have access to objects like `prepped_training` and `kickstarter_train` so we don't have to create them inside the file.
+
+Now that we have the file set up we need to specify the different hyperparameters we want to look at. 3 different values for the kernel size and 2 different values for the stride length giving us `3 * 2 = 6` different runs.
+
+```{r}
+hyperparams <- list(
+  kernel_size1 = c(3, 5, 7),
+  strides1 = c(1, 2)
+)
+```
+
+```{block, type = "rmdnote"}
+This is a small selection of hyperparameters and ranges. There is much more room for experimentation.
+```
+
+Now we have everything we need to do some hyperparameter searching. Load up tfruns and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
+
+```{r, results='hide'}
+library(tfruns)
+runs <- tuning_run(
+  file = 'cnn-spec.R',
+  runs_dir = '_tuning',
+  flags = hyperparams
+)
+```
+
+You don't have to, but we have manually specified the `runs_dir` argument which is where the results of the tuning will be saved.
+
+A summary of all the runs in the folder can be retrieved with `ls_runs()` and here we use `as_tibble()` to get the results as a tibble.
+
+```{r}
+as_tibble(ls_runs())
+```
+
+We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.
+
+```{r}
+best_runs <- as_tibble(ls_runs()) %>%
+  select(eval_acc, flag_kernel_size1, flag_strides1) %>%
+  arrange(desc(eval_acc))
+best_runs
+```
+
+There isn't a lot of performance difference between the different choices but using kernel size of `r best_runs$flag_kernel_size1[1]` and stride length of `r best_runs$flag_strides1[1]` narrowly came on top.
+
 ## Cross validation for evaluation
 
 ## Limitations of Covolution Neural Networks
