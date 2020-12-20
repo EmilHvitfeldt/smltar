@@ -376,14 +376,14 @@ Let us pick a vocabulary size to be 10,000 and a corresponding sequence length t
 
 ```{r}
 max_subwords <- 10000
-max_length <- 40
+bpe_max_length <- 40
 
 bpe_recipe <- recipe(~blurb, data = kickstarter_train) %>%
   step_mutate(blurb = tolower(blurb)) %>%
   step_tokenize(blurb, 
                 engine = "tokenizers.bpe",
                 training_options = list(vocab_size = max_subwords)) %>%
-  step_sequence_onehot(blurb, sequence_length = max_length) %>%
+  step_sequence_onehot(blurb, sequence_length = bpe_max_length) %>%
   prep()
 
 prepped_bpe <- bpe_recipe %>%
@@ -395,7 +395,7 @@ The model we will be using will be very similar to the baseline CNN model we exp
 ```{r}
 cnn_bpe <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
-                  input_length = max_length) %>%
+                  input_length = bpe_max_length) %>%
   layer_conv_1d(filter = 32, kernel_size = 7, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
@@ -591,7 +591,7 @@ Next, we specify the keras model we want to run.
 ```{r, eval=FALSE}
 model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
-                  input_length = 30) %>%
+                  input_length = max_length) %>%
   layer_conv_1d(filter = 32, 
                 kernel_size = FLAGS$kernel_size1,
                 strides = FLAGS$strides1,
@@ -705,7 +705,7 @@ fit_split <- function(split, prepped_rec) {
   
   mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
-                  input_length = 30) %>%
+                  input_length = max_length) %>%
   layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
