@@ -11,7 +11,7 @@ FLAGS <- flags(
 
 model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
-                  input_length = 30) %>%
+                  input_length = max_length) %>%
   layer_conv_1d(filter = 32, 
                 kernel_size = FLAGS$kernel_size1,
                 strides = FLAGS$strides1,
