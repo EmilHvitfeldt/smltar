@@ -448,7 +448,111 @@ tidy(bpe_recipe, 3) %>%
 
 These 25 words were common enough to get their own subword token. looking at the longest subword tokens gives you a good look into the data you are looking at.
 
-## Explainability with lime
+## Explainability with lime {#lime}
+
+We noted in section \@ref(dllimitations) that one of the limitations of deep learning models is that they are hard to reason about. One of the ways to expect a predictive model, like we have been working with in this book is using the *Local Interpretable Model-Agnostic Explanations*[@ribeiro2016why] algorithm or *lime* for short. The lime package can take a model and its prediction and determine a small set of features in the original data that has driven the outcome of the prediction. 
+
+To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. `model` is the trained model we are trying to explain. `lime()` works out of the box with keras models so we should be good to go. `x` is the training data used for training the model. This is where we need to to create a helper function, it would be good for some of the functions in the lime package if we can make `x` be a character vector. If we create a function that takes a character vector as input and returns the matrix the keras model is expecting so we are good, which is what the following function is doing
+
+```{r}
+text_to_matrix <- function(x) {
+  bake(
+    prepped_recipe,
+    new_data = tibble(blurb = x), 
+    composition = "matrix"
+  )
+}
+```
+
+```{block, type = "rmdnote"}
+Since the function needs to be able to work with just the `x` parameter, we need to put `prepped_recipe` inside the function rather than passing it in as an argument. This will work with R's scoping rules but will make it so you have to create a new function for each recipe.
+```
+
+We also need to select a couple of training observations to explain
+
+```{r}
+sentence_to_explain <- kickstarter_train %>%
+  slice(c(1, 2)) %>%
+  pull(blurb)
+
+sentence_to_explain
+```
+
+We now load the lime package and passes observations into `lime()` along with the model we are trying to explain and the preprocess function.
+
+```{block, type = "rmdwarning"}
+Make sure that the preprocess function matches the preprocessing that was used to train the model.
+```
+
+```{r}
+library(lime)
+
+explainer <- lime(
+  x = sentence_to_explain, 
+  model = simple_cnn_model, 
+  preprocess = text_to_matrix
+  )
+```
+
+this `explainer` object can now be used with `explain()` to generate explanations from the sentences. We set `n_labels = 1` to only get explanations for the first label since we are working with a binary classification model. The explanations of the second label would just be the inverse of the first label. If you have more than 2 labels then it makes sense to explore some or all of them. We set `n_features = 12` so we can look at the 12 most prominent features. If we were dealing with longer text you would take to adjust `n_features` to capture the effect of as many features you want.
+
+```{r}
+explanation <- explain(
+  x = sentence_to_explain, 
+  explainer = explainer, 
+  n_labels = 1, 
+  n_features = 12
+  )
+
+explanation
+```
+
+The output comes in a tibble format where `feature` and `feature_weight` are included, but luckily lime contains some functions to visualize these weights. \@ref(fig:limeplotfeatures) shows the result of using `plot_features()`, each facet contains an observation-label pair and the bars show the weight of the different tokens. Blue bars indicate that the weights support the prediction in the direction and red bars indicate contradictions. This chart is great for finding the most prominent features in an observation.
+
+```{r limeplotfeatures, fig.cap="Plot of most important features in a CNN model for a couple of observations."}
+plot_features(explanation)
+```
+
+Figure \@ref(fig:limeplottextexplanations) shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.
+
+```{r limeplottextexplanations, fig.cap="Feature highlighting of words in two examples explained by a CNN model."}
+plot_text_explanations(explanation)
+```
+
+```{block, type = "rmdnote"}
+`interactive_text_explanations()` can be used on launch an shiny app where you can interactively explore the weights the model.
+```
+
+One of the ways a deep learning model is hard to explain is that changes to a part of the input can affect how the input is being used as a whole. Remember in bag-of-words models how adding another token when prediction would just another unit in the weight, this is not always the case when using deep learning models.
+The following example shows this effect. We have created two very similar sentences in `fake_sentences`. 
+
+```{r}
+fake_sentences <- c(
+  "Fun and exciting dice game for the whole family",
+  "Fun and exciting dice game for the family"
+)
+
+explainer <- lime(
+  x = fake_sentences, 
+  model = simple_cnn_model, 
+  preprocess = text_to_matrix
+  )
+
+explanation <- explain(
+  x = fake_sentences, 
+  explainer = explainer, 
+  n_labels = 1, 
+  n_features = 12
+  )
+```
+
+Explanations based on these two sentences are fairly similar as we can see in \@ref(fig:robustlimeplottextexplanations). However, notice how the removal of the word "whole" affects the weights of the other words in the examples.
+
+```{r robustlimeplottextexplanations, fig.cap="Feature highlighting of words in two examples explained by a CNN model."}
+plot_text_explanations(explanation)
+```
+
+It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
 
 ## Hyper Parameter search
 
