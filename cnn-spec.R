@@ -29,18 +29,17 @@ model %>% compile(
 # Training & Evaluation ----------------------------------------------------
 
 history <- model %>% fit(
-  x = prepped_training, 
-  y = kickstarter_train$state,
+  x = kick_analysis, 
+  y = state_analysis,
   batch_size = 512,
   epochs = 10,
-  validation_split = 0.2
+  validation_data = list(kick_assess, state_assess)
 )
 
 plot(history)
 
 score <- model %>% evaluate(
-  bake(prepped_recipe, kickstarter_test, composition = "matrix"),
-  kickstarter_test$state
+  kick_assess, state_assess
 )
 
 cat('Test accuracy:', score$acc, '\n')
