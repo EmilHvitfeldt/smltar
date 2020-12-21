@@ -29,7 +29,7 @@ The tidymodels framework is modular, so we can use it for certain tasks without 
 ```
 
 
-This chapter explores one of the most straightforward configurations for a deep learning model, a densely connected neural network. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
+This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
 
 ## Kickstarter data {#kickstarter}
 
@@ -128,14 +128,14 @@ kickstarter_test <- testing(kickstarter_split)
 
 There are `r scales::comma(nrow(kickstarter_train))` blurbs in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
 
-### Preprocessing for deep learning
+### Preprocessing for deep learning {#dnnrecipe}
 
 Preprocessing for deep learning models is different than preprocessing for most other text models. These neural networks model _sequences_, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away) and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model and we need to select this value such that we don't: 
 
 - overshoot and introduce a lot of padded zeroes which would make the model hard to train, or 
 - undershoot and cut off too much informative text from our documents.
 
-We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram. Notice how we are only using the training dataset to avoid data leakage when selecting this value.
+We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram in Figure \@ref(fig:kickstarterwordlength). Notice how we are only using the training dataset to avoid data leakage when selecting this value.
 
 ```{r kickstarterwordlength, fig.cap="Distribution of word count for Kickstarter campaign blurbs"}
 kickstarter_train %>% 
@@ -164,7 +164,7 @@ kick_rec
 
 This preprocessing recipe tokenizes our text (Chapter \@ref(tokenization)) and filters to keep only the top 20,000 words, but then it transforms the tokenized text in a new way to prepare for deep learning that we have not used in this book before, using `step_sequence_onehot()`.
 
-### One-hot sequence embedding of text
+### One-hot sequence embedding of text {#onehotsequence}
 
 The function `step_sequence_onehot()` transforms tokens into a numeric format appropriate for modeling, like `step_tf()` and `step_tfidf()`. However, it is different in that it takes into account the order of the tokens, unlike `step_tf()` and `step_tfidf()` which do not take order into account. 
 
