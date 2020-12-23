@@ -42,4 +42,4 @@ score <- model %>% evaluate(
   kick_assess, state_assess
 )
 
-cat('Test accuracy:', score$acc, '\n')
+cat('Test accuracy:', score["accuracy"], '\n')

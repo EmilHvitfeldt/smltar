@@ -7,10 +7,10 @@ opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
 options(crayon.enabled = FALSE)
-doParallel::registerDoParallel()
+#doParallel::registerDoParallel()
 
 library(keras)
-use_session_with_seed(1234)
+tensorflow::tf$random$set_seed(1234)
 
 ## for Julia's local environment
 #spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
@@ -154,7 +154,7 @@ Constructing a sequence layer by layer and using Keras' print method to check th
 
 The compilation and fitting are the same as we have seen before, using a validation split created with tidymodels as shown in Sections \@ref(evaluate-dnn) and \@ref(lstmevaluation). 
 
-```{r}
+```{r, eval=!online}
 simple_cnn_model %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -168,6 +168,16 @@ cnn_history <- simple_cnn_model %>% fit(
   epochs = 10,
   validation_data = list(kick_assess, state_assess)
 )
+```
+
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(simple_cnn_model, "data/cnn_simple_cnn_model")
+readr::write_rds(cnn_history, "data/cnn_cnn_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+simple_cnn_model <- keras::load_model_tf("data/cnn_simple_cnn_model/")
+cnn_history <- readr::read_rds("data/cnn_cnn_history.rds")
 ```
 
 
@@ -245,7 +255,7 @@ cnn_double_dense
 
 We can compile and fit this new model. We will try to keep as much as we can constant as we compare the different models.
 
-```{r}
+```{r, eval=!online}
 cnn_double_dense %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -259,7 +269,17 @@ history <- cnn_double_dense %>% fit(
   epochs = 10,
   validation_data = list(kick_assess, state_assess)
 )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(cnn_double_dense, "data/cnn_cnn_double_dense")
+```
+
+```{r, include=FALSE, eval=online}
+cnn_double_dense <- keras::load_model_tf("data/cnn_cnn_double_dense/")
+```
+
+```{r}
 val_res_double_dense <- keras_predict(
   cnn_double_dense, 
   kick_assess, 
@@ -308,7 +328,7 @@ This is another parameter you can tinker with when you are designing the network
 
 We compile this model like the others, again trying to keep as much as we can constant. The only thing that changed in this model compared to the first is the addition of a `layer_max_pooling_1d()` and a `layer_conv_1d()`.
 
-```{r}
+```{r, eval=!online}
 cnn_double_conv %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -322,7 +342,17 @@ history <- cnn_double_conv %>% fit(
   epochs = 10,
   validation_data = list(kick_assess, state_assess)
 )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(cnn_double_conv, "data/cnn_cnn_double_conv")
+```
+
+```{r, include=FALSE, eval=online}
+cnn_double_conv <- keras::load_model_tf("data/cnn_cnn_double_conv/")
+```
+
+```{r}
 val_res_double_conv <- keras_predict(
   cnn_double_conv, 
   kick_assess, 
@@ -462,7 +492,7 @@ cnn_bpe
 
 We can compile and train like we have done so many times now.
 
-```{r}
+```{r, eval=!online}
 cnn_bpe %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -476,7 +506,19 @@ bpe_history <- cnn_bpe %>% fit(
   validation_data = list(bpe_assess, state_assess),
   batch_size = 512
 )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(cnn_bpe, "data/cnn_cnn_bpe")
+readr::write_rds(bpe_history, "data/cnn_bpe_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+cnn_bpe <- keras::load_model_tf("data/cnn_cnn_bpe/")
+bpe_history <- readr::read_rds("data/cnn_bpe_history.rds")
+```
+
+```{r}
 bpe_history
 ```
 
@@ -694,7 +736,7 @@ score <- model %>% evaluate(
   kick_assess, state_assess
 )
 
-cat('Test accuracy:', score$acc, '\n')
+cat('Test accuracy:', score["accuracy"], '\n')
 ```
 
 This is mostly the same as what we have seen before. When we are running these different models the scripts will be run in the environment they are initialized from, so the models will have access to objects like `prepped_training` and `kickstarter_train` and we don't have to create them inside the file.
@@ -714,13 +756,23 @@ This is a small selection of hyperparameters and ranges. There is much more room
 
 Now we have everything we need to do some hyperparameter searching. Load up tfruns and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
 
-```{r, results='hide'}
+```{r, results='hide', eval=!online}
 library(tfruns)
 runs <- tuning_run(
   file = 'cnn-spec.R',
   runs_dir = '_tuning',
   flags = hyperparams
 )
+
+runs_results <- as_tibble(ls_runs())
+```
+
+```{r, include=FALSE, eval=!online}
+readr::write_rds(runs_results, "data/cnn_runs_results.rds")
+```
+
+```{r, include=FALSE, eval=online}
+runs_results <- readr::read_rds("data/cnn_runs_results.rds")
 ```
 
 You don't have to, but we have manually specified the `runs_dir` argument, which is where the results of the tuning will be saved.
@@ -728,15 +780,15 @@ You don't have to, but we have manually specified the `runs_dir` argument, which
 A summary of all the runs in the folder can be retrieved with `ls_runs()`; here we use `as_tibble()` to get the results as a tibble.
 
 ```{r}
-as_tibble(ls_runs())
+runs_results
 ```
 
 We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.
 
 ```{r}
-best_runs <- as_tibble(ls_runs()) %>%
-  select(eval_acc, flag_kernel_size1, flag_strides1) %>%
-  arrange(desc(eval_acc))
+best_runs <- runs_results %>%
+  select(metric_val_accuracy, flag_kernel_size1, flag_strides1) %>%
+  arrange(desc(metric_val_accuracy))
 
 best_runs
 ```
@@ -803,10 +855,20 @@ fit_split <- function(split, prepped_rec) {
 
 We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.
 
-```{r}
+```{r, eval=!online}
 cv_fitted <- kick_folds %>%
   mutate(validation = map(splits, fit_split, kick_prep))
+```
 
+```{r, include=FALSE, eval=!online}
+readr::write_rds(cv_fitted, "data/cnn_cv_fitted")
+```
+
+```{r, include=FALSE, eval=online}
+cv_fitted <- readr::read_rds("data/cnn_cv_fitted")
+```
+
+```{r}
 cv_fitted
 ```
 
@@ -858,7 +920,7 @@ dim(kick_matrix)
 
 Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.1` and let the Keras model choose the validation set.
 
-```{r cnnfinalmod}
+```{r cnnfinalmod, eval=!online}
 final_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
@@ -884,7 +946,19 @@ final_history <- final_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(final_mod, "data/cnn_final_mod")
+readr::write_rds(final_history, "data/cnn_final_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+final_mod <- keras::load_model_tf("data/cnn_final_mod/")
+final_history <- readr::read_rds("data/cnn_final_history.rds")
+```
+
+```{r}
 final_history
 ```
 
