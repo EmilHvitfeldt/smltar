@@ -10,7 +10,7 @@ options(crayon.enabled = FALSE)
 doParallel::registerDoParallel()
 
 library(keras)
-use_session_with_seed(1234)
+tensorflow::tf$random$set_seed(1234)
 
 ## for Julia's local environment
 #spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
@@ -122,7 +122,7 @@ Next we `compile()` the model, which configures the model for training with a sp
 A good default optimizer for many problems is `"adam"`, and a good loss function for binary classification is `"binary_crossentropy"`.
 ```
 
-```{r}
+```{r, eval=!online}
 lstm_mod %>% 
   compile(
     optimizer = "adam",
@@ -137,7 +137,7 @@ As we noted in Chapter \@ref(dldnn), the neural network model is modified **in p
 
 After the model is compiled, we can fit it. The `fit()` method for Keras models has an argument `validation_split` that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the _end_ of each epoch.
 
-```{r}
+```{r, eval=!online}
 lstm_history <- lstm_mod %>% 
   fit(
     kick_matrix, 
@@ -147,7 +147,17 @@ lstm_history <- lstm_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+readr::write_rds(lstm_history, "data/lstm_lstm_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+lstm_history <- readr::read_rds("data/lstm_lstm_history.rds")
+```
+
+```{r}
 lstm_history
 ```
 
@@ -198,7 +208,7 @@ Let's also think about our LSTM model architecture. We saw evidence for signific
 When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting.
 ```
 
-```{r}
+```{r, eval=!online}
 lstm_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
@@ -220,7 +230,19 @@ val_history <- lstm_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(lstm_mod, "data/lstm_lstm_mod")
+readr::write_rds(val_history, "data/lstm_val_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+lstm_mod <- keras::load_model_tf("data/lstm_lstm_mod/")
+val_history <- readr::read_rds("data/lstm_val_history.rds")
+```
+
+```{r}
 val_history
 ```
 
@@ -268,7 +290,7 @@ Simple RNNs can only connect very recent information and structure in sequences,
 
 Let's train an RNN to see how it compares to the LSTM.
 
-```{r rnnmod}
+```{r rnnmod, eval=!online}
 rnn_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   layer_simple_rnn(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
@@ -290,7 +312,19 @@ rnn_history <- rnn_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(rnn_mod, "data/lstm_rnn_mod")
+readr::write_rds(rnn_history, "data/lstm_rnn_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+rnn_mod <- keras::load_model_tf("data/lstm_rnn_mod/")
+rnn_history <- readr::read_rds("data/lstm_rnn_history.rds")
+```
+
+```{r}
 rnn_history
 ```
 
@@ -317,7 +351,7 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 The input sequences are passed through the network in two directions, both forward and backward, allowing the network to learn more context, structures, and dependencies.
 
 
-```{r}
+```{r, eval=!online}
 bilstm_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   bidirectional(layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4)) %>%
@@ -339,7 +373,19 @@ bilstm_history <- bilstm_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(bilstm_mod, "data/lstm_bilstm_mod")
+readr::write_rds(bilstm_history, "data/lstm_bilstm_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+bilstm_mod <- keras::load_model_tf("data/lstm_bilstm_mod/")
+bilstm_history <- readr::read_rds("data/lstm_bilstm_history.rds")
+```
+
+```{r}
 bilstm_history
 ```
 
@@ -363,7 +409,7 @@ Intermediate layers must be set up to return sequences (with `return_sequences =
 
 Let's start by adding one single additional layer.
 
-```{r stackmod}
+```{r stackmod, eval=!online}
 stacked_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4, 
@@ -387,7 +433,19 @@ stacked_history <- stacked_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(stacked_mod, "data/lstm_stacked_mod")
+readr::write_rds(stacked_history, "data/lstm_stacked_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+stacked_mod <- keras::load_model_tf("data/lstm_stacked_mod/")
+stacked_history <- readr::read_rds("data/lstm_stacked_history.rds")
+```
+
+```{r}
 stacked_history
 ```
 
@@ -430,7 +488,7 @@ pad_assess <- bake(padding_prep, new_data = assessment(kick_val$splits[[1]]),
 
 Now, let's create and fit an LSTM to this preprocessed data.
 
-```{r}
+```{r, eval=!online}
 padding_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
@@ -452,7 +510,19 @@ padding_history <- padding_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(padding_mod, "data/lstm_padding_mod")
+readr::write_rds(padding_history, "data/lstm_padding_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+padding_mod <- keras::load_model_tf("data/lstm_padding_mod/")
+padding_history <- readr::read_rds("data/lstm_padding_history.rds")
+```
+
+```{r}
 padding_history
 ```
 
@@ -526,7 +596,7 @@ Let's create an LSTM and see what we can do. We will need to use higher-dimensio
 A good default loss function for regression is mean squared error, `"mse"`.
 ```
 
-```{r}
+```{r, eval=!online}
 scotus_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 64) %>%
   layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
@@ -547,6 +617,16 @@ scotus_history <- scotus_mod %>%
     validation_split = 0.25,
     verbose = FALSE
   )
+```
+
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(scotus_mod, "data/lstm_scotus_mod")
+readr::write_rds(scotus_history, "data/lstm_scotus_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+scotus_mod <- keras::load_model_tf("data/lstm_scotus_mod/")
+scotus_history <- readr::read_rds("data/lstm_scotus_history.rds")
 ```
 
 How does this model perform on the test data? Let's transform back to real values for `year` so our metrics will be on the same scale as in Chapter \@ref(mlregression).
@@ -588,7 +668,7 @@ kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]),
 
 Once our preprocessing is done and applied to our validation split `kick_val`, we can set up our model, another straightforward LSTM neural network.
 
-```{r}
+```{r, eval=!online}
 smaller_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   layer_lstm(units = 32, dropout = 0.4, recurrent_dropout = 0.4) %>%
@@ -610,7 +690,19 @@ smaller_history <- smaller_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(smaller_mod, "data/lstm_smaller_mod")
+readr::write_rds(smaller_history, "data/lstm_smaller_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+smaller_mod <- keras::load_model_tf("data/lstm_smaller_mod/")
+smaller_history <- readr::read_rds("data/lstm_smaller_history.rds")
+```
+
+```{r}
 smaller_history
 ```
 
@@ -661,7 +753,7 @@ We've learned a lot about how to model this dataset over the course of this chap
 
 Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.1` and let the Keras model choose the validation set.
 
-```{r lstmfinalmod}
+```{r lstmfinalmod, eval=!online}
 final_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 32) %>%
   bidirectional(layer_lstm(
@@ -693,7 +785,19 @@ final_history <- final_mod %>%
     batch_size = 512,
     verbose = FALSE
   )
+```
 
+```{r, include=FALSE, eval=!online}
+keras::save_model_tf(final_mod, "data/lstm_final_mod")
+readr::write_rds(final_history, "data/lstm_final_history.rds")
+```
+
+```{r, include=FALSE, eval=online}
+final_mod <- keras::load_model_tf("data/lstm_final_mod/")
+final_history <- readr::read_rds("data/lstm_final_history.rds")
+```
+
+```{r}
 final_history
 ```
 
