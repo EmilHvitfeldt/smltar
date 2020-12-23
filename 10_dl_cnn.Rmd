@@ -125,7 +125,7 @@ state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 Our first start CNN will look a lot like what is shown in Figure \@ref(fig:cnn-architecture).
 We start with an embedding layer, followed by a single one-dimensional convolution layer `layer_conv_1d()`, then a global max pooling layer `layer_global_max_pooling_1d()`, a densely connected layer, and ending with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.
 
-```{r simple_cnn_model}
+```{r}
 library(keras)
 
 simple_cnn_model <- keras_model_sequential() %>%
@@ -154,7 +154,7 @@ Constructing a sequence layer by layer and using Keras' print method to check th
 
 The compilation and fitting are the same as we have seen before, using a validation split created with tidymodels as shown in Sections \@ref(evaluate-dnn) and \@ref(lstmevaluation). 
 
-```{r simple_cnn_model_fit, dependson="simple_cnn_model"}
+```{r}
 simple_cnn_model %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -329,7 +329,7 @@ val_res_double_conv <- keras_predict(
   state_assess
 )
 
-metrics(val_res_double_conv, state, .pred_class, pred_1)
+metrics(val_res_double_conv, state, .pred_class, .pred_1)
 ```
 
 This model also performs well compared to earlier results. Let us extract the the prediction using `keras_predict()` we defined in \@ref(evaluate-dnn).
@@ -349,7 +349,7 @@ Now that the results are combined in `all_cnn_model_predictions` we can calculat
 ```{r}
 all_cnn_model_predictions %>%
   group_by(model) %>%
-  metrics(state, .pred_class, pred_1)
+  metrics(state, .pred_class, .pred_1)
 ```
 
 We can also compute ROC curves for all our models so far. Figure \@ref(fig:allcnnroccurve) shows the three different ROC curves together in one chart.
@@ -484,7 +484,7 @@ The performance is doing quite well, which is a pleasant surprise! This is what 
 
 The confusion matrix in \@ref(fig:bpeheatmap) also gives us clear information that there isn't much bias between the two classes with this new tokenizer.
 
-```{r bpeheatmap, dependson="nbrs", fig.cap="Confusion matrix for CNN model using byte pair encoding tokenization"}
+```{r bpeheatmap, fig.cap="Confusion matrix for CNN model using byte pair encoding tokenization"}
 val_res_bpe <- keras_predict(cnn_bpe, bpe_assess, state_assess)
 
 val_res_bpe %>%
