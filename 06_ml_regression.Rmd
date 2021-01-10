@@ -297,7 +297,7 @@ Tuning a model uses a similar syntax compared to fitting a model to a set of res
 
 We add our tunable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
 
-```{r scotustunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval = !online}
+```{r scotustunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval=!online}
 set.seed(2020)
 tune_rs <- tune_grid(
   scotus_wf %>% add_model(tune_spec),
@@ -309,7 +309,7 @@ tune_rs <- tune_grid(
 tune_rs
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(tune_rs, "data/ml_reg_tune_rs.rds")
 ```
 
@@ -401,7 +401,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r scotusrfrsoffline, dependson=c("scotuswf", "scotusfolds", "scotusrfspec"), eval = !online}
+```{r scotusrfrsoffline, dependson=c("scotuswf", "scotusfolds", "scotusrfspec"), eval=!online}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -415,7 +415,7 @@ We can use `collect_metrics()` to obtain and format the performance metrics for 
 collect_metrics(rf_rs)
 ```
 
-```{r, dependson="rfmetricsoffline", include = FALSE, eval = !online}
+```{r, dependson="rfmetricsoffline", include = FALSE, eval=!online}
 rf_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_rf_metrics.rds")
@@ -428,7 +428,7 @@ rf_metrics
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=5.5, eval = !online}
+```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=5.5, eval=!online}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -443,7 +443,7 @@ rf_rs %>%
   )
 ```
 
-```{r, dependson="rfpredictoffline", include = FALSE, eval = !online}
+```{r, dependson="rfpredictoffline", include = FALSE, eval=!online}
 rf_rs %>%
   collect_predictions() %>%
   write_rds("data/ml_reg_rf_predictions.rds")
@@ -522,7 +522,7 @@ grid_twenty
 
 We can tune this lasso regression model, in the same way that we did in Section \@ref(tunelasso). We will fit and assess each possible regularization parameter on each resampling fold, to find the best amount of regularization.
 
-```{r sparsetunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval = !online}
+```{r sparsetunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval=!online}
 set.seed(2020)
 sparse_rs <- tune_grid(
   sparse_wf,
@@ -533,7 +533,7 @@ sparse_rs <- tune_grid(
 sparse_rs
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(sparse_rs, "data/ml_reg_sparse_rs.rds")
 ```
 
@@ -603,7 +603,7 @@ Now we can put this all together and tune these models which include stop word r
 - The same cross-validation folds we created earlier
 - The same grid of values for the regularization parameter that we used in the previous case study
 
-```{r stopwordsresoffline, dependson=c("gridtwenty", "tunablewf", "stopwordrec", "scotusfolds"), eval = !online}
+```{r stopwordsresoffline, dependson=c("gridtwenty", "tunablewf", "stopwordrec", "scotusfolds"), eval=!online}
 set.seed(123)
 snowball_rs <- tune_grid(
   tunable_wf %>% add_recipe(stopword_rec("snowball"), blueprint = sparse_bp),
@@ -629,11 +629,11 @@ stopwords_iso_rs <- tune_grid(
 
 After fitting models for each of possible regularization values to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.
 
-```{r dependson="stopwordsresoffline", eval = !online}
+```{r dependson="stopwordsresoffline", eval=!online}
 collect_metrics(smart_rs)
 ```
 
-```{r, dependson="stopwordsresoffline", include = FALSE, eval = !online}
+```{r, dependson="stopwordsresoffline", include = FALSE, eval=!online}
 smart_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_smart_metrics.rds")
@@ -646,7 +646,7 @@ smart_metrics
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
-```{r snowballrmseoffline, dependson="stopwordsres", eval = !online}
+```{r snowballrmseoffline, dependson="stopwordsres", eval=!online}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
@@ -663,7 +663,7 @@ list(snowball = snowball_rs,
        subtitle = "For this dataset, the Snowball lexicon performed best")
 ```
 
-```{r, dependson="snowballrmseoffline", echo = FALSE, eval = !online}
+```{r, dependson="snowballrmseoffline", echo = FALSE, eval=!online}
 list(snowball = snowball_rs, 
      smart = smart_rs, 
      `stopwords-iso` = stopwords_iso_rs) %>%
@@ -749,7 +749,7 @@ With this helper function, let's try out predicting the year of Supreme Court op
 - bigrams and unigrams
 - trigrams, bigrams, and unigrams
 
-```{r ngramresoffline, dependson=c("tunengram"), eval = !online}
+```{r ngramresoffline, dependson=c("tunengram"), eval=!online}
 set.seed(123)
 unigram_rs <- tune_ngram(list(n = 1))
 
@@ -762,11 +762,11 @@ trigram_rs <- tune_ngram(list(n = 3, n_min = 1))
 
 These sets of results contain metrics computed for the model with that tokenization strategy.
 
-```{r dependson="ngramresoffline", eval = !online}
+```{r dependson="ngramresoffline", eval=!online}
 collect_metrics(bigram_rs)
 ```
 
-```{r, dependson="ngramresoffline", echo = FALSE, eval = !online}
+```{r, dependson="ngramresoffline", echo = FALSE, eval=!online}
 bigram_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_bigram_metrics.rds")
@@ -779,7 +779,7 @@ bigram_metrics
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
-```{r ngramrmseoffline, dependson="ngramres", eval = !online}
+```{r ngramrmseoffline, dependson="ngramres", eval=!online}
 list(`1` = unigram_rs, 
      `1 and 2` = bigram_rs, 
      `1, 2, and 3` = trigram_rs) %>%
@@ -793,7 +793,7 @@ list(`1` = unigram_rs,
        subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
 ```
 
-```{r, dependson="ngramrmseoffline", echo = FALSE, eval = !online}
+```{r, dependson="ngramrmseoffline", echo = FALSE, eval=!online}
 list(`1` = unigram_rs, 
      `1 and 2` = bigram_rs, 
      `1, 2, and 3` = trigram_rs) %>%
@@ -852,7 +852,7 @@ lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
 lemma_rec
 ```
 
-```{r lemmarecoffline, dependson="scotussplit", echo = FALSE, eval = !online}
+```{r lemmarecoffline, dependson="scotussplit", echo = FALSE, eval=!online}
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
@@ -864,7 +864,7 @@ lemma_rec
 
 Let's combine this lemmatized text with our tunable workflow and grid of possible parameter values. We can then tune our workflow and identify the best model for the lemmatized text.
 
-```{r, lemmatunersoffline, dependson=c("gridtwenty", "tunablewf", "lemmarecoffline", "scotusfolds"), eval = !online}
+```{r, lemmatunersoffline, dependson=c("gridtwenty", "tunablewf", "lemmarecoffline", "scotusfolds"), eval=!online}
 set.seed(123)
 lemma_rs <- tune_grid(
   tunable_wf %>% add_recipe(lemma_rec, blueprint = sparse_bp),
@@ -876,7 +876,7 @@ lemma_rs <- tune_grid(
 
 Let's visualize the performance metrics, RMSE and $R^2$, in Figure \@ref(fig:scotuslemmavis) to see what the best model using lemmas is, much like we did in Figure \@ref(fig:scotustunevis).
 
-```{r scotuslemmavisoffline, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, eval = !online}
+```{r scotuslemmavisoffline, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, eval=!online}
 lemma_rs %>%
   collect_metrics() %>%
   ggplot(aes(penalty, mean, color = .metric)) +
@@ -895,7 +895,7 @@ lemma_rs %>%
        subtitle = "Performance metrics indicate that lemmatization improves model performance")
 ```
 
-```{r, dependson="scotuslemmavisoffline", echo = FALSE, eval = !online}
+```{r, dependson="scotuslemmavisoffline", echo = FALSE, eval=!online}
 lemma_rs %>%
   collect_metrics() %>%
   write_rds("data/ml_reg_lemma_metrics.rds")
@@ -923,12 +923,12 @@ lemma_metrics %>%
 
 What is the best model, using lemmatization?
 
-```{r dependson="scotustuners", eval = !online}
+```{r dependson="scotustuners", eval=!online}
 lemma_rs %>%
   show_best("rmse")
 ```
 
-```{r, dependson="lemmatunersoffline", echo = FALSE, eval = !online}
+```{r, dependson="lemmatunersoffline", echo = FALSE, eval=!online}
 lemma_rs %>%
   show_best("rmse") %>%
   write_rds("data/ml_reg_lemma_best.rds")
@@ -1076,7 +1076,7 @@ Throughout this chapter, we have used `grid_regular()` where we fit a model at e
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
 
-```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds"), eval = !online}
+```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds"), eval=!online}
 final_rs <- tune_grid(
   tune_wf,
   scotus_folds,
