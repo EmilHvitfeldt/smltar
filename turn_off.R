@@ -6,4 +6,4 @@ turn_off <- function(x) {
   writeLines(text, x)
 }
 
-purrr::walk(fs::dir_ls(regexp = "\\.Rmd$"), turn_off)
+purrr::walk(fs::dir_ls(regexp = "[0-9]+.*\\.Rmd$"), turn_off)
