@@ -19,16 +19,16 @@ library(hcandersenr)
 library(tidyverse)
 library(tidytext)
 
-fir_tree <- hca_fairytales() %>% 
-  filter(book == "The fir tree", 
+fir_tree <- hca_fairytales() %>%
+  filter(book == "The fir tree",
          language == "English")
 
 tidy_fir_tree <- fir_tree %>%
   unnest_tokens(word, text) %>%
   anti_join(get_stopwords())
 
-tidy_fir_tree %>% 
-  count(word, sort = TRUE) %>% 
+tidy_fir_tree %>%
+  count(word, sort = TRUE) %>%
   filter(str_detect(word, "^tree"))
 ```
 
@@ -65,7 +65,7 @@ stopword_df <- tribble(~language, ~two_letter,
                        "german",  "de",
                        "spanish", "es")
 
-tidy_by_lang <- hca_fairytales() %>% 
+tidy_by_lang <- hca_fairytales() %>%
   filter(book == "The fir tree") %>%
   select(text, language) %>%
   mutate(language = str_to_lower(language)) %>%
@@ -80,7 +80,7 @@ tidy_by_lang %>%
   inner_join(stopword_df) %>%
   mutate(data = map2(
     data, two_letter, ~ anti_join(.x, get_stopwords(language = .y)))
-  )%>%
+  ) %>%
   unnest(data) %>%
   mutate(stem = wordStem(word, language = language)) %>%
   group_by(language) %>%
@@ -123,7 +123,7 @@ Why does stemming often help, if you are training a machine learning model for t
 ```{r tidy_hca}
 library(scotus)
 
-tidy_scotus <- scotus_filtered %>% 
+tidy_scotus <- scotus_filtered %>%
   unnest_tokens(word, text) %>%
   anti_join(get_stopwords())
 
@@ -209,8 +209,8 @@ Punctuation contains information that can be used in text analysis. Punctuation 
 We've already seen how punctuation and stemming can interact with our small example of "The Fir-Tree"; none of the stemming strategies we've discussed so far have recognized `"tree's"` as belonging to the same stem as `"trees"` and `"tree"`.
 
 ```{r dependson="tidyfirtree"}
-tidy_fir_tree %>% 
-  count(word, sort = TRUE) %>% 
+tidy_fir_tree %>%
+  count(word, sort = TRUE) %>%
   filter(str_detect(word, "^tree"))
 ```
 
@@ -229,7 +229,7 @@ fir_tree_counts
 Now we are able to put all these related words together, having identified them with the same stem.
 
 ```{r}
-fir_tree_counts %>% 
+fir_tree_counts %>%
   filter(str_detect(stem, "^tree"))
 ```
 
@@ -248,9 +248,9 @@ Let's compare a few simple stemming algorithms and see what results we end with.
 stemming <- tidy_fir_tree %>%
   select(-book, -language) %>%
   mutate(`Remove S` = str_remove(word, "s$"),
-         `Plural endings` = case_when(str_detect(word, "[^e|aies$]ies$") ~ 
+         `Plural endings` = case_when(str_detect(word, "[^e|aies$]ies$") ~
                                         str_replace(word, "ies$", "y"),
-                                      str_detect(word, "[^e|a|oes$]es$") ~ 
+                                      str_detect(word, "[^e|a|oes$]es$") ~
                                         str_replace(word, "es$", "e"),
                                       str_detect(word, "[^ss$|us$]s$") ~
                                         str_remove(word, "s$"),
@@ -269,7 +269,7 @@ stemming %>%
   group_by(Type) %>%
   top_n(20, n) %>%
   ungroup %>%
-  ggplot(aes(fct_reorder(Result, n), 
+  ggplot(aes(fct_reorder(Result, n),
              n, fill = Type)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~Type, scales = "free_y") +
@@ -280,7 +280,7 @@ stemming %>%
 Porter stemming is the most different from the other two approaches. In the top twenty words here, we don't see a difference between removing only the letter "s" and taking the slightly more sophisticated "S" stemmer approach to plural endings. In what situations *do* we see a difference?
 
 ```{r dependson="stemming"}
-stemming %>% 
+stemming %>%
   filter(`Remove S` != `Plural endings`) %>%
   distinct(`Remove S`, `Plural endings`, .keep_all = TRUE)
 ```
@@ -290,7 +290,7 @@ We also see situations where the same sets of original words are bucketed differ
 ```{r dependson="stemming"}
 stemming %>%
   gather(Type, Result, `Remove S`:`Porter stemming`) %>%
-  filter(Result %in% c("come", "coming")) %>% 
+  filter(Result %in% c("come", "coming")) %>%
   distinct(`Original word`, Type, Result)
 ```
 
@@ -319,9 +319,9 @@ Let's briefly walk through how to use spacyr.
 library(spacyr)
 spacy_initialize(entity = FALSE)
 
-fir_tree %>% 
-  mutate(doc_id = paste0("doc", row_number())) %>% 
-  select(doc_id, everything()) %>% 
+fir_tree %>%
+  mutate(doc_id = paste0("doc", row_number())) %>%
+  select(doc_id, everything()) %>%
   spacy_parse() %>%
   anti_join(get_stopwords(), by = c("lemma" = "word")) %>%
   count(lemma, sort = TRUE) %>%
