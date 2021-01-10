@@ -180,7 +180,7 @@ nb_wf
 
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit the model many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r nbrs, dependson=c("nbwf", "complaintsfolds"), eval = !online}
+```{r nbrs, dependson=c("nbwf", "complaintsfolds"), eval=!online}
 nb_rs <- fit_resamples(
   nb_wf,
   complaints_folds,
@@ -190,17 +190,17 @@ nb_rs <- fit_resamples(
 
 We can extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r nbrsmetrics, eval = !online}
+```{r nbrsmetrics, eval=!online}
 nb_rs_metrics <- collect_metrics(nb_rs)
 nb_rs_predictions <- collect_predictions(nb_rs)
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
 write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
 ```
 
-```{r, include = FALSE, eval = online}
+```{r, include = FALSE, eval=online}
 nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
 nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
 ```
@@ -306,7 +306,7 @@ svm_wf
 
 The **liquidSVM** engine doesn't support class probabilities as output so we need to replace the default metric set with a metric set that doesn't use class probabilities. Here we use accuracy, sensitivity, and specificity.
 
-```{r svmrs, dependson=c("svmwf", "complaintsfolds"), eval = !online}
+```{r svmrs, dependson=c("svmwf", "complaintsfolds"), eval=!online}
 set.seed(2020)
 svm_rs <- fit_resamples(
   svm_wf,
@@ -318,17 +318,17 @@ svm_rs <- fit_resamples(
 
 Let's again extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r, eval = !online}
+```{r, eval=!online}
 svm_rs_metrics <- collect_metrics(svm_rs)
 svm_rs_predictions <- collect_predictions(svm_rs)
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(svm_rs_metrics, "data/ml_class_first_svm_rs_metrics.rds")
 write_rds(svm_rs_predictions, "data/ml_class_first_svm_rs_predictions.rds")
 ```
 
-```{r svmrsmetrics, include = FALSE, eval = online}
+```{r svmrsmetrics, include = FALSE, eval=online}
 svm_rs_metrics <- read_rds("data/ml_class_first_svm_rs_metrics.rds")
 svm_rs_predictions <- read_rds("data/ml_class_first_svm_rs_predictions.rds")
 ```
@@ -450,7 +450,7 @@ Notice that you don't have to specify anything to perform multiclass classificat
 Now we have everything we need for `fit_resamples()` to fit all the models. Note that we specify `save_pred = TRUE`, so we can create a confusion matrix later. This is especially beneficial for multiclass classification.
 We again specify the `metric_set()` since liquidSVM doesn't support class probabilities.
 
-```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval= !online}
+```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval=!online}
 multi_svm_rs <- fit_resamples(
   multi_svm_wf,
   multicomplaints_folds,
@@ -463,17 +463,17 @@ multi_svm_rs
 
 Let's again extract the relevant results using `collect_metrics()` and `collect_predictions()`
 
-```{r multisvmrsmetrics, dependson="multisvmrs", eval = !online}
+```{r multisvmrsmetrics, dependson="multisvmrs", eval=!online}
 multi_svm_rs_metrics <- collect_metrics(multi_svm_rs)
 multi_svm_rs_predictions <- collect_predictions(multi_svm_rs)
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(multi_svm_rs_metrics, "data/ml_class_first_multi_svm_rs_metrics.rds")
 write_rds(multi_svm_rs_predictions, "data/ml_class_first_multi_svm_rs_predictions.rds")
 ```
 
-```{r, include = FALSE, eval = online}
+```{r, include = FALSE, eval=online}
 multi_svm_rs_metrics <- read_rds("data/ml_class_first_multi_svm_rs_metrics.rds")
 multi_svm_rs_predictions <- read_rds("data/ml_class_first_multi_svm_rs_predictions.rds")
 ```
@@ -588,7 +588,7 @@ more_vars_wf
 
 Let's fit this `workflow()` to our resampled datasets and estimate accuracy, sensitivity, and specificity.
 
-```{r morevarsrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval = !online}
+```{r morevarsrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval=!online}
 set.seed(123)
 more_vars_rs <- fit_resamples(
   more_vars_wf,
@@ -599,15 +599,15 @@ more_vars_rs <- fit_resamples(
 
 We can extract the metrics from these results with `collect_metrics()`.
 
-```{r, eval = !online}
+```{r, eval=!online}
 more_vars_metrics <- collect_metrics(more_vars_rs)
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(more_vars_metrics, "data/ml_class_more_vars_rs_metrics.rds")
 ```
 
-```{r morevarsmetrics, include = FALSE, eval = online}
+```{r morevarsmetrics, include = FALSE, eval=online}
 more_vars_metrics <- read_rds("data/ml_class_more_vars_rs_metrics.rds")
 ```
 
@@ -1077,7 +1077,7 @@ We have focused on using accuracy and ROC AUC as metrics for our classification 
 
 If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`.
 
-```{r, eval = FALSE}
+```{r, eval=FALSE}
 nb_rs <- fit_resamples(
   nb_wf,
   complaints_folds,
@@ -1267,17 +1267,17 @@ final_res <- svm_wf_final %>%
 
 Let's explore our results using `collect_metrics()` and `collect_predictions()`.
 
-```{r finalresmetrics, dependson="finalres", eval = !online}
+```{r finalresmetrics, dependson="finalres", eval=!online}
 final_res_metrics <- collect_metrics(final_res)
 final_res_predictions <- collect_predictions(final_res)
 ```
 
-```{r, include = FALSE, eval = !online}
+```{r, include = FALSE, eval=!online}
 write_rds(final_res_metrics, "data/ml_class_final_res_metrics.rds")
 write_rds(final_res_predictions, "data/ml_class_final_res_predictions.rds")
 ```
 
-```{r, include = FALSE, eval = online}
+```{r, include = FALSE, eval=online}
 final_res_metrics <- read_rds("data/ml_class_final_res_metrics.rds")
 final_res_predictions <- read_rds("data/ml_class_final_res_predictions.rds")
 ```
