@@ -21,7 +21,6 @@ online <- TRUE
 
 keras_predict <- function(model, baked_data, response) {
   predictions <- predict(model, baked_data)[, 1]
-  
   tibble(
     .pred_1 = predictions,
     .pred_class = if_else(.pred_1 < 0.5, 0, 1),
@@ -112,10 +111,10 @@ set.seed(234)
 kick_val <- validation_split(kickstarter_train, strata = state)
 
 kick_prep <- prep(kick_rec)
-kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]),
                       composition = "matrix")
 
-kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]),
                     composition = "matrix")
 
 state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
@@ -162,7 +161,7 @@ simple_cnn_model %>% compile(
 )
 
 cnn_history <- simple_cnn_model %>% fit(
-  x = kick_analysis, 
+  x = kick_analysis,
   y = state_analysis,
   batch_size = 512,
   epochs = 10,
@@ -204,7 +203,7 @@ The heatmap in Figure \@ref(fig:cnnheatmap) shows that the model performs about 
 
 ```{r cnnheatmap, fig.cap="Confusion matrix for first CNN model predictions of Kickstarter campaign success"}
 val_res %>%
-  conf_mat( state, .pred_class) %>%
+  conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -263,7 +262,7 @@ cnn_double_dense %>% compile(
 )
 
 history <- cnn_double_dense %>% fit(
-  x = kick_analysis, 
+  x = kick_analysis,
   y = state_analysis,
   batch_size = 512,
   epochs = 10,
@@ -281,8 +280,8 @@ cnn_double_dense <- keras::load_model_tf("data/cnn_cnn_double_dense/")
 
 ```{r}
 val_res_double_dense <- keras_predict(
-  cnn_double_dense, 
-  kick_assess, 
+  cnn_double_dense,
+  kick_assess,
   state_assess
 )
 
@@ -336,7 +335,7 @@ cnn_double_conv %>% compile(
 )
 
 history <- cnn_double_conv %>% fit(
-  x = kick_analysis, 
+  x = kick_analysis,
   y = state_analysis,
   batch_size = 512,
   epochs = 10,
@@ -354,8 +353,8 @@ cnn_double_conv <- keras::load_model_tf("data/cnn_cnn_double_conv/")
 
 ```{r}
 val_res_double_conv <- keras_predict(
-  cnn_double_conv, 
-  kick_assess, 
+  cnn_double_conv,
+  kick_assess,
   state_assess
 )
 
@@ -423,7 +422,7 @@ library(textrecipes)
 get_bpe_token_dist <- function(vocab_size, x) {
   recipe(~text, data = tibble(text = x)) %>%
     step_mutate(text = tolower(text)) %>%
-    step_tokenize(text, 
+    step_tokenize(text,
                   engine = "tokenizers.bpe",
                   training_options = list(vocab_size = vocab_size)) %>%
     prep() %>%
@@ -437,7 +436,7 @@ We can use `map()` to try a handful of different vocabulary sizes
 
 ```{r}
 bpe_token_dist <- map_dfr(
-  c(2500, 5000, 10000, 20000), 
+  c(2500, 5000, 10000, 20000),
   get_bpe_token_dist,
   kickstarter_train$blurb
 )
@@ -463,16 +462,16 @@ bpe_max_length <- 40
 
 bpe_rec <- recipe(~blurb, data = kickstarter_train) %>%
   step_mutate(blurb = tolower(blurb)) %>%
-  step_tokenize(blurb, 
+  step_tokenize(blurb,
                 engine = "tokenizers.bpe",
                 training_options = list(vocab_size = max_subwords)) %>%
   step_sequence_onehot(blurb, sequence_length = bpe_max_length)
 
 bpe_prep <- prep(bpe_rec)
 
-bpe_analysis <- bake(bpe_prep, new_data = analysis(kick_val$splits[[1]]), 
+bpe_analysis <- bake(bpe_prep, new_data = analysis(kick_val$splits[[1]]),
                      composition = "matrix")
-bpe_assess <- bake(bpe_prep, new_data = assessment(kick_val$splits[[1]]), 
+bpe_assess <- bake(bpe_prep, new_data = assessment(kick_val$splits[[1]]),
                    composition = "matrix")
 ```
 
@@ -500,7 +499,7 @@ cnn_bpe %>% compile(
 )
 
 bpe_history <- cnn_bpe %>% fit(
-  bpe_analysis, 
+  bpe_analysis,
   state_analysis,
   epochs = 10,
   validation_data = list(bpe_assess, state_assess),
@@ -530,7 +529,7 @@ The confusion matrix in \@ref(fig:bpeheatmap) also gives us clear information th
 val_res_bpe <- keras_predict(cnn_bpe, bpe_assess, state_assess)
 
 val_res_bpe %>%
-  conf_mat( state, .pred_class) %>%
+  conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -580,7 +579,7 @@ kick_prepped_rec <- prep(kick_rec)
 text_to_matrix <- function(x) {
   bake(
     kick_prepped_rec,
-    new_data = tibble(blurb = x), 
+    new_data = tibble(blurb = x),
     composition = "matrix"
   )
 }
@@ -610,8 +609,8 @@ Be sure that the preprocess function _matches_ the preprocessing that was used t
 library(lime)
 
 explainer <- lime(
-  x = sentence_to_explain, 
-  model = simple_cnn_model, 
+  x = sentence_to_explain,
+  model = simple_cnn_model,
   preprocess = text_to_matrix
 )
 ```
@@ -620,9 +619,9 @@ This `explainer` object can now be used with `explain()` to generate explanation
 
 ```{r}
 explanation <- explain(
-  x = sentence_to_explain, 
-  explainer = explainer, 
-  n_labels = 1, 
+  x = sentence_to_explain,
+  explainer = explainer,
+  n_labels = 1,
   n_features = 12
 )
 
@@ -655,15 +654,15 @@ fake_sentences <- c(
 )
 
 explainer <- lime(
-  x = fake_sentences, 
-  model = simple_cnn_model, 
+  x = fake_sentences,
+  model = simple_cnn_model,
   preprocess = text_to_matrix
 )
 
 explanation <- explain(
-  x = fake_sentences, 
-  explainer = explainer, 
-  n_labels = 1, 
+  x = fake_sentences,
+  explainer = explainer,
+  n_labels = 1,
   n_features = 12
 )
 ```
@@ -688,8 +687,8 @@ Be sure you are using the right type for each of these flags; Keras is quite pic
 
 ```{r, eval=FALSE}
 FLAGS <- flags(
-  flag_integer('kernel_size1', 5),
-  flag_integer('strides1', 1)
+  flag_integer("kernel_size1", 5),
+  flag_integer("strides1", 1)
 )
 ```
 
@@ -701,7 +700,7 @@ Next, we specify the Keras model we want to run.
 model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, 
+  layer_conv_1d(filter = 32,
                 kernel_size = FLAGS$kernel_size1,
                 strides = FLAGS$strides1,
                 activation = "relu") %>%
@@ -721,9 +720,9 @@ We specify the hyperparameters we want to change by marking them as `FLAGS$name`
 Lastly, we have to specify how is trained and evaluated.
 
 ```{r, eval=FALSE}
-history <- model %>% 
+history <- model %>%
   fit(
-    x = kick_analysis, 
+    x = kick_analysis,
     y = state_analysis,
     batch_size = 512,
     epochs = 10,
@@ -736,7 +735,7 @@ score <- model %>% evaluate(
   kick_assess, state_assess
 )
 
-cat('Test accuracy:', score["accuracy"], '\n')
+cat("Test accuracy:", score["accuracy"], "\n")
 ```
 
 This is mostly the same as what we have seen before. When we are running these different models the scripts will be run in the environment they are initialized from, so the models will have access to objects like `prepped_training` and `kickstarter_train` and we don't have to create them inside the file.
@@ -759,8 +758,8 @@ Now we have everything we need to do some hyperparameter searching. Load up tfru
 ```{r, results='hide', eval=!online}
 library(tfruns)
 runs <- tuning_run(
-  file = 'cnn-spec.R',
-  runs_dir = '_tuning',
+  file = "cnn-spec.R",
+  runs_dir = "_tuning",
   flags = hyperparams
 )
 
@@ -811,42 +810,40 @@ Last time we saw how to create a custom function to handle preprocessing, fittin
 
 ```{r}
 fit_split <- function(split, prepped_rec) {
-  
   ## preprocessing
-  x_train <- bake(prepped_rec, new_data = analysis(split), 
+  x_train <- bake(prepped_rec, new_data = analysis(split),
                   composition = "matrix")
-  x_val   <- bake(prepped_rec, new_data = assessment(split), 
+  x_val   <- bake(prepped_rec, new_data = assessment(split),
                   composition = "matrix")
-  
+
   ## create model
   y_train <- analysis(split) %>% pull(state)
   y_val   <- assessment(split) %>% pull(state)
-  
-  
+
   mod <- keras_model_sequential() %>%
     layer_embedding(input_dim = max_words + 1, output_dim = 16,
                     input_length = max_length) %>%
     layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
     layer_global_max_pooling_1d() %>%
     layer_dense(units = 64, activation = "relu") %>%
-    layer_dense(units = 1, activation = "sigmoid") %>% 
+    layer_dense(units = 1, activation = "sigmoid") %>%
     compile(
       optimizer = "adam",
       loss = "binary_crossentropy",
       metrics = c("accuracy")
     )
-  
+
   ## fit model
   mod %>%
     fit(
-      x_train, 
+      x_train,
       y_train,
       epochs = 10,
       validation_data = list(x_val, y_val),
       batch_size = 512,
       verbose = FALSE
     )
-  
+
   ## evaluate model
   keras_predict(mod, x_val, y_val) %>%
     metrics(state, .pred_class, .pred_1)
@@ -924,22 +921,22 @@ Instead of using specific validation data that we can then compute performance m
 final_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 7, 
+  layer_conv_1d(filter = 32, kernel_size = 7,
                 strides = 1, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
 
-final_mod %>% 
+final_mod %>%
   compile(
     optimizer = "adam",
     loss = "binary_crossentropy",
     metrics = c("accuracy")
   )
 
-final_history <- final_mod %>% 
+final_history <- final_mod %>%
   fit(
-    kick_matrix, 
+    kick_matrix,
     kickstarter_train$state,
     epochs = 10,
     validation_split = 0.1,
@@ -965,7 +962,7 @@ final_history
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
 
 ```{r}
-kick_matrix_test <- bake(kick_prep, new_data = kickstarter_test, 
+kick_matrix_test <- bake(kick_prep, new_data = kickstarter_test,
                          composition = "matrix")
 final_res <- keras_predict(final_mod, kick_matrix_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)
