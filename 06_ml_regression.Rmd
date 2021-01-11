@@ -99,7 +99,7 @@ First, let's create an empty `workflow()` and then only add the data preprocesso
 
 ```{r scotuswf, dependson="scotusrec"}
 scotus_wf <- workflow() %>%
-  add_recipe(scotus_rec) 
+  add_recipe(scotus_rec)
 
 scotus_wf
 ```
@@ -196,9 +196,9 @@ lasso_rs %>%
 ```
 
 ```{r firstattemprmse, dependson="lassors", echo=FALSE}
-first_attemp_rmse <- collect_metrics(lasso_rs) %>% 
-  filter(.metric == "rmse") %>% 
-  pull(mean) %>% 
+first_attemp_rmse <- collect_metrics(lasso_rs) %>%
+  filter(.metric == "rmse") %>%
+  pull(mean) %>%
   round(1)
 ```
 
@@ -239,7 +239,7 @@ A null model is a simple, non-informative model that always predicts the largest
 We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
 
 ```{r nullrs, dependson=c("scotuswf", "scotusfolds")}
-null_regression <- null_model() %>% 
+null_regression <- null_model() %>%
   set_engine("parsnip") %>%
   set_mode("regression")
 
@@ -341,8 +341,10 @@ tune_rs %>%
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
   theme(legend.position = "none") +
-  labs(title = "Lasso model performance across regularization penalties",
-       subtitle = "Performance metrics can be used to identity the best penalty")
+  labs(
+    title = "Lasso model performance across regularization penalties",
+    subtitle = "Performance metrics can be used to identity the best penalty"
+  )
 ```
 
 We can view the best results with `show_best()` and a choice for the metric, such as RMSE.
@@ -353,9 +355,9 @@ tune_rs %>%
 ```
 
 ```{r tunersrmse, dependson="scotustuners"}
-tune_rs_rmse <- show_best(tune_rs, "rmse") %>% 
-  pull(mean) %>% 
-  min() %>% 
+tune_rs_rmse <- show_best(tune_rs, "rmse") %>%
+  pull(mean) %>%
+  min() %>%
   round(1)
 ```
 
@@ -438,7 +440,8 @@ rf_rs %>%
     x = "Truth",
     y = "Predicted year",
     color = NULL,
-    title = "Predicted and true years for Supreme Court opinions using a random forest model",
+    title = paste("Predicted and true years for Supreme Court opinions using",
+                  "a random forest model"),
     subtitle = "Each cross-validation fold is shown in a different color"
   )
 ```
@@ -459,7 +462,8 @@ rf_predictions %>%
     x = "Truth",
     y = "Predicted year",
     color = NULL,
-    title = "Predicted and true years for Supreme Court opinions using a random forest model",
+    title = paste("Predicted and true years for Supreme Court opinions using",
+                  "a random forest model"),
     subtitle = "Each cross-validation fold is shown in a different color"
   )
 ```
@@ -484,7 +488,7 @@ To keep our text data sparse in the sense of having many zero values, we need to
 tfidf_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text) %>%
   step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text) 
+  step_tfidf(text)
 
 tfidf_rec
 ```
@@ -590,7 +594,7 @@ Next, let's set up a new workflow that has a model only, using `add_model()`. We
 
 ```{r tunablewf, dependson="scotustunespec"}
 tunable_wf <- workflow() %>%
-  add_model(tune_spec) 
+  add_model(tune_spec)
 
 tunable_wf
 ```
@@ -606,21 +610,24 @@ Now we can put this all together and tune these models which include stop word r
 ```{r stopwordsresoffline, dependson=c("gridtwenty", "tunablewf", "stopwordrec", "scotusfolds"), eval=!online}
 set.seed(123)
 snowball_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("snowball"), blueprint = sparse_bp),
+  tunable_wf %>% add_recipe(stopword_rec("snowball"),
+                            blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
 
 set.seed(234)
 smart_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("smart"), blueprint = sparse_bp),
+  tunable_wf %>% add_recipe(stopword_rec("smart"),
+                            blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
 
 set.seed(345)
 stopwords_iso_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("stopwords-iso"), blueprint = sparse_bp),
+  tunable_wf %>% add_recipe(stopword_rec("stopwords-iso"),
+                            blueprint = sparse_bp),
   scotus_folds,
   grid = grid_twenty
 )
@@ -647,14 +654,14 @@ smart_metrics
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
 ```{r snowballrmseoffline, dependson="stopwordsres", eval=!online}
-word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
+word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>%
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
-list(snowball = snowball_rs, 
-     smart = smart_rs, 
+list(snowball = snowball_rs,
+     smart = smart_rs,
      `stopwords-iso` = stopwords_iso_rs) %>%
   map_dfr(show_best, "rmse", .id = "name") %>%
-  left_join(word_counts) %>%
+  left_join(word_counts, by = "name") %>%
   mutate(name = paste0(name, " (", words, " words)")) %>%
   ggplot(aes(fct_reorder(name, words), mean, color = name)) +
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
@@ -664,15 +671,15 @@ list(snowball = snowball_rs,
 ```
 
 ```{r, dependson="snowballrmseoffline", echo = FALSE, eval=!online}
-list(snowball = snowball_rs, 
-     smart = smart_rs, 
+list(snowball = snowball_rs,
+     smart = smart_rs,
      `stopwords-iso` = stopwords_iso_rs) %>%
   map_dfr(show_best, "rmse", .id = "name") %>%
   write_rds("data/ml_reg_stopword_results.rds")
 ```
 
 ```{r snowballrmse, echo = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
-word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>% 
+word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>%
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
 stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
@@ -780,22 +787,26 @@ bigram_metrics
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
 ```{r ngramrmseoffline, dependson="ngramres", eval=!online}
-list(`1` = unigram_rs, 
-     `1 and 2` = bigram_rs, 
+list(`1` = unigram_rs,
+     `1 and 2` = bigram_rs,
      `1, 2, and 3` = trigram_rs) %>%
   map_dfr(collect_metrics, .id = "name") %>%
   filter(.metric == "rmse") %>%
   ggplot(aes(name, mean, fill = name)) +
-  geom_dotplot(binaxis = "y", stackdir = "center", binpositions="all",
+  geom_dotplot(binaxis = "y", stackdir = "center", binpositions = "all",
                show.legend = FALSE) +
-  labs(x = "Degree of n-grams", y = "mean RMSE",
-       title = "Model performance for different degrees of n-gram tokenization",
-       subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
+  labs(
+    x = "Degree of n-grams",
+    y = "mean RMSE",
+    title = "Model performance for different degrees of n-gram tokenization",
+    subtitle = paste("For the same number of tokens,",
+                     "bigrams plus unigrams performed best")
+  )
 ```
 
 ```{r, dependson="ngramrmseoffline", echo = FALSE, eval=!online}
-list(`1` = unigram_rs, 
-     `1 and 2` = bigram_rs, 
+list(`1` = unigram_rs,
+     `1 and 2` = bigram_rs,
      `1, 2, and 3` = trigram_rs) %>%
   map_dfr(collect_metrics, .id = "name") %>%
   filter(.metric == "rmse") %>%
@@ -806,11 +817,15 @@ list(`1` = unigram_rs,
 ngram_results <- read_rds("data/ml_reg_ngram_results.rds")
 ngram_results %>%
   ggplot(aes(name, mean, fill = name)) +
-  geom_dotplot(binaxis = "y", stackdir = "center", binpositions="all",
+  geom_dotplot(binaxis = "y", stackdir = "center", binpositions = "all",
                show.legend = FALSE) +
-  labs(x = "Degree of n-grams", y = "mean RMSE",
-       title = "Model performance for different degrees of n-gram tokenization",
-       subtitle = "For the same number of tokens, bigrams plus unigrams performed best")
+  labs(
+    x = "Degree of n-grams",
+    y = "mean RMSE",
+    title = "Model performance for different degrees of n-gram tokenization",
+    subtitle = paste("For the same number of tokens,",
+                     "bigrams plus unigrams performed best")
+  )
 ```
 
 Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much. 
@@ -824,10 +839,15 @@ As we discussed in Section \@ref(lemmatization), we can normalize words to their
 ```{r lemmatb, echo=FALSE}
 ## for GH actions and people with "regular" environments i.e. not Julia
 spacyr::spacy_initialize(entity = FALSE)
-
-spacyr::spacy_parse(c("However, the Court of Appeals disagreed with the District Court's construction of the state statute, concluding that it did authorize issuance of the orders to withhold to the Postal Service.")) %>% 
-  select(`original word` = token, lemma) %>% 
-  knitr::kable(caption = "Lemmatization of one sentence from a Supreme Court opinion")
+paste(
+  "However, the Court of Appeals disagreed with the District Court's",
+  "construction of the state statute, concluding that it did authorize",
+  "issuance of the orders to withhold to the Postal Service.") %>%
+spacyr::spacy_parse() %>%
+  select(`original word` = token, lemma) %>%
+  knitr::kable(
+    caption = "Lemmatization of one sentence from a Supreme Court opinion"
+  )
 ```
 
 Notice several things about lemmatization that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
@@ -890,9 +910,12 @@ lemma_rs %>%
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
   theme(legend.position = "none") +
-  labs(y = "RMSE",
-       title = "Lasso model performance using lemmatization",
-       subtitle = "Performance metrics indicate that lemmatization improves model performance")
+  labs(
+    y = "RMSE",
+    title = "Lasso model performance using lemmatization",
+    subtitle = paste("Performance metrics indicate that lemmatization",
+                     "improves model performance")
+  )
 ```
 
 ```{r, dependson="scotuslemmavisoffline", echo = FALSE, eval=!online}
@@ -915,9 +938,12 @@ lemma_metrics %>%
   facet_wrap(~.metric, scales = "free", nrow = 2) +
   scale_x_log10() +
   theme(legend.position = "none") +
-  labs(y = "RMSE",
-       title = "Lasso model performance using lemmatization",
-       subtitle = "Performance metrics indicate that lemmatization improves model performance")
+  labs(
+    y = "RMSE",
+    title = "Lasso model performance using lemmatization",
+    subtitle = paste("Performance metrics indicate that lemmatization",
+                     "improves model performance")
+  )
 ```
 
 
@@ -1015,7 +1041,7 @@ When we set `max_tokens = tune()`, we can train multiple models with different n
 ```{r finalscotusrec, dependson="scotussplit"}
 final_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(
-    text, token = "ngrams", 
+    text, token = "ngrams",
     options = list(n = 2, n_min = 1,
                    stopwords = stopwords::stopwords(source = "snowball"))
   ) %>%
@@ -1116,9 +1142,13 @@ final_rs %>%
   geom_point(size = 2, alpha = 0.9) +
   facet_wrap(~.metric, scales = "free_y") +
   scale_x_log10() +
-  labs(color = "Number of tokens",
-       title = "Lasso model performance across regularization penalties and number of tokens",
-       subtitle = "The best model includes a high number of tokens but also significant regularization")
+  labs(
+    color = "Number of tokens",
+    title = paste("Lasso model performance across regularization penalties",
+                  "and number of tokens"),
+    subtitle = paste("The best model includes a high number of tokens",
+                     "but also significant regularization")
+  )
 ```
 
 Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the simplest model within some limit around the numerically best result. Let's stick with choosing the model with the best performance, in terms of one of the metrics we chose.
@@ -1149,7 +1179,7 @@ Notice that this is the first time we have used our testing data during this ent
 We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
 
 ```{r scotusfinalfitted, dependson=c("scotusfinalwf", "scotussplit")}
-final_fitted <- last_fit(final_wf, scotus_split) 
+final_fitted <- last_fit(final_wf, scotus_split)
 
 collect_metrics(final_fitted)
 ```
@@ -1162,27 +1192,31 @@ The output of `last_fit()` also contains a fitted model (a `workflow`, to be mor
 library(vip)
 
 scotus_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
-  vi(lambda = lowest_mae$penalty) 
+  vi(lambda = lowest_mae$penalty)
 
 scotus_imp %>%
   mutate(
     Sign = case_when(Sign == "POS" ~ "Later (after mean year)",
-                     Sign == "NEG" ~ "Earlier (before mean year)",),
+                     Sign == "NEG" ~ "Earlier (before mean year)"),
     Importance = abs(Importance),
     Variable = str_remove_all(Variable, "tfidf_text_")
   ) %>%
   group_by(Sign) %>%
   top_n(20, Importance) %>%
   ungroup %>%
-  ggplot(aes(x = Importance, 
-             y = fct_reorder(Variable, Importance), 
+  ggplot(aes(x = Importance,
+             y = fct_reorder(Variable, Importance),
              fill = Sign)) +
   geom_col(show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   facet_wrap(~Sign, scales = "free") +
-  labs(y = NULL,
-       title = "Variable importance for predicting year of Supreme Court opinions",
-       subtitle = "These features are the most importance in predicting the year of an opinion")
+  labs(
+    y = NULL,
+    title = paste("Variable importance for predicting year of",
+                  "Supreme Court opinions"),
+    subtitle = paste("These features are the most importance",
+                     "in predicting the year of an opinion")
+  )
 ```
 
 The tokens (unigrams or bigrams) that contribute in the positive direction, like "see supra" and "scalia", are associated with higher, later years and those that contribute in the negative direction, like "years ago" and "founded", are associated with lower, earlier years for these Supreme Court opinions. 
@@ -1202,7 +1236,8 @@ final_fitted %>%
   labs(
     x = "Truth",
     y = "Predicted year",
-    title = "Predicted and true years for the testing set of Supreme Court opinions",
+    title = paste("Predicted and true years for the testing set of",
+                  "Supreme Court opinions"),
     subtitle = "For the testing set, predictions are more reliable after 1850"
   )
 ```

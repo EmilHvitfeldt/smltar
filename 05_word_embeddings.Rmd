@@ -21,11 +21,11 @@ library(SnowballC)
 
 complaints <- read_csv("data/complaints.csv.gz")
 
-complaints %>% 
-  unnest_tokens(word, consumer_complaint_narrative) %>%  
-  anti_join(get_stopwords()) %>%  
-  mutate(stem = wordStem(word)) %>% 
-  count(complaint_id, stem) %>%  
+complaints %>%
+  unnest_tokens(word, consumer_complaint_narrative) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word)) %>%
+  count(complaint_id, stem) %>%
   cast_dfm(complaint_id, stem, n)
 ```
 
@@ -38,12 +38,12 @@ $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents co
 These two quantities can be combined to calculate a term's [tf-idf](https://www.tidytextmining.com/tfidf.html) (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
 
 ```{r dependson="complaints", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
-complaints %>% 
-  unnest_tokens(word, consumer_complaint_narrative) %>% 
-  anti_join(get_stopwords()) %>%  
-  mutate(stem = wordStem(word)) %>% 
-  count(complaint_id, stem) %>%  
-  bind_tf_idf(stem, complaint_id, n) %>% 
+complaints %>%
+  unnest_tokens(word, consumer_complaint_narrative) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word)) %>%
+  count(complaint_id, stem) %>%
+  bind_tf_idf(stem, complaint_id, n) %>%
   cast_dfm(complaint_id, stem, tf_idf)
 ```
 
@@ -55,12 +55,12 @@ As the size of a corpus increases in terms of words or other tokens, both the sp
 
 ```{r sparsityram, dependson="complaints", fig.cap="Memory requirements and sparsity increase with corpus size"}
 get_dfm <- function(frac) {
-  complaints %>% 
+  complaints %>%
     sample_frac(frac) %>%
-    unnest_tokens(word, consumer_complaint_narrative) %>% 
-    anti_join(get_stopwords()) %>%  
-    mutate(stem = wordStem(word)) %>% 
-    count(complaint_id, stem) %>%  
+    unnest_tokens(word, consumer_complaint_narrative) %>%
+    anti_join(get_stopwords(), by = "word") %>%
+    mutate(stem = wordStem(word)) %>%
+    count(complaint_id, stem) %>%
     cast_dfm(complaint_id, stem, n)
 }
 
@@ -115,24 +115,23 @@ One of the arguments to this function is the `window_size`, which determines the
 
 ```{r slidewindows}
 slide_windows <- function(tbl, window_size) {
-  
   skipgrams <- slider::slide(
-    tbl, 
-    ~.x, 
-    .after = window_size - 1, 
-    .step = 1, 
+    tbl,
+    ~.x,
+    .after = window_size - 1,
+    .step = 1,
     .complete = TRUE
   )
-  
+
   safe_mutate <- safely(mutate)
-  
-  out <- map2(skipgrams, 
-              1:length(skipgrams), 
+
+  out <- map2(skipgrams,
+              seq_len(skipgrams),
               ~ safe_mutate(.x, window_id = .y))
-  
+
   out %>%
-    transpose() %>% 
-    pluck("result") %>% 
+    transpose() %>%
+    pluck("result") %>%
     compact() %>%
     bind_rows()
 }
@@ -153,7 +152,7 @@ library(furrr)
 
 plan(multiprocess)  ## for parallel processing
 
-tidy_pmi <- nested_words %>%  
+tidy_pmi <- nested_words %>%
   mutate(words = future_map(words, slide_windows, 4,
                             .progress = TRUE)) %>%
   unnest(words) %>%
@@ -181,7 +180,7 @@ We can next determine the word vectors from the PMI values using singular value 
 ```{r tidywordvectors, dependson="tidypmi"}
 tidy_word_vectors <- tidy_pmi %>%
   widely_svd(
-    item1, item2, pmi, 
+    item1, item2, pmi,
     nv = 100, maxit = 1000
   )
 
@@ -205,7 +204,7 @@ Which words are close to each other in this new feature space of word embeddings
 nearest_neighbors <- function(df, token) {
   df %>%
     widely(
-      ~ . %*% (.[token, ]), 
+      ~ . %*% (.[token, ]),
       sort = TRUE
     )(item1, dimension, value) %>%
     select(-item2)
@@ -257,9 +256,13 @@ tidy_word_vectors %>%
     facet_wrap(~dimension, scales = "free_y", ncol = 4) +
     scale_x_reordered() +
     coord_flip() +
-    labs(x = NULL, y = "Value",
-         title = "First 24 principal components for text of CFPB complaints",
-         subtitle = "Top words contributing to the components that explain the most variation")
+    labs(
+      x = NULL,
+      y = "Value",
+      title = "First 24 principal components for text of CFPB complaints",
+      subtitle = paste("Top words contributing to the components that explain",
+                       "the most variation")
+    )
 ```
 
 It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like `"regarding"`, `"contacted"`, and `"called"`, while component 9 highlights the use of *different* common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.
@@ -267,8 +270,8 @@ It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not
 We created word embeddings and can explore them to understand our text dataset, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into **document embeddings**, either using a mean or sum. This approach loses information about word order but is straightforward to implement. Let's `count()` to find the sum here in our example.
 
 ```{r docmatrix, dependson=c("nestedwords", "tidywordvectors")}
-word_matrix <- tidy_complaints %>% 
-  count(complaint_id, word) %>%  
+word_matrix <- tidy_complaints %>%
+  count(complaint_id, word) %>%
   cast_sparse(complaint_id, word, n)
 
 embedding_matrix <- tidy_word_vectors %>%
@@ -328,8 +331,8 @@ We've already explored some sets of "synonyms" in the embedding space we determi
 nearest_neighbors <- function(df, token) {
   df %>%
     widely(
-      ~ . %*% (.[token, ]), 
-      sort = TRUE, 
+      ~ . %*% (.[token, ]),
+      sort = TRUE,
       maximum_size = NULL
     )(item1, dimension, value) %>%
     select(-item2)
@@ -371,14 +374,16 @@ If we do choose to use pre-trained word embeddings, how do we go about integrati
 
 ```{r glovematrix, dependson=c("docmatrix", "tidyglove")}
 word_matrix <- tidy_complaints %>%
-  inner_join(tidy_glove %>%
+  inner_join(by = "word",
+             tidy_glove %>%
                distinct(item1) %>%
                rename(word = item1)) %>%
-  count(complaint_id, word) %>%  
+  count(complaint_id, word) %>%
   cast_sparse(complaint_id, word, n)
 
 glove_matrix <- tidy_glove %>%
-  inner_join(tidy_complaints %>% 
+  inner_join(by = "item1",
+             tidy_complaints %>%
                distinct(word) %>%
                rename(item1 = word)) %>%
   cast_sparse(item1, dimension, value)

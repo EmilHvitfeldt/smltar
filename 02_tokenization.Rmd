@@ -165,8 +165,8 @@ Tokenizing at the word level is perhaps the most common and widely used tokeniza
 
 ```{r}
 tft_token_words <- tokenize_words(x = the_fir_tree,
-                                  lowercase = TRUE, 
-                                  stopwords = NULL, 
+                                  lowercase = TRUE,
+                                  stopwords = NULL,
                                   strip_punct = TRUE,
                                   strip_numeric = FALSE)
 ```
@@ -245,23 +245,30 @@ length_and_max <- function(x) {
   paste(length(tab), max(tab), sep = "-")
 }
 
+count_ngrams <- function(data, n, n_min) {
+  ngrams <- tokenize_ngrams(data, n, n_min)
+  map_chr(ngrams, length_and_max)
+}
+
+ngram_types <- c("quadrugram", "trigram", "bigram", "unigram")
+
 plotting_data <- hcandersen_en %>%
   nest(data = c(text)) %>%
   mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
-  mutate(unigram = tokenize_ngrams(data, n = 1, n_min = 1) %>% map_chr(length_and_max),
-         bigram = tokenize_ngrams(data, n = 2, n_min = 2) %>% map_chr(length_and_max),
-         trigram = tokenize_ngrams(data, n = 3, n_min = 3) %>% map_chr(length_and_max),
-         quadrugram = tokenize_ngrams(data, n = 4, n_min = 4) %>% map_chr(length_and_max)) %>%
+  mutate(unigram = count_ngrams(data, n = 1, n_min = 1),
+         bigram = count_ngrams(data, n = 2, n_min = 2),
+         trigram = count_ngrams(data, n = 3, n_min = 3),
+         quadrugram = count_ngrams(data, n = 4, n_min = 4)) %>%
   select(unigram, bigram, trigram, quadrugram) %>%
   pivot_longer(cols = unigram:quadrugram, names_to = "ngrams") %>%
   separate(value, c("length", "max"), convert = TRUE) %>%
-  mutate(ngrams = factor(ngrams, levels = c("quadrugram", "trigram", "bigram", "unigram"))) 
+  mutate(ngrams = factor(ngrams, levels = ngram_types))
 
 plotting_data  %>%
   ggplot(aes(length, ngrams, color = max)) +
   geom_jitter(width = 0, alpha = 0.8, height = 0.35) +
   scale_color_viridis_c(trans = "log", labels = scales::comma) +
-  labs(x = "Number of unique n-grams", 
+  labs(x = "Number of unique n-grams",
        y = NULL,
        color = "Count of\nmost frequent\nngram",
        title = "Unique n-grams by n-gram order",
@@ -289,7 +296,7 @@ Let's create a function that takes a dataframe containing a variable called `tex
 
 ```{r}
 add_paragraphs <- function(data) {
-  pull(data, text) %>% 
+  pull(data, text) %>%
     paste(collapse = "\n") %>%
     tokenize_paragraphs() %>%
     unlist() %>%
@@ -305,10 +312,10 @@ library(janeaustenr)
 
 northangerabbey_paragraphed <- tibble(text = northangerabbey) %>%
   mutate(chapter = cumsum(str_detect(text, "^CHAPTER "))) %>%
-  filter(chapter > 0, 
+  filter(chapter > 0,
          !str_detect(text, "^CHAPTER ")) %>%
   nest(data = text) %>%
-  mutate(data = map(data, add_paragraphs)) %>% 
+  mutate(data = map(data, add_paragraphs)) %>%
   unnest(cols = c(data))
 
 glimpse(northangerabbey_paragraphed)
@@ -334,7 +341,7 @@ To do this we use `nest()` and `map_chr()` to create a dataframe where each fair
 
 ```{r}
 hcandersen_sentences <- hcandersen_en %>%
-  nest(text) %>%
+  nest(data = c(text)) %>%
   mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
   unnest_sentences(sentences, data)
 ```
@@ -372,14 +379,35 @@ Another thing to consider is the degree of compression each type of tokenization
 Figure \@ref(fig:tokendists) illustrates these points. Each of the fairy tales from **hcandersenr** has been tokenized in five different ways and the number of distinct tokens has been plotted along the x-axis (note that the x-axis is logarithmic). We see that the number of distinct tokens decreases if we convert words to lowercase or extract word stems (see Chapter \@ref(stemming) for more on stemming). Second, notice that the distributions of distinct tokens for character tokenizers are quite narrow; these texts use all or most of the letters in the English alphabet.
 
 ```{r tokendists, echo=FALSE, fig.cap="The number of distinct tokens can vary enormously for different tokenizers"}
+tokendist_chars_no_alpnum <- function(data) {
+  tokenize_characters(data) %>% map_int(~table(.x) %>% length())
+}
+
+tokendist_chars <- function(data) {
+  tokenize_characters(data, strip_non_alphanum = FALSE) %>%
+    map_int(~ table(.x) %>% length())
+}
+
+tokendist_words <- function(data) {
+  tokenize_words(data) %>% map_int(~table(.x) %>% length())
+}
+
+tokendist_words_no_lowercase <- function(data) {
+  tokenize_words(data, lowercase = FALSE) %>% map_int(~table(.x) %>% length())
+}
+
+tokendist_word_stems <- function(data) {
+  tokenize_word_stems(data) %>% map_int(~table(.x) %>% length())
+}
+
 hcandersen_en %>%
   nest(data = c(text)) %>%
   mutate(data = map_chr(data, ~ paste(.x$text, collapse = " "))) %>%
-  mutate(`Characters w/o alphanumerics` = tokenize_characters(data) %>% map_int(~table(.x) %>% length()),
-         `Characters` = tokenize_characters(data, strip_non_alphanum = FALSE) %>% map_int(~table(.x) %>% length()),
-         Words = tokenize_words(data) %>% map_int(~table(.x) %>% length()),
-         `Words no lowercase` = tokenize_words(data, lowercase = FALSE) %>% map_int(~table(.x) %>% length()),
-         `word stems` = tokenize_word_stems(data) %>% map_int(~table(.x) %>% length())) %>%
+  mutate(`Characters w/o alphanumerics` = tokendist_chars_no_alpnum(data),
+         `Characters` = tokendist_chars(data),
+         `Words` = tokendist_words(data),
+         `Words no lowercase` = tokendist_words_no_lowercase(data),
+         `word stems` = tokendist_word_stems(data)) %>%
   select(-data) %>%
   pivot_longer(-book) %>%
   ggplot(aes(name, value)) +
@@ -388,7 +416,8 @@ hcandersen_en %>%
   scale_y_log10() +
   theme_minimal() +
   coord_flip() +
-  labs(title = "Distributions of distinct tokens for different tokenizing strategies",
+  labs(title = paste("Distributions of distinct tokens",
+                     "for different tokenizing strategies"),
        x = NULL,
        y = "Number of distinct tokens")
 ```
@@ -413,8 +442,10 @@ In this example, leaving out the quantifier yields the same result as including 
 ```
 
 ```{r}
-letter_tokens <- str_extract_all("This sentence include 2 numbers and 1 period.", 
-                                 "[:alpha:]{1}")
+letter_tokens <- str_extract_all(
+  string = "This sentence include 2 numbers and 1 period.",
+  pattern = "[:alpha:]{1}"
+)
 letter_tokens
 ```
 
@@ -423,7 +454,7 @@ We may be tempted to specify the character class as something like `[a-zA-Z]{1}`
 ```{r}
 danish_sentence <- "Så mødte han en gammel heks på landevejen"
 
-str_extract_all(danish_sentence, "[:alpha:]")  
+str_extract_all(danish_sentence, "[:alpha:]")
 str_extract_all(danish_sentence, "[a-zA-Z]")
 ```
 
@@ -459,25 +490,37 @@ If you are in a situation where you want to avoid using the **purrr** package, y
 Now let's see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen. 
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphenated-words.", "[:alpha:]+-[:alpha:]+")
+str_extract_all(
+  string = "This isn't a sentence with hyphenated-words.",
+  pattern = "[:alpha:]+-[:alpha:]+"
+)
 ```
 
 Wait, this only matched the hyphenated word! This happened because we are only matching words with hyphens. If we add the quantifier `?` then we can match 0 or 1 occurrences.
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphenated-words.", "[:alpha:]+-?[:alpha:]+")
+str_extract_all(
+  string = "This isn't a sentence with hyphenated-words.",
+  pattern = "[:alpha:]+-?[:alpha:]+"
+)
 ```
 
 Now we are getting more words, but the ending of `"isn't"` isn't there anymore and we lost the word `"a"`. We can get matches for the whole contraction by expanding the character class `[:alpha:]` to include the character `'`. We do that by using `[[:alpha:]']`.
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?[[:alpha:]']+")
+str_extract_all(
+  string = "This isn't a sentence with hyphenated-words.",
+  pattern = "[[:alpha:]']+-?[[:alpha:]']+"
+)
 ```
 
 Next, we need to find out why `"a"` wasn't matched. If we look at the regular expression, we remember that we imposed the restriction that a non-zero number of characters needed to surround the hyphen to avoid matching words that start or end with a hyphen. This means that the smallest possible pattern matched is 2 characters long. We can fix this by using an alternation with `|`. We will keep our previous match on the left-hand side, and include `[:alpha:]{1}` on the right-hand side to match the single length words that won't be picked up by the left-hand side. Notice how we aren't using `[[:alpha:]']` since we are not interested in matching single `'` characters.
 
 ```{r}
-str_extract_all("This isn't a sentence with hyphenated-words.", "[[:alpha:]']+-?[[:alpha:]']+|[:alpha:]{1}")
+str_extract_all(
+  string = "This isn't a sentence with hyphenated-words.",
+  pattern = "[[:alpha:]']+-?[[:alpha:]']+|[:alpha:]{1}"
+)
 ```
 
 That is getting to be quite a complex regex, but we are now getting the same answer as before. 
@@ -492,7 +535,7 @@ Let's start with the example with hyphenated words. To make the function a littl
 tokenize_hyphenated_words <- function(x, lowercase = TRUE) {
   if (lowercase)
     x <- str_to_lower(x)
-  
+
   str_split(x, "[:space:]") %>%
     map(~ str_remove_all(.x, "^[:punct:]+|[:punct:]+$"))
 }
@@ -507,11 +550,11 @@ Next let's turn our character n-gram tokenizer into a function, with a variable 
 ```{r}
 tokenize_character_ngram <- function(x, n) {
   ngram_loc <- str_locate_all(x, paste0("(?=(\\w{", n, "}))"))
-  
+
   map2(ngram_loc, x, ~str_sub(.y, .x[, 1], .x[, 1] + n - 1))
 }
 
-tokenize_character_ngram(the_fir_tree[1:3], n  =3)
+tokenize_character_ngram(the_fir_tree[1:3], n = 3)
 ```
 
 We can use `paste0()` in this function to construct an actual regex. 

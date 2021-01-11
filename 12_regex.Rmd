@@ -84,8 +84,8 @@ tibble::tribble(
   "closing curly brackets", "}",
   "opening parentheses", "(",
   "closing parentheses", ")"
-) %>% 
-  knitr::kable(caption = 'All meta characters')
+) %>%
+  knitr::kable(caption = "All meta characters")
 ```
 
 ## Full stop, the wildcard
@@ -151,8 +151,8 @@ tibble::tribble(
   "\\\\\\\\w", "Word characters:  letters, digits, and underscores [A-z0-9_]",
   "\\\\\\\\W", "Non-word characters [^A-z0-9_]",
   "\\\\\\\\D", "Non-digits [^0-9]"
-) %>% 
-  knitr::kable(caption = 'All character classes')
+) %>%
+  knitr::kable(caption = "All character classes")
 ```
 
 Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
@@ -170,8 +170,8 @@ tibble::tribble(
   "{n}", "exactly n times",
   "{n,}", "at least n times",
   "{n,m}", "between n and m times"
-) %>% 
-  knitr::kable(caption = 'Regular expression quantifiers')
+) %>%
+  knitr::kable(caption = "Regular expression quantifiers")
 ```
 
 We can detect both color and colour by placing a quantifier after the "u" that detects 0 or 1 times used.
@@ -213,8 +213,8 @@ tibble::tribble(
   "{n}?", "exactly n times, match as few times as possible",
   "{n,}?", "at least n times, match as few times as possible",
   "{n,m}?", "between n and m times, match as few times as possible but at least n"
-) %>% 
-  knitr::kable(caption = 'Lazy quantifiers')
+) %>%
+  knitr::kable(caption = "Lazy quantifiers")
 ```
 
 Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.

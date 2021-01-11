@@ -56,7 +56,7 @@ fromList(list(smart = stopwords(source = "smart"),
 The UpSet plot in Figure \@ref(fig:stopwordoverlap) shows us that these three lists are almost true subsets of each other. The only exception is a set of ten words that appear in Snowball and ISO but not in the SMART list. What are those words?
 
 ```{r}
-setdiff(stopwords(source = "snowball"), 
+setdiff(stopwords(source = "snowball"),
         stopwords(source = "smart"))
 ```
 
@@ -83,8 +83,8 @@ library(hcandersenr)
 library(tidyverse)
 library(tidytext)
 
-fir_tree <- hca_fairytales() %>% 
-  filter(book == "The fir tree", 
+fir_tree <- hca_fairytales() %>%
+  filter(book == "The fir tree",
          language == "English")
 
 tidy_fir_tree <- fir_tree %>%
@@ -115,8 +115,8 @@ Another way to get a stop word list is to create one yourself. Let's explore a f
 tidy_fir_tree %>%
   count(word, sort = TRUE) %>%
   slice(1:120) %>%
-  mutate(row = rep(1:5, each = n()/5),
-         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(row = rep(1:5, each = n() / 5),
+         column = rep(rev(seq_len(n() / 5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
   geom_text(hjust = 0) +
@@ -140,14 +140,16 @@ hcandersen_en %>%
   unnest_tokens(word, text) %>%
   count(word, sort = TRUE) %>%
   slice(1:120) %>%
-  mutate(row = rep(1:5, each = n()/5),
-         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(row = rep(1:5, each = n() / 5),
+         column = rep(rev(seq_len(n() / 5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
   geom_text(hjust = 0) +
   xlim(c(1, 5.5)) +
   theme_void() +
-  labs(title = "120 most frequent tokens in H.C. Andersen's English fairy tales")
+  labs(
+    title = "120 most frequent tokens in H.C. Andersen's English fairy tales"
+  )
 ```
 
 This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine apriori how many different "meaningless" words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose. 
@@ -176,9 +178,9 @@ gender_words <- tribble(
   "himself", "herself"
 )
 
-ordered_words <- hcandersen_en %>% 
-  unnest_tokens(word, text) %>% 
-  count(word, sort = TRUE) %>% 
+ordered_words <- hcandersen_en %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
   pull(word)
 
 gender_words_plot <- gender_words %>%
@@ -188,7 +190,9 @@ gender_words_plot <- gender_words %>%
   pivot_longer(male_index:female_index) %>%
   mutate(value = log10(value),
          label = ifelse(name == "male_index", men, women)) %>%
-  mutate(name = factor(name, c("male_index", "female_index"), c("men", "women")))
+  mutate(name = factor(x = name,
+                       levels = c("male_index", "female_index"),
+                       labels = c("men", "women")))
 
 limit <- max(abs(gender_words_plot$slope)) * c(-1, 1)
 
@@ -201,7 +205,8 @@ gender_words_plot %>%
   guides(color = "none") +
   theme(panel.border = element_blank(), panel.grid.major.x = element_blank()) +
   labs(x = NULL, y = "Word rank (log scale)") +
-  labs(title = "Masculine gendered words appear more often in H.C. Andersen's fairy tales")
+  labs(title = paste("Masculine gendered words appear more often in",
+                     "H.C. Andersen's fairy tales"))
 ```
 
 Imagine now we would like to create a stop word list that spans multiple different genres, in such a way that the subject-specific stop words don't overlap. For this case, we would like words to be denoted as a stop word only if it is a stop word in all the genres. You could find the words individually in each genre and use the right intersections. However, that approach might take a substantial amount of time.
@@ -216,15 +221,13 @@ What happens if we create a stop word list based on words with the lowest IDF? T
 library(rlang)
 calc_idf <- function(df, word, document) {
   words <- df %>% pull({{word}}) %>% unique()
-
   n_docs <- length(unique(pull(df, {{document}})))
-  
   n_words <- df %>%
     nest(data = c({{word}})) %>%
     pull(data) %>%
     map_dfc(~ words %in% unique(pull(.x, {{word}}))) %>%
     rowSums()
-  
+
   tibble(word = words,
          idf = log(n_docs / n_words))
 }
@@ -240,14 +243,15 @@ hcandersenr::hca_fairytales() %>%
   calc_idf(word, document) %>%
   arrange(idf) %>%
   slice(1:120) %>%
-  mutate(row = rep(1:5, each = n()/5),
-         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(row = rep(1:5, each = n() / 5),
+         column = rep(rev(seq_len(n() / 5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
   geom_text(hjust = 0) +
   xlim(c(1, 5.5)) +
   theme_void() +
-  labs(title = "120 tokens in H.C. Andersen's fairy tales with lowest IDF, multi-language")
+  labs(title = paste("120 tokens in H.C. Andersen's fairy tales with",
+                     "lowest IDF, multi-language"))
 ```
 
 This didn't work very well because there is very little overlap between common words. Instead, let us limit the calculation to only one language and calculate the IDF of each word we can find compared to words that appear in a lot of documents.
@@ -259,14 +263,15 @@ hcandersenr::hcandersen_en %>%
   calc_idf(word, book) %>%
   arrange(idf) %>%
   slice(1:120) %>%
-  mutate(row = rep(1:5, each = n()/5),
-         column = rep(rev(seq_len(n()/5)), length.out = n())) %>%
+  mutate(row = rep(1:5, each = n() / 5),
+         column = rep(rev(seq_len(n() / 5)), length.out = n())) %>%
   mutate(word = paste0(row_number(), ": ", word)) %>%
   ggplot(aes(row, column, label = word)) +
   geom_text(hjust = 0) +
   xlim(c(1, 5.5)) +
   theme_void() +
-  labs(title = "120 tokens in H.C. Andersen's fairy tales with lowest IDF, English only")
+  labs(title = paste("120 tokens in H.C. Andersen's fairy tales with",
+                     "lowest IDF, English only"))
 ```
 
 This time we get better results. The list starts with "a", "the", "and", and "to" and continues with many more reasonable choices of stop words. We need to look at these results manually to turn this into a list. We need to go as far down in rank as we are comfortable with. You as a data practitioner are in full control of how you want to create the list. If you don't want to include "little" you are still able to add "are" to your list even though it is lower on the list.
@@ -284,30 +289,41 @@ We have discussed different ways of finding and removing stop words; now let's s
 ```{r stopwordresults, echo=FALSE, fig.cap="Proportion of words removed for different stop word lists and different document lengths"}
 library(tokenizers)
 
+count_no_stopwords <- function(tokens, source) {
+  map_int(tokens, ~ length(setdiff(.x, stopwords(source = source))))
+}
+
 plotting_data <- hcandersen_en %>%
   nest(data = c(text)) %>%
   mutate(tokens = map(data, ~ unlist(tokenize_words(.x$text))),
-         no_snowball = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "snowball")))),
-         no_smart = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "smart")))),
-         no_iso = map_int(tokens, ~ length(setdiff(.x, stopwords(source = "stopwords-iso")))),
+         no_snowball = count_no_stopwords(tokens, "snowball"),
+         no_smart = count_no_stopwords(tokens, "smart"),
+         no_iso = count_no_stopwords(tokens, "stopwords-iso"),
          n_tokens = lengths(tokens)) %>%
   pivot_longer(no_snowball:no_iso) %>%
   mutate(value = 1 - value / n_tokens)
 
+stopwords_labels <- c("snowball (175)", "smart (571)", "stopwords-iso (1298)")
+
 plotting_data %>%
-  mutate(name = factor(name, c("no_snowball", "no_smart",  "no_iso"),
-                       c("snowball (175)", "smart (571)", "stopwords-iso (1298)")),
+  mutate(name = factor(name,
+                       levels = c("no_snowball", "no_smart",  "no_iso"),
+                       labels =  stopwords_labels),
          name = fct_rev(name)) %>%
   ggplot(aes(n_tokens, value, color = name)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = 'loess', se = FALSE) +
+  geom_smooth(method = "loess", se = FALSE) +
   scale_color_brewer(palette = "Set2") +
   scale_y_continuous(labels = scales::percent) +
-  labs(x = "Number of words in fairy tale", 
-       y = "Percentage of words removed",
-       color = "Removed",
-       title = "Stop words take up a larger part of the text in longer fairy tales",
-       subtitle = "Each vertical trio of points represents an H.C. Andersen fairy tale")
+  labs(
+    x = "Number of words in fairy tale",
+    y = "Percentage of words removed",
+    color = "Removed",
+    title = paste("Stop words take up a larger part of the text in",
+                  "longer fairy tales"),
+    subtitle = paste("Each vertical trio of points represents an",
+                     "H.C. Andersen fairy tale")
+  )
 ```
 
 We notice, as we would predict, that larger stop word lists remove more words than shorter stop word lists. In this example with fairy tales, over half of the words have been removed, with the largest list removing over 80% of the words. We observe that shorter texts have a lower percentage of stop words. Since we are looking at fairy tales, this could be explained by the fact that a story has to be told regardless of the length of the fairy tale, so shorter texts are going to be denser with more informative words.

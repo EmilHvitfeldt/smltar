@@ -3,8 +3,8 @@ library(keras)
 # Hyperparameter flags --------------------------------------------------------
 
 FLAGS <- flags(
-  flag_integer('kernel_size1', 5),
-  flag_integer('strides1', 1)
+  flag_integer("kernel_size1", 5),
+  flag_integer("strides1", 1)
 )
 
 # Define Model ----------------------------------------------------------------
@@ -42,4 +42,4 @@ score <- model %>% evaluate(
   kick_assess, state_assess
 )
 
-cat('Test accuracy:', score["accuracy"], '\n')
+cat("Test accuracy:", score["accuracy"], "\n")
