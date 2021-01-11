@@ -138,7 +138,7 @@ Preprocessing for deep learning models is different than preprocessing for most 
 We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram in Figure \@ref(fig:kickstarterwordlength). Notice how we are only using the training dataset to avoid data leakage when selecting this value.
 
 ```{r kickstarterwordlength, fig.cap="Distribution of word count for Kickstarter campaign blurbs"}
-kickstarter_train %>% 
+kickstarter_train %>%
   mutate(n_words = tokenizers::count_words(blurb)) %>%
   ggplot(aes(n_words)) +
   geom_bar() +
@@ -157,7 +157,7 @@ max_length <- 30
 kick_rec <- recipe(~blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
   step_tokenfilter(blurb, max_tokens = max_words) %>%
-  step_sequence_onehot(blurb, sequence_length = max_length) 
+  step_sequence_onehot(blurb, sequence_length = max_length)
 
 kick_rec
 ```
@@ -184,9 +184,9 @@ small_data <- tibble(
            "Monsters, Ghosts, Goblins, Me, Myself and I")
 )
 
-small_spec <- recipe( ~ text, data = small_data) %>%
+small_spec <- recipe(~ text, data = small_data) %>%
   step_tokenize(text) %>%
-  step_sequence_onehot(text, sequence_length = 6, prefix = "") 
+  step_sequence_onehot(text, sequence_length = 6, prefix = "")
 
 prep(small_spec)
 ```
@@ -228,9 +228,9 @@ Lastly, we need to decide how to pad a document that is too short. Pre-padding t
 The defaults for `step_sequence_onehot()` are `sequence_length = 100`, `padding = "pre"`, and `truncating = "pre"`. If we change the truncation to happen at the end with:
 
 ```{r sequence_onhot_rec_matrix2, dependson="sequence_onhot_rec"}
-recipe( ~ text, data = small_data) %>%
+recipe(~ text, data = small_data) %>%
   step_tokenize(text) %>%
-  step_sequence_onehot(text, sequence_length = 6, prefix = "", 
+  step_sequence_onehot(text, sequence_length = 6, prefix = "",
                        padding = "pre", truncating = "post") %>%
   prep() %>%
   bake(new_data = NULL, composition = "matrix")
@@ -239,9 +239,9 @@ recipe( ~ text, data = small_data) %>%
 then we see the 11 at the beginning of the last row representing the "monsters". The starting points are not aligned since we are still padding on the left side. We can left-align all the sequences by setting `padding = "post"`.
 
 ```{r sequence_onhot_rec_matrix3, dependson="sequence_onhot_rec"}
-recipe( ~ text, data = small_data) %>%
+recipe(~ text, data = small_data) %>%
   step_tokenize(text) %>%
-  step_sequence_onehot(text, sequence_length = 6, prefix = "", 
+  step_sequence_onehot(text, sequence_length = 6, prefix = "",
                        padding = "post", truncating = "post") %>%
   prep() %>%
   bake(new_data = NULL, composition = "matrix")
@@ -268,7 +268,7 @@ Our first deep learning model embeds these Kickstarter blurbs in sequences of ve
 library(keras)
 
 dense_model <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, 
+  layer_embedding(input_dim = max_words + 1,
                   output_dim = 12,
                   input_length = max_length) %>%
   layer_flatten() %>%
@@ -316,9 +316,9 @@ Finally, we can fit this model! We need to supply the data for training as a mat
 This is sufficient information to get started training the model, but we are going to specify a few more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 20` to tell the model to pass all the training data through the training loop 20 times. Lastly, we set `validation_split = 0.25` to specify an internal validation split; this will keep 25% of the data for validation.
 
 ```{r dense_model_history, eval=!online}
-dense_history <- dense_model %>% 
+dense_history <- dense_model %>%
   fit(
-    x = kick_train, 
+    x = kick_train,
     y = kickstarter_train$state,
     batch_size = 512,
     epochs = 20,
@@ -362,11 +362,11 @@ kick_val
 The `split` object contains the information necessary to extract the data we will use for training/analysis and the data we will use for validation/assessment. We can extract these datasets in their raw, unprocessed form from the split using the helper functions `analysis()` and `assessment()`. Then, we can apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
 
 ```{r}
-kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]), 
+kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]),
                       composition = "matrix")
 dim(kick_analysis)
 
-kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]), 
+kick_assess <- bake(kick_prep, new_data = assessment(kick_val$splits[[1]]),
                     composition = "matrix")
 dim(kick_assess)
 ```
@@ -382,7 +382,7 @@ Let's set up our same dense neural network architecture.
 
 ```{r dense_model2, eval=!online}
 dense_model <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, 
+  layer_embedding(input_dim = max_words + 1,
                   output_dim = 12,
                   input_length = max_length) %>%
   layer_flatten() %>%
@@ -399,9 +399,9 @@ dense_model %>% compile(
 Now we can fit this model with dropout to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
 
 ```{r val_history, eval=!online}
-val_history <- dense_model %>% 
+val_history <- dense_model %>%
   fit(
-    x = kick_analysis, 
+    x = kick_analysis,
     y = state_analysis,
     batch_size = 512,
     epochs = 10,
@@ -438,7 +438,6 @@ library(dplyr)
 
 keras_predict <- function(model, baked_data, response) {
   predictions <- predict(model, baked_data)[, 1]
-  
   tibble(
     .pred_1 = predictions,
     .pred_class = if_else(.pred_1 < 0.5, 0, 1),
@@ -473,7 +472,7 @@ The heatmap in Figure \@ref(fig:dnnheatmap) shows that there isn't any dramatic 
 
 ```{r dnnheatmap, dependson="nbrs", fig.cap="Confusion matrix for first DNN model predictions of Kickstarter campaign success"}
 val_res %>%
-  conf_mat( state, .pred_class) %>%
+  conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -534,7 +533,7 @@ We'll keep the model architecture itself as unchanged as possible. The `output_d
 
 ```{r dense_model_pte, dependson="glove6b_matrix", eval=!online}
 dense_model_pte <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, 
+  layer_embedding(input_dim = max_words + 1,
                   output_dim = ncol(glove6b_matrix),
                   input_length = max_length) %>%
   layer_flatten() %>%
@@ -564,9 +563,9 @@ dense_model_pte %>% compile(
   metrics = c("accuracy")
 )
 
-dense_pte_history <- dense_model_pte %>% 
+dense_pte_history <- dense_model_pte %>%
   fit(
-    x = kick_analysis, 
+    x = kick_analysis,
     y = state_analysis,
     batch_size = 512,
     epochs = 20,
@@ -615,7 +614,7 @@ We specify a new model to get started on this approach.
 
 ```{r dense_model_pte2, dependson="glove6b_matrix", eval=!online}
 dense_model_pte2 <- keras_model_sequential() %>%
-  layer_embedding(input_dim = max_words + 1, 
+  layer_embedding(input_dim = max_words + 1,
                   output_dim = ncol(glove6b_matrix),
                   input_length = max_length) %>%
   layer_flatten() %>%
@@ -641,7 +640,7 @@ dense_model_pte2 %>% compile(
 )
 
 dense_pte2_history <- dense_model_pte2 %>% fit(
-  x = kick_analysis, 
+  x = kick_analysis,
   y = state_analysis,
   batch_size = 512,
   epochs = 20,
@@ -689,20 +688,18 @@ In our previous chapters, we used models with full tidymodels support and functi
 
 ```{r}
 fit_split <- function(split, prepped_rec) {
-  
   ## preprocessing
-  x_train <- bake(prepped_rec, new_data = analysis(split), 
+  x_train <- bake(prepped_rec, new_data = analysis(split),
                   composition = "matrix")
-  x_val   <- bake(prepped_rec, new_data = assessment(split), 
+  x_val   <- bake(prepped_rec, new_data = assessment(split),
                   composition = "matrix")
-  
+
   ## create model
   y_train <- analysis(split) %>% pull(state)
   y_val   <- assessment(split) %>% pull(state)
-  
-  
+
   mod <- keras_model_sequential() %>%
-    layer_embedding(input_dim = max_words + 1, 
+    layer_embedding(input_dim = max_words + 1,
                     output_dim = 12,
                     input_length = max_length) %>%
     layer_flatten() %>%
@@ -712,18 +709,18 @@ fit_split <- function(split, prepped_rec) {
       loss = "binary_crossentropy",
       metrics = c("accuracy")
     )
-  
+
   ## fit model
   mod %>%
     fit(
-      x_train, 
+      x_train,
       y_train,
       epochs = 10,
       validation_data = list(x_val, y_val),
       batch_size = 512,
       verbose = FALSE
     )
-  
+
   ## evaluate model
   keras_predict(mod, x_val, y_val) %>%
     metrics(state, .pred_class, .pred_1)
@@ -811,7 +808,7 @@ We compared these three model options using the validation set we created. Let's
 - compute metrics for these results.
 
 ```{r}
-kick_test <- bake(kick_prep, new_data = kickstarter_test, 
+kick_test <- bake(kick_prep, new_data = kickstarter_test,
                   composition = "matrix")
 final_res <- keras_predict(dense_model, kick_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)

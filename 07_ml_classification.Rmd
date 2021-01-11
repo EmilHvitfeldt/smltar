@@ -73,7 +73,8 @@ library(tidymodels)
 set.seed(1234)
 complaints2class <- complaints %>%
   mutate(product = factor(if_else(
-    product == "Credit reporting, credit repair services, or other personal consumer reports", 
+    product == paste("Credit reporting, credit repair services,",
+                     "or other personal consumer reports"),
     "Credit", "Other"
   )))
 
@@ -96,7 +97,7 @@ The **recipes** package, part of tidymodels, allows us to create a specification
 We initialize our set of preprocessing transformations with the `recipe()` function, using a formula expression to specify the variables, our outcome plus our predictor, along with the dataset.
 
 ```{r complaintrec1, dependson="complaintssplit"}
-complaints_rec <- 
+complaints_rec <-
   recipe(product ~ consumer_complaint_narrative, data = complaints_train)
 ```
 
@@ -258,7 +259,7 @@ Like we did in Section \@ref(regnull), we can assess a model like this one by co
 We can build a classification `null_model()` specification and add it to a `workflow()` with the same preprocessing recipe we used in the previous section, to estimate performance.
 
 ```{r nullrs2, dependson=c("nbwf", "complaintsfolds")}
-null_classification <- null_model() %>% 
+null_classification <- null_model() %>%
   set_engine("parsnip") %>%
   set_mode("classification")
 
@@ -386,8 +387,8 @@ multicomplaints_test <- testing(multicomplaints_split)
 Before we continue, let us take a look at the number of cases in each of the classes.
 
 ```{r, dependson="multicomplaintssplit"}
-multicomplaints_train %>% 
-  count(product, sort = TRUE) %>% 
+multicomplaints_train %>%
+  count(product, sort = TRUE) %>%
   select(n, product)
 ```
 
@@ -416,8 +417,8 @@ The specification `multicomplaints_rec` is similar to what we created in Section
 ```{r multicomplaintsrec, message=FALSE, dependson="multicomplaintssplit"}
 library(themis)
 
-multicomplaints_rec <- 
-  recipe(product ~ consumer_complaint_narrative, 
+multicomplaints_rec <-
+  recipe(product ~ consumer_complaint_narrative,
          data = multicomplaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
@@ -469,13 +470,23 @@ multi_svm_rs_predictions <- collect_predictions(multi_svm_rs)
 ```
 
 ```{r, include = FALSE, eval=!online}
-write_rds(multi_svm_rs_metrics, "data/ml_class_first_multi_svm_rs_metrics.rds")
-write_rds(multi_svm_rs_predictions, "data/ml_class_first_multi_svm_rs_predictions.rds")
+write_rds(
+  multi_svm_rs_metrics,
+  "data/ml_class_first_multi_svm_rs_metrics.rds"
+)
+write_rds(
+  multi_svm_rs_predictions,
+  "data/ml_class_first_multi_svm_rs_predictions.rds"
+)
 ```
 
 ```{r, include = FALSE, eval=online}
-multi_svm_rs_metrics <- read_rds("data/ml_class_first_multi_svm_rs_metrics.rds")
-multi_svm_rs_predictions <- read_rds("data/ml_class_first_multi_svm_rs_predictions.rds")
+multi_svm_rs_metrics <- read_rds(
+  "data/ml_class_first_multi_svm_rs_metrics.rds"
+)
+multi_svm_rs_predictions <- read_rds(
+  "data/ml_class_first_multi_svm_rs_predictions.rds"
+)
 ```
 
 What do we see, in terms of performance metrics?
@@ -540,8 +551,8 @@ The `submitted_via` variable could have been a viable candidate, but all the ent
 The other variables like ZIP code could be of use too, but they are categorical variables with many values so we will exclude them for now.
 
 ```{r complaintrec5, dependson="complaintssplit"}
-more_vars_rec <- 
-  recipe(product ~ date_received + tags + consumer_complaint_narrative, 
+more_vars_rec <-
+  recipe(product ~ date_received + tags + consumer_complaint_narrative,
          data = complaints_train)
 ```
 
@@ -636,10 +647,10 @@ library(tidytext)
 
 complaints_train %>%
   slice(1:1000) %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
                 collapse = FALSE) %>%
   count(trigrams, sort = TRUE) %>%
-  mutate(censored = str_detect(trigrams, 'xx')) %>%
+  mutate(censored = str_detect(trigrams, "xx")) %>%
   slice(1:20) %>%
   ggplot(aes(n, reorder(trigrams, n), fill = censored)) +
   geom_col() +
@@ -656,17 +667,17 @@ and plot the proportions for "Credit" and "Other".
 ```{r trigram25, fig.cap="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class"}
 top_censored_trigrams <- complaints_train %>%
   slice(1:1000) %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
                 collapse = FALSE) %>%
   count(trigrams, sort = TRUE) %>%
-  filter(str_detect(trigrams, 'xx')) %>%
+  filter(str_detect(trigrams, "xx")) %>%
   slice(1:25)
 
 plot_data <- complaints_train %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams", 
+  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
                 collapse = FALSE) %>%
   right_join(top_censored_trigrams, by = "trigrams") %>%
-  count(trigrams, product, .drop = FALSE) 
+  count(trigrams, product, .drop = FALSE)
 
 plot_data %>%
   ggplot(aes(n, trigrams, fill = product)) +
@@ -689,7 +700,6 @@ uncensor <- function(n) {
 
 uncensor_vec <- function(x) {
   locs <- str_locate_all(x, "XX")
-  
   map2_chr(x, locs, ~ {
     for (i in seq_len(nrow(.y))) {
       str_sub(.x, .y[i, 1], .y[i, 2]) <- uncensor(2)
@@ -711,10 +721,10 @@ Now we can produce the same visualization as Figure \@ref(fig:censoredtrigram) b
 complaints_train %>%
   slice(1:1000) %>%
   mutate(text = uncensor_vec(consumer_complaint_narrative)) %>%
-  unnest_tokens(trigrams, text, token = "ngrams", 
+  unnest_tokens(trigrams, text, token = "ngrams",
                 collapse = FALSE) %>%
   count(trigrams, sort = TRUE) %>%
-  mutate(censored = str_detect(trigrams, 'xx')) %>%
+  mutate(censored = str_detect(trigrams, "xx")) %>%
   slice(1:20) %>%
   ggplot(aes(n, reorder(trigrams, n), fill = censored)) +
   geom_col() +
@@ -751,12 +761,12 @@ It's a good idea to use a "word" that won't be accidentally broken up by a token
 
 ```{r}
 ssn_text <- c("My social security number is 498-08-6333",
-              "No way, mine is 362-60-9159", 
+              "No way, mine is 362-60-9159",
               "My parents numbers are 575-32-6985 and 576-36-5202")
 
 ssn_pattern <-  "(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}"
 
-str_replace_all(string = ssn_text, 
+str_replace_all(string = ssn_text,
                 pattern = ssn_pattern,
                 replacement = "ssnindicator")
 ```
@@ -943,8 +953,9 @@ Hashing functions are typically very fast and have certain properties. For examp
 
 ```{r eval=FALSE}
 library(hashFunction)
-countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina", "Mayotte", 
-               "Bouvet Island", "South Korea", "San Marino", "American Samoa")
+countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina",
+               "Mayotte", "Bouvet Island", "South Korea", "San Marino",
+               "American Samoa")
 
 map_int(countries, murmur3.32)
 ```
@@ -959,7 +970,7 @@ map_int(countries, murmur3.32) %% 24
 Now we can use these values as indices when creating a matrix.
 
 ```{r, eval=FALSE, echo=FALSE}
-Matrix::sparseMatrix(1:10, map_int(countries, murmur3.32) %% 24, 
+Matrix::sparseMatrix(1:10, map_int(countries, murmur3.32) %% 24,
                      dims = c(10, 24),
                      dimnames = list(countries, NULL))
 ```
@@ -993,9 +1004,11 @@ This feature hashing method is used because of its speed and scalability, not be
 Feature hashing on tokens is available in tidymodels using the `step_texthash()` step from textrecipes.
 
 ```{r complaintshash, dependson="complaintssplit"}
-complaints_hash <- recipe(product ~ consumer_complaint_narrative, data = complaints_train) %>%
+complaints_hash <- recipe(product ~ consumer_complaint_narrative,
+                          data = complaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_texthash(consumer_complaint_narrative, signed = TRUE, num_terms = 512) %>%
+  step_texthash(consumer_complaint_narrative,
+                signed = TRUE, num_terms = 512) %>%
   prep() %>%
   bake(new_data = NULL)
 
@@ -1005,8 +1018,8 @@ dim(complaints_hash)
 There are many columns in the results. Let's take a `glimpse()` at the first ten columns.
 
 ```{r dependson="complaintshash"}
-complaints_hash %>% 
-  select(consumer_complaint_narrative_hash001:consumer_complaint_narrative_hash010) %>% 
+complaints_hash %>%
+  select(num_range("consumer_complaint_narrative_hash00", 1:9)) %>%
   glimpse()
 ```
 
@@ -1139,8 +1152,8 @@ We start by creating a new preprocessing recipe.
 Let's use the same predictors and handle `date_received` and `tags` in the same way.
 
 ```{r complaintrecfinal1, dependson="complaintssplit"}
-complaints_rec_v2 <- 
-  recipe(product ~ date_received + tags + consumer_complaint_narrative, 
+complaints_rec_v2 <-
+  recipe(product ~ date_received + tags + consumer_complaint_narrative,
          data = complaints_train) %>%
   step_date(date_received, features = c("month", "dow"), role = "dates") %>%
   step_rm(date_received) %>%
@@ -1155,8 +1168,8 @@ We create a list of the custom text features and pass this list to `step_textfea
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
 
 ```{r complaintrecfinal2, dependson="complaintrecfinal1"}
-extract_funs <- list(creditcard_count = creditcard_count, 
-                     procent_censoring = procent_censoring, 
+extract_funs <- list(creditcard_count = creditcard_count,
+                     procent_censoring = procent_censoring,
                      max_money = max_money)
 
 complaints_rec_v2 <- complaints_rec_v2 %>%
@@ -1177,8 +1190,9 @@ This dataset has many more than 50 of the most common 2000 tokens, but it can st
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_stopwords(consumer_complaint_narrative) %>%
-  step_ngram(consumer_complaint_narrative, num_tokens = 3, min_num_tokens = 1) %>%
-  step_tokenfilter(consumer_complaint_narrative, 
+  step_ngram(consumer_complaint_narrative,
+             num_tokens = 3, min_num_tokens = 1) %>%
+  step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
@@ -1211,7 +1225,7 @@ set.seed(2020)
 tune_rs <- tune_grid(
   svm_wf_v2,
   complaints_folds,
-  grid = param_grid, 
+  grid = param_grid,
   metrics = metric_set(accuracy, sensitivity, specificity),
   control = control_resamples(save_pred = TRUE)
 )
@@ -1293,7 +1307,7 @@ This is pretty good, and we note that this result is close to what we saw from t
 The confusion matrix on the testing data in Figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn't any strong bias towards either of the classes.
 
 ```{r, finalheatmap, fig.cap="Confusion matrix on the test set for final Support Vector Machine classifier"}
-final_res_predictions %>% 
+final_res_predictions %>%
   conf_mat(truth = product, estimate = .pred_class) %>%
   autoplot(type = "heatmap")
 ```
