@@ -21,7 +21,11 @@ diffs <- tibble::tribble(
   "Depends on preprocessing to model more than very simple relationships", "Can model highly complex relationships"
 )
 
-knitr::kable(diffs, caption = "Comparing deep learning with other machine learning methods")
+library(magrittr)
+knitr::kable(diffs, caption = "Comparing deep learning with other machine learning methods")  %>%
+  kableExtra::column_spec(1, width = "55mm") %>%
+  kableExtra::column_spec(2, width = "55mm") %>%
+  kableExtra::row_spec(0, bold = TRUE)
 ```
 
 Deep learning and more traditional machine learning algorithms are different, but the structure of the modeling process is largely the same, no matter what the specific details of prediction or algorithm are.
