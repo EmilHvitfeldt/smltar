@@ -1,25 +1,5 @@
 # Dense neural networks {#dldnn}
 
-```{r setup, include = FALSE}
-library(knitr)
-opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
-               tidy = "styler", fig.width = 8, fig.height = 5)
-suppressPackageStartupMessages(library(tidyverse))
-theme_set(theme_light())
-options(crayon.enabled = FALSE)
-#doParallel::registerDoParallel()
-
-library(keras)
-tensorflow::tf$random$set_seed(1234)
-
-## for Julia's local environment
-#spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
-#online <- FALSE
-
-## for GH actions
-online <- TRUE
-```
-
 These chapters on deep learning are broken up by network architecture instead of by outcome as we did in Chapters \@ref(mlclassification) and \@ref(mlregression).
 We'll use Keras [@R-keras] with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
 Keras provides extensive support for creating and training many kinds of deep learning models, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 

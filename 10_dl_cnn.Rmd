@@ -1,36 +1,5 @@
 # Convolutional neural networks {#dlcnn}
 
-```{r setup, include = FALSE}
-library(knitr)
-opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
-               tidy = "styler", fig.width = 8, fig.height = 5)
-suppressPackageStartupMessages(library(tidyverse))
-theme_set(theme_light())
-options(crayon.enabled = FALSE)
-#doParallel::registerDoParallel()
-
-library(keras)
-tensorflow::tf$random$set_seed(1234)
-
-## for Julia's local environment
-#spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
-#online <- FALSE
-
-## for GH actions
-online <- TRUE
-
-keras_predict <- function(model, baked_data, response) {
-  predictions <- predict(model, baked_data)[, 1]
-  tibble(
-    .pred_1 = predictions,
-    .pred_class = if_else(.pred_1 < 0.5, 0, 1),
-    state = response
-  ) %>%
-    mutate(across(c(state, .pred_class),            ## create factors
-                  ~ factor(.x, levels = c(1, 0))))  ## with matching levels
-}
-```
-
 The first neural networks we built in Chapter \@ref(dldnn) did not learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on **convolutional neural network** (CNN) architecture, which can learn local, spatial structure within a dataset.
 
 CNNs can be well-suited for modeling text data text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN takes data (like text) as input and then hopefully produces output that represents specific structures in the data.
