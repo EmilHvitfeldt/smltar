@@ -12,14 +12,14 @@ options(crayon.enabled = FALSE)
 online <- TRUE
 ```
 
-In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For example, let's consider the dataset of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Appendix \@ref(us-consumer-finance-complaints)) with `read_csv()`.
+In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For example, let's consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Appendix \@ref(us-consumer-finance-complaints)) with `read_csv()`.
 
 ```{r complaints, message=FALSE}
 library(tidyverse)
 complaints <- read_csv("data/complaints.csv.gz")
 ```
 
-We can start by taking a quick `glimpse()` at the data to see what we have to work with. This dataset contains a text field with the complaint, along with information regarding what it was for,
+We can start by taking a quick `glimpse()` at the data to see what we have to work with. This data set contains a text field with the complaint, along with information regarding what it was for,
 how and when it was filed, and the response from the bureau. 
 
 ```{r, dependson="complaints"}
@@ -45,7 +45,7 @@ It is always a good idea to look at your data! Here are the first six complaints
 head(complaints$consumer_complaint_narrative)
 ```
 
-The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publicly available dataset. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
+The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publicly available data set. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
 
 We also see that monetary amounts are surrounded by curly brackets (like `"{$21.00}"`); this is another text preprocessing step that has been taken care of for us. We could craft a regular expression to extract all the dollar amounts. 
 
@@ -60,9 +60,9 @@ In Section \@ref(customfeatures), we will use an approach like this for custom f
 
 ### Building our first classification model {#classfirstmodel}
 
-This dataset includes more possible predictors than the text alone, but for this first model we will only use the text variable `consumer_complaint_narrative`.
+This data set includes more possible predictors than the text alone, but for this first model we will only use the text variable `consumer_complaint_narrative`.
 Let's create a factor outcome variable `product` with two levels, "Credit" and "Other".
-Then, we split the data into training and testing datasets.
+Then, we split the data into training and testing data sets.
 We can use the `initial_split()` function from **rsample** to create this binary split of the data. 
 The `strata` argument ensures that the distribution of `product` is similar in the training set and testing set. 
 Since the split uses random sampling, we set a seed so we can reproduce our results.
@@ -94,7 +94,7 @@ dim(complaints_test)
 Next we need to preprocess this data to prepare it for modeling; we have text data, and we need to build numeric features for machine learning from that text.
 
 The **recipes** package, part of tidymodels, allows us to create a specification of preprocessing steps we want to perform. These transformations are estimated (or "trained") on the training set so that they can be applied in the same way on the testing set or new data at prediction time, without data leakage.
-We initialize our set of preprocessing transformations with the `recipe()` function, using a formula expression to specify the variables, our outcome plus our predictor, along with the dataset.
+We initialize our set of preprocessing transformations with the `recipe()` function, using a formula expression to specify the variables, our outcome plus our predictor, along with the data set.
 
 ```{r complaintrec1, dependson="complaintssplit"}
 complaints_rec <-
@@ -154,7 +154,7 @@ We have trained our first classification model!
 
 Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use **resampling** methods to evaluate our model.
 
-Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r complaintsfolds, dependson="complaintssplit"}
 set.seed(234)
@@ -218,7 +218,7 @@ The default performance parameters for binary classification are accuracy and RO
 For both accuracy and ROC AUC, values closer to 1 are better.
 ```
 
-The [receiver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) is a plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled datasets.
+The [receiver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) is a plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled data sets.
 
 ```{r firstroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Bureau complaints"}
 nb_rs_predictions %>%
@@ -357,7 +357,7 @@ One of the main benefits of a support vector machine model is its support for sp
 
 Most of this chapter focuses on binary classification, where we have two classes in our outcome variable (such as "Credit" and "Other") and each observation can either be one or the other. This is a simple scenario with straightforward evaluation strategies because the results only have a two-by-two contingency matrix.
 However, it is not always possible to limit a modeling question to two classes. Let's explore how to deal with situations where we have more than two classes.
-The CFPB complaints dataset we have been working with has nine different `product` classes. In decreasing frequency, they are:
+The CFPB complaints data set we have been working with has nine different `product` classes. In decreasing frequency, they are:
 
 - Credit reporting, credit repair services, or other personal consumer reports
 - Debt collection
@@ -373,7 +373,7 @@ We assume that there is a reason why these product classes have been created in 
 Perhaps complaints from different classes are handled by different people or organizations.
 Whatever the reason, in this section we would like to build a multiclass classifier to identify these nine specific product classes.
 
-We need to create a new split of the data using `initial_split()` on the unmodified `complaints` dataset.
+We need to create a new split of the data using `initial_split()` on the unmodified `complaints` data set.
 
 ```{r, multicomplaintssplit}
 set.seed(1234)
@@ -393,7 +393,7 @@ multicomplaints_train %>%
 ```
 
 There is significant imbalance between the classes that we must address, with over twenty times more cases of the majority class than there is of the smallest class.
-This kind of imbalance is a common problem with multiclass classification, with few multiclass datasets in the real world exhibiting balance between classes.
+This kind of imbalance is a common problem with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.
 
 Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:
 
@@ -412,7 +412,7 @@ The themis package provides many more algorithms to deal with imbalanced data.
 ```
 
 We have to create a new recipe specification from scratch, since we are dealing with new training data this time.
-The specification `multicomplaints_rec` is similar to what we created in Section \@ref(classfirstattemptlookatdata). The only changes are that different data is passed to the `data` argument in the `recipe()` function (it is now `multicomplaints_train`) and we have added `step_downsample(product)` to the end of the recipe specification to downsample after all the text preprocessing. We want to downsample last so that we still generate features on the full training dataset. The downsampling will then _only_ affect the modeling step, not the preprocessing steps, with hopefully better results.
+The specification `multicomplaints_rec` is similar to what we created in Section \@ref(classfirstattemptlookatdata). The only changes are that different data is passed to the `data` argument in the `recipe()` function (it is now `multicomplaints_train`) and we have added `step_downsample(product)` to the end of the recipe specification to downsample after all the text preprocessing. We want to downsample last so that we still generate features on the full training data set. The downsampling will then _only_ affect the modeling step, not the preprocessing steps, with hopefully better results.
 
 ```{r multicomplaintsrec, message=FALSE, dependson="multicomplaintssplit"}
 library(themis)
@@ -427,7 +427,7 @@ multicomplaints_rec <-
   step_downsample(product)
 ```
 
-We also need a new cross-validation object since we are using a different dataset.
+We also need a new cross-validation object since we are using a different data set.
 
 ```{r multicomplaintsfolds, dependson="complaintssplit"}
 multicomplaints_folds <- vfold_cv(multicomplaints_train)
@@ -532,7 +532,7 @@ Now that we have an idea of where the model isn't working, we can look more clos
 
 ## Case study: including non-text data
 
-We are building a model from a dataset that includes more than text data alone. Annotations and labels have been added by the CFPB that we can use during modeling, but we need to ensure that only information that would be available at the time of prediction is included in the model.
+We are building a model from a data set that includes more than text data alone. Annotations and labels have been added by the CFPB that we can use during modeling, but we need to ensure that only information that would be available at the time of prediction is included in the model.
 Otherwise we we will be very disappointed once our model is used to predict on new data!
 The variables we identify as available for use as predictors are:
 
@@ -597,7 +597,7 @@ more_vars_wf <- workflow() %>%
 more_vars_wf
 ```
 
-Let's fit this `workflow()` to our resampled datasets and estimate accuracy, sensitivity, and specificity.
+Let's fit this `workflow()` to our resampled data sets and estimate accuracy, sensitivity, and specificity.
 
 ```{r morevarsrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval=!online}
 set.seed(123)
@@ -637,10 +637,10 @@ This whole book focuses on supervised machine learning for text data, but models
 
 ## Case study: data censoring
 
-The complaints dataset already has sensitive information (PII) censored or protected using strings such as "XXXX" and "XX".
+The complaints data set already has sensitive information (PII) censored or protected using strings such as "XXXX" and "XX".
 This data censoring can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
 
-Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training dataset.
+Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training data set.
 
 ```{r censoredtrigram, dependson="complaintssplit", fig.cap="Many of the most frequent trigrams feature censored information"}
 library(tidytext)
@@ -742,7 +742,7 @@ What happens when we use these censored dates as a feature in supervised machine
 ```
 
 Data censoring can be a form of preprocessing in your data pipeline.
-For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your dataset.
+For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
 More importantly, that information can become embedded in your model and begin to leak as demonstrated by @carlini2018secret, @Fredrikson2014, and @Fredrikson2015.
 Both of these issues are important, and one of them could land you in a lot of legal trouble. 
 Exposing such PII to modeling is an example of where we should all stop to ask, "Should we even be doing this?" as we discussed in the foreword to these chapters.
@@ -775,14 +775,14 @@ This technique isn't useful only for personally identifiable information but can
 
 
 ```{block2, type = "rmdwarning"}
-The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" datasets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as @Sweeney2000, and current best practices to protect against such mining.
+The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as @Sweeney2000, and current best practices to protect against such mining.
 ```
 
 
 ## Case study: custom features {#customfeatures}
 
 Most of what we have looked at so far has boiled down to counting tokens and weighting them in one way or another.
-This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your dataset that you should use in feature engineering.
+This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your data set that you should use in feature engineering.
 Your domain knowledge allows you to build more predictive features than the naive search of simple tokens.
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of regular expressions knowledge pays off.
@@ -803,12 +803,12 @@ For our CFPB complaints data, certain patterns have not adequately been picked u
 
 ### Detect credit cards
 
-A credit card number is represented as four groups of four capital Xs in this dataset.
+A credit card number is represented as four groups of four capital Xs in this data set.
 Since the data is fairly well processed we are fairly sure that spacing will not be an issue and all credit cards will be represented as "XXXX XXXX XXXX XXXX". 
 A first naive attempt may be to use `str_detect()` with "XXXX XXXX XXXX XXXX" to find all the credit cards.
 
 ```{block, type = "rmdnote"}
-It is a good idea to create a small example regular expression where you know the answer, and then prototype your function before moving to the main dataset.
+It is a good idea to create a small example regular expression where you know the answer, and then prototype your function before moving to the main data set.
 ```
 
 We start by creating a vector with two positives, one negative, and one potential false positive.
@@ -991,7 +991,7 @@ There are downsides to using feature hashing. Feature hashing:
 
 The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
 It is your job to find the output that best suits your needs.
-Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output dataset which increases model fitting time. 
+Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data set which increases model fitting time. 
 The number of buckets is tunable in tidymodels using the tune package.
 
 Perhaps the more important downside to using feature hashing is that the operation can't be reversed. 
@@ -1098,7 +1098,7 @@ nb_rs <- fit_resamples(
 )
 ```
 
-If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. 
+If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using `control_resamples(save_pred = TRUE)`. 
 
 Let's go back to the naive Bayes model we tuned in Section \@ref(classfirstmodel), with predictions stored in `nb_rs_predictions`. We can compute the overall [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
 
@@ -1124,7 +1124,7 @@ nb_rs_predictions %>%
   conf_mat(product, .pred_class)
 ```
 
-It is possible with many datasets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
+It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
 
 ```{block, type = "rmdnote"}
 For the full set of classification metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
@@ -1183,7 +1183,7 @@ Let's also set the `min_times` argument to 50, to throw away tokens that appear 
 We want our model to be robust and a token needs to appear enough times before we include it.
 
 ```{block, type = "rmdnote"}
-This dataset has many more than 50 of the most common 2000 tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
+This data set has many more than 50 of the most common 2000 tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
@@ -1302,7 +1302,7 @@ How does the final model performance on the testing data look?
 final_res_metrics
 ```
 
-This is pretty good, and we note that this result is close to what we saw from the training dataset. This is an indication that our model is not overfit and is able to generalize well enough.
+This is pretty good, and we note that this result is close to what we saw from the training data set. This is an indication that our model is not overfit and is able to generalize well enough.
 
 The confusion matrix on the testing data in Figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn't any strong bias towards either of the classes.
 
@@ -1314,7 +1314,7 @@ final_res_predictions %>%
 
 ## Summary {#mlclassificationsummary}
 
-You can use classification modeling to predict labels or categorical variables from a dataset, including datasets that include text.
+You can use classification modeling to predict labels or categorical variables from a data set, including data sets that include text.
 Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
 This is important as bag-of-word text models can involve thousands of tokens.
 We also saw that support vector machine models perform well for text data.
