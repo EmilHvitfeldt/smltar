@@ -3,10 +3,27 @@
 ```{r setup, include = FALSE}
 library(knitr)
 library(tidytext)
+library(htmltools)
 opts_chunk$set(message = FALSE, warning = FALSE, cache = TRUE, eval = TRUE,
                tidy = "styler", fig.width = 8, fig.height = 5)
 suppressPackageStartupMessages(library(tidyverse))
 theme_set(theme_light())
+
+columnize <- function(words, ncol = 5,
+                      style = "p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}") {
+  
+  tagList(
+    tags$style(style),
+    tags$div(
+      words %>%
+        map(tags$p) %>%
+        tagList(),
+      style = sprintf("column-count:%d", as.integer(ncol))
+    )
+  )
+  
+}
+
 ``` 
 
 Once we have split text into tokens, it often becomes clear that not all words carry the same amount of information, if any information at all, for a predictive modeling task. Common words that carry little (or perhaps no) meaningful information are called **stop words**. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.
@@ -111,7 +128,7 @@ The result of these two stop word removals is the same since we used the same st
 
 Another way to get a stop word list is to create one yourself. Let's explore a few different ways to find appropriate words to use. We will use the tokenized data from "The Fir-Tree" as a first example. Let's take the words and rank them by their count or frequency.
 
-```{r, echo=FALSE, fig.cap='Words from "The Fir Tree" ordered by count or frequency'}
+```{r, eval=!knitr:::is_html_output(), echo=FALSE, fig.cap='Words from "The Fir Tree" ordered by count or frequency'}
 tidy_fir_tree %>%
   count(word, sort = TRUE) %>%
   slice(1:120) %>%
@@ -125,6 +142,15 @@ tidy_fir_tree %>%
   labs(title = 'Most frequent tokens in "The Fir Tree"')
 ```
 
+```{r, eval=knitr:::is_html_output(), echo=FALSE, results='markup'}
+tidy_fir_tree %>%
+  count(word, sort = TRUE) %>% 
+  slice(1:120) %>% 
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  pull(word) %>% 
+  columnize()
+```
+
 We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see `"tree"` at 3, `"fir"` at 12 and `"little"` at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a **corpus** of documents, not an individual document. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well. 
 
 ```{block, type = "rmdnote"}
@@ -133,7 +159,7 @@ In NLP, a corpus is a set of texts or documents. The set of Hans Christian Ander
 
 The word `"tree"` does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Let's try a different approach, extracting high-frequency words from the corpus of *all* English fairy tales by H.C. Andersen.
 
-```{r, echo=FALSE, fig.cap="Words in all English fairy tales by Hans Christian Andersen ordered by count or frequency"}
+```{r, eval=!knitr:::is_html_output(), echo=FALSE, fig.cap="Words in all English fairy tales by Hans Christian Andersen ordered by count or frequency"}
 library(hcandersenr)
 library(tidytext)
 hcandersen_en %>%
@@ -152,7 +178,21 @@ hcandersen_en %>%
   )
 ```
 
-This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine apriori how many different "meaningless" words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose. 
+
+```{r, eval=knitr:::is_html_output(), echo=FALSE, results='markup'}
+library(hcandersenr)
+library(tidytext)
+
+hcandersen_en %>%
+  unnest_tokens(word, text) %>%
+  count(word, sort = TRUE) %>%
+  slice(1:120) %>% 
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  pull(word) %>% 
+  columnize()
+```
+
+This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine a priori how many different "meaningless" words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose. 
 
 It is worth keeping in mind that such a list is not perfect. Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased. In our example here, all the fairy tales were written by the same European white man from the early 1800s. 
 
@@ -227,15 +267,19 @@ calc_idf <- function(df, word, document) {
     pull(data) %>%
     map_dfc(~ words %in% unique(pull(.x, {{word}}))) %>%
     rowSums()
-
+  
   tibble(word = words,
          idf = log(n_docs / n_words))
 }
 ```
 
-Here is the result when we try to create a cross-language list of stop words, by taking each fairy tale as a document. It is not very good! The overlap between words that appear in each language is very small, and these are what we mostly see in this list.
+Here is the result when we try to create a cross-language list of stop words, by taking each fairy tale as a document. It is not very good! 
 
-```{r, echo=FALSE, fig.cap="Words from all of H.C. Andersen's fairy tales in Danish, English, French, German, and Spanish, counted and ordered by IDF"}
+```{block, type = "rmdnote"}
+The overlap between words that appear in each language is very small, but these words are what we mostly see in this list.
+```
+
+```{r, eval=!knitr:::is_html_output(), echo=FALSE, fig.cap="Words from all of H.C. Andersen's fairy tales in Danish, English, French, German, and Spanish, counted and ordered by IDF"}
 hcandersenr::hca_fairytales() %>%
   unnest_tokens(word, text) %>%
   mutate(document = paste(language, book)) %>%
@@ -254,9 +298,22 @@ hcandersenr::hca_fairytales() %>%
                      "lowest IDF, multi-language"))
 ```
 
+```{r, eval=knitr:::is_html_output(), echo=FALSE, results='markup'}
+hcandersenr::hca_fairytales() %>%
+  unnest_tokens(word, text) %>%
+  mutate(document = paste(language, book)) %>%
+  select(word, document) %>%
+  calc_idf(word, document) %>%
+  arrange(idf) %>%
+  slice(1:120) %>% 
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  pull(word) %>% 
+  columnize()
+```
+
 This didn't work very well because there is very little overlap between common words. Instead, let us limit the calculation to only one language and calculate the IDF of each word we can find compared to words that appear in a lot of documents.
 
-```{r, echo=FALSE, fig.cap="Words from all of H.C. Andersen's fairy tales in English, counted and ordered by IDF"}
+```{r, eval=!knitr:::is_html_output(), echo=FALSE, fig.cap="Words from all of H.C. Andersen's fairy tales in English, counted and ordered by IDF"}
 hcandersenr::hcandersen_en %>%
   unnest_tokens(word, text) %>%
   select(word, book) %>%
@@ -272,6 +329,18 @@ hcandersenr::hcandersen_en %>%
   theme_void() +
   labs(title = paste("120 tokens in H.C. Andersen's fairy tales with",
                      "lowest IDF, English only"))
+```
+
+```{r, eval=knitr:::is_html_output(), echo=FALSE, results='markup'}
+hcandersenr::hcandersen_en %>%
+  unnest_tokens(word, text) %>%
+  select(word, book) %>%
+  calc_idf(word, book) %>%
+  arrange(idf) %>%
+  slice(1:120) %>% 
+  mutate(word = paste0(row_number(), ": ", word)) %>%
+  pull(word) %>% 
+  columnize()
 ```
 
 This time we get better results. The list starts with "a", "the", "and", and "to" and continues with many more reasonable choices of stop words. We need to look at these results manually to turn this into a list. We need to go as far down in rank as we are comfortable with. You as a data practitioner are in full control of how you want to create the list. If you don't want to include "little" you are still able to add "are" to your list even though it is lower on the list.
@@ -357,7 +426,7 @@ tibble::tribble(
   "des", "der", "des", "der", "Genitive"
 ) %>%
   gt(rowname_col = "case") %>%
-   tab_header(title = "German Definite Articles (the)")
+  tab_header(title = "German Definite Articles (the)")
 ```
 
 ```{r, echo=FALSE}
@@ -369,7 +438,7 @@ tibble::tribble(
   "eines", "einer", "eines", "keiner", "Genitive"
 ) %>%
   gt(rowname_col = "case") %>%
-   tab_header(title = "German Indefinite Articles (a/an)")
+  tab_header(title = "German Indefinite Articles (a/an)")
 ```
 
 
