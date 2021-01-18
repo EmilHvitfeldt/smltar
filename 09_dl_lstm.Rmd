@@ -1,38 +1,5 @@
 # Long short-term memory (LSTM) networks  {#dllstm}
 
-```{r setup, include = FALSE}
-library(knitr)
-opts_chunk$set(message = FALSE, warning = FALSE, cache = FALSE, eval = TRUE,
-               tidy = "styler", fig.width = 8, fig.height = 5)
-suppressPackageStartupMessages(library(tidyverse))
-theme_set(theme_light())
-options(crayon.enabled = FALSE)
-doParallel::registerDoParallel()
-
-library(keras)
-tensorflow::tf$random$set_seed(1234)
-
-## for Julia's local environment
-#spacyr::spacy_initialize(condaenv = "r-spacyr", entity = FALSE)
-#online <- FALSE
-
-## for GH actions
-online <- TRUE
-
-keras_predict <- function(model, baked_data, response) {
-  predictions <- predict(model, baked_data)[, 1]
-
-  tibble(
-    .pred_1 = predictions,
-    .pred_class = if_else(.pred_1 < 0.5, 0, 1),
-    state = response
-  ) %>%
-    mutate(across(c(state, .pred_class),
-                  ~ factor(.x, levels = c(1, 0))))
-}
-```
-
-
 In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple" dense network architectures. These architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlclassification) and \@ref(mlregression), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs).
 
 ## A first LSTM model {#firstlstm}
