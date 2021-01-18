@@ -1062,7 +1062,7 @@ murmur3.32(s2)
 
 We can deal with this problem by performing **text normalization** on our text before feeding it into our preprocessing engine.
 One library to perform text normalization is the **stringi** package which includes many different text normalization methods.
-How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön" equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition.
+How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön" equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition, but we could also use `textrecipes::step_text_normalize()` within a tidymodels recipe for the same task.
 
 ```{r eval=FALSE}
 library(stringi)
@@ -1082,7 +1082,7 @@ This issue of text normalization can be important even if you don't use feature 
 Since these words are encoded in different ways, they will be counted separately when we are counting token frequencies. 
 Representing what should be a single token in multiple ways will split the counts. This will introduce noise in the best case, and in worse cases, some tokens will fall below the cutoff when we select tokens, leading to a loss of potentially informative words.
 
-Luckily this is easily addressed by using `stri_trans_nfc()` on our text columns before starting preprocessing.
+Luckily this is easily addressed by using `stri_trans_nfc()` on our text columns _before_ starting preprocessing, or perhaps more conveniently, by using `textrecipes::step_text_normalize()` _within_ a preprocessing recipe.
 
 ## What evaluation metrics are appropriate?
 
