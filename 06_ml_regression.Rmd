@@ -15,7 +15,7 @@ scotus_filtered %>%
   as_tibble()
 ```
 
-This dataset contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the `year` that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
+This data set contains the entire text of each opinion in the `text` column, along with the `case_name` and `docket_number`. Notice that we also have the `year` that each case was decided by the Supreme Court; this is basically a continuous variable (rather than a group membership of discrete label). 
 
 ```{block, type = "rmdnote"}
 If we want to build a model to predict which court opinions were written in which years, we would build a regression model.
@@ -41,11 +41,11 @@ scotus_filtered %>%
   labs(x = "Year", y = "Number of opinions per decade")
 ```
 
-This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this dataset after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.
+This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.
 
 ### Building our first regression model {#firstregression}
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the datasets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
@@ -114,7 +114,7 @@ lasso_fit <- scotus_wf %>%
   fit(data = scotus_train)
 ```
 
-We have successfully fit a regularized regression model to this dataset of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+We have successfully fit a regularized regression model to this data set of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
 ```{r dependson="lassofit"}
 lasso_fit %>%
@@ -148,9 +148,9 @@ Another option for evaluating models is to predict one time on the training set 
 
 Yet another option for evaluating or comparing models is to use a separate validation set. In this situation, we split our data _not_ into two sets (training and testing) but into three sets (testing, training, and validation). The validation set is used for computing performance metrics to compare models or model parameters. This can be a great option if you have enough data for it, but often we as machine learning practitioners are not so lucky. 
 
-What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated datasets from the training set for the purpose of, for example, measuring model performance.
+What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the lasso regression model we just fit. We can do this using resampled datasets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the lasso regression model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
 set.seed(123)
@@ -195,7 +195,7 @@ The default performance metrics to be computed for regression models are RMSE (r
 The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
 ```
 
-These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled datasets.
+These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled data sets.
 
 ```{r firstregpredict, dependson="lassors", fig.width=7, fig.height=5.5, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
 lasso_rs %>%
@@ -278,7 +278,7 @@ The function `grid_regular()` is from the **dials** package. It chooses sensible
 Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
 
 ```{block, type = "rmdnote"}
-Tuning a model uses a similar syntax compared to fitting a model to a set of resampled datasets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
+Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
 ```
 
 We add our tunable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
@@ -371,7 +371,7 @@ Instead of `penalty = tune()` like before, now our workflow has finalized values
 
 ## Compare to a random forest model {#comparerf}
 
-Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see @Caruana2008 and @Olson2017 for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark datasets; random forest models were one of the best overall. Let's see how a random forest model performs with our dataset of Supreme Court opinions.
+Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see @Caruana2008 and @Olson2017 for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark data sets; random forest models were one of the best overall. Let's see how a random forest model performs with our data set of Supreme Court opinions.
 
 First, let's build a random forest model specification, using the ranger implementation. Random forest models are known for performing well without tuning, so we will just make sure we have enough `trees`.
 
@@ -653,7 +653,7 @@ list(snowball = snowball_rs,
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
-       subtitle = "For this dataset, the Snowball lexicon performed best")
+       subtitle = "For this data set, the Snowball lexicon performed best")
 ```
 
 ```{r, dependson="snowballrmseoffline", echo = FALSE, eval=!online}
@@ -676,7 +676,7 @@ stopword_results %>%
   geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
   labs(x = NULL, y = "mean RMSE for five best models",
        title = "Model performance for three stop word lexicons",
-       subtitle = "For this dataset, the Snowball lexicon performed best")
+       subtitle = "For this data set, the Snowball lexicon performed best")
 ```
 
 The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig:stopwordoverlap)) and, in this case, results in the best performance. Removing fewer stop words results in the best performance.
@@ -968,7 +968,7 @@ lemma_rs <- tune_grid(
 )
 ```
 
-If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled datasets using `control_resamples(save_pred = TRUE)`. 
+If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using `control_resamples(save_pred = TRUE)`. 
 
 Let's go back to the lasso model we tuned in Section \@ref(tunelasso), with results in `tune_rs`. We can compute the overall mean absolute percent error.
 
@@ -1159,7 +1159,7 @@ The `final_wf` workflow now has finalized values for `max_tokens` and `penalty`.
 We can now fit this finalized workflow on training data and _finally_ return to our testing data. 
 
 ```{block, type = "rmdwarning"}
-Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled datasets instead of touching the testing set. 
+Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled data sets instead of touching the testing set. 
 ```
 
 We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
@@ -1231,7 +1231,7 @@ final_fitted %>%
 
 ## Summary {#mlregressionsummary}
 
-You can use regression modeling to predict a continuous variable from a dataset, including a text dataset. Regularized linear models, such as lasso, often work well for text datasets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own concerns and priorities.
+You can use regression modeling to predict a continuous variable from a data set, including a text data set. Regularized linear models, such as lasso, often work well for text data sets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own concerns and priorities.
 
 ### In this chapter, you learned:
 
