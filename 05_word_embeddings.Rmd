@@ -3,7 +3,11 @@
 > You shall know a word by the company it keeps.
 > `r tufte::quote_footer('--- [John Rupert Firth](https://en.wikiquote.org/wiki/John_Rupert_Firth)')`
 
-So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling. An example of such a data structure is a sparse matrix. Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), we would start with straightforward word counts. Let's create a sparse matrix where the matrix elements are the counts of words in each document.
+So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling. 
+
+## Motivating embeddings for sparse, high-dimensional data {#motivatingsparse}
+
+What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), we would start with straightforward word counts. Let's create a sparse matrix where the matrix elements are the counts of words in each document.
 
 ```{r complaints, R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
 library(tidyverse)
@@ -18,6 +22,10 @@ complaints %>%
   mutate(stem = wordStem(word)) %>%
   count(complaint_id, stem) %>%
   cast_dfm(complaint_id, stem, n)
+```
+
+```{block, type = "rmdwarning"}
+A _sparse matrix_ is a matrix where most of the elements are zero. When working with text data, we say our data is "sparse" because most documents do not contain most words, resulting in a representation of mostly zeroes. There are special data structures and algorithms for dealing with sparse data that can take advantage of their structure. For example, an array can more efficiently store the locations and values of only the non-zero elements instead of all elements.
 ```
 
 The data set of consumer complaints used in this book has been filtered to those submitted to the CFPB since 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text).
@@ -38,9 +46,7 @@ complaints %>%
   cast_dfm(complaint_id, stem, tf_idf)
 ```
 
-Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet**. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms.
-
-**SPARSE VS. NON SPARSE MATRIX DIAGRAM GOES HERE**
+Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet**. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
 
 As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
 
@@ -73,7 +79,7 @@ tibble(frac = 2 ^ seq(-16, -6, 2)) %>%
        y = NULL)
 ```
 
-Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called **word embeddings**.
+Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called _word embeddings_.
 
 ## Understand word embeddings by finding them yourself
 
