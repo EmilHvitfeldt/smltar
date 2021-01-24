@@ -456,7 +456,7 @@ rf_predictions %>%
 
 Figure \@ref(fig:rfpredict) shows some of the strange behavior from our fitted model. The overall performance metrics look pretty good, but predictions are too high and too low around certain threshold years. 
 
-It is very common to run into problems when using tree-based models like random forests with text data. One of the defining characteristics of text data is that it is **sparse**, with many features but most features not occurring in most observations. Tree-based models such as random forests are often not well-suited to sparse data because of how decision trees model outcomes [@Tang2018].
+It is very common to run into problems when using tree-based models like random forests with text data. One of the defining characteristics of text data is that it is _sparse_, with many features but most features not occurring in most observations. Tree-based models such as random forests are often not well-suited to sparse data because of how decision trees model outcomes [@Tang2018].
 
 ```{block, type = "rmdnote"}
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
@@ -466,7 +466,7 @@ Algorithms that work well with sparse data are less important when text has been
 
 ## Case study: sparse encoding {#casestudysparseencoding}
 
-Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix, rather than a dense data frame or tibble representation.
+Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
 To keep our text data sparse in the sense of having many zero values, we need to create a slightly different preprocessing recipe.
 
