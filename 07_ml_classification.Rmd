@@ -930,35 +930,42 @@ We being with a hashing function which we then apply to our tokens.
 A hashing function takes input of variable size and maps it to output of a fixed size. Hashing functions are commonly used in cryptography.
 ```
 
-We will use the hashFunction package to illustrate the behavior of hashing functions.
-Suppose we have many country names in a character vector.
-We can apply the hashing function to each of the country names to project them into an integer space defined by the hashing function.
-We will use the 32-bit version of MurmurHash3 [@appleby2008] here.
+We will use the `hash()` function from the rlang package package to illustrate the behavior of hashing functions.
+hash() uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a generally complex hashing function then what is normally used for the hashing trick. The 32-bit version of MurmurHash3 [@appleby2008] is typically for its speed good properties.
 
 ```{block, type = "rmdnote"}
 Hashing functions are typically very fast and have certain properties. For example, the output of a hash function is expected to be uniform, with the whole output space filled evenly. The "avalanche effect" describes how similar strings are hashed in such a way that their hashes are not similar in the output space.
 ```
 
-```{r eval=FALSE}
-library(hashFunction)
+Suppose we have many country names in a character vector.
+We can apply the hashing function to each of the country names to project them into an integer space defined by the hashing function.
+
+since `hash()` has too long hashes we create `small_hash()` for demonstration purposes that gives slightly smallerr hashes. The details are not important here.
+
+```{r}
+library(rlang)
 countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina",
                "Mayotte", "Bouvet Island", "South Korea", "San Marino",
                "American Samoa")
 
-map_int(countries, murmur3.32)
+small_hash <- function(x) {
+  strtoi(substr(hash(x), 26, 32), 16)
+}
+
+map_int(countries, small_hash)
 ```
 
-Since MurmurHash uses 32 bits, the number of possible values is `2^32 = 4294967296`, which is admittedly not much of an improvement over ten country names.
+small_hash uses `7 * 4 = 28` bits, the number of possible values is `2^28 = 268435456`, which is admittedly not much of an improvement over ten country names.
 Let's take the modulo of these big integer values to project them down to a more manageable space.
 
-```{r eval=FALSE}
-map_int(countries, murmur3.32) %% 24
+```{r}
+map_int(countries, small_hash) %% 24
 ```
 
 Now we can use these values as indices when creating a matrix.
 
-```{r, eval=FALSE, echo=FALSE}
-Matrix::sparseMatrix(1:10, map_int(countries, murmur3.32) %% 24,
+```{r, echo=FALSE}
+Matrix::sparseMatrix(1:10, map_int(countries, small_hash) %% 24,
                      dims = c(10, 24),
                      dimnames = list(countries, NULL))
 ```
