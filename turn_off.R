@@ -4,10 +4,26 @@ turn_off <- function(x) {
   text <- gsub(pattern = "`r ", replace = "`r #", x = text)
   text <- gsub(pattern = "`r #if \\(", replace = "`r if \\(", x = text)
   text <- gsub(pattern = "eval ?= ?TRUE", replace = "eval=FALSE", x = text)
+  text <- gsub(pattern = r"(```\{r, eval=!?knitr:::is_html_output\(\))", replacement = "```{r, eval=FALSE", x = text)
   writeLines(text, x)
 }
 
 purrr::walk(fs::dir_ls(regexp = "[0-9]+.*\\.Rmd$"), turn_off)
+writeLines(
+  '
+    knitr::opts_chunk$set(
+  comment = "#>",
+    message = FALSE, 
+    warning = FALSE, 
+    cache = TRUE, 
+    eval = FALSE,
+    tidy = "styler", 
+    fig.width = 8, 
+    fig.height = 5
+  )
+    ',
+  "_common.R"
+)
 
 single_core <- function(x) {
   text <- readLines(x)
