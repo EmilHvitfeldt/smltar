@@ -142,9 +142,18 @@ We might want to have these ligatures separated back into separate characters, b
 
 Newcomers in terms of characters are emojis. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
 
-```{r,}
-## TODO, probably run offline and paste finished results
-flags <- ""
+```{r, eval=!knitr:::is_html_output(), echo=FALSE, out.width="100%"}
+knitr::include_graphics("images/tokenization-emoji.png")
+```
+
+```{r, eval=!knitr:::is_html_output(), echo=FALSE}
+flags <- "🇨🇦🇦🇶🇪🇺🇯🇵"
+
+tokenize_characters(flags)
+```
+
+```{r, eval=knitr:::is_html_output(), echo=knitr:::is_html_output()}
+flags <- "🇨🇦🇦🇶🇪🇺🇯🇵"
 
 tokenize_characters(flags)
 ```

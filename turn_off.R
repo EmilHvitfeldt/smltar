@@ -5,6 +5,7 @@ turn_off <- function(x) {
   text <- gsub(pattern = "`r #if \\(", replace = "`r if \\(", x = text)
   text <- gsub(pattern = "eval ?= ?TRUE", replace = "eval=FALSE", x = text)
   text <- gsub(pattern = r"(```\{r, eval=!?knitr:::is_html_output\(\))", replacement = "```{r, eval=FALSE", x = text)
+  text <- gsub(pattern = r"(echo=knitr:::is_html_output\(\))", replacement = "echo=FALSE", x = text)
   writeLines(text, x)
 }
 
