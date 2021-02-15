@@ -65,7 +65,7 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
 - Next, we filter to only keep the top 1000 tokens by term frequency. We filter out those less frequent words because we expect them to be too rare to be reliable, at least for our first attempt. (We are _not_ removing stop words yet; we'll explore removing them in Section \@ref(casestudystopwords).)
 - The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
-- As a last step, we normalize (center and scale) these tf-idf values. We need to do this centering and scaling because it's important for lasso regularization.
+- As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is a good idea because we're going to use a lasso model.
 
 ```{r scotusrec, dependson="scotussplit"}
 library(textrecipes)
