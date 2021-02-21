@@ -1,4 +1,5 @@
-knitr::opts_chunk$set(
+library(knitr)
+opts_chunk$set(
   comment = "#>",
   message = FALSE, 
   warning = FALSE, 
@@ -7,7 +8,20 @@ knitr::opts_chunk$set(
   tidy = "styler", 
   fig.width = 8, 
   fig.height = 5
-  )
+)
+
+# https://github.com/EmilHvitfeldt/smltar/issues/114
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
 
 options(crayon.enabled = FALSE)
 
