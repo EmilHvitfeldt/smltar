@@ -15,7 +15,7 @@ Figure \@ref(fig:cnn-architecture) illustrates a typical CNN architecture.
 The input sequence in this example uses character tokens, but it could also use word tokens.
 A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small tensor which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
 
-```{r cnn-architecture, echo= FALSE, fig.cap="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value."}
+```{r cnn-architecture, echo= FALSE, fig.cap="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value.", out.width="100%"}
 knitr::include_graphics("diagram-files/cnn-architecture.png")
 ```
 
@@ -34,7 +34,7 @@ In Keras, the `filters` represent how many different kernels are trained in each
 The most prominent hyperparameter is the kernel size. 
 The kernel size is the size of the tensor (one-dimensional is this case) that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output tensor, as we see in Figure \@ref(fig:cnn-kernel-size).
 
-```{r cnn-kernel-size, echo= FALSE, fig.cap="The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value."}
+```{r cnn-kernel-size, echo= FALSE, fig.cap="The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value.", out.width="100%"}
 knitr::include_graphics("diagram-files/cnn-kernel-size.png")
 ```
 
