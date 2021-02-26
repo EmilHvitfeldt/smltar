@@ -1,12 +1,17 @@
 on:
   push:
-    branches: master
+    branches:
+      - main
+      - master
 
 name: bookdown
 
 jobs:
   build:
-    runs-on: macOS-latest
+    runs-on: ubuntu-18.04
+    env:
+      RSPM: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -18,7 +23,7 @@ jobs:
 
       - name: Install pandoc and pandoc citeproc
         uses: r-lib/actions/setup-pandoc@master
-        
+
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -30,8 +35,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-2-
+          key: ubuntu-18.04-${{ hashFiles('.github/R-version') }}-2-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ubuntu-18.04-${{ hashFiles('.github/R-version') }}-2-
 
       - name: Cache bookdown results
         uses: actions/cache@v1
@@ -40,17 +45,23 @@ jobs:
           key: bookdown-${{ hashFiles('**/*Rmd') }}
           restore-keys: bookdown-
 
+      - name: Install system dependencies
+        run: |
+          while read -r cmd
+          do
+            eval sudo $cmd
+          done < <(Rscript -e 'cat(remotes::system_requirements("ubuntu", "18.04"), sep = "\n")')
       - name: Install packages
         run: |
           R -e 'remotes::install_deps(dependencies = TRUE)'
-
       - name: Install spacy + tensorflow
         run: |
-          Rscript -e "reticulate::install_miniconda()"
-          echo "options(reticulate.conda_binary = reticulate:::miniconda_conda())" >> .Rprofile
-          Rscript -e "reticulate::conda_create('r-reticulate', packages = 'python==3.6.9')"
-          Rscript -e "spacyr::spacy_install(prompt = FALSE)"
-          Rscript -e "tensorflow::install_tensorflow(version='2.2')"
+          remotes::install_github('rstudio/reticulate')
+          reticulate::install_miniconda()
+          reticulate::conda_create('r-reticulate', packages = c('python==3.6.9'))
+          keras::install_keras(tensorflow = '2.2', extra_packages = c('IPython', 'requests', 'certifi', 'urllib3'))
+          spacyr::spacy_install(prompt = FALSE)
+        shell: Rscript {0}  
           
       - name: Session info
         run: |
