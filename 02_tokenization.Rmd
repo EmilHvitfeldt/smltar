@@ -131,14 +131,13 @@ tokenize_characters(x = the_fir_tree,
 
 The results have more elements because the spaces and punctuation have not been removed.
 
-Sometimes you run into problems where what a "character" is can be ambiguous. Depending on the format you have the data in, it might contain ligatures. Ligatures are when multiple graphemes or letters are combined as a single glyph, which is what we have called a character
-so far. The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+Sometimes you run into problems where what a "character" is can be ambiguous. Depending on the format you have the data in, it might contain ligatures. Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
 
 ```{r}
 tokenize_characters("ﬂowers")
 ```
 
-We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures, stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase glyph. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å.
+We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures, stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å.
 
 Newcomers in terms of characters are emojis. While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
 
@@ -564,7 +563,7 @@ We can use `paste0()` in this function to construct an actual regex.
 
 Our discussion of tokenization so far has focused on text where words are separated by white space and punctuation. For such text, even a quite basic tokenizer can give decent results. However, many written languages don't separate words in this way.
 
-One of these languages is Chinese where each "word" can be represented by one or more consecutive glyphs.
+One of these languages is Chinese where each "word" can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called "word segmentation" and is still an active area of research [@ma-etal-2018-state; @Huang2019].
 
 We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
