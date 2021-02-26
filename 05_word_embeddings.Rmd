@@ -105,7 +105,6 @@ nested_words <- tidy_complaints %>%
 nested_words
 ```
 
-
 Next, let’s create a `slide_windows()` function, using the `slide()` function from the **slider** package [@Vaughan2020] which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see `word1` and `word2` together within this window? We can calculate probabilities based on when we do or do not.
 
 One of the arguments to this function is the `window_size`, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are [@Levy2014]. A smaller window size is also faster to compute.
@@ -141,7 +140,6 @@ For this example, let's use a window size of **four**.
 This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the **furrr** package [@Vaughan2018] to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.
 ```
 
-
 ```{r eval=FALSE}
 library(widyr)
 library(furrr)
@@ -165,12 +163,14 @@ tidy_pmi
 
 When PMI is high, the two words are associated with each other, likely to occur together. When PMI is low, the two words are not associated with each other, unlikely to occur together.
 
-
 ```{block, type = "rmdwarning"}
 The step above used `unite()`, a function from **tidyr** that pastes multiple columns into one, to make a new column for `window_id` from the old `window_id` plus the `complaint_id`. This new column tells us which combination of window and complaint each word belongs to.
 ```
 
-We can next determine the word vectors from the PMI values using singular value decomposition. (TODO: briefly explain what SVD is.) Let's use the `widely_svd()` function in **widyr**, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.
+We can next determine the word vectors from the PMI values using singular value decomposition (SVD). 
+SVD is a common method for dimensionality reduction[@Golub1970]. SVD works intuitively by taking the data, which in our case is located in a high dimensional space, and rotating the axes such that the first dimension captures as much of the variance as possible. Keeping the first axis fixed, the remaining axes are rotated to maximize the variance in the second. This is repeated for all the dimensions.
+More concrete will SVD factor the PMI matrix into a set of smaller matrices containing the word embeddings with dimension size we can control. The dimension size is typically picked to be in the low hundreds. Thus we get a matrix with dimension (`n_vocabulary * n_dim`) instead of (`n_vocabulary * n_vocabulary`), which can be a vast reduction in size for large vocabularies.
+Let's use the `widely_svd()` function in **widyr**, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.
 
 ```{r tidywordvectors, dependson="tidypmi"}
 tidy_word_vectors <- tidy_pmi %>%
@@ -180,6 +180,10 @@ tidy_word_vectors <- tidy_pmi %>%
   )
 
 tidy_word_vectors
+```
+
+```{block, type = "rmdnote"}
+`tidy_word_vectors` is not drastically smaller than `tidy_pmi` since the vocabulary only has a size of `r nrow(count(tidy_pmi, item1))` and `tidy_pmi` is represented in a sparse format.
 ```
 
 We have now successfully found word embeddings, with clear and understandable code. This is a real benefit of this approach; this approach is based on counting, dividing, and matrix decomposition and is thus easier to understand and implement than options based on deep learning. Training word vectors or embeddings, even with this straightforward method, still requires a large data set (ideally, hundreds of thousands of documents or more) and a not insignificant investment of time and computational power. 
