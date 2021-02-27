@@ -731,16 +731,17 @@ cv_fitted %>%
   unnest(validation)
 ```
 
-We can even create a visualization in Figure \@ref(fig:dnncvmetrics) to see the distribution of these metrics for these five folds.
+We can summarize the unnested results to match what we normally would get from `collect_metrics()`
 
-```{r dnncvmetrics, fig.cap="Dense neutral network performance metrics for cross-validation folds"}
+```{r}
 cv_fitted %>%
   unnest(validation) %>%
-  mutate(.metric = fct_reorder(.metric, .estimate)) %>%
-  ggplot(aes(.metric, .estimate, color = .metric)) +
-  geom_boxplot() +
-  geom_point(alpha = 0.5) +
-  theme(legend.position = "none")
+  group_by(.metric) %>%
+  summarize(
+    mean = mean(.estimate),
+    n = n(),
+    std_err = sd(.estimate) / sqrt(n)
+  )
 ```
 
 This dataset is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
