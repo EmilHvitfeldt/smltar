@@ -188,11 +188,11 @@ first_attemp_rmse <- collect_metrics(lasso_rs) %>%
   round(1)
 ```
 
-
 The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r first_attemp_rmse` years.
 
 ```{block, type = "rmdnote"}
-The lower RMSE is, the better; the closer $R^2$ is to one, the better. 
+RSME and $R^2$ are performance metrics used for regression models. RSME is calculated as the mean values of the squared difference between the predicted and observed values. This value is then square rooted. If the model fits the data well then the difference between the predicted and observed value is small, resulting in a lower RSME.  
+$R^2$ is the squared correlation between the predicted and observed values. When the model fits the data well then the predicted and observed values should be closer together hence a higher correlation between them. The correlation between two variables is bounded between -1 and 1. Thus the closer $R^2$ is to one, the better.
 ```
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled data sets.
