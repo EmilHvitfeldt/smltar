@@ -199,18 +199,23 @@ Each word can be represented as a numeric vector in this new feature space. A si
 Which words are close to each other in this new feature space of word embeddings? Let's create a simple function that will find the nearest words to any given example in using our newly created word embeddings.
 
 ```{r nearestsynonyms}
-## TODO: switch to cosine similarity?
 nearest_neighbors <- function(df, token) {
   df %>%
     widely(
-      ~ . %*% (.[token, ]),
+      ~ {
+        y <- .[rep(token, nrow(.)), ]
+        res <- rowSums(. * y) / 
+          (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
+
+        matrix(res, ncol = 1, dimnames = list(x = names(res)))
+        },
       sort = TRUE
     )(item1, dimension, value) %>%
     select(-item2)
 }
 ```
 
-This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
+This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and summations to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word and returns a dataframe sorted by similarity.
 
 What words are closest to `"error"` in the data set of CFPB complaints, as determined by our word embeddings?
 
@@ -237,7 +242,15 @@ tidy_word_vectors %>%
     nearest_neighbors("fee")
 ```
 
-We find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
+We find a lot of dollar amounts which makes sense. Let us filter out the numbers to see what words are similar to `"fee'`
+
+```{r dependson=c("tidywordvectors", "nearestsynonyms")}
+tidy_word_vectors %>%
+    nearest_neighbors("fee") %>%
+  filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE))
+```
+
+We now find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints.
 
