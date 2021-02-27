@@ -1,6 +1,6 @@
 # Long short-term memory (LSTM) networks  {#dllstm}
 
-In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple" dense network architectures. These architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlclassification) and \@ref(mlregression), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs).
+In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple" dense network architectures. These architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlclassification) and \@ref(mlregression), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs)[@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
 
@@ -86,7 +86,7 @@ Because we are training a binary classification model, we use `activation = "sig
 Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
 
 ```{block, type = "rmdnote"}
-A good default optimizer for many problems is `"adam"`, and a good loss function for binary classification is `"binary_crossentropy"`.
+A good default optimizer for many problems is `"adam"`[@kingma2017adam], and a good loss function for binary classification is `"binary_crossentropy"`.
 ```
 
 ```{r, eval=!online}
@@ -172,7 +172,7 @@ state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 Let's also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
 
 ```{block, type = "rmdwarning"}
-When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting.
+When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting[@Srivastava2014].
 ```
 
 ```{r, eval=!online}
@@ -248,7 +248,7 @@ val_res %>%
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN). Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs.
+An LSTM is actually a specific kind of recurrent neural network (RNN)[@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs.
 
 ```{block, type = "rmdwarning"}
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
