@@ -109,3 +109,12 @@ cm_heat <- function(x) {
     ) %+%
     ggplot2::geom_text(ggplot2::aes(label = Freq))
 }
+
+
+tidy.LiblineaR <- function(x, ...) {
+  
+  ret <- tibble(colnames(x$W), x$W[1,])
+  colnames(ret) <- c("term", "estimate")
+  
+  ret
+}
