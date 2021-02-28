@@ -102,7 +102,7 @@ cm_heat <- function(x) {
       )
     ) %+%
     ggplot2::geom_tile() %+%
-    ggplot2::scale_fill_gradient(low = "grey99", high = "#A8C902") %+%
+    ggplot2::scale_fill_gradient(low = "grey99", high = "#5781AE") %+%
     ggplot2::theme(
       panel.background = ggplot2::element_blank(),
       legend.position = "none"
