@@ -72,3 +72,40 @@ keras_predict <- function(model, baked_data, response) {
     mutate(across(c(state, .pred_class),
                   ~ factor(.x, levels = c(1, 0))))
 }
+
+autoplot.conf_mat <- function(object, type = "heatmap", ...) {
+  cm_heat(object)
+}
+
+cm_heat <- function(x) {
+  `%+%` <- ggplot2::`%+%`
+  
+  table <- x$table
+  
+  df <- as.data.frame.table(table)
+  
+  # Force known column names, assuming that predictions are on the
+  # left hand side of the table (#157).
+  names(df) <- c("Prediction", "Truth", "Freq")
+  
+  # Have prediction levels going from high to low so they plot in an
+  # order that matches the LHS of the confusion matrix
+  lvls <- levels(df$Prediction)
+  df$Prediction <- factor(df$Prediction, levels = rev(lvls))
+  
+  df %>%
+    ggplot2::ggplot(
+      ggplot2::aes(
+        x = Truth,
+        y = Prediction,
+        fill = Freq
+      )
+    ) %+%
+    ggplot2::geom_tile() %+%
+    ggplot2::scale_fill_gradient(low = "grey99", high = "#A8C902") %+%
+    ggplot2::theme(
+      panel.background = ggplot2::element_blank(),
+      legend.position = "none"
+    ) %+%
+    ggplot2::geom_text(ggplot2::aes(label = Freq))
+}
