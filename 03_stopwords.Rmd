@@ -387,7 +387,7 @@ In Section \@ref(casestudystopwords) we investigate the influence of removing st
 
 So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of "short" and "long" lists we have used so far are specific to English as a language. You should expect different languages to have a different number of "uninformative" words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.
 
-Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are a couple of diagrams showing the use of definite and indefinite articles in German. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.
+Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are a couple of tables showing the use of definite and indefinite articles in German[@germanarticles]. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.
 
 ```{r, echo=FALSE}
 library(magrittr)
@@ -405,16 +405,15 @@ tibble::tribble(
 
 ```{r, echo=FALSE}
 tibble::tribble(
-  ~Masculine, ~Feminine, ~Neuter, ~Plural, ~case,
-  "ein", "eine", "ein", "keine", "Nominative",
-  "einen", "eine", "ein", "keine", "Accusative",
-  "einem", "einer", "einem", "keinen", "Dative",
-  "eines", "einer", "eines", "keiner", "Genitive"
+  ~Masculine, ~Feminine, ~Neuter, ~case,
+  "ein", "eine", "ein", "Nominative",
+  "einen", "eine", "ein", "Accusative",
+  "einem", "einer", "einem", "Dative",
+  "eines", "einer", "eines", "Genitive"
 ) %>%
   gt(rowname_col = "case") %>%
   tab_header(title = "German Indefinite Articles (a/an)")
 ```
-
 
 Building lists of stop words in Chinese has been done both manually and automatically [@Zou2006ACC] but so far none has been accepted as a standard [@Zou2006]. A full discussion of stop word identification in Chinese text would be out of scope for this book, so we will just highlight some of the challenges that differentiate it from English. 
 
