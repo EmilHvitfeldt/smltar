@@ -65,7 +65,7 @@ Next, let's preprocess our data to get it ready for modeling using a recipe. We'
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
 - Next, we filter to only keep the top 1000 tokens by term frequency. We filter out those less frequent words because we expect them to be too rare to be reliable, at least for our first attempt. (We are _not_ removing stop words yet; we'll explore removing them in Section \@ref(casestudystopwords).)
 - The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
-- As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is a good idea because we're going to use a lasso model.
+- As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is needed because we're going to use a support vector machine model.
 
 ```{r scotusrec, dependson="scotussplit"}
 library(textrecipes)
@@ -79,6 +79,17 @@ scotus_rec <- recipe(year ~ text, data = scotus_train) %>%
 scotus_rec
 ```
 
+Now that we have a full specification of the preprocessing recipe, we can `prep()` this recipe to estimate all the necessary parameters for each step using the training data and `bake()` it to apply the steps to data, like the training data (with `new_data = NULL`), testing data, or new data at prediction time. 
+
+```{r scotusprep, dependson="scotusrec"}
+scotus_prep <- prep(scotus_rec)
+scotus_bake <- bake(scotus_prep, new_data = NULL)
+
+dim(scotus_bake)
+```
+
+For most modeling tasks, you will not need to `prep()` or `bake()` your recipe directly; instead you can build up a tidymodels `workflow()` to bundle together your modeling components.
+
 Let's create a `workflow()` to bundle together this recipe with any model specifications we may want to create later. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
 
 First, let's create an empty `workflow()` and then only add the data preprocessor `scotus_rec` to it.
@@ -90,49 +101,49 @@ scotus_wf <- workflow() %>%
 scotus_wf
 ```
 
-Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a lasso regression model with `mixture = 1`. 
+Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a linear support vector machine (SVM) model. 
 
-```{block, type = "rmdnote"}
-The `mixture` argument for a linear regression model specifies the proportion of L1 regularization. Using `mixture = 1` sets up a lasso model, while `mixture = 0` would be a ridge model.
+```{block2, type = "rmdnote"}
+An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section \@ref(tktk) for tuning model hyperparameters).
 ```
 
-Before fitting, we set up a model specification.
+Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let's use the **LiblineaR** engine [R-LiblineaR].
 
-```{r lassospec}
-lasso_spec <- linear_reg(penalty = 0.1, mixture = 1) %>%
+```{r svmspec}
+svm_spec <- svm_linear() %>%
   set_mode("regression") %>%
-  set_engine("glmnet")
-
-lasso_spec
+  set_engine("LiblineaR")
 ```
 
 Everything is now ready for us to fit our model. Let's add our model to the workflow with `add_model()` and fit to our training data `scotus_train`.
 
-```{r lassofit, dependson=c("lassospec", "scotuswf")}
-lasso_fit <- scotus_wf %>%
-  add_model(lasso_spec) %>%
+```{r svmfit, dependson=c("svmspec", "scotuswf")}
+svm_fit <- scotus_wf %>%
+  add_model(svm_spec) %>%
   fit(data = scotus_train)
 ```
 
-We have successfully fit a regularized regression model to this data set of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+We have successfully fit an SVM model to this data set of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
-```{r dependson="lassofit"}
-lasso_fit %>%
+```{r dependson="svmfit"}
+svm_fit %>%
   pull_workflow_fit() %>%
   tidy() %>%
   arrange(-estimate)
 ```
 
-We see here, for the penalty we specified (`penalty = 0.1`), what terms contribute to a Supreme Court opinion being written more recently, plus the intercept for this particular penalty. 
+The term `Bias` here means the same thing as an intercept. We see here, what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
 
 What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?
 
-```{r dependson="lassofit"}
-lasso_fit %>%
+```{r dependson="svmfit"}
+svm_fit %>%
   pull_workflow_fit() %>%
   tidy() %>%
   arrange(estimate)
 ```
+
+Here we see words like "ought" and "therefore".
 
 ### Evaluation {#firstregressionevaluation}
 
@@ -150,7 +161,7 @@ Yet another option for evaluating or comparing models is to use a separate valid
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the lasso regression model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
 set.seed(123)
@@ -163,26 +174,25 @@ Each of these "splits" contains information about how to create cross-validation
 
 In Section \@ref(firstregression), we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r lassors, dependson=c("scotuswf", "scotusfolds", "lassospec")}
+```{r svmrs, dependson=c("scotuswf", "scotusfolds", "svmspec")}
 set.seed(123)
-lasso_rs <- fit_resamples(
-  scotus_wf %>% add_model(lasso_spec),
+svm_rs <- fit_resamples(
+  scotus_wf %>% add_model(svm_spec),
   scotus_folds,
   control = control_resamples(save_pred = TRUE)
 )
 
-lasso_rs
+svm_rs
 ```
 
 These results look a lot like the resamples, but they have some additional columns, like the `.metrics` that we can use to measure how well this model performed and the `.predictions` we can use to explore that performance more deeply. What results do we see, in terms of performance metrics?
 
-```{r, dependson="lassors"}
-lasso_rs %>%
-  collect_metrics()
+```{r, dependson="svmrs"}
+collect_metrics(svm_rs)
 ```
 
-```{r firstattemprmse, dependson="lassors", echo=FALSE}
-first_attemp_rmse <- collect_metrics(lasso_rs) %>%
+```{r firstattemprmse, dependson="svmrs", echo=FALSE}
+first_attemp_rmse <- collect_metrics(svm_rs) %>%
   filter(.metric == "rmse") %>%
   pull(mean) %>%
   round(1)
@@ -191,14 +201,17 @@ first_attemp_rmse <- collect_metrics(lasso_rs) %>%
 The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is `r first_attemp_rmse` years.
 
 ```{block, type = "rmdnote"}
-RSME and $R^2$ are performance metrics used for regression models. RSME is calculated as the mean values of the squared difference between the predicted and observed values. This value is then square rooted. If the model fits the data well then the difference between the predicted and observed value is small, resulting in a lower RSME.  
-$R^2$ is the squared correlation between the predicted and observed values. When the model fits the data well then the predicted and observed values should be closer together hence a higher correlation between them. The correlation between two variables is bounded between -1 and 1. Thus the closer $R^2$ is to one, the better.
+RSME and $R^2$ are performance metrics used for regression models. 
+
+RSME is a measure of the difference between the predicted and observed values; if the model fits the data well, RMSE is lower. To compute RMSE, you take the mean values of the squared difference between the predicted and observed values, then take the square root. 
+
+$R^2$ is the squared correlation between the predicted and observed values. When the model fits the data well, the predicted and observed values are closer together with a higher correlation between them. The correlation between two variables is bounded between -1 and 1, so the closer $R^2$ is to one, the better.
 ```
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled data sets.
 
-```{r firstregpredict, dependson="lassors", fig.width=7, fig.height=5.5, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our lasso regression predictions and the real years"}
-lasso_rs %>%
+```{r firstregpredict, dependson="svmrs", fig.width=7, fig.height=5.5, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years"}
+svm_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
@@ -222,7 +235,7 @@ One way to assess a model like this one is to compare its performance to a "null
 A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)^[This is sometimes called a "baseline model."].
 ```
 
-We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our lasso model specification for the `null_model()` specification.
+We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our SVM model specification for the `null_model()` specification.
 
 ```{r nullrs, dependson=c("scotuswf", "scotusfolds")}
 null_regression <- null_model() %>%
@@ -241,139 +254,16 @@ null_rs
 What results do we obtain from the null model, in terms of performance metrics?
 
 ```{r, dependson="nullrs"}
-null_rs %>%
-  collect_metrics()
+collect_metrics(null_rs)
 ```
 
-The RMSE indicates that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and no tuning) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
-
-## Tuning lasso hyperparameters {#tunelasso}
-
-The value `penalty = 0.1` for regularization in Section \@ref(firstregression) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
-
-```{r scotustunespec}
-tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
-  set_mode("regression") %>%
-  set_engine("glmnet")
-
-tune_spec
-```
-
-After the tuning process, we can select a single best numeric value.
-
-```{block, type = "rmdnote"}
-Think of `tune()` here as a placeholder for the regularization penalty.
-```
-
-We can create a regular grid of values to try, using a convenience function for `penalty()`.
-
-```{r scotuslambdagrid}
-lambda_grid <- grid_regular(penalty(), levels = 30)
-
-lambda_grid
-```
-
-The function `grid_regular()` is from the **dials** package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values.
-
-Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
-
-```{block, type = "rmdnote"}
-Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
-```
-
-We add our tunable model specification `tune_spec` to the same workflow we've been using so far that contains the preprocessing recipe.
-
-```{r scotustunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval=!online}
-set.seed(2020)
-tune_rs <- tune_grid(
-  scotus_wf %>% add_model(tune_spec),
-  scotus_folds,
-  grid = lambda_grid,
-  control = control_resamples(save_pred = TRUE)
-)
-
-tune_rs
-```
-
-```{r, include = FALSE, eval=!online}
-write_rds(tune_rs, "data/ml_reg_tune_rs.rds")
-```
-
-```{r scotustuners, include = FALSE}
-tune_rs <- read_rds("data/ml_reg_tune_rs.rds")
-tune_rs
-```
-
-Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
-
-```{r dependson="scotustuners"}
-tune_rs %>%
-  collect_metrics()
-```
-
-Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:scotustunevis) to see what the best model is.
-
-```{r scotustunevis, dependson="scotustuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the lowest RMSE"}
-tune_rs %>%
-  collect_metrics() %>%
-  ggplot(aes(penalty, mean, color = .metric)) +
-  geom_errorbar(aes(
-    ymin = mean - std_err,
-    ymax = mean + std_err
-  ),
-  alpha = 0.5
-  ) +
-  geom_line(size = 1.5) +
-  facet_wrap(~.metric, scales = "free", nrow = 2) +
-  scale_x_log10() +
-  theme(legend.position = "none") +
-  labs(
-    title = "Lasso model performance across regularization penalties",
-    subtitle = "Performance metrics can be used to identity the best penalty"
-  )
-```
-
-We can view the best results with `show_best()` and a choice for the metric, such as RMSE.
-
-```{r dependson="scotustuners"}
-tune_rs %>%
-  show_best("rmse")
-```
-
-```{r tunersrmse, echo=FALSE, dependson="scotustuners"}
-tune_rs_rmse <- show_best(tune_rs, "rmse") %>%
-  pull(mean) %>%
-  min() %>%
-  round(1)
-```
-
-The best value for RMSE from this tuning run is `r tune_rs_rmse`. We can extract the best regularization parameter for this value of RMSE from our tuning results with `select_best()`.
-
-```{r scotuslowestrmse, dependson="scotustuners"}
-lowest_rmse <- tune_rs %>%
-  select_best("rmse")
-
-lowest_rmse
-```
-
-Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
-
-```{r dependson=c("scotuslowestrmse", "scotustuners")}
-final_lasso <- finalize_workflow(
-  scotus_wf %>% add_model(tune_spec),
-  lowest_rmse
-)
-
-final_lasso
-```
-
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(lowest_rmse$penalty, 3)`. This workflow is ready to go! It can now be applied to new data.
+The RMSE indicates that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and very little specialized preprocessing) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
 
 ## Compare to a random forest model {#comparerf}
 
 Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see @Caruana2008 and @Olson2017 for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark data sets; random forest models were one of the best overall. Let's see how a random forest model performs with our data set of Supreme Court opinions.
 
-First, let's build a random forest model specification, using the ranger implementation. Random forest models are known for performing well without tuning, so we will just make sure we have enough `trees`.
+First, let's build a random forest model specification, using the ranger implementation. Random forest models are known for performing well without hyperparameter tuning, so we will just make sure we have enough `trees`.
 
 ```{r scotusrfspec}
 rf_spec <- rand_forest(trees = 1000) %>%
@@ -438,7 +328,7 @@ rf_rs %>%
   write_rds("data/ml_reg_rf_predictions.rds")
 ```
 
-```{r rfpredict, echo = FALSE, fig.width=7, fig.height=5.5, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear model with lasso regularization"}
+```{r rfpredict, echo = FALSE, fig.width=7, fig.height=5.5, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
 rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
 rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -464,99 +354,11 @@ Models that work best with text tend to be models designed for or otherwise appr
 
 Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
 
-## Case study: sparse encoding {#casestudysparseencoding}
-
-Speaking of sparse data, we can change how our text data is represented to take advantage of this sparsity. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
-
-To keep our text data sparse in the sense of having many zero values, we need to create a slightly different preprocessing recipe.
-
-```{r tfidfrec, dependson="scotussplit"}
-tfidf_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(text) %>%
-  step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text)
-
-tfidf_rec
-```
-
-How is this recipe different from `scotus_rec`? It does not include a step to center and scale the predictors with `step_normalize()`, instead relying on the "normalization" of weighting by tf-idf. Regularized models do require that all predictors are on the same scale, but weighting by tf-idf can often provide this for text data, without a final centering and scaling.
-
-The next step to use the sparse capabilities of `set_engine("glmnet")` is to explicitly set a non-default preprocessing blueprint, using the package hardhat.
-
-```{block, type = "rmdwarning"}
-The [hardhat](https://hardhat.tidymodels.org/) package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
-```
-
-```{r sparsebp}
-library(hardhat)
-sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
-```
-
-This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type, from the Matrix package [@R-Matrix], used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
-
-```{r sparsewf, dependson=c("scotustunespec", "tfidfrec", "sparsebp")}
-sparse_wf <- workflow() %>%
-  add_recipe(tfidf_rec, blueprint = sparse_bp) %>%
-  add_model(tune_spec)
-
-sparse_wf
-```
-
-The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
-
-```{r gridtwenty}
-grid_twenty <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
-
-grid_twenty
-```
-
-We can tune this lasso regression model, in the same way that we did in Section \@ref(tunelasso). We will fit and assess each possible regularization parameter on each resampling fold, to find the best amount of regularization.
-
-```{r sparsetunersoffline, dependson=c("scotuswf", "scotusfolds", "scotuslambdagrid", "scotustunespec"), eval=!online}
-set.seed(2020)
-sparse_rs <- tune_grid(
-  sparse_wf,
-  scotus_folds,
-  grid = grid_twenty
-)
-
-sparse_rs
-```
-
-```{r, include = FALSE, eval=!online}
-write_rds(sparse_rs, "data/ml_reg_sparse_rs.rds")
-```
-
-```{r sparsetuners, include = FALSE}
-sparse_rs <- read_rds("data/ml_reg_sparse_rs.rds")
-sparse_rs
-```
-
-How did this model turn out, especially compared to the tuned model that included centering/scaling and did not use the sparse capabilities of `set_engine("glmnet")`?
-
-```{r dependson="sparsetuners"}
-sparse_rs %>%
-  show_best("rmse")
-```
-
-The best RMSE is nearly identical; the best RMSE for the non-sparse tuned lasso model in Section \@ref(tunelasso) was `r tune_rs_rmse`. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was `r round(lowest_rmse$penalty, 3)`) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
-
-Importantly, this tuning also took a bit less time to complete. 
-
-- The _preprocessing_ was only a little bit faster, because tokenization and computing tf-idf take a long time, compared to `step_normalize()` that we removed. 
-- The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
-
-Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
-
-```{block, type = "rmdnote"}
-Since our model performance is about the same and we see gains in training time, let's use this sparse representation for the rest of this chapter.
-```
-
 ## Case study: removing stop words {#casestudystopwords}
 
 We did not remove stop words (Chapter \@ref(stopwords)) in any of our models so far in this chapter. What impact will removing stop words have, and how do we know which stop word list is the best to use? The best way to answer these questions is with experimentation. 
 
-Removing stop words is part of data preprocessing, so we define this step as part of our preprocessing recipe. Let's use the best model we've found so far (the regularized regression model from Section \@ref(tunelasso)) and switch in a different recipe in our modeling workflow.
+Removing stop words is part of data preprocessing, so we define this step as part of our preprocessing recipe. Let's use the best model we've found so far (the linear SVM model from Section \@ref(firstregressionevaluation)) and switch in a different recipe in our modeling workflow.
 
 Let's build a small recipe wrapper helper function so we can pass a value `stopword_name` to `step_stopwords()`.
 
@@ -566,7 +368,8 @@ stopword_rec <- function(stopword_name) {
     step_tokenize(text) %>%
     step_stopwords(text, stopword_source = stopword_name) %>%
     step_tokenfilter(text, max_tokens = 1e3) %>%
-    step_tfidf(text)
+    step_tfidf(text) %>%
+    step_normalize(all_predictors())
 }
 ```
 
@@ -576,70 +379,53 @@ For example, now we can create a recipe that removes the Snowball stop words lis
 stopword_rec("snowball")
 ```
 
-Next, let's set up a new workflow that has a model only, using `add_model()`. We start with the empty `workflow()` and then add our tunable regularized regression model.
+Next, let's set up a new workflow that has a model only, using `add_model()`. We start with the empty `workflow()` and then add our linear SVM regression model.
 
-```{r tunablewf, dependson="scotustunespec"}
-tunable_wf <- workflow() %>%
-  add_model(tune_spec)
+```{r svmwf, dependson="svmspec"}
+svm_wf <- workflow() %>%
+  add_model(svm_spec)
 
-tunable_wf
+svm_wf
 ```
 
-Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same tunable lasso model specification that we used in Section \@ref(tunelasso) but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
+Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same linear SVM specification that we used in Section \@ref(firstmlregression) but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
 
-Now we can put this all together and tune these models which include stop word removal. We could create a little helper function for tuning like we did for the recipe, but we have printed out all three calls to `tune_grid()` for extra clarity. Notice for each one that there are three arguments:
+Now we can put this all together and fit these models which include stop word removal. We could create a little helper function for fitting like we did for the recipe, but we have printed out all three calls to `fit_resamples()` for extra clarity. Notice for each one that there are two arguments:
 
-- A tunable workflow, which consists of the tunable lasso model specification and a data preprocessing recipe with stop word removal
+- A workflow, which consists of the linear SVM model specification and a data preprocessing recipe with stop word removal
 - The same cross-validation folds we created earlier
-- The same grid of values for the regularization parameter that we used in the previous case study
 
-```{r stopwordsresoffline, dependson=c("gridtwenty", "tunablewf", "stopwordrec", "scotusfolds"), eval=!online}
+
+```{r stopwordsres, dependson=c("svmwf", "stopwordrec", "scotusfolds")}
 set.seed(123)
-snowball_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("snowball"),
-                            blueprint = sparse_bp),
-  scotus_folds,
-  grid = grid_twenty
+snowball_rs <- fit_resamples(
+  svm_wf %>% add_recipe(stopword_rec("snowball")),
+  scotus_folds
 )
 
 set.seed(234)
-smart_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("smart"),
-                            blueprint = sparse_bp),
-  scotus_folds,
-  grid = grid_twenty
+smart_rs <- fit_resamples(
+  svm_wf %>% add_recipe(stopword_rec("smart")),
+  scotus_folds
 )
 
 set.seed(345)
-stopwords_iso_rs <- tune_grid(
-  tunable_wf %>% add_recipe(stopword_rec("stopwords-iso"),
-                            blueprint = sparse_bp),
-  scotus_folds,
-  grid = grid_twenty
+stopwords_iso_rs <- fit_resamples(
+  svm_wf %>% add_recipe(stopword_rec("stopwords-iso")),
+  scotus_folds
 )
 ```
 
 
-After fitting models for each of possible regularization values to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.
+After fitting models to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.
 
-```{r dependson="stopwordsresoffline", eval=!online}
+```{r dependson="stopwordsres"}
 collect_metrics(smart_rs)
-```
-
-```{r, dependson="stopwordsresoffline", include = FALSE, eval=!online}
-smart_rs %>%
-  collect_metrics() %>%
-  write_rds("data/ml_reg_smart_metrics.rds")
-```
-
-```{r smartmetrics, echo = FALSE}
-smart_metrics <- read_rds("data/ml_reg_smart_metrics.rds")
-smart_metrics
 ```
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
-```{r snowballrmseoffline, dependson="stopwordsres", eval=!online}
+```{r snowballrmse, dependson="stopwordsres"}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>%
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
@@ -648,33 +434,13 @@ list(snowball = snowball_rs,
      `stopwords-iso` = stopwords_iso_rs) %>%
   map_dfr(show_best, "rmse", .id = "name") %>%
   left_join(word_counts, by = "name") %>%
-  mutate(name = paste0(name, " (", words, " words)")) %>%
-  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
-  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
-  labs(x = NULL, y = "mean RMSE for five best models",
-       title = "Model performance for three stop word lexicons",
-       subtitle = "For this data set, the Snowball lexicon performed best")
-```
-
-```{r, dependson="snowballrmseoffline", echo = FALSE, eval=!online}
-list(snowball = snowball_rs,
-     smart = smart_rs,
-     `stopwords-iso` = stopwords_iso_rs) %>%
-  map_dfr(show_best, "rmse", .id = "name") %>%
-  write_rds("data/ml_reg_stopword_results.rds")
-```
-
-```{r snowballrmse, echo = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
-word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>%
-  mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
-
-stopword_results <- read_rds("data/ml_reg_stopword_results.rds")
-stopword_results %>%
-  left_join(word_counts) %>%
-  mutate(name = paste0(name, " (", words, " words)")) %>%
-  ggplot(aes(fct_reorder(name, words), mean, color = name)) +
-  geom_point(size = 3, alpha = 0.8, show.legend = FALSE) +
-  labs(x = NULL, y = "mean RMSE for five best models",
+  mutate(name = paste0(name, " (", words, " words)"),
+         name = fct_reorder(name, words)) %>%
+  ggplot(aes(name, mean, color = name)) +
+  geom_crossbar(aes(ymin = mean - std_err, ymax = mean + std_err), alpha = 0.6) +
+  geom_point(size = 3, alpha = 0.8) +
+  theme(legend.position = "none") +
+  labs(x = NULL, y = "RMSE",
        title = "Model performance for three stop word lexicons",
        subtitle = "For this data set, the Snowball lexicon performed best")
 ```
@@ -685,7 +451,7 @@ The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig
 This result is not generalizable to all data sets and contexts, but the approach outlined in this section **is** generalizable. 
 ```
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results for smart and stopword-iso are worse than removing no stopwords at all (see Figure \@ref(fig:scotustunevis)). This indicates that removing a small stop word list is a good choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results for smart and stopword-iso are worse than removing no stopwords at all (remember that the RMSE was `r first_attemp_rmse` years in Section \@ref(firstregressionevaluation)). This indicates that removing a small stop word list is a good choice.
 
 This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
 
@@ -700,7 +466,8 @@ ngram_rec <- function(ngram_options) {
   recipe(year ~ text, data = scotus_train) %>%
     step_tokenize(text, token = "ngrams", options = ngram_options) %>%
     step_tokenfilter(text, max_tokens = 1e3) %>%
-    step_tfidf(text)
+    step_tfidf(text) %>%
+    step_normalize(all_predictors())
 }
 ```
 
@@ -720,20 +487,19 @@ ngram_rec(list(n = 3, n_min = 1))
 Including n-grams of different orders in a model (such as trigrams, bigrams, plus unigrams) allows the model to learn at different levels of linguistic organization and context. 
 ```
 
-We can reuse the same components `tunable_wf` and `grid_twenty` from our earlier case study; these modular components are a benefit to adopting this approach to supervised machine learning. These model components provide the tunable lasso model specification and possible regularization parameters to try. Let's put it all together and create a helper function to use `tune_grid()` with these components plus our helper recipe function.
+We can reuse the same workflow `svm_wf` from our earlier case study; these types of modular components are a benefit to adopting this approach to supervised machine learning. This workflow provides the linear SVM specification. Let's put it all together and create a helper function to use `fit_resamples()` with this model plus our helper recipe function.
 
-```{r tunengram, dependson=c("gridtwenty", "tunablewf", "ngramrec", "scotusfolds")}
-tune_ngram <- function(ngram_options) {
-  tune_grid(
-    tunable_wf %>% add_recipe(ngram_rec(ngram_options), blueprint = sparse_bp),
-    scotus_folds,
-    grid = grid_twenty
+```{r fitngram, dependson=c("tunablewf", "ngramrec", "scotusfolds")}
+fit_ngram <- function(ngram_options) {
+  fit_resamples(
+    svm_wf %>% add_recipe(ngram_rec(ngram_options)),
+    scotus_folds
   )
 }
 ```
 
 ```{block2, type = "rmdwarning"}
-We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords), but there we showed each call to `tune_grid()` for extra clarity.
+We could have created this type of small function for trying out different stop word lexicons in Section \@ref(casestudystopwords), but there we showed each call to `fit_resamples()` for extra clarity.
 ```
 
 With this helper function, let's try out predicting the year of Supreme Court opinions using:
@@ -742,72 +508,38 @@ With this helper function, let's try out predicting the year of Supreme Court op
 - bigrams and unigrams
 - trigrams, bigrams, and unigrams
 
-```{r ngramresoffline, dependson=c("tunengram"), eval=!online}
+```{r ngramrs, dependson=c("fitngram")}
 set.seed(123)
-unigram_rs <- tune_ngram(list(n = 1))
+unigram_rs <- fit_ngram(list(n = 1))
 
 set.seed(234)
-bigram_rs <- tune_ngram(list(n = 2, n_min = 1))
+bigram_rs <- fit_ngram(list(n = 2, n_min = 1))
 
 set.seed(345)
-trigram_rs <- tune_ngram(list(n = 3, n_min = 1))
+trigram_rs <- fit_ngram(list(n = 3, n_min = 1))
 ```
 
 These sets of results contain metrics computed for the model with that tokenization strategy.
 
-```{r dependson="ngramresoffline", eval=!online}
+```{r dependson="ngramrs"}
 collect_metrics(bigram_rs)
-```
-
-```{r, dependson="ngramresoffline", echo = FALSE, eval=!online}
-bigram_rs %>%
-  collect_metrics() %>%
-  write_rds("data/ml_reg_bigram_metrics.rds")
-```
-
-```{r bigrammetrics, echo = FALSE}
-bigram_metrics <- read_rds("data/ml_reg_bigram_metrics.rds")
-bigram_metrics
 ```
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
-```{r ngramrmseoffline, dependson="ngramres", eval=!online}
+```{r ngramrmse, dependson="ngramrs"}
 list(`1` = unigram_rs,
      `1 and 2` = bigram_rs,
      `1, 2, and 3` = trigram_rs) %>%
   map_dfr(collect_metrics, .id = "name") %>%
   filter(.metric == "rmse") %>%
-  ggplot(aes(name, mean, fill = name)) +
-  geom_dotplot(binaxis = "y", stackdir = "center", binpositions = "all",
-               show.legend = FALSE) +
+  ggplot(aes(name, mean, color = name)) +
+  geom_crossbar(aes(ymin = mean - std_err, ymax = mean + std_err), alpha = 0.6) +
+  geom_point(size = 3, alpha = 0.8) +
+  theme(legend.position = "none") +
   labs(
     x = "Degree of n-grams",
-    y = "mean RMSE",
-    title = "Model performance for different degrees of n-gram tokenization",
-    subtitle = paste("For the same number of tokens,",
-                     "bigrams plus unigrams performed best")
-  )
-```
-
-```{r, dependson="ngramrmseoffline", echo = FALSE, eval=!online}
-list(`1` = unigram_rs,
-     `1 and 2` = bigram_rs,
-     `1, 2, and 3` = trigram_rs) %>%
-  map_dfr(collect_metrics, .id = "name") %>%
-  filter(.metric == "rmse") %>%
-  write_rds("data/ml_reg_ngram_results.rds")
-```
-
-```{r ngramrmse, echo = FALSE, fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
-ngram_results <- read_rds("data/ml_reg_ngram_results.rds")
-ngram_results %>%
-  ggplot(aes(name, mean, fill = name)) +
-  geom_dotplot(binaxis = "y", stackdir = "center", binpositions = "all",
-               show.legend = FALSE) +
-  labs(
-    x = "Degree of n-grams",
-    y = "mean RMSE",
+    y = "RMSE",
     title = "Model performance for different degrees of n-gram tokenization",
     subtitle = paste("For the same number of tokens,",
                      "bigrams plus unigrams performed best")
@@ -846,112 +578,201 @@ Using lemmatization instead of a more straightforward tokenization strategy is s
 
 Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.
 
-```{r lemmarec, dependson="scotussplit", message=FALSE, eval=online}
+```{r lemmarec, dependson="scotussplit", message=FALSE}
 spacyr::spacy_initialize(entity = FALSE)
 
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
   step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text)
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
 
 lemma_rec
 ```
 
-```{r lemmarecoffline, dependson="scotussplit", echo = FALSE, eval=!online}
-lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(text, engine = "spacyr") %>%
-  step_lemma(text) %>%
-  step_tokenfilter(text, max_tokens = 1e3) %>%
-  step_tfidf(text)
+Let's combine this lemmatized text with our linear SVM workflow. We can then fit our workflow to our resampled data sets and estimate performance using lemmatization.
 
-lemma_rec
-```
-
-Let's combine this lemmatized text with our tunable workflow and grid of possible parameter values. We can then tune our workflow and identify the best model for the lemmatized text.
-
-```{r, lemmatunersoffline, dependson=c("gridtwenty", "tunablewf", "lemmarecoffline", "scotusfolds"), eval=!online}
-set.seed(123)
-lemma_rs <- tune_grid(
-  tunable_wf %>% add_recipe(lemma_rec, blueprint = sparse_bp),
-  scotus_folds,
-  grid = grid_twenty
+```{r lemmars, dependson=c("svmwf", "lemmarec", "scotusfolds")}
+lemma_rs <- fit_resamples(
+  svm_wf %>% add_recipe(lemma_rec),
+  scotus_folds
 )
 ```
 
+How did this model perform?
 
-Let's visualize the performance metrics, RMSE and $R^2$, in Figure \@ref(fig:scotuslemmavis) to see what the best model using lemmas is, much like we did in Figure \@ref(fig:scotustunevis).
-
-```{r scotuslemmavisoffline, dependson="lemmatuners", echo=FALSE, fig.width=8, fig.height=8, eval=!online}
-lemma_rs %>%
-  collect_metrics() %>%
-  ggplot(aes(penalty, mean, color = .metric)) +
-  geom_errorbar(aes(
-    ymin = mean - std_err,
-    ymax = mean + std_err
-  ),
-  alpha = 0.5
-  ) +
-  geom_line(size = 1.5) +
-  facet_wrap(~.metric, scales = "free", nrow = 2) +
-  scale_x_log10() +
-  theme(legend.position = "none") +
-  labs(
-    y = "RMSE",
-    title = "Lasso model performance using lemmatization",
-    subtitle = paste("Performance metrics indicate that lemmatization",
-                     "improves model performance")
-  )
+```{r dependson="lemmars"}
+collect_metrics(lemma_rs)
 ```
 
-```{r, dependson="scotuslemmavisoffline", echo = FALSE, eval=!online}
-lemma_rs %>%
-  collect_metrics() %>%
-  write_rds("data/ml_reg_lemma_metrics.rds")
+The best value for RMSE at `r collect_metrics(lemma_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
+
+## Case study: feature hashing
+
+The models we have created so far have used tokenization (Chapter \@ref(tokenization)) to split apart text data into tokens that are meaningful to us as human beings (words, bigrams) and then weighted these tokens by simple counts with word frequencies or weighted counts with tf-idf.
+A problem with these methods is that the output space can be vast and dynamic.
+We have limited ourselves to 1000 tokens so far in this chapter, but we could easily have more than 10,000 features in our training set. 
+We may run into computational problems with memory or long processing times; deciding how many tokens to include can become a trade-off between computational time and information.
+This style of approach also doesn't let us take advantage of new tokens we didn't see in our training data.
+
+One method that has gained popularity in the machine learning field is the **hashing trick**.
+This method addresses many of the challenges outlined above and is very fast with a low memory footprint.
+
+Let's start with the basics of feature hashing.
+First proposed by @Weinberger2009, feature hashing was introduced as a dimensionality reduction method with a simple premise.
+We begin with a hashing function which we then apply to our tokens.
+
+```{block, type = "rmdwarning"}
+A hashing function takes input of variable size and maps it to output of a fixed size. Hashing functions are commonly used in cryptography.
 ```
 
-```{r scotuslemmavis, echo = FALSE, fig.width=8, fig.height=8, fig.cap="The best model using lemmatization is better than the best model without."}
-lemma_metrics <- read_rds("data/ml_reg_lemma_metrics.rds")
-lemma_metrics %>%
-  ggplot(aes(penalty, mean, color = .metric)) +
-  geom_errorbar(aes(
-    ymin = mean - std_err,
-    ymax = mean + std_err
-  ),
-  alpha = 0.5
-  ) +
-  geom_line(size = 1.5) +
-  facet_wrap(~.metric, scales = "free", nrow = 2) +
-  scale_x_log10() +
-  theme(legend.position = "none") +
-  labs(
-    y = "RMSE",
-    title = "Lasso model performance using lemmatization",
-    subtitle = paste("Performance metrics indicate that lemmatization",
-                     "improves model performance")
-  )
+We will use the `hash()` function from the **rlang** package package to illustrate the behavior of hashing functions.
+The `rlang::hash()` function uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a more complex hashing function than what is normally used for the hashing trick. The 32-bit version of MurmurHash3 [@appleby2008] is often used for its speed and good properties.
+
+```{block, type = "rmdnote"}
+Hashing functions are typically very fast and have certain properties. For example, the output of a hash function is expected to be uniform, with the whole output space filled evenly. The "avalanche effect" describes how similar strings are hashed in such a way that their hashes are not similar in the output space.
 ```
 
+Suppose we have many country names in a character vector.
+We can apply the hashing function to each of the country names to project them into an integer space defined by the hashing function.
 
-What is the best model, using lemmatization?
+Since `hash()` creates hashes that are very long, let's create `small_hash()` for demonstration purposes here that generates slightly smaller hashes. (The specific details of what hashes are generated are not important here.)
 
-```{r dependson="scotustuners", eval=!online}
-lemma_rs %>%
-  show_best("rmse")
+```{r}
+library(rlang)
+countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina",
+               "Mayotte", "Bouvet Island", "South Korea", "San Marino",
+               "American Samoa")
+
+small_hash <- function(x) {
+  strtoi(substr(hash(x), 26, 32), 16)
+}
+
+map_int(countries, small_hash)
 ```
 
-```{r, dependson="lemmatunersoffline", echo = FALSE, eval=!online}
-lemma_rs %>%
-  show_best("rmse") %>%
-  write_rds("data/ml_reg_lemma_best.rds")
+Our `small_hash()` function uses `7 * 4 = 28` bits, so the number of possible values is `2^28 = 268435456`. This is admittedly not much of an improvement over ten country names.
+Let's take the modulo of these big integer values to project them down to a more manageable space.
+
+```{r}
+map_int(countries, small_hash) %% 24
 ```
 
-```{r echo = FALSE}
-lemma_best <- read_rds("data/ml_reg_lemma_best.rds")
-lemma_best
+Now we can use these values as indices when creating a matrix.
+
+```{r, echo=FALSE}
+Matrix::sparseMatrix(1:10, map_int(countries, small_hash) %% 24,
+                     dims = c(10, 24),
+                     dimnames = list(countries, NULL))
 ```
 
-The best value for RMSE at `r lemma_best %>% pull(mean) %>% min() %>% round(2)` shows us that using lemmatization can have a significant benefit for model performance, compared to `r tune_rs_rmse` from tuning a non-lemmatized lasso model in Section \@ref(tunelasso). However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
+This method is very fast; both the hashing and modulo can be performed independently for each input since neither need information about the full corpus.
+Since we are reducing the space, there is a chance that multiple words are hashed to the same value.
+This is called a collision and at first glance, it seems like it would be a big problem for a model.
+However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor [@Forman2008].
+
+```{block, type = "rmdnote"}
+Another step that is taken to avoid the negative effects of hash collisions is to use a _second_ hashing function that returns 1 and -1. This determines if we are adding or subtracting the index we get from the first hashing function. Suppose both the words "outdoor" and "pleasant" hash to the integer value 583. Without the second hashing they would collide to 2. Using signed hashing, we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.
+```
+
+There are downsides to using feature hashing. Feature hashing:
+
+- still has one tuning parameter, and
+- cannot be reversed.
+
+The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
+It is your job to find the output that best suits your needs.
+Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data set which increases model fitting time. 
+The number of buckets is tunable in tidymodels using the **tune** package.
+
+Perhaps the more important downside to using feature hashing is that the operation can't be reversed. 
+We are not able to detect if a collision occurs and it is difficult to understand the effect of any word in the model.
+Remember that we are left with `n` columns of _hashes_ (not tokens), so if we find that the 274th column is a highly predictive feature, we cannot know in general which tokens contribute to that column. 
+We cannot directly connect model values to words or tokens at all.
+We could go back to our training set and create a paired list of the tokens and what hashes they map to. Sometimes we might find only one token in that list, but it may have two (or three or four or more!) different tokens contributing.
+This feature hashing method is used because of its speed and scalability, not because it is interpretable.
+
+Feature hashing on tokens is available in tidymodels using the `step_texthash()` step from **textrecipes**. Let's `prep()` and `bake()` this recipe for demonstration purposes.
+
+```{r scotushash, dependson="scotussplit"}
+scotus_hash <- recipe(year ~ text, data = scotus_train) %>%
+  step_tokenize(text) %>%
+  step_texthash(text, signed = TRUE, num_terms = 512) %>%
+  prep() %>%
+  bake(new_data = NULL)
+
+dim(scotus_hash)
+```
+
+There are many columns in the results. Let's take a `glimpse()` at the first ten columns.
+
+```{r dependson="scotushash"}
+scotus_hash %>%
+  select(num_range("text_hash00", 1:9)) %>%
+  glimpse()
+```
+
+By using `step_texthash()` we can quickly generate machine-ready data with a consistent number of variables.
+This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this [**textrecipes** blogpost](https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/).
+
+### Text normalization
+
+When working with text, you will inevitably run into problems with encodings and related irregularities.
+These kinds of problems have a significant influence on feature hashing, as well as other preprocessing steps.
+Consider the German word "schön."
+The o with an umlaut (two dots over it) is a fairly simple character but it can be represented in a couple of different ways.
+We can either use a single character [\\U00f6](https://www.fileformat.info/info/unicode/char/00f6/index.htm) to represent the letter with an umlaut. 
+Alternatively, we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm)
+
+```{r}
+s1 <- "sch\U00f6n"
+s2 <- "scho\U0308n"
+```
+
+These two strings will print the same for us as human readers.
+
+```{r}
+s1
+s2
+```
+
+However, they are not equal.
+
+```{r}
+s1 == s2
+```
+
+This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will results in these two words (which should be identical) hashing to completely different values.
+
+```{r}
+small_hash(s1)
+small_hash(s2)
+```
+
+We can deal with this problem by performing **text normalization** on our text before feeding it into our preprocessing engine.
+One library to perform text normalization is the **stringi** package, which includes many different text normalization methods.
+How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön" equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition, but we could also use `textrecipes::step_text_normalize()` within a tidymodels recipe for the same task.
+
+```{r}
+library(stringi)
+
+stri_trans_nfc(s1) == stri_trans_nfc(s2)
+
+small_hash(stri_trans_nfc(s1))
+small_hash(stri_trans_nfc(s2))
+```
+
+Now we see that the strings are equal after normalization.
+
+```{block, type = "rmdwarning"}
+This issue of text normalization can be important even if you don't use feature hashing in your machine learning. 
+```
+
+Since these words are encoded in different ways, they will be counted separately when we are counting token frequencies. 
+Representing what should be a single token in multiple ways will split the counts. This will introduce noise in the best case, and in worse cases, some tokens will fall below the cutoff when we select tokens, leading to a loss of potentially informative words.
+
+Luckily this is easily addressed by using `stri_trans_nfc()` on our text columns _before_ starting preprocessing, or perhaps more conveniently, by using `textrecipes::step_text_normalize()` _within_ a preprocessing recipe.
 
 ## What evaluation metrics are appropriate?
 
@@ -960,20 +781,19 @@ We have focused on using RMSE and $R^2$ as metrics for our models in this chapte
 If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for mean absolute error (`mae`) and mean absolute percent error (`mape`).
 
 ```{r eval=FALSE}
-lemma_rs <- tune_grid(
-  tunable_wf %>% add_recipe(lemma_rec),
+lemma_rs <- fit_resamples(
+  svm_wf %>% add_recipe(lemma_rec),
   scotus_folds,
-  grid = grid_twenty,
   metrics = metric_set(mae, mape)
 )
 ```
 
 If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using `control_resamples(save_pred = TRUE)`. 
 
-Let's go back to the lasso model we tuned in Section \@ref(tunelasso), with results in `tune_rs`. We can compute the overall mean absolute percent error.
+Let's go back to the first linear SVM model we tuned in Section \@ref(firstregressionevaluation), with results in `svm_rs`. We can compute the overall mean absolute percent error.
 
 ```{r dependson="scotustuners"}
-tune_rs %>%
+svm_rs %>%
   collect_predictions() %>%
   mape(year, .pred)
 ```
@@ -981,7 +801,7 @@ tune_rs %>%
 We can also compute the mean absolute percent error for each resample.
 
 ```{r dependson="scotustuners"}
-tune_rs %>%
+svm_rs %>%
   collect_predictions() %>%
   group_by(id) %>%
   mape(year, .pred)
@@ -990,7 +810,7 @@ tune_rs %>%
 Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.
 
 ```{r dependson="scotustuners"}
-tune_rs %>%
+svm_rs %>%
   collect_predictions() %>%
   group_by(id) %>%
   mae(year, .pred)
@@ -1005,10 +825,10 @@ For the full set of regression metric options, see the [yardstick documentation]
 
 ## The full game: regression {#mlregressionfull}
 
-In this chapter, we started from the beginning and then explored both different types of models and different data preprocessing steps. Let's take a step back and build one final model, using everything we've learned. For our final model, let's again use a lasso regression model, since it performed better than the other options we looked at. We will:
+In this chapter, we started from the beginning and then explored both different types of models and different data preprocessing steps. Let's take a step back and build one final model, using everything we've learned. For our final model, let's again use a linear SVM regression model, since it performed better than the other options we looked at. We will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
-- tune both the lasso regularization parameter _and_ the number of tokens used in the model,
+- _tune_ the number of tokens used in the model to find a value that fits our needs,
 - include both unigrams and bigrams,
 - remove the Snowball stop word lexicon,
 - choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and
@@ -1022,7 +842,7 @@ First, let's create the data preprocessing recipe. By setting the tokenization o
 We can remove the Snowball lexicon of stop words from the text with the option `stopwords = stopwords::stopwords(source = "snowball")`; this will remove the stop words before tokenizing so that neither the unigrams or bigrams will include these stop words. 
 ```
 
-When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value.
+When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value. Before we set `max_tokens = 1e3` to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.
 
 ```{r finalscotusrec, dependson="scotussplit"}
 final_rec <- recipe(year ~ text, data = scotus_train) %>%
@@ -1032,7 +852,8 @@ final_rec <- recipe(year ~ text, data = scotus_train) %>%
                    stopwords = stopwords::stopwords(source = "snowball"))
   ) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
-  step_tfidf(text)
+  step_tfidf(text) %>%
+  step_normalize(all_predictors())
 
 final_rec
 ```
@@ -1040,22 +861,22 @@ final_rec
 
 ### Specify the model
 
-Let's use the same lasso regression model specification we have used multiple times in this chapter, and set it up here again to remind ourselves. We will `tune()` the regularization penalty to find the best value.
+Let's use the same linear SVM regression model specification we have used multiple times in this chapter, and set it up here again to remind ourselves.
 
-```{r scotustunespec2}
-tune_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+```{r scotussvmspec2}
+svm_spec <- svm_linear() %>%
   set_mode("regression") %>%
-  set_engine("glmnet")
+  set_engine("LiblineaR")
 
-tune_spec
+svm_spec
 ```
 
-We can combine the preprocessing recipe and the model specification in a tunable workflow.
+We can combine the preprocessing recipe and the model specification in a tunable workflow. We can't fit this workflow right away to training data, because the value for `max_tokens` hasn't been chosen yet.
 
 ```{r tunescotuswf, dependson=c("finalscotusrec", "scotustunespec2")}
 tune_wf <- workflow() %>%
-  add_recipe(final_rec, blueprint = sparse_bp) %>%
-  add_model(tune_spec)
+  add_recipe(final_rec) %>%
+  add_model(svm_spec)
 
 tune_wf
 ```
@@ -1065,101 +886,77 @@ tune_wf
 Before we tune the model, we need to set up a set of possible parameter values to try. 
 
 ```{block, type = "rmdwarning"}
-There are _two_ tunable parameters in this model, the regularization parameter and the maximum number of tokens included in the model. 
+There is _one_ tunable parameters in this model, the maximum number of tokens included in the model. 
 ```
 
-Let's include different possible values for each parameter, for a combination of 120 models.
+Let's include different possible values for this parameter starting from the value we've already tried, for a combination of six models.
 
 ```{r finalscotusgrid}
 final_grid <- grid_regular(
-  penalty(range = c(-4, 0)),
   max_tokens(range = c(1e3, 6e3)),
-  levels = c(penalty = 20, max_tokens = 6)
+  levels = 6
 )
-
-
 final_grid
 ```
 
+Now it's time for tuning. Instead of using `fit_resamples()` as we have throughout this chapter, we are going to use `tune_grid()`, a function that has a very similar set of arguments. We pass this function our workflow (which holds our preprocessing recipe and SVM model), our resampling folds, and also the grid of possible parameter values to try. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
 
-```{block, type = "rmdnote"}
-Throughout this chapter, we have used `grid_regular()` where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`.
-```
-
-Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
-
-```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds"), eval=!online}
+```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds")}
 final_rs <- tune_grid(
   tune_wf,
   scotus_folds,
   grid = final_grid,
-  metrics = metric_set(rmse, mae, mape)
+  metrics = metric_set(rmse, mae, mape),
+  control = control_resamples(save_pred = TRUE)
 )
 
 final_rs
 ```
-
-```{r, dependson="finalscotusrsoffline", eval=!online, include=FALSE}
-write_rds(final_rs, "data/ml_reg_final_rs.rds")
-```
-
-```{r finalscotusrs, echo=FALSE}
-final_rs <- read_rds("data/ml_reg_final_rs.rds")
-final_rs
-```
-
 
 We trained all these models!
 
 ### Evaluate the modeling
 
-Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:scotusfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization. 
+Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:scotusfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose) and the number of tokens.
 
-```{block, type = "rmdnote"}
-Pay attention to how increasing regularization affects performance as more tokens are included.
-```
-
-
-```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=9, fig.height=5, fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
+```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=7, fig.height=7, fig.cap="Performance improves significantly at about 4000 tokens"}
 final_rs %>%
   collect_metrics() %>%
-  ggplot(aes(penalty, mean, color = as.factor(max_tokens))) +
+  ggplot(aes(max_tokens, mean, color = .metric)) +
   geom_line(size = 1.5, alpha = 0.5) +
   geom_point(size = 2, alpha = 0.9) +
-  facet_wrap(~.metric, scales = "free_y") +
-  scale_x_log10() +
+  facet_wrap(~.metric, scales = "free_y", ncol = 1) +
+  theme(legend.position = "none") +
   labs(
-    color = "Number of tokens",
-    title = paste("Lasso model performance across regularization penalties",
-                  "and number of tokens"),
-    subtitle = paste("The best model includes a high number of tokens",
-                     "but also significant regularization")
+    x = "Number of tokens",
+    title = "Linear SVM performance across number of tokens",
+    subtitle = "Performance improves as we include more tokens"
   )
 ```
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the simplest model within some limit around the numerically best result. Let's stick with choosing the model with the best performance, in terms of one of the metrics we chose.
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model.
 
-```{r lowestmae, dependson="finalscotusrs"}
-lowest_mae <- final_rs %>%
-  select_best("mae")
+```{r chosenmade, dependson="finalscotusrs"}
+chosen_mae <- final_rs %>%
+  select_by_pct_loss(metric = "mae", max_tokens)
 
-lowest_mae
+chosen_mae
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
 
-```{r scotusfinalwf, dependson=c("lowestmae", "tunescotuswf")}
-final_wf <- finalize_workflow(tune_wf, lowest_mae)
+```{r scotusfinalwf, dependson=c("chosenmade", "tunescotuswf")}
+final_wf <- finalize_workflow(tune_wf, chosen_mae)
 
 final_wf
 ```
 
-The `final_wf` workflow now has finalized values for `max_tokens` and `penalty`.
+The `final_wf` workflow now has a finalized value for `max_tokens`.
 
 We can now fit this finalized workflow on training data and _finally_ return to our testing data. 
 
 ```{block, type = "rmdwarning"}
-Notice that this is the first time we have used our testing data during this entire chapter; we tuned and compared models using resampled data sets instead of touching the testing set. 
+Notice that this is the first time we have used our testing data during this entire chapter; we compared and now tuned models using resampled data sets instead of touching the testing set. 
 ```
 
 We can use the function `last_fit()` to **fit** our model one last time on our training data and **evaluate** it on our testing data. We only have to pass this function our finalized model/workflow and our data split.
@@ -1172,30 +969,29 @@ collect_metrics(final_fitted)
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
 
-The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
+The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can `tidy()` this final result to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
 
 ```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.width=8, fig.height=5, fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
-library(vip)
+scotus_fit <- pull_workflow_fit(final_fitted$.workflow[[1]])
 
-scotus_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
-  vi(lambda = lowest_mae$penalty)
-
-scotus_imp %>%
+scotus_fit %>%
+  tidy() %>%
+  filter(term != "Bias") %>%
   mutate(
-    Sign = case_when(Sign == "POS" ~ "Later (after mean year)",
-                     Sign == "NEG" ~ "Earlier (before mean year)"),
-    Importance = abs(Importance),
-    Variable = str_remove_all(Variable, "tfidf_text_")
+    sign = case_when(estimate > 0 ~ "Later (after mean year)",
+                     TRUE ~ "Earlier (before mean year)"),
+    estimate = abs(estimate),
+    term = str_remove_all(term, "tfidf_text_")
   ) %>%
-  group_by(Sign) %>%
-  top_n(20, Importance) %>%
-  ungroup %>%
-  ggplot(aes(x = Importance,
-             y = fct_reorder(Variable, Importance),
-             fill = Sign)) +
+  group_by(sign) %>%
+  top_n(20, estimate) %>%
+  ungroup() %>%
+  ggplot(aes(x = estimate,
+             y = fct_reorder(term, estimate),
+             fill = sign)) +
   geom_col(show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
-  facet_wrap(~Sign, scales = "free") +
+  facet_wrap(~sign, scales = "free") +
   labs(
     y = NULL,
     title = paste("Variable importance for predicting year of",
@@ -1205,15 +1001,15 @@ scotus_imp %>%
   )
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "see supra" and "scalia", are associated with higher, later years and those that contribute in the negative direction, like "years ago" and "founded", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "therefore" and "assembly", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
-Some of these features are unigrams and some are bigrams, but notice that none include stop words included in the Snowball lexicon because we removed them. The bigram "opinion court" is largely representing the phrase "opinion of the court".
+Some of these features are unigrams and some are bigrams, but notice that none of either include stop words included in the Snowball lexicon because we removed them.
 ```
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
 
-```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6.5, fig.height=6, fig.cap="Predicted and true years from a lasso regression model with bigrams and unigrams, and stop words removed"}
+```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6.5, fig.height=6, fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed"}
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
@@ -1231,12 +1027,12 @@ final_fitted %>%
 
 ## Summary {#mlregressionsummary}
 
-You can use regression modeling to predict a continuous variable from a data set, including a text data set. Regularized linear models, such as lasso, often work well for text data sets, while tree-based models such as random forest often behave poorly. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own concerns and priorities.
+You can use regression modeling to predict a continuous variable from a data set, including a text data set. Linear support vector machine models, along with regularized linear models (which we will cover in the next chapter), often work well for text data sets, while tree-based models such as random forest often behave poorly in practice. There are many possible preprocessing steps for text data, from removing stop words to n-gram tokenization strategies to lemmatization, that may improve your model. Resampling data sets and careful use of metrics allow you to make good choices among these possible options, given your own concerns and priorities.
 
 ### In this chapter, you learned:
 
 - what kind of quantities can be modeled using regression
-- to tune a lasso regression model using resampled data
+- to evaluate a model using resampled data
 - how to compare different model types
 - about measuring the impact of n-gram tokenization on models
 - how to implement lemmatization and stop word removal with text models
