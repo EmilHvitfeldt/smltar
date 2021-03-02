@@ -168,8 +168,9 @@ The step above used `unite()`, a function from **tidyr** that pastes multiple co
 ```
 
 We can next determine the word vectors from the PMI values using singular value decomposition (SVD). 
-SVD is a common method for dimensionality reduction[@Golub1970]. SVD works intuitively by taking the data, which in our case is located in a high dimensional space, and rotating the axes such that the first dimension captures as much of the variance as possible. Keeping the first axis fixed, the remaining axes are rotated to maximize the variance in the second. This is repeated for all the dimensions.
-More concrete will SVD factor the PMI matrix into a set of smaller matrices containing the word embeddings with dimension size we can control. The dimension size is typically picked to be in the low hundreds. Thus we get a matrix with dimension (`n_vocabulary * n_dim`) instead of (`n_vocabulary * n_vocabulary`), which can be a vast reduction in size for large vocabularies.
+SVD is a method for dimensionality reduction via matrix factorization [@Golub1970] which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.
+
+In our application, we will use SVD to factor the PMI matrix into a set of smaller matrices containing the word embeddings with a size we get to choose. The embedding size is typically chosen to be in the low hundreds. Thus we get a matrix of dimension (`n_vocabulary * n_dim`) instead of dimension (`n_vocabulary * n_vocabulary`), which can be a vast reduction in size for large vocabularies.
 Let's use the `widely_svd()` function in **widyr**, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.
 
 ```{r tidywordvectors, dependson="tidypmi"}
@@ -252,9 +253,7 @@ tidy_word_vectors %>%
 
 We now find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
-Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints.
-
-SVD was used to represent the data in a way where each dimension contains the highest variance so far. We can now take a look at which and how much each dimension (tokens in this case) contributed to each of the resulting principal components that was produced using SVD.
+Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
 ```{r embeddingpca, dependson="tidywordvectors", fig.width=8, fig.height=12, fig.cap="Word embeddings for Consumer Finance Protection Bureau complaints"}
 tidy_word_vectors %>%
