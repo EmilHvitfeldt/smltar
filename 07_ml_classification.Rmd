@@ -102,13 +102,7 @@ complaints_rec <- complaints_rec %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
-Now that we have a full specification of the preprocessing recipe, we can `prep()` this recipe to estimate all the necessary parameters for each step using the training data. 
-
-```{r complaintprep, dependson="complaintrec4"}
-complaint_prep <- prep(complaints_rec)
-```
-
-For most modeling tasks, you will not need to `prep()` your recipe directly; instead you can build up a tidymodels `workflow()` to bundle together your modeling components.
+Now that we have a full specification of the preprocessing recipe, we can build up a tidymodels `workflow()` to bundle together our modeling components.
 
 ```{r complaintwf, dependson="complaintrec4"}
 complaint_wf <- workflow() %>%
@@ -169,7 +163,7 @@ nb_wf
 
 In the last section, we fit one time to the training data as a whole. Now, to estimate how well that model performs, let's fit the model many times, once to each of these resampled folds, and then evaluate on the heldout part of each resampled fold.
 
-```{r nbrs, dependson=c("nbwf", "complaintsfolds"), eval=!online}
+```{r nbrs, dependson=c("nbwf", "complaintsfolds")}
 nb_rs <- fit_resamples(
   nb_wf,
   complaints_folds,
@@ -179,19 +173,9 @@ nb_rs <- fit_resamples(
 
 We can extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r nbrsmetrics, eval=!online}
+```{r nbrsmetrics}
 nb_rs_metrics <- collect_metrics(nb_rs)
 nb_rs_predictions <- collect_predictions(nb_rs)
-```
-
-```{r, include = FALSE, eval=!online}
-write_rds(nb_rs_metrics, "data/ml_class_first_nb_rs_metrics.rds")
-write_rds(nb_rs_predictions, "data/ml_class_first_nb_rs_predictions.rds")
-```
-
-```{r, include = FALSE, eval=online}
-nb_rs_metrics <- read_rds("data/ml_class_first_nb_rs_metrics.rds")
-nb_rs_predictions <- read_rds("data/ml_class_first_nb_rs_predictions.rds")
 ```
 
 What results do we see, in terms of performance metrics?
@@ -200,42 +184,46 @@ What results do we see, in terms of performance metrics?
 nb_rs_metrics
 ```
 
-The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator curve). The accuracy is the percentage of accurate predictions. For these resamples, the average accuracy is `r nb_rs_metrics %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`.
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is `r nb_rs_metrics %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent(accuracy = 0.1)`.
 
 ```{block, type = "rmdnote"}
-For both accuracy and ROC AUC, values closer to 1 are better.
+Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.
+
+Accuracy is the proportion of the data that are predicted correctly. Be aware that accuracy can be misleading in some situations, such as for imbalanced data sets.
+
+ROC AUC measures how well a classifier performs at different thresholds. The ROC curve plots the true positive rate against the false positive rate, and AUC closer to 1 indicates a better-performing model while AUC closer to 0.5 indicates a model that does no better than random guessing.
 ```
 
-The [receiver operator curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) is a plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes. Figure \@ref(fig:firstroccurve) shows the ROC curve for our first classification model on each of the resampled data sets.
+Figure \@ref(fig:firstroccurve) shows the ROC curve, a visualization of how well a classification model can distinguish between classes, for our first classification model on each of the resampled data sets.
 
-```{r firstroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for resamples of US Consumer Finance Bureau complaints"}
+```{r firstroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints"}
 nb_rs_predictions %>%
   group_by(id) %>%
   roc_curve(truth = product, .pred_Credit) %>%
   autoplot() +
   labs(
     color = NULL,
-    title = "Receiver operator curve for US Consumer Finance Complaints",
+    title = "ROC curve for US Consumer Finance Complaints",
     subtitle = "Each resample fold is shown in a different color"
   )
 ```
 
 The area under each of these curves is the `roc_auc` metric we have computed. If the curve was close to the diagonal line, then the model's predictions would be no better than random guessing.
 
-Another way to evaluate our model is to evaluate the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). A confusion matrix visualizes a model's false positives and false negatives for each class.
+Another way to evaluate our model is to evaluate the confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
 There is not a trivial way to visualize multiple confusion matrices, so we can look at them individually for a single fold.
 
-```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for first naive Bayes classifier, showing some bias towards predicting 'Credit'"}
+```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'"}
 nb_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
-In Figure \@ref(fig:firstheatmap), the diagonal squares have darker shades than the off diagonal squares. This is a good sign meaning that our model is right more often then not. However, this first model is struggling somewhat since it is close to even odds when predicting something from the "Other" class.
+In Figure \@ref(fig:firstheatmap), the diagonal squares have darker shades than the off diagonal squares. This is a good sign, meaning that our model is right more often then not! However, this first model is struggling somewhat since there are close to even odds when predicting something from the "Other" class.
 
 ```{block, type = "rmdwarning"}
-One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance as it includes rich information.
+One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.
 ```
 
 This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more "Credit" complaints are correctly identified than "Other" complaints, either for consumers or for policymakers? 
@@ -266,16 +254,22 @@ null_rs %>%
   collect_metrics()
 ```
 
-The accuracy and ROC indicate that this null model is, like in the regression case, dramatically worse than even our first model. The text of the CFPB complaints is predictive relative to the category we are building models for.
+The accuracy and ROC AUC indicate that this null model is, like in the regression case, dramatically worse than even our first model. The text of the CFPB complaints is predictive relative to the category we are building models for.
 
 
-## Compare to an SVM model {#comparetosvm}
+## Compare to a lasso regression model {#comparetolasso}
 
-Support vector machines are a class of machine learning model that can be used in regression and classification tasks. While they don't see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification [@Joachims1998] and can give good performance [@Vantu2016].
+Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani2016], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
 
-Let's create a specification of an SVM model with a radial basis function as the kernel, a good default for SVMs. 
+```{block, type = "rmdnote"}
+Using regularization helps us choose a simpler model that we expect to generalize better to new observations, and variable selection helps us identify which features to include in our model. 
+```
 
-```{r svmspec}
+Lasso regression learns how much of a _penalty_ to put on some features (sometimes penalizing all the way down to zero) so that we can select only some features out of the high-dimensional space of original possible variables (tokens) for the final model.
+
+Let's create a specification of lasso regularized model. Remember that in tidymodels, specifying a model has three components, the algorithm, the mode, and the computational engine. 
+
+```{r lassospec}
 svm_spec <- svm_rbf() %>%
   set_mode("classification") %>%
   set_engine("liquidSVM")
@@ -911,173 +905,6 @@ max_money(dollar_texts)
 
 Now that we have created some feature engineering functions, we can use them to (hopefully) make our classification model better.
 
-## Case study: feature hashing
-
-The models we have created so far have used tokenization (Chapter \@ref(tokenization)) to split apart text data into tokens that are meaningful to us as human beings (words, bigrams) and then weighted these tokens by simple counts with word frequencies or weighted counts with tf-idf.
-A problem with these methods is that the output space is vast and dynamic.
-We could easily have more than 10,000 features in our training set, and we may run into computational problems with memory or long processing times.
-Deciding how many tokens to include can become a trade-off between computational time and information.
-This style of approach also doesn't let us take advantage of new tokens we didn't see in our training data.
-
-One method that has gained popularity in the machine learning field is the **hashing trick**.
-This method addresses many of the challenges outlined above and is very fast with a low memory footprint.
-
-Let's start with the basics of feature hashing.
-First proposed by @Weinberger2009, feature hashing was introduced as a dimensionality reduction method with a simple premise.
-We being with a hashing function which we then apply to our tokens.
-
-```{block, type = "rmdwarning"}
-A hashing function takes input of variable size and maps it to output of a fixed size. Hashing functions are commonly used in cryptography.
-```
-
-We will use the `hash()` function from the rlang package package to illustrate the behavior of hashing functions.
-hash() uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a generally complex hashing function then what is normally used for the hashing trick. The 32-bit version of MurmurHash3 [@appleby2008] is typically for its speed good properties.
-
-```{block, type = "rmdnote"}
-Hashing functions are typically very fast and have certain properties. For example, the output of a hash function is expected to be uniform, with the whole output space filled evenly. The "avalanche effect" describes how similar strings are hashed in such a way that their hashes are not similar in the output space.
-```
-
-Suppose we have many country names in a character vector.
-We can apply the hashing function to each of the country names to project them into an integer space defined by the hashing function.
-
-since `hash()` has too long hashes we create `small_hash()` for demonstration purposes that gives slightly smallerr hashes. The details are not important here.
-
-```{r}
-library(rlang)
-countries <- c("Palau", "Luxembourg", "Vietnam", "Guam", "Argentina",
-               "Mayotte", "Bouvet Island", "South Korea", "San Marino",
-               "American Samoa")
-
-small_hash <- function(x) {
-  strtoi(substr(hash(x), 26, 32), 16)
-}
-
-map_int(countries, small_hash)
-```
-
-small_hash uses `7 * 4 = 28` bits, the number of possible values is `2^28 = 268435456`, which is admittedly not much of an improvement over ten country names.
-Let's take the modulo of these big integer values to project them down to a more manageable space.
-
-```{r}
-map_int(countries, small_hash) %% 24
-```
-
-Now we can use these values as indices when creating a matrix.
-
-```{r, echo=FALSE}
-Matrix::sparseMatrix(1:10, map_int(countries, small_hash) %% 24,
-                     dims = c(10, 24),
-                     dimnames = list(countries, NULL))
-```
-
-This method is very fast; both the hashing and modulo can be performed independently for each input since neither need information about the full corpus.
-Since we are reducing the space, there is a chance that multiple words are hashed to the same value.
-This is called a collision and at first glance, it seems like would be a big problem for a model.
-However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor [@Forman2008].
-
-```{block, type = "rmdnote"}
-Another step that is taken to avoid the negative effects of hash collisions is to use a _second_ hashing function that returns 1 and -1. This determines if we are adding or subtracting the index we get from the first hashing function. Suppose both the words "outdoor" and "pleasant" hash to the integer value 583. Without the second hashing they would collide to 2. Using signed hashing, we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.
-```
-
-There are downsides to using feature hashing. Feature hashing:
-
-- still has one tuning parameter, and
-- cannot be reversed.
-
-The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
-It is your job to find the output that best suits your needs.
-Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data set which increases model fitting time. 
-The number of buckets is tunable in tidymodels using the tune package.
-
-Perhaps the more important downside to using feature hashing is that the operation can't be reversed. 
-We are not able to detect if a collision occurs and it is difficult to understand the effect of any word in the model.
-Remember that we are left with `n` columns of _hashes_ (not tokens), so if we find that the 274th column is a highly predictive feature, we cannot know in general which tokens contribute to that column. 
-We cannot directly connect model values to words or tokens at all.
-We could go back to our training set and create a paired list of the tokens and what hashes they map to. Sometimes we might find only one token in that list, but it may have two (or three or four or more!) different tokens contributing.
-This feature hashing method is used because of its speed and scalability, not because it is interpretable.
-
-Feature hashing on tokens is available in tidymodels using the `step_texthash()` step from textrecipes.
-
-```{r complaintshash, dependson="complaintssplit"}
-complaints_hash <- recipe(product ~ consumer_complaint_narrative,
-                          data = complaints_train) %>%
-  step_tokenize(consumer_complaint_narrative) %>%
-  step_texthash(consumer_complaint_narrative,
-                signed = TRUE, num_terms = 512) %>%
-  prep() %>%
-  bake(new_data = NULL)
-
-dim(complaints_hash)
-```
-
-There are many columns in the results. Let's take a `glimpse()` at the first ten columns.
-
-```{r dependson="complaintshash"}
-complaints_hash %>%
-  select(num_range("consumer_complaint_narrative_hash00", 1:9)) %>%
-  glimpse()
-```
-
-By using `step_texthash()` we can quickly generate machine-ready data with a consistent number of variables.
-This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this [textrecipes blogpost](https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/).
-
-### Text normalization
-
-When working with text, you will inevitably run into problems with encodings and related irregularities.
-These kinds of problems have a significant influence on feature hashing.
-Consider the German word "schön."
-The o with an umlaut (two dots over it) is a fairly simple character but it can be represented in a couple of different ways.
-We can either use a single character [\\U00f6](https://www.fileformat.info/info/unicode/char/00f6/index.htm) to represent the letter with umlaut. 
-Or we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm)
-
-```{r}
-s1 <- "sch\U00f6n"
-s2 <- "scho\U0308n"
-```
-
-These two strings will print the same for us as human readers.
-
-```{r}
-s1
-s2
-```
-
-However, they are not equal.
-
-```{r}
-s1 == s2
-```
-
-This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will results in these two words (which should be identical) hashing to completely different values.
-
-```{r eval=FALSE}
-murmur3.32(s1)
-murmur3.32(s2)
-```
-
-We can deal with this problem by performing **text normalization** on our text before feeding it into our preprocessing engine.
-One library to perform text normalization is the **stringi** package which includes many different text normalization methods.
-How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön" equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition, but we could also use `textrecipes::step_text_normalize()` within a tidymodels recipe for the same task.
-
-```{r eval=FALSE}
-library(stringi)
-
-stri_trans_nfc(s1) == stri_trans_nfc(s2)
-
-murmur3.32(stri_trans_nfc(s1))
-murmur3.32(stri_trans_nfc(s2))
-```
-
-Now we see that the strings are equal after normalization.
-
-```{block, type = "rmdwarning"}
-This issue of text normalization can be important even if you don't use feature hashing in your machine learning. 
-```
-
-Since these words are encoded in different ways, they will be counted separately when we are counting token frequencies. 
-Representing what should be a single token in multiple ways will split the counts. This will introduce noise in the best case, and in worse cases, some tokens will fall below the cutoff when we select tokens, leading to a loss of potentially informative words.
-
-Luckily this is easily addressed by using `stri_trans_nfc()` on our text columns _before_ starting preprocessing, or perhaps more conveniently, by using `textrecipes::step_text_normalize()` _within_ a preprocessing recipe.
 
 ## What evaluation metrics are appropriate?
 
