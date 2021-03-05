@@ -257,7 +257,7 @@ null_rs %>%
 The accuracy and ROC AUC indicate that this null model is, like in the regression case, dramatically worse than even our first model. The text of the CFPB complaints is predictive relative to the category we are building models for.
 
 
-## Compare to a lasso regression model {#comparetolasso}
+## Compare to a lasso classification model {#comparetolasso}
 
 Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani2016], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
 
@@ -265,75 +265,215 @@ Regularized linear models are a class of statistical model that can be used in r
 Using regularization helps us choose a simpler model that we expect to generalize better to new observations, and variable selection helps us identify which features to include in our model. 
 ```
 
-Lasso regression learns how much of a _penalty_ to put on some features (sometimes penalizing all the way down to zero) so that we can select only some features out of the high-dimensional space of original possible variables (tokens) for the final model.
+Lasso regression or classification learns how much of a _penalty_ to put on some features (sometimes penalizing all the way down to zero) so that we can select only some features out of the high-dimensional space of original possible variables (tokens) for the final model.
 
-Let's create a specification of lasso regularized model. Remember that in tidymodels, specifying a model has three components, the algorithm, the mode, and the computational engine. 
+Let's create a specification of lasso regularized model. Remember that in tidymodels, specifying a model has three components: the algorithm, the mode, and the computational engine. 
 
 ```{r lassospec}
-svm_spec <- svm_rbf() %>%
+lasso_spec <- logistic_reg(penalty = 0.01, mixture = 1) %>%
   set_mode("classification") %>%
-  set_engine("liquidSVM")
+  set_engine("glmnet")
 
-svm_spec
+lasso_spec
 ```
 
-Then we can create another `workflow()` object with the SVM specification. Notice that we can reuse our text preprocessing recipe.
+Then we can create another `workflow()` object with the lasso specification. Notice that we can reuse our text preprocessing recipe.
 
-```{r svmwf, dependson=c("svmspec", "complaintrec4")}
-svm_wf <- workflow() %>%
+```{r lassowf, dependson=c("lassospec", "complaintrec4")}
+lasso_wf <- workflow() %>%
   add_recipe(complaints_rec) %>%
-  add_model(svm_spec)
+  add_model(lasso_spec)
 
-svm_wf
+lasso_spec
 ```
 
-The **liquidSVM** engine doesn't support class probabilities as output so we need to replace the default metric set with a metric set that doesn't use class probabilities. Here we use accuracy, sensitivity, and specificity.
+Now we estimate the performance of this first lasso classification model with `fit_resamples()`.
 
-```{r svmrs, dependson=c("svmwf", "complaintsfolds"), eval=!online}
+```{r lassors, dependson=c("lassowf", "complaintsfolds")}
 set.seed(2020)
-svm_rs <- fit_resamples(
-  svm_wf,
+lasso_rs <- fit_resamples(
+  lasso_wf,
   complaints_folds,
-  metrics = metric_set(accuracy, sensitivity, specificity),
   control = control_resamples(save_pred = TRUE)
 )
 ```
 
 Let's again extract the relevant information using `collect_metrics()` and `collect_predictions()`
 
-```{r, eval=!online}
-svm_rs_metrics <- collect_metrics(svm_rs)
-svm_rs_predictions <- collect_predictions(svm_rs)
+```{r lassorsmetrics, dependson="lassors"}
+lasso_rs_metrics <- collect_metrics(lasso_rs)
+lasso_rs_predictions <- collect_predictions(lasso_rs)
 ```
 
-```{r, include = FALSE, eval=!online}
-write_rds(svm_rs_metrics, "data/ml_class_first_svm_rs_metrics.rds")
-write_rds(svm_rs_predictions, "data/ml_class_first_svm_rs_predictions.rds")
+Now we can see that `lasso_rs_metrics` contains the same default performance metrics we have been using so far in this chapter.
+
+```{r, dependson="lassorsmetrics"}
+lasso_rs_metrics
 ```
 
-```{r svmrsmetrics, include = FALSE, eval=online}
-svm_rs_metrics <- read_rds("data/ml_class_first_svm_rs_metrics.rds")
-svm_rs_predictions <- read_rds("data/ml_class_first_svm_rs_predictions.rds")
+This looks pretty promising, considering we haven't yet done any tuning on the lasso hyperparameters.
+Figure \@ref(fig:lassoroccurve) shows the ROC curves for this regularized model on each of the resampled data sets.
+
+```{r lassoroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints"}
+lasso_rs_predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = product, .pred_Credit) %>%
+  autoplot() +
+  labs(
+    color = NULL,
+    title = "ROC curve for US Consumer Finance Complaints",
+    subtitle = "Each resample fold is shown in a different color"
+  )
 ```
 
-Now we can see that `svm_rs_metrics` contains the three performance metrics we chose for the SVM model.
+Let's finish this section by generating a confusion matrix, shown in Figure \@ref(fig:lassoheatmap).
+Our lasso model is much better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are much more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
 
-```{r, dependson="svmrsmetrics"}
-svm_rs_metrics
-```
-
-This looks pretty promising, considering we didn't do any hyperparameter tuning on the model parameters.
-Let's finish this section by generating a confusion matrix, shown in Figure \@ref(fig:svmheatmap).
-Our SVM model is much better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are much more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
-
-```{r svmheatmap, dependson="svmrsmetrics", fig.cap="Confusion matrix for a simple Support Vector Machine classifier, with more symmetric results"}
-svm_rs_predictions %>%
+```{r lassoheatmap, dependson="lassorsmetrics", fig.cap="Confusion matrix for a lasso regularized classifier, with more symmetric results"}
+lasso_rs_predictions %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap")
 ```
 
-One of the main benefits of a support vector machine model is its support for sparse data, making this algorithm a great match for text data. Support vector machine models generally also perform well with many predictors, which are again quite characteristic of text data.
+
+## Tuning lasso hyperparameters {#tunelasso}
+
+The value `penalty = 0.1` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
+
+```{r complaintstunespec}
+tune_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+
+tune_spec
+```
+
+After the tuning process, we can select a single best numeric value.
+
+```{block, type = "rmdnote"}
+Think of `tune()` here as a placeholder for the regularization penalty.
+```
+
+We can create a regular grid of values to try, using a convenience function for `penalty()`.
+
+```{r complaintslambdagrid}
+lambda_grid <- grid_regular(penalty(), levels = 30)
+lambda_grid
+```
+
+The function `grid_regular()` is from the **dials** package. It chooses sensible values to try for a parameter like the regularization penalty; here, we asked for 30 different possible values.
+
+Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
+
+```{block, type = "rmdnote"}
+Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
+```
+
+We add our tunable model specification `tune_spec` to a workflow with the same preprocessing recipe we've been using so far, and then fit it to every possible parameter in `lambda_grid` and every resample in `complaints_folds` with `tune_grid()`.
+
+```{r complaintstuners, dependson=c("complaintsfolds", "complaintslambdagrid", "complaintstunespec")}
+tune_wf <- workflow() %>%
+  add_recipe(complaints_rec) %>%
+  add_model(tune_spec)
+
+set.seed(2020)
+tune_rs <- tune_grid(
+  tune_wf,
+  complaints_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+
+tune_rs
+```
+
+Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
+
+```{r dependson="complaintstuners"}
+collect_metrics(tune_rs)
+```
+
+Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
+
+```{r complaintstunevis, dependson="complaintstuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC"}
+tune_rs %>%
+  collect_metrics() %>%
+  ggplot(aes(penalty, mean, color = .metric)) +
+  geom_errorbar(aes(
+    ymin = mean - std_err,
+    ymax = mean + std_err
+  ),
+  alpha = 0.5
+  ) +
+  geom_line(size = 1.5) +
+  facet_wrap(~.metric, scales = "free", nrow = 2) +
+  scale_x_log10() +
+  theme(legend.position = "none") +
+  labs(
+    title = "Lasso model performance across regularization penalties",
+    subtitle = "Performance metrics can be used to identity the best penalty"
+  )
+```
+
+We can view the best results with `show_best()` and a choice for the metric, such as ROC AUC.
+
+```{r dependson="complaintstuners"}
+tune_rs %>%
+  show_best("roc_auc")
+```
+
+```{r tunersauc, dependson="complaintstuners"}
+tune_rs_auc <- show_best(tune_rs, "roc_auc") %>%
+  pull(mean) %>%
+  max() %>%
+  round(3)
+```
+
+The best value for ROC AUC from this tuning run is `r tune_rs_auc`. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`.
+
+```{r complaintsbestauc, dependson="complaintstuners"}
+best_auc <- tune_rs %>%
+  select_best("roc_auc")
+
+best_auc
+```
+
+Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
+
+```{r tunedlasso, dependson=c("complaintsbestauc", "complaintstuners")}
+final_lasso <- finalize_workflow(tune_wf, best_auc)
+
+final_lasso
+```
+
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(best_auc$penalty, 5)`. This workflow is ready to go! It can now be fit to our training data.
+
+```{r lassofit, dependson=c("tunedlasso", "complaintssplit")}
+fitted_lasso <- fit(final_lasso, complaints_train)
+```
+
+What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+
+```{r dependson="lassofit"}
+fitted_lasso %>%
+  pull_workflow_fit() %>%
+  tidy() %>%
+  arrange(-estimate)
+```
+
+We see here, for the best penalty we found, what terms contribute the most to a complaint _not_ being about credit. The words are largely about mortgages and other financial products.
+
+What terms contribute to a complaint being about credit, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.
+
+```{r dependson="lassofit"}
+fitted_lasso %>%
+  pull_workflow_fit() %>%
+  tidy() %>%
+  arrange(estimate)
+```
+
+
 
 ## Two class or multiclass? {#mlmulticlass}
 
