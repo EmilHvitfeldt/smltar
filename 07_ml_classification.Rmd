@@ -397,19 +397,7 @@ collect_metrics(tune_rs)
 Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
 
 ```{r complaintstunevis, dependson="complaintstuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC"}
-tune_rs %>%
-  collect_metrics() %>%
-  ggplot(aes(penalty, mean, color = .metric)) +
-  geom_errorbar(aes(
-    ymin = mean - std_err,
-    ymax = mean + std_err
-  ),
-  alpha = 0.5
-  ) +
-  geom_line(size = 1.5) +
-  facet_wrap(~.metric, scales = "free", nrow = 2) +
-  scale_x_log10() +
-  theme(legend.position = "none") +
+autoplot(tune_rs) +
   labs(
     title = "Lasso model performance across regularization penalties",
     subtitle = "Performance metrics can be used to identity the best penalty"
@@ -430,24 +418,24 @@ tune_rs_auc <- show_best(tune_rs, "roc_auc") %>%
   round(3)
 ```
 
-The best value for ROC AUC from this tuning run is `r tune_rs_auc`. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`.
+The best value for ROC AUC from this tuning run is `r tune_rs_auc`. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`, or a simpler model with higher regularization with `select_by_pct_loss()` or `select_by_one_std_err()` Let's choose the model with the best ROC AUC within one standard error of the numerically best model [@Breiman1984].
 
-```{r complaintsbestauc, dependson="complaintstuners"}
-best_auc <- tune_rs %>%
-  select_best("roc_auc")
+```{r complaintschooseauc, dependson="complaintstuners"}
+chosen_auc <- tune_rs %>%
+  select_by_one_std_err(metric = "roc_auc", -penalty)
 
-best_auc
+chosen_auc
 ```
 
 Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
 
-```{r tunedlasso, dependson=c("complaintsbestauc", "complaintstuners")}
-final_lasso <- finalize_workflow(tune_wf, best_auc)
+```{r tunedlasso, dependson=c("complaintschooseauc", "complaintstuners")}
+final_lasso <- finalize_workflow(tune_wf, chosen_auc)
 
 final_lasso
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(best_auc$penalty, 5)`. This workflow is ready to go! It can now be fit to our training data.
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of `r round(chosen_auc$penalty, 5)`. This workflow is ready to go! It can now be fit to our training data.
 
 ```{r lassofit, dependson=c("tunedlasso", "complaintssplit")}
 fitted_lasso <- fit(final_lasso, complaints_train)
@@ -462,7 +450,7 @@ fitted_lasso %>%
   arrange(-estimate)
 ```
 
-We see here, for the best penalty we found, what terms contribute the most to a complaint _not_ being about credit. The words are largely about mortgages and other financial products.
+We see here, for the penalty we chose, what terms contribute the most to a complaint _not_ being about credit. The words are largely about mortgages and other financial products.
 
 What terms contribute to a complaint being about credit, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.
 
@@ -473,7 +461,70 @@ fitted_lasso %>%
   arrange(estimate)
 ```
 
+## Case study: sparse encoding {#casestudysparseencoding}
 
+We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
+
+To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package hardhat.
+
+```{block, type = "rmdwarning"}
+The [hardhat](https://hardhat.tidymodels.org/) package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
+```
+
+```{r sparsebp}
+library(hardhat)
+sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
+```
+
+This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type, from the Matrix package [@R-Matrix], used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
+
+```{r sparsewf, dependson=c("complaintstunespec", "complaintrec4", "sparsebp")}
+sparse_wf <- workflow() %>%
+  add_recipe(complaints_rec, blueprint = sparse_bp) %>%
+  add_model(tune_spec)
+
+sparse_wf
+```
+
+The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let's restrict the values this time using the `range` argument, so we don't test out as small values for regularization, and only try 20 levels.
+
+```{r smallerlambda}
+smaller_lambda <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
+smaller_lambda
+```
+
+We can tune this lasso regression model, in the same way that we did in Section \@ref(tunelasso). We will fit and assess each possible regularization parameter on each resampling fold, to find the best amount of regularization.
+
+```{r sparsetuners, dependson=c("sparsewf", "complaintsfolds", "smallerlambda")}
+set.seed(2020)
+sparse_rs <- tune_grid(
+  sparse_wf,
+  complaints_folds,
+  grid = smaller_lambda
+)
+
+sparse_rs
+```
+
+How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of `set_engine("glmnet")`?
+
+```{r dependson="sparsetuners"}
+sparse_rs %>%
+  show_best("roc_auc")
+```
+
+The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was `r tune_rs_auc`. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was `r select_best(tune_rs, "roc_auc") %>% pull(penalty) %>% round(5)`) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
+
+Importantly, this tuning also took a bit less time to complete. 
+
+- The _preprocessing_ was not much faster, because tokenization and computing tf-idf take a long time. 
+- The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
+
+Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
+
+```{block, type = "rmdnote"}
+Since our model performance is about the same and we see gains in training time, let's use this sparse representation for the rest of this chapter.
+```
 
 ## Two class or multiclass? {#mlmulticlass}
 
