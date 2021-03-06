@@ -854,7 +854,7 @@ This isn't quite right since dates will be given values between `00` and `99` an
 Below is a simple function `uncensor_vec()` that locates all instances of `"XX"` and replaces them with a number between 11 and 99.
 We don't need to handle the special case of `XXXX` as it automatically being handled.
 
-```{r uncensor_vec}
+```{r uncensorvec}
 uncensor <- function(n) {
   as.character(sample(seq(10 ^ (n - 1), 10 ^ n - 1), 1))
 }
@@ -872,7 +872,7 @@ uncensor_vec <- function(x) {
 
 We can run a quick test to see how it works.
 
-```{r, dependson="uncesor_vec"}
+```{r, dependson="uncensorvec"}
 uncensor_vec("In XX/XX/XXXX I leased a XXXX vehicle")
 ```
 
@@ -946,17 +946,17 @@ Most of what we have looked at so far has boiled down to counting tokens and wei
 This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your data set that you should use in feature engineering.
 Your domain knowledge allows you to build more predictive features than the naive search of simple tokens.
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
-This is where having a little bit of regular expressions knowledge pays off.
+This is where having a little bit of knowledge about regular expressions pays off.
 
-```{block, type = "rmdnote"}
-The [textfeatures](https://github.com/mkearney/textfeatures) package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.
+```{block2, type = "rmdnote"}
+The **textfeatures** [R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.
 ```
 
 Your specific domain knowledge may provide specific guidance about feature engineering for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
 They can also be more engineered such as the percentage of capitalization, whether the text ends with a hashtag, or whether two people's names are both mentioned in a document.
 
-For our CFPB complaints data, certain patterns have not adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section \@ref(classfirstattemptlookatdata). Let's walk through how to create data preprocessing functions to build the features to:
+For our CFPB complaints data, certain patterns may not have adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section \@ref(classfirstattemptlookatdata). Let's walk through how to create data preprocessing functions to build the features to:
 
 - detect credit cards,
 - calculate percentage censoring, and
@@ -1039,11 +1039,11 @@ str_count(credit_cards, "X") / str_count(credit_cards, "[:alnum:]")
 We can finish up by creating a function.
 
 ```{r}
-procent_censoring <- function(x) {
+percent_censoring <- function(x) {
   str_count(x, "X") / str_count(x, "[:alnum:]")
 }
 
-procent_censoring(credit_cards)
+percent_censoring(credit_cards)
 ```
 
 ### Detect monetary amounts
@@ -1087,9 +1087,9 @@ Now that we have created some feature engineering functions, we can use them to 
 
 ## What evaluation metrics are appropriate?
 
-We have focused on using accuracy and ROC AUC as metrics for our classification models so far, along with sensitivity and specificity in Section \@ref(comparetosvm). These are not the only classification metrics available and your choice will often depend on how much you care about false positives compared to false negatives.
+We have focused on using accuracy and ROC AUC as metrics for our classification models so far. These are not the only classification metrics available and your choice will often depend on how much you care about false positives compared to false negatives.
 
-If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`.
+If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`, that focus not on the overall proportion of observations that are predicted correctly but instead on false positives and false negatives.
 
 ```{r, eval=FALSE}
 nb_rs <- fit_resamples(
@@ -1101,23 +1101,23 @@ nb_rs <- fit_resamples(
 
 If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using `control_resamples(save_pred = TRUE)`. 
 
-Let's go back to the naive Bayes model we tuned in Section \@ref(classfirstmodel), with predictions stored in `nb_rs_predictions`. We can compute the overall [recall](https://en.wikipedia.org/wiki/Precision_and_recall#Recall).
+Let's go back to the naive Bayes model we tuned in Section \@ref(classfirstmodel), with predictions stored in `nb_rs_predictions`. We can compute the overall recall.
 
-```{r}
+```{r, dependson="nbrsmetrics"}
 nb_rs_predictions %>%
   recall(product, .pred_class)
 ```
 
 We can also compute the recall for each resample using `group_by()`.
 
-```{r}
+```{r, dependson="nbrsmetrics"}
 nb_rs_predictions %>%
   group_by(id) %>%
   recall(product, .pred_class)
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
-The confusion matrix, the contingency table of observed classes and predicted classes, gives us information on these rates directly.
+The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.
 
 ```{r}
 nb_rs_predictions %>%
