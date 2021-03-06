@@ -530,7 +530,7 @@ Since our model performance is about the same and we see gains in training time,
 
 Most of this chapter focuses on binary classification, where we have two classes in our outcome variable (such as "Credit" and "Other") and each observation can either be one or the other. This is a simple scenario with straightforward evaluation strategies because the results only have a two-by-two contingency matrix.
 However, it is not always possible to limit a modeling question to two classes. Let's explore how to deal with situations where we have more than two classes.
-The CFPB complaints data set we have been working with has nine different `product` classes. In decreasing frequency, they are:
+The CFPB complaints data set in this chapter has nine different `product` classes. In decreasing frequency, they are:
 
 - Credit reporting, credit repair services, or other personal consumer reports
 - Debt collection
@@ -578,7 +578,7 @@ When you have multiple classes in your data, it is possible to formulate the mul
 
 There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the [themis](https://github.com/tidymodels/themis) add-on package for recipes which provides the [step_downsample()](https://tidymodels.github.io/themis/reference/step_downsample.html) function to perform downsampling.
+We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
 
 ```{block, type = "rmdnote"}
 The themis package provides many more algorithms to deal with imbalanced data.
@@ -606,74 +606,60 @@ We also need a new cross-validation object since we are using a different data s
 multicomplaints_folds <- vfold_cv(multicomplaints_train)
 ```
 
-We can reuse the support vector machine specification from Section \@ref(comparetosvm) to create a new workflow object with the new recipe specification.
-The SVM algorithm is specified for binary classification, but extensions have been made to generalize it to multiclass cases. The liquidSVM method will automatically detect that we are performing multiclass classification and switch to the appropriate case.
+We cannot reuse the tuneable lasso classification specification from Section \@ref(tunelasso) because it only works for binary classification. Some model algorithms and computational engines (examples are most random forests and SVMs) automatically detect when we perform multiclass classification from the number of classes in the outcome variable and do not require any changes to our model specification. For lasso regularization, we need to create a new special model specification just for the multiclass class using `multinom_reg()`.
 
-```{r multisvmwf, dependson=c("svmspec", "multicomplaintsrec")}
-multi_svm_wf <- workflow() %>%
-  add_recipe(multicomplaints_rec) %>%
-  add_model(svm_spec)
+```{r multispec}
+multi_spec <- multinom_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
 
-multi_svm_wf
+multi_spec
 ```
 
-```{block, type = "rmdwarning"}
-Notice that you don't have to specify anything to perform multiclass classification in this case. The modeling packages will infer this from the number of classes in the outcome variable.
+We used the same arguments for `penalty` and `mixture` as in Section \@ref(tunelasso), as well as the same mode and engine, but this model specification is set up to handle more than just two classes. We can combine this model specification with our preprocessing recipe for multiclass data in a `workflow()`.
+
+```{r multilassowf, dependson=c("multispec", "multicomplaintsrec")}
+multi_lasso_wf <- workflow() %>%
+  add_recipe(multicomplaints_rec, blueprint = sparse_bp) %>%
+  add_model(multi_spec)
+
+multi_lasso_wf
 ```
 
-Now we have everything we need for `fit_resamples()` to fit all the models. Note that we specify `save_pred = TRUE`, so we can create a confusion matrix later. This is especially beneficial for multiclass classification.
-We again specify the `metric_set()` since liquidSVM doesn't support class probabilities.
+Now we have everything we need to tune the regularization penalty and find an appropriate value. Note that we specify `save_pred = TRUE`, so we can create ROC curves and a confusion matrix later. This is especially beneficial for multiclass classification.
 
-```{r multisvmrs, dependson=c("multisvmwf", "multicomplaintsrec"), eval=!online}
-multi_svm_rs <- fit_resamples(
-  multi_svm_wf,
+```{r multilassors, dependson=c("multilassowf", "multicomplaintsfolds")}
+multi_lasso_rs <- tune_grid(
+  multi_lasso_wf,
   multicomplaints_folds,
-  metrics = metric_set(accuracy),
+  grid = smaller_lambda,
   control = control_resamples(save_pred = TRUE)
 )
 
-multi_svm_rs
-```
-
-Let's again extract the relevant results using `collect_metrics()` and `collect_predictions()`
-
-```{r multisvmrsmetrics, dependson="multisvmrs", eval=!online}
-multi_svm_rs_metrics <- collect_metrics(multi_svm_rs)
-multi_svm_rs_predictions <- collect_predictions(multi_svm_rs)
-```
-
-```{r, include = FALSE, eval=!online}
-write_rds(
-  multi_svm_rs_metrics,
-  "data/ml_class_first_multi_svm_rs_metrics.rds"
-)
-write_rds(
-  multi_svm_rs_predictions,
-  "data/ml_class_first_multi_svm_rs_predictions.rds"
-)
-```
-
-```{r, include = FALSE, eval=online}
-multi_svm_rs_metrics <- read_rds(
-  "data/ml_class_first_multi_svm_rs_metrics.rds"
-)
-multi_svm_rs_predictions <- read_rds(
-  "data/ml_class_first_multi_svm_rs_predictions.rds"
-)
+multi_lasso_rs
 ```
 
 What do we see, in terms of performance metrics?
 
-```{r}
-multi_svm_rs_metrics
+```{r dependson="multilassors"}
+best_acc <- multi_lasso_rs %>%
+  show_best("accuracy")
+
+best_acc
 ```
 
-The accuracy metric naturally extends to multiclass tasks, but it appears quite low at `r multi_svm_rs_metrics %>% filter(.metric == "accuracy") %>% pull(mean) %>% scales::percent_format(accuracy = 0.1)()`, significantly lower than for the binary case in Section \@ref(comparetosvm). This is expected since multiclass classification is a harder task than binary classification. In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and _eight_ wrong answers.
+The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at `r collect_metrics(multi_lasso_rs) %>% filter(.metric == "accuracy") %>% pull(mean) %>% max() %>% scales::percent(accuracy = 0.1)`, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
+
+```{block, type = "rmdwarning"}
+In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and _eight_ wrong answers.
+```
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier, with most of the classifications along the diagonal", fig.width=10, fig.height=8}
-multi_svm_rs_predictions %>%
+```{r multiheatmap, fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal", fig.width=10, fig.height=8}
+multi_lasso_rs %>%
+  collect_predictions() %>%
+  filter(penalty == best_acc$penalty) %>%
   filter(id == "Fold01") %>%
   conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap") +
@@ -686,8 +672,10 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r multiheatmapminusdiag, fig.cap="Confusion matrix for multiclass Support Vector Machine classifier without diagonal", fig.width=10, fig.height=8}
-multi_svm_rs_predictions %>%
+```{r multiheatmapminusdiag, fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal", fig.width=10, fig.height=8}
+multi_lasso_rs %>%
+  collect_predictions() %>%
+  filter(penalty == best_acc$penalty) %>%
   filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
   conf_mat(product, .pred_class) %>%
@@ -696,12 +684,12 @@ multi_svm_rs_predictions %>%
   scale_x_discrete(labels = function(x) str_wrap(x, 20))
 ```
 
-Now we can more clearly see where our model breaks down in Figure \@ref(fig:multiheatmapminusdiag). One of the most common errors is "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Credit card or prepaid card" complaints. That is not hard to understand since both deal with credit and do have overlap in vocabulary.
+Now we can more clearly see where our model breaks down in Figure \@ref(fig:multiheatmapminusdiag). Some of the most common errors are "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Debt collection" or "Credit card of prepaid card" complaints. Those mistakes by the model are not hard to understand since all deal with credit and debt and do have overlap in vocabulary.
 Knowing what the problem is helps us figure out how to improve our model.
-The first step for improving our model is to revisit the data preprocessing steps and model selection.
-We can look at different models or model engines that might be able to more easily separate the classes. The `svm_rbf()` model has a `cost` argument that determines the penalization of wrongly predicted classes that might be worth looking at.
+The next step for improving our model is to revisit the data preprocessing steps and model selection.
+We can look at different models or model engines that might be able to more easily separate the classes.
 
-Now that we have an idea of where the model isn't working, we can look more closely at the data to create features that could distinguish between these classes. In Section \@ref(customfeatures) will we demonstrate how you can create custom features.
+Now that we have an idea of where the model isn't working, we can look more closely at the data and attempt to create features that could distinguish between these classes. In Section \@ref(customfeatures) we will demonstrate how you can create your own custom features.
 
 ## Case study: including non-text data
 
@@ -719,7 +707,7 @@ The variables we identify as available for use as predictors are:
 - `tags`
 - `submitted_via`
 
-Let's try including `date_received` in our modeling, along with the text variable `consumer_complaint_narrative` and `tags`.
+Let's try including `date_received` in our modeling, along with the text variable we have already used `consumer_complaint_narrative` and a new variable `tags`.
 The `submitted_via` variable could have been a viable candidate, but all the entries are "web".
 The other variables like ZIP code could be of use too, but they are categorical variables with many values so we will exclude them for now.
 
@@ -760,48 +748,48 @@ more_vars_rec <- more_vars_rec %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
-Let's combine this more extensive preprocessing recipe that handles more variables together with the support vector machine model specification.
+Let's combine this more extensive preprocessing recipe that handles more variables together with the tuneable lasso regularized classification model specification.
 
-```{r svmwfmorevars, dependson=c("svmspec", "complaintrec8")}
+```{r lassowfmorevars, dependson=c("complaintstunespec", "complaintrec8")}
 more_vars_wf <- workflow() %>%
-  add_recipe(more_vars_rec) %>%
-  add_model(svm_spec)
+  add_recipe(more_vars_rec, blueprint = sparse_bp) %>%
+  add_model(tune_spec)
 
 more_vars_wf
 ```
 
-Let's fit this `workflow()` to our resampled data sets and estimate accuracy, sensitivity, and specificity.
+Let's tune this `workflow()` with our resampled data sets, find a good value for the regularization penalty, and estimate the model's performance.
 
-```{r morevarsrs, dependson=c("svmwfmorevars", "complaintsfolds"), eval=!online}
+```{r morevarsrs, dependson=c("lassowfmorevars", "complaintsfolds")}
 set.seed(123)
-more_vars_rs <- fit_resamples(
+more_vars_rs <- tune_grid(
   more_vars_wf,
   complaints_folds,
-  metrics = metric_set(accuracy, sensitivity, specificity)
+  grid = smaller_lambda,
 )
 ```
 
-We can extract the metrics from these results with `collect_metrics()`.
+We can extract the metrics for the best-performing regularization penalties from these results with `show_best()` with an option like `"roc_auc"` or `"accuracy"` if we prefer. How did our chosen performance metric turn out for our model that included more than just the text data?
 
-```{r, eval=!online}
-more_vars_metrics <- collect_metrics(more_vars_rs)
+```{r dependson="morevarsrs"}
+more_vars_rs %>%
+  show_best("roc_auc")
 ```
 
-```{r, include = FALSE, eval=!online}
-write_rds(more_vars_metrics, "data/ml_class_more_vars_rs_metrics.rds")
+We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of `r collect_metrics(sparse_rs) %>% dplyr::filter(.metric == "roc_auc") %>% pull(mean) %>% max() %>% round(3)`, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was `r select_best(sparse_rs, "roc_auc") %>% pull(penalty) %>% round(5)` but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+
+```{r dependson="morevarsrs"}
+finalize_workflow(more_vars_wf, 
+                  select_best(more_vars_rs, "roc_auc")) %>%
+  fit(complaints_train) %>%
+  pull_workflow_fit() %>%
+  tidy() %>% 
+  arrange(-abs(estimate)) %>% 
+  mutate(term_rank = row_number()) %>% 
+  filter(!str_detect(term, "tfidf"))
 ```
 
-```{r morevarsmetrics, include = FALSE, eval=online}
-more_vars_metrics <- read_rds("data/ml_class_more_vars_rs_metrics.rds")
-```
-
-How did these three performance metrics turn out for our model that included more than just the text data?
-
-```{r, dependson="morevarsmetrics"}
-more_vars_metrics
-```
-
-We see here that including more predictors improves our model performance. With only text features in Section \@ref(comparetosvm), we achieved an accuracy of `r round(dplyr::filter(svm_rs_metrics, .metric == "accuracy")$mean, 3)`; now by including the features dealing with dates and tags as well, our accuracy is `r round(dplyr::filter(more_vars_metrics, .metric == "accuracy")$mean, 3)`.
+In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms.
 
 ```{block, type = "rmdnote"}
 This whole book focuses on supervised machine learning for text data, but models can combine _both_ text predictors and other kinds of predictors.
