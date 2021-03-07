@@ -461,6 +461,10 @@ fitted_lasso %>%
   arrange(estimate)
 ```
 
+```{block, type = "rmdnote"}
+Since we are using a linear model, the model coefficients are directly interpretable and transparently give us variable importance. Many models useful for machine learning with text do _not_ have such transparent variable importance; in those situations, you can use other model-independent or model-agnostic approaches like [permutation variable importance](https://juliasilge.com/blog/last-airbender/). 
+```
+
 ## Case study: sparse encoding {#casestudysparseencoding}
 
 We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
