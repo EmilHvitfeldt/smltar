@@ -227,6 +227,10 @@ svm_rs %>%
 
 The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is `r first_attemp_rmse` years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
 
+```{block, type = "rmdwarning"}
+Hopefully you are convinced that using resampled data sets for measuring performance is the right choice, but it can be computationally expensive. Instead of fitting once, we must fit the model one time for _each_ resample. The resamples are independent of each other, so this is a great fit for parallel processing. The tidymodels framework is designed to work fluently with parallel processing in R, using multiple cores or multiple machines. The implementation details of parallel processing are operating system specific, so [look at tidymodels' documentation for how to get started](https://tune.tidymodels.org/articles/extras/optimizations.html).
+```
+
 ## Compare to the null model {#regnull}
 
 One way to assess a model like this one is to compare its performance to a "null model."
