@@ -938,9 +938,9 @@ final_rs %>%
   )
 ```
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss).
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model, with the default 2% loss.
 
-```{r chosenmade, dependson="finalscotusrs"}
+```{r chosenmae, dependson="finalscotusrs"}
 chosen_mae <- final_rs %>%
   select_by_pct_loss(metric = "mae", max_tokens)
 
@@ -949,7 +949,7 @@ chosen_mae
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
 
-```{r scotusfinalwf, dependson=c("chosenmade", "tunescotuswf")}
+```{r scotusfinalwf, dependson=c("chosenmae", "tunescotuswf")}
 final_wf <- finalize_workflow(tune_wf, chosen_mae)
 
 final_wf
