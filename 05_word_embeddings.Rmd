@@ -112,12 +112,13 @@ One of the arguments to this function is the `window_size`, which determines the
 ```{r slidewindows}
 slide_windows <- function(tbl, window_size) {
   skipgrams <- slider::slide(
-    tbl,
-    ~.x,
-    .after = window_size - 1L,
+    tbl, 
+    ~.x, 
+    .after = window_size - 1, 
+    .step = 1, 
     .complete = TRUE
   )
-
+  
   safe_mutate <- safely(mutate)
   
   out <- map2(skipgrams,
