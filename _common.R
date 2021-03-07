@@ -58,8 +58,6 @@ online <- TRUE
 sparse_bp <- hardhat::default_recipe_blueprint(composition = "dgCMatrix")
 
 ## for Keras chapters
-library(keras)
-tensorflow::tf$random$set_seed(1234)
 
 keras_predict <- function(model, baked_data, response) {
   predictions <- predict(model, baked_data)[, 1]
