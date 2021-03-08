@@ -797,7 +797,7 @@ finalize_workflow(more_vars_wf,
   filter(!str_detect(term, "tfidf"))
 ```
 
-In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms.
+In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms. They are not that important.
 
 ```{block, type = "rmdnote"}
 This whole book focuses on supervised machine learning for text data, but models can combine _both_ text predictors and other kinds of predictors.
@@ -816,8 +816,9 @@ library(tidytext)
 
 complaints_train %>%
   slice(1:1000) %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
-                collapse = FALSE) %>%
+  unnest_tokens(trigrams, 
+                consumer_complaint_narrative, token = "ngrams",
+                collapse = NULL) %>%
   count(trigrams, sort = TRUE) %>%
   mutate(censored = str_detect(trigrams, "xx")) %>%
   slice(1:20) %>%
@@ -836,15 +837,17 @@ and plot the proportions for "Credit" and "Other".
 ```{r trigram25, fig.cap="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class"}
 top_censored_trigrams <- complaints_train %>%
   slice(1:1000) %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
-                collapse = FALSE) %>%
+  unnest_tokens(trigrams, 
+                consumer_complaint_narrative, token = "ngrams",
+                collapse = NULL) %>%
   count(trigrams, sort = TRUE) %>%
   filter(str_detect(trigrams, "xx")) %>%
   slice(1:25)
 
 plot_data <- complaints_train %>%
-  unnest_tokens(trigrams, consumer_complaint_narrative, token = "ngrams",
-                collapse = FALSE) %>%
+  unnest_tokens(trigrams, 
+                consumer_complaint_narrative, token = "ngrams",
+                collapse = NULL) %>%
   right_join(top_censored_trigrams, by = "trigrams") %>%
   count(trigrams, product, .drop = FALSE)
 
@@ -891,7 +894,7 @@ complaints_train %>%
   slice(1:1000) %>%
   mutate(text = uncensor_vec(consumer_complaint_narrative)) %>%
   unnest_tokens(trigrams, text, token = "ngrams",
-                collapse = FALSE) %>%
+                collapse = NULL) %>%
   count(trigrams, sort = TRUE) %>%
   mutate(censored = str_detect(trigrams, "xx")) %>%
   slice(1:20) %>%
