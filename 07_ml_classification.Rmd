@@ -196,7 +196,7 @@ ROC AUC measures how well a classifier performs at different thresholds. The ROC
 
 Figure \@ref(fig:firstroccurve) shows the ROC curve, a visualization of how well a classification model can distinguish between classes, for our first classification model on each of the resampled data sets.
 
-```{r firstroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints"}
+```{r firstroccurve, opts.label = "fig.square", fig.cap="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints"}
 nb_rs_predictions %>%
   group_by(id) %>%
   roc_curve(truth = product, .pred_Credit) %>%
@@ -314,7 +314,7 @@ lasso_rs_metrics
 This looks pretty promising, considering we haven't yet done any tuning on the lasso hyperparameters.
 Figure \@ref(fig:lassoroccurve) shows the ROC curves for this regularized model on each of the resampled data sets.
 
-```{r lassoroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints"}
+```{r lassoroccurve, opts.label = "fig.square", fig.cap="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints"}
 lasso_rs_predictions %>%
   group_by(id) %>%
   roc_curve(truth = product, .pred_Credit) %>%
@@ -400,7 +400,7 @@ collect_metrics(tune_rs)
 
 Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
 
-```{r complaintstunevis, dependson="complaintstuners", fig.width=8, fig.height=8, fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC"}
+```{r complaintstunevis, dependson="complaintstuners", opts.label = "fig.square", fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC"}
 autoplot(tune_rs) +
   labs(
     title = "Lasso model performance across regularization penalties",
@@ -664,7 +664,7 @@ In binary classification, there is one right answer and one wrong answer; in thi
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap, fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal", fig.width=10, fig.height=8}
+```{r multiheatmap, opts.label = "fig.square", fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -680,7 +680,7 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r multiheatmapminusdiag, fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal", fig.width=10, fig.height=8}
+```{r multiheatmapminusdiag, opts.label = "fig.square", fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -1259,7 +1259,7 @@ Now that all of the models with possible parameter values have been trained, we 
 Pay attention to how increasing regularization affects performance as more tokens are included.
 ```
 
-```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.width=9, fig.height=5, fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
+```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
 autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
@@ -1314,7 +1314,7 @@ collect_predictions(final_fitted) %>%
 
 Figure \@ref(fig:finalroccurve) shows the ROC curve for testing set, to demonstrate how well this final classification model can distinguish between the two classes.
 
-```{r finalroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve with the test set for final lasso regularized classifier"}
+```{r finalroccurve, opts.label = "fig.square", fig.cap="ROC curve with the test set for final lasso regularized classifier"}
 collect_predictions(final_fitted)  %>%
   roc_curve(truth = product, .pred_Credit) %>%
   autoplot() +
@@ -1328,7 +1328,7 @@ collect_predictions(final_fitted)  %>%
 
 The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:complaintsvip).
 
-```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.width=8, fig.height=5, fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
+```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
 library(vip)
 
 complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%

@@ -245,7 +245,7 @@ lstm_auc <- val_res %>%
 
 A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752. This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
 
-```{r lstmvalroc, fig.cap="ROC curve for LSTM with dropout predictions of Kickstarter campaign success"}
+```{r lstmvalroc, opts.label = "fig.square", fig.cap="ROC curve for LSTM with dropout predictions of Kickstarter campaign success"}
 val_res %>%
   roc_curve(state, .pred_1) %>%
   autoplot()
@@ -779,7 +779,7 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 
 This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).
 
-```{r lstmfinalroc, fig.cap="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success"}
+```{r lstmfinalroc, opts.label = "fig.square", fig.cap="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   roc_curve(state, .pred_1) %>%
   autoplot()
@@ -787,7 +787,7 @@ final_res %>%
 
 We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
 
-```{r lstmheatmap, fig.cap="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success"}
+```{r lstmheatmap, opts.label = "fig.square", fig.cap="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")

@@ -68,7 +68,7 @@ tidy_by_lang <- hca_fairytales() %>%
 
 Then we can remove stop words (using `get_stopwords(language = "da")` and similar for each language) and stem with the language-specific Porter algorithm. What are the top 20 stems for "The Fir-Tree" in each of these five languages, after removing the Snowball stop words for that language?
 
-```{r porterlanguages, dependson="tidybylang", fig.height=10, fig.width=7, fig.cap="Porter stemming results in five languages"}
+```{r porterlanguages, dependson="tidybylang", opts.label = "fig.long", fig.cap="Porter stemming results in five languages"}
 tidy_by_lang %>%
   inner_join(stopword_df) %>%
   mutate(data = map2(
@@ -253,7 +253,7 @@ stemming <- tidy_fir_tree %>%
 
 Figure \@ref(fig:stemmingresults) shows the results of these stemming strategies. All successfully handled the transition from `"trees"` to `"tree"` in the same way, but we have different results for `"stories"` to `"story"` or `"stori"`, different handling of `"branches"`, and more. There are subtle differences in the output of even these straightforward stemming approaches that can effect the transformation of text features for modeling.
 
-```{r stemmingresults, dependson="stemming", fig.width=10, fig.height=5, fig.cap="Results for three different stemming strategies"}
+```{r stemmingresults, dependson="stemming", fig.cap="Results for three different stemming strategies"}
 stemming %>%
   gather(Type, Result, `Remove S`:`Porter stemming`) %>%
   mutate(Type = fct_inorder(Type)) %>%
@@ -307,7 +307,7 @@ A modern, efficient implementation for lemmatization is available in the excelle
 
 Let's briefly walk through how to use spacyr.
 
-```{r lemmafirtree, dependson="tidyfirtree", fig.width = 6, fig.height = 5, fig.cap="Results for lemmatization, rather than stemming"}
+```{r lemmafirtree, dependson="tidyfirtree", fig.cap="Results for lemmatization, rather than stemming"}
 library(spacyr)
 spacy_initialize(entity = FALSE)
 

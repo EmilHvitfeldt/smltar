@@ -210,7 +210,7 @@ $R^2$ is the squared correlation between the predicted and observed values. When
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled data sets.
 
-```{r firstregpredict, dependson="svmrs", fig.width=7, fig.height=5.5, fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years"}
+```{r firstregpredict, dependson="svmrs", opts.label = "fig.large", fig.cap="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years"}
 svm_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -310,7 +310,7 @@ rf_metrics
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredictoffline, dependson="scotusrfrsoffline", fig.width=7, fig.height=5.5, eval=!online}
+```{r rfpredictoffline, dependson="scotusrfrsoffline", opts.label = "fig.square", eval=!online}
 rf_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -332,7 +332,7 @@ rf_rs %>%
   write_rds("data/ml_reg_rf_predictions.rds")
 ```
 
-```{r rfpredict, echo = FALSE, fig.width=7, fig.height=5.5, fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
+```{r rfpredict, echo = FALSE, opts.label = "fig.large", fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
 rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
 rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
@@ -927,7 +927,7 @@ We trained all these models!
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:scotusfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose) and the number of tokens.
 
-```{r scotusfinaltunevis, dependson="finalscotusrs", fig.width=7, fig.height=7, fig.cap="Performance improves significantly at about 4000 tokens"}
+```{r scotusfinaltunevis, dependson="finalscotusrs", opts.label = "fig.square", fig.cap="Performance improves significantly at about 4000 tokens"}
 final_rs %>%
   collect_metrics() %>%
   ggplot(aes(max_tokens, mean, color = .metric)) +
@@ -979,7 +979,7 @@ The metrics for the test set look about the same as the resampled training data 
 
 The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can `tidy()` this final result to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
 
-```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.width=8, fig.height=5, fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
+```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
 scotus_fit <- pull_workflow_fit(final_fitted$.workflow[[1]])
 
 scotus_fit %>%
@@ -1017,7 +1017,7 @@ Some of these features are unigrams and some are bigrams, but notice that none o
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
 
-```{r scotusfinalpredvis, dependson="finalscotusrs", fig.width=6.5, fig.height=6, fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed"}
+```{r scotusfinalpredvis, dependson="finalscotusrs", opts.label = "fig.large", fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed"}
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +

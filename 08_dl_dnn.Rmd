@@ -463,7 +463,7 @@ val_res %>%
 
 The ROC curve in Figure \@ref(fig:dnnroccurve) shows how the model performs at different thresholds.
 
-```{r dnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first DNN model predictions of Kickstarter campaign success"}
+```{r dnnroccurve, opts.label = "fig.square", fig.cap="ROC curve for first DNN model predictions of Kickstarter campaign success"}
 val_res %>%
   roc_curve(truth = state, .pred_1) %>%
   autoplot() +
@@ -773,7 +773,7 @@ all_dense_model_res %>%
 
 We can also do this for ROC curves. Figure \@ref(fig:alldnnroccurve) shows the three different ROC curves together in one chart. As we know, the model using pre-trained word embeddings with locked weights didn't perform very well at all and its ROC curve is the lowest of the three. The other two models perform more similarly but the model using an embedding learned from scratch ends up being the best.
 
-```{r alldnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for all DNN models' predictions of Kickstarter campaign success"}
+```{r alldnnroccurve, opts.label = "fig.square", fig.cap="ROC curve for all DNN models' predictions of Kickstarter campaign success"}
 all_dense_model_res %>%
   group_by(model) %>%
   roc_curve(truth = state, .pred_1) %>%
