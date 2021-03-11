@@ -6,8 +6,44 @@ opts_chunk$set(
   cache = TRUE, 
   eval = TRUE,
   tidy = "styler", 
-  fig.width = 8, 
-  fig.height = 5
+  dpi = 105, # this creates 2*105 dpi at 6in, which is 300 dpi at 4.2in
+  fig.align = 'center',
+  fig.width = 6,
+  fig.asp = 0.618  # 1 / phi
+)
+
+opts_template$set(
+  fig.square = list(fig.asp = 1)
+)
+
+# library(paletteer)
+# library(prismatic)
+# library(magrittr)
+# paletteer_d("RColorBrewer::Set3") %>%
+#   clr_saturate(0.25) %>%
+#   clr_darken(0.15) %>%
+#   plot()
+discrete_colors <- c("#5BBCACFF", "#D5D587FF", "#9993C5FF", "#DE6454FF", 
+                     "#5497C2FF", "#DA9437FF", "#92C22BFF", "#D8A8C1FF", 
+                     "#C0ACACFF", "#B556B7FF", "#A3CA9AFF", "#D7C637FF")
+
+alpha_viridis <- function(...) {
+  scale_fill_gradientn(..., colors = viridis::viridis(256, alpha = 0.7))
+}
+
+suppressPackageStartupMessages(library(tidyverse))
+
+theme_set(theme_light())
+
+update_geom_defaults("col", list(fill = "#8097ae", alpha = 0.9))
+update_geom_defaults("point", list(color = "#566675"))
+update_geom_defaults("line", list(color = "#566675", alpha = 0.7))
+
+options(
+  ggplot2.discrete.fill = discrete_colors,
+  ggplot2.discrete.colour = discrete_colors,
+  ggplot2.continuous.fill = alpha_viridis,
+  ggplot2.continuous.colour = alpha_viridis
 )
 
 # https://github.com/EmilHvitfeldt/smltar/issues/114
@@ -25,15 +61,8 @@ knit_hooks$set(output = function(x, options) {
 
 options(crayon.enabled = FALSE)
 
-suppressPackageStartupMessages(library(tidyverse))
-theme_set(theme_light())
-
 library(htmltools)
 library(quanteda)
-
-update_geom_defaults("col", list(fill = "#8097ae", alpha = 0.9))
-update_geom_defaults("point", list(color = "#566675"))
-update_geom_defaults("line", list(color = "#566675", alpha = 0.7))
 
 
 columnize <- function(words, ncol = 5,
