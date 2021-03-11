@@ -183,7 +183,7 @@ val_res %>%
 
 The ROC curve in Figure \@ref(fig:cnnroccurve) shows how the model performs at different thresholds.
 
-```{r cnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for first CNN model predictions of Kickstarter campaign success"}
+```{r cnnroccurve, opts.label = "fig.square", fig.cap="ROC curve for first CNN model predictions of Kickstarter campaign success"}
 val_res %>%
   roc_curve(truth = state, .pred_1) %>%
   autoplot() +
@@ -357,7 +357,7 @@ all_cnn_model_predictions %>%
 
 We can also compute ROC curves for all our models so far. Figure \@ref(fig:allcnnroccurve) shows the three different ROC curves together in one chart.
 
-```{r allcnnroccurve, fig.width=7, fig.height=6, fig.cap="ROC curve for three CNN variants' predictions of Kickstarter campaign success"}
+```{r allcnnroccurve, opts.label = "fig.square", fig.cap="ROC curve for three CNN variants' predictions of Kickstarter campaign success"}
 all_cnn_model_predictions %>%
   group_by(model) %>%
   roc_curve(truth = state, .pred_1) %>%
@@ -945,7 +945,7 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 
 This is our best performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:cnnfinalroc).
 
-```{r cnnfinalroc, fig.cap="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success"}
+```{r cnnfinalroc, opts.label = "fig.square", fig.cap="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   roc_curve(state, .pred_1) %>%
   autoplot()
@@ -953,7 +953,7 @@ final_res %>%
 
 We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model's performance using a confusion matrix as well, in Figure \@ref(fig:cnnheatmapfinal).
 
-```{r cnnheatmapfinal, fig.cap="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success"}
+```{r cnnheatmapfinal, opts.label = "fig.square", fig.cap="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
   conf_mat(state, .pred_class) %>%
   autoplot(type = "heatmap")

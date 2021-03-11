@@ -13,7 +13,9 @@ opts_chunk$set(
 )
 
 opts_template$set(
-  fig.square = list(fig.asp = 1)
+  fig.large = list(fig.asp = 0.8),
+  fig.square = list(fig.asp = 1),
+  fig.long = list(fig.asp = 1.5)
 )
 
 # library(paletteer)
