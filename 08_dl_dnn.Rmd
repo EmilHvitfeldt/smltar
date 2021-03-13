@@ -249,7 +249,7 @@ The matrix `kick_train` has `r comma(dim(kick_train)[1])` rows, corresponding to
 
 Our first deep learning model embeds these Kickstarter blurbs in sequences of vectors, flattens them, and then trains a dense network layer to predict whether the campaign was successful or not.
 
-```{r dense_model, eval=!online}
+```{r dense_model}
 library(keras)
 
 dense_model <- keras_model_sequential() %>%
@@ -285,7 +285,7 @@ We can also add any number of metrics^[https://keras.io/api/metrics/] to be calc
 
 Let's set these 3 options (`optimizer`, `loss`, and `metrics`) using the `compile()` function:
 
-```{r dense_model_compiled, eval=!online}
+```{r dense_model_compiled}
 dense_model %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -300,7 +300,7 @@ Notice how the `compile()` function modifies the model in place. This is differe
 Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
 This is sufficient information to get started training the model, but we are going to specify a few more arguments to get better control of the training loop. First, we set the number of observations to pass through at a time with `batch_size`, and we set `epochs = 20` to tell the model to pass all the training data through the training loop 20 times. Lastly, we set `validation_split = 0.25` to specify an internal validation split; this will keep 25% of the data for validation.
 
-```{r dense_model_history, eval=!online}
+```{r dense_model_history}
 dense_history <- dense_model %>%
   fit(
     x = kick_train,
@@ -310,15 +310,6 @@ dense_history <- dense_model %>%
     validation_split = 0.25,
     verbose = FALSE
   )
-```
-
-
-```{r, include=FALSE, eval=!online}
-readr::write_rds(dense_history, "data/dnn_dense_history.rds")
-```
-
-```{r, include=FALSE, eval=online}
-dense_history <- readr::read_rds("data/dnn_dense_history.rds")
 ```
 
 
@@ -365,7 +356,7 @@ state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 
 Let's set up our same dense neural network architecture. 
 
-```{r dense_model2, eval=!online}
+```{r dense_model2}
 dense_model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1,
                   output_dim = 12,
@@ -383,7 +374,7 @@ dense_model %>% compile(
 
 Now we can fit this model with dropout to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
 
-```{r val_history, eval=!online}
+```{r val_history}
 val_history <- dense_model %>%
   fit(
     x = kick_analysis,
@@ -393,19 +384,7 @@ val_history <- dense_model %>%
     validation_data = list(kick_assess, state_assess),
     verbose = FALSE
   )
-```
 
-```{r, include=FALSE, eval=!online}
-keras::save_model_tf(dense_model, "data/dnn_dense_model")
-readr::write_rds(val_history, "data/dnn_val_history.rds")
-```
-
-```{r, include=FALSE, eval=online}
-dense_model <- keras::load_model_tf("data/dnn_dense_model/")
-val_history <- readr::read_rds("data/dnn_val_history.rds")
-```
-
-```{r}
 val_history
 ```
 
@@ -516,7 +495,7 @@ glove6b_matrix <- tidy(kick_prep, 3) %>%
 
 We'll keep the model architecture itself as unchanged as possible. The `output_dim` argument is set equal to`ncol(glove6b_matrix)` to make sure that all the dimensions line up correctly, but everything else stays the same.
 
-```{r dense_model_pte, dependson="glove6b_matrix", eval=!online}
+```{r dense_model_pte, dependson="glove6b_matrix"}
 dense_model_pte <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1,
                   output_dim = ncol(glove6b_matrix),
@@ -532,7 +511,7 @@ Now we use `get_layer()` to access the first layer (which is the embedding layer
 Freezing the weights stops them from being updated during the training loop.
 ```
 
-```{r dense_model_pte_weights, dependson="dense_model_pte", eval=!online}
+```{r dense_model_pte_weights, dependson="dense_model_pte"}
 dense_model_pte %>%
   get_layer(index = 1) %>%
   set_weights(list(glove6b_matrix)) %>%
@@ -541,7 +520,7 @@ dense_model_pte %>%
 
 Now we compile and fit the model just like the last one we looked at.
 
-```{r dense_pte_history, dependson="dense_model_pte_weights", eval=!online}
+```{r dense_pte_history, dependson="dense_model_pte_weights"}
 dense_model_pte %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -557,19 +536,7 @@ dense_pte_history <- dense_model_pte %>%
     validation_data = list(kick_assess, state_assess),
     verbose = FALSE
   )
-```
 
-```{r, include=FALSE, eval=!online}
-keras::save_model_tf(dense_model_pte, "data/dnn_dense_model_pte")
-readr::write_rds(dense_pte_history, "data/dnn_dense_pte_history.rds")
-```
-
-```{r, include=FALSE, eval=online}
-dense_model_pte <- keras::load_model_tf("data/dnn_dense_model_pte/")
-dense_pte_history <- readr::read_rds("data/dnn_dense_pte_history.rds")
-```
-
-```{r}
 dense_pte_history
 ```
 
@@ -597,7 +564,7 @@ This allows the model to adjust the weights to better fit the data. The intentio
 
 We specify a new model to get started on this approach.
 
-```{r dense_model_pte2, dependson="glove6b_matrix", eval=!online}
+```{r dense_model_pte2, dependson="glove6b_matrix"}
 dense_model_pte2 <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1,
                   output_dim = ncol(glove6b_matrix),
@@ -609,7 +576,7 @@ dense_model_pte2 <- keras_model_sequential() %>%
 
 Now, we set the weights with `set_weights()` but we _don't_ freeze them.
 
-```{r dense_model_pte_noweights, dependson="dense_model_pte", eval=!online}
+```{r dense_model_pte_noweights, dependson="dense_model_pte"}
 dense_model_pte2 %>%
   get_layer(index = 1) %>%
   set_weights(list(glove6b_matrix))
@@ -617,7 +584,7 @@ dense_model_pte2 %>%
 
 We compile and fit the model as before.
 
-```{r dense_pte_noweights_history, dependson="dense_model_pte_noweights", eval=!online}
+```{r dense_pte_noweights_history, dependson="dense_model_pte_noweights"}
 dense_model_pte2 %>% compile(
   optimizer = "adam",
   loss = "binary_crossentropy",
@@ -632,16 +599,6 @@ dense_pte2_history <- dense_model_pte2 %>% fit(
   validation_data = list(kick_assess, state_assess),
   verbose = FALSE
 )
-```
-
-```{r, include=FALSE, eval=!online}
-keras::save_model_tf(dense_model_pte2, "data/dnn_dense_model_pte2")
-readr::write_rds(dense_pte2_history, "data/dnn_dense_pte2_history.rds")
-```
-
-```{r, include=FALSE, eval=online}
-dense_model_pte2 <- keras::load_model_tf("data/dnn_dense_model_pte2/")
-dense_pte2_history <- readr::read_rds("data/dnn_dense_pte2_history.rds")
 ```
 
 How did this version of using pre-trained embeddings do?
@@ -714,19 +671,11 @@ fit_split <- function(split, prepped_rec) {
 
 We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.
 
-```{r, eval=!online}
+```{r}
 cv_fitted <- kick_folds %>%
   mutate(validation = map(splits, fit_split, kick_prep))
 
 cv_fitted
-```
-
-```{r, include=FALSE, eval=!online}
-readr::write_rds(cv_fitted, "data/dnn_cv_fitted")
-```
-
-```{r, include=FALSE, eval=online}
-cv_fitted <- readr::read_rds("data/dnn_cv_fitted")
 ```
 
 Now we can use `unnest()` to find the metrics we computed.
