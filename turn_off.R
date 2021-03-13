@@ -19,8 +19,9 @@ writeLines(
     cache = TRUE, 
     eval = FALSE,
     tidy = "styler", 
-    fig.width = 8, 
-    fig.height = 5
+    fig.align = "center",
+    fig.width = 6,
+    fig.asp = 0.618  # 1 / phi
   )
     ',
   "_common.R"
