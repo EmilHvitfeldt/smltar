@@ -691,7 +691,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 
 Now we have everything we need to do some hyperparameter searching. Load up tfruns and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
 
-```{r, results='hide'}
+```{r, results='hide', cache=FALSE}
 library(tfruns)
 runs <- tuning_run(
   file = "cnn-spec.R",
@@ -706,13 +706,13 @@ You don't have to, but we have manually specified the `runs_dir` argument, which
 
 A summary of all the runs in the folder can be retrieved with `ls_runs()`; here we use `as_tibble()` to get the results as a tibble.
 
-```{r}
+```{r, cache=FALSE}
 runs_results
 ```
 
 We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.
 
-```{r}
+```{r, cache=FALSE}
 best_runs <- runs_results %>%
   select(metric_val_accuracy, flag_kernel_size1, flag_strides1) %>%
   arrange(desc(metric_val_accuracy))
