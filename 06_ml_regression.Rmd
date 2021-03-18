@@ -278,7 +278,7 @@ Now we can fit this random forest model. Let's use `fit_resamples()` again, so w
 - Our cross-validation resamples of the Supreme Court opinions
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
-```{r scotusrfrsoffline, dependson=c("scotuswf", "scotusfolds", "scotusrfspec"), eval=!online}
+```{r scotusrfrs, dependson=c("scotuswf", "scotusfolds", "scotusrfspec")}
 rf_rs <- fit_resamples(
   scotus_wf %>% add_model(rf_spec),
   scotus_folds,
@@ -288,47 +288,13 @@ rf_rs <- fit_resamples(
 
 We can use `collect_metrics()` to obtain and format the performance metrics for this random forest model.
 
-```{r rfmetricsoffline, dependson="scotusrfrsoffline", eval=!online}
+```{r rfmetrics, dependson="scotusrfrs"}
 collect_metrics(rf_rs)
-```
-
-```{r, dependson="rfmetricsoffline", include = FALSE, eval=!online}
-rf_rs %>%
-  collect_metrics() %>%
-  write_rds("data/ml_reg_rf_metrics.rds")
-```
-
-```{r rfmetrics, echo = FALSE}
-rf_metrics <- read_rds("data/ml_reg_rf_metrics.rds")
-rf_metrics
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
-```{r rfpredictoffline, dependson="scotusrfrsoffline", opts.label = "fig.square", eval=!online}
-rf_rs %>%
-  collect_predictions() %>%
-  ggplot(aes(year, .pred, color = id)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_point(alpha = 0.3) +
-  labs(
-    x = "Truth",
-    y = "Predicted year",
-    color = NULL,
-    title = paste("Predicted and true years for Supreme Court opinions using",
-                  "a random forest model", sep = "\n"),
-    subtitle = "Each cross-validation fold is shown in a different color"
-  )
-```
-
-```{r, dependson="rfpredictoffline", include = FALSE, eval=!online}
-rf_rs %>%
-  collect_predictions() %>%
-  write_rds("data/ml_reg_rf_predictions.rds")
-```
-
-```{r rfpredict, echo = FALSE, opts.label = "fig.large", fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
-rf_predictions <- read_rds("data/ml_reg_rf_predictions.rds")
+```{r rfpredict, dependson="scotusrfrs", opts.label = "fig.large", fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
 rf_predictions %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
@@ -424,7 +390,7 @@ collect_metrics(smart_rs)
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
 
-```{r snowballrmse, dependson="stopwordsres"}
+```{r snowballrmse, dependson="stopwordsres", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons"}
 word_counts <- tibble(name = c("snowball", "smart", "stopwords-iso")) %>%
   mutate(words = map_int(name, ~length(stopwords::stopwords(source = .))))
 
@@ -526,7 +492,7 @@ collect_metrics(bigram_rs)
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
 
-```{r ngramrmse, dependson="ngramrs"}
+```{r ngramrmse, dependson="ngramrs", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
 list(`1` = unigram_rs,
      `1 and 2` = bigram_rs,
      `1, 2, and 3` = trigram_rs) %>%
@@ -554,7 +520,6 @@ Keep in mind that adding n-grams is computationally expensive, especially compar
 As we discussed in Section \@ref(lemmatization), we can normalize words to their roots or **lemmas** based on each word's context and the structure of a language. Table \@ref(tab:lemmatb) shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the [spaCy](https://spacy.io/) library as made available through the spacyr R package [@Benoit19].
 
 ```{r lemmatb, echo=FALSE}
-## for GH actions and people with "regular" environments i.e. not Julia
 spacyr::spacy_initialize(entity = FALSE)
 paste(
   "However, the Court of Appeals disagreed with the District Court's",
@@ -599,13 +564,13 @@ lemma_rs <- fit_resamples(
 )
 ```
 
-How did this model perform?
+How did this model perform? 
 
 ```{r dependson="lemmars"}
 collect_metrics(lemma_rs)
 ```
 
-The best value for RMSE at `r collect_metrics(lemma_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
+The best value for RMSE at `r collect_metrics(lemma_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
 
 ```{block, type="rmdnote"}
 We can use `engine = "spacyr"` to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this [**textrecipes** blogpost](https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/) and can be performed with `step_pos_filter()`.
