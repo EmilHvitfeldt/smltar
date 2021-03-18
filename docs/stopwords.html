@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R</title>
+  <meta name="description" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="generator" content="bookdown 0.21.6 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="github-repo" content="EmilHvitfeldt/smltar" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
+  
+  <meta name="twitter:description" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
+  
+
+<meta name="author" content="Emil Hvitfeldt and Julia Silge" />
+
+
+<meta name="date" content="2021-03-16" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="tokenization.html"/>
+<link rel="next" href="stemming.html"/>
+<script src="libs/header-attrs-2.7.4/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
+<script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="stylesheet" href="smltar.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Supervised Machine Learning for Text Analysis in R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome to Supervised Machine Learning for Text Analysis in R</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#outline"><i class="fa fa-check"></i>Outline</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#topics-this-book-will-not-cover"><i class="fa fa-check"></i>Topics this book will not cover</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for?</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#acknowledgements"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#colophon"><i class="fa fa-check"></i>Colophon</a></li>
+</ul></li>
+<li class="part"><span><b>I Natural Language Features</b></span></li>
+<li class="chapter" data-level="1" data-path="language.html"><a href="language.html"><i class="fa fa-check"></i><b>1</b> Language and modeling</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="language.html"><a href="language.html#linguistics-for-text-analysis"><i class="fa fa-check"></i><b>1.1</b> Linguistics for text analysis</a></li>
+<li class="chapter" data-level="1.2" data-path="language.html"><a href="language.html#morphology"><i class="fa fa-check"></i><b>1.2</b> A glimpse into one area: morphology</a></li>
+<li class="chapter" data-level="1.3" data-path="language.html"><a href="language.html#different-languages"><i class="fa fa-check"></i><b>1.3</b> Different languages</a></li>
+<li class="chapter" data-level="1.4" data-path="language.html"><a href="language.html#other-ways-text-can-vary"><i class="fa fa-check"></i><b>1.4</b> Other ways text can vary</a></li>
+<li class="chapter" data-level="1.5" data-path="language.html"><a href="language.html#languagesummary"><i class="fa fa-check"></i><b>1.5</b> Summary</a>
+<ul>
+<li class="chapter" data-level="1.5.1" data-path="language.html"><a href="language.html#in-this-chapter-you-learned"><i class="fa fa-check"></i><b>1.5.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="tokenization.html"><a href="tokenization.html"><i class="fa fa-check"></i><b>2</b> Tokenization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="tokenization.html"><a href="tokenization.html#what-is-a-token"><i class="fa fa-check"></i><b>2.1</b> What is a token?</a></li>
+<li class="chapter" data-level="2.2" data-path="tokenization.html"><a href="tokenization.html#types-of-tokens"><i class="fa fa-check"></i><b>2.2</b> Types of tokens</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="tokenization.html"><a href="tokenization.html#character-tokens"><i class="fa fa-check"></i><b>2.2.1</b> Character tokens</a></li>
+<li class="chapter" data-level="2.2.2" data-path="tokenization.html"><a href="tokenization.html#word-tokens"><i class="fa fa-check"></i><b>2.2.2</b> Word tokens</a></li>
+<li class="chapter" data-level="2.2.3" data-path="tokenization.html"><a href="tokenization.html#tokenizingngrams"><i class="fa fa-check"></i><b>2.2.3</b> Tokenizing by n-grams</a></li>
+<li class="chapter" data-level="2.2.4" data-path="tokenization.html"><a href="tokenization.html#lines-sentence-and-paragraph-tokens"><i class="fa fa-check"></i><b>2.2.4</b> Lines, sentence, and paragraph tokens</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="tokenization.html"><a href="tokenization.html#where-does-tokenization-break-down"><i class="fa fa-check"></i><b>2.3</b> Where does tokenization break down?</a></li>
+<li class="chapter" data-level="2.4" data-path="tokenization.html"><a href="tokenization.html#building-your-own-tokenizer"><i class="fa fa-check"></i><b>2.4</b> Building your own tokenizer</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="tokenization.html"><a href="tokenization.html#tokenize-to-characters-only-keeping-letters"><i class="fa fa-check"></i><b>2.4.1</b> Tokenize to characters, only keeping letters</a></li>
+<li class="chapter" data-level="2.4.2" data-path="tokenization.html"><a href="tokenization.html#allow-for-hyphenated-words"><i class="fa fa-check"></i><b>2.4.2</b> Allow for hyphenated words</a></li>
+<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-into-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it into a function</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="tokenization.html"><a href="tokenization.html#tokenization-for-non-latin-alphabets"><i class="fa fa-check"></i><b>2.5</b> Tokenization for non-Latin alphabets</a></li>
+<li class="chapter" data-level="2.6" data-path="tokenization.html"><a href="tokenization.html#tokenization-benchmark"><i class="fa fa-check"></i><b>2.6</b> Tokenization benchmark</a></li>
+<li class="chapter" data-level="2.7" data-path="tokenization.html"><a href="tokenization.html#tokensummary"><i class="fa fa-check"></i><b>2.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="2.7.1" data-path="tokenization.html"><a href="tokenization.html#in-this-chapter-you-learned-1"><i class="fa fa-check"></i><b>2.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="stopwords.html"><a href="stopwords.html"><i class="fa fa-check"></i><b>3</b> Stop words</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="stopwords.html"><a href="stopwords.html#premadestopwords"><i class="fa fa-check"></i><b>3.1</b> Using premade stop word lists</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="stopwords.html"><a href="stopwords.html#stop-word-removal-in-r"><i class="fa fa-check"></i><b>3.1.1</b> Stop word removal in R</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="stopwords.html"><a href="stopwords.html#homemadestopwords"><i class="fa fa-check"></i><b>3.2</b> Creating your own stop words list</a></li>
+<li class="chapter" data-level="3.3" data-path="stopwords.html"><a href="stopwords.html#all-stop-word-lists-are-context-specific"><i class="fa fa-check"></i><b>3.3</b> All stop word lists are context-specific</a></li>
+<li class="chapter" data-level="3.4" data-path="stopwords.html"><a href="stopwords.html#what-happens-when-you-remove-stop-words"><i class="fa fa-check"></i><b>3.4</b> What happens when you remove stop words</a></li>
+<li class="chapter" data-level="3.5" data-path="stopwords.html"><a href="stopwords.html#stop-words-in-languages-other-than-english"><i class="fa fa-check"></i><b>3.5</b> Stop words in languages other than English</a></li>
+<li class="chapter" data-level="3.6" data-path="stopwords.html"><a href="stopwords.html#stopwordssummary"><i class="fa fa-check"></i><b>3.6</b> Summary</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="stopwords.html"><a href="stopwords.html#in-this-chapter-you-learned-2"><i class="fa fa-check"></i><b>3.6.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="stemming.html"><a href="stemming.html"><i class="fa fa-check"></i><b>4</b> Stemming</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="stemming.html"><a href="stemming.html#how-to-stem-text-in-r"><i class="fa fa-check"></i><b>4.1</b> How to stem text in R</a></li>
+<li class="chapter" data-level="4.2" data-path="stemming.html"><a href="stemming.html#should-you-use-stemming-at-all"><i class="fa fa-check"></i><b>4.2</b> Should you use stemming at all?</a></li>
+<li class="chapter" data-level="4.3" data-path="stemming.html"><a href="stemming.html#understand-a-stemming-algorithm"><i class="fa fa-check"></i><b>4.3</b> Understand a stemming algorithm</a></li>
+<li class="chapter" data-level="4.4" data-path="stemming.html"><a href="stemming.html#handling-punctuation-when-stemming"><i class="fa fa-check"></i><b>4.4</b> Handling punctuation when stemming</a></li>
+<li class="chapter" data-level="4.5" data-path="stemming.html"><a href="stemming.html#compare-some-stemming-options"><i class="fa fa-check"></i><b>4.5</b> Compare some stemming options</a></li>
+<li class="chapter" data-level="4.6" data-path="stemming.html"><a href="stemming.html#lemmatization"><i class="fa fa-check"></i><b>4.6</b> Lemmatization and stemming</a></li>
+<li class="chapter" data-level="4.7" data-path="stemming.html"><a href="stemming.html#stemming-and-stop-words"><i class="fa fa-check"></i><b>4.7</b> Stemming and stop words</a></li>
+<li class="chapter" data-level="4.8" data-path="stemming.html"><a href="stemming.html#stemmingsummary"><i class="fa fa-check"></i><b>4.8</b> Summary</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="stemming.html"><a href="stemming.html#in-this-chapter-you-learned-3"><i class="fa fa-check"></i><b>4.8.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="embeddings.html"><a href="embeddings.html"><i class="fa fa-check"></i><b>5</b> Word Embeddings</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="embeddings.html"><a href="embeddings.html#motivatingsparse"><i class="fa fa-check"></i><b>5.1</b> Motivating embeddings for sparse, high-dimensional data</a></li>
+<li class="chapter" data-level="5.2" data-path="embeddings.html"><a href="embeddings.html#understand-word-embeddings-by-finding-them-yourself"><i class="fa fa-check"></i><b>5.2</b> Understand word embeddings by finding them yourself</a></li>
+<li class="chapter" data-level="5.3" data-path="embeddings.html"><a href="embeddings.html#exploring-cfpb-word-embeddings"><i class="fa fa-check"></i><b>5.3</b> Exploring CFPB word embeddings</a></li>
+<li class="chapter" data-level="5.4" data-path="embeddings.html"><a href="embeddings.html#glove"><i class="fa fa-check"></i><b>5.4</b> Use pre-trained word embeddings</a></li>
+<li class="chapter" data-level="5.5" data-path="embeddings.html"><a href="embeddings.html#fairnessembeddings"><i class="fa fa-check"></i><b>5.5</b> Fairness and word embeddings</a></li>
+<li class="chapter" data-level="5.6" data-path="embeddings.html"><a href="embeddings.html#using-word-embeddings-in-the-real-world"><i class="fa fa-check"></i><b>5.6</b> Using word embeddings in the real world</a></li>
+<li class="chapter" data-level="5.7" data-path="embeddings.html"><a href="embeddings.html#embeddingssummary"><i class="fa fa-check"></i><b>5.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="embeddings.html"><a href="embeddings.html#in-this-chapter-you-learned-4"><i class="fa fa-check"></i><b>5.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Machine Learning Methods</b></span></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html"><i class="fa fa-check"></i>Foreword</a>
+<ul>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#should-we-even-be-doing-this"><i class="fa fa-check"></i>Should we even be doing this?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-bias-is-already-in-the-data"><i class="fa fa-check"></i>What bias is already in the data?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#can-the-code-and-data-be-audited"><i class="fa fa-check"></i>Can the code and data be audited?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-are-the-error-rates-for-sub-groups"><i class="fa fa-check"></i>What are the error rates for sub-groups?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-is-the-accuracy-of-a-simple-rule-based-alternative"><i class="fa fa-check"></i>What is the accuracy of a simple rule-based alternative?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-processes-are-in-place-to-handle-appeals-or-mistakes"><i class="fa fa-check"></i>What processes are in place to handle appeals or mistakes?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#how-diverse-is-the-team-that-built-it"><i class="fa fa-check"></i>How diverse is the team that built it?</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="mlregression.html"><a href="mlregression.html"><i class="fa fa-check"></i><b>6</b> Regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="mlregression.html"><a href="mlregression.html#firstmlregression"><i class="fa fa-check"></i><b>6.1</b> A first regression model</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="mlregression.html"><a href="mlregression.html#firstregression"><i class="fa fa-check"></i><b>6.1.1</b> Building our first regression model</a></li>
+<li class="chapter" data-level="6.1.2" data-path="mlregression.html"><a href="mlregression.html#firstregressionevaluation"><i class="fa fa-check"></i><b>6.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="mlregression.html"><a href="mlregression.html#regnull"><i class="fa fa-check"></i><b>6.2</b> Compare to the null model</a></li>
+<li class="chapter" data-level="6.3" data-path="mlregression.html"><a href="mlregression.html#comparerf"><i class="fa fa-check"></i><b>6.3</b> Compare to a random forest model</a></li>
+<li class="chapter" data-level="6.4" data-path="mlregression.html"><a href="mlregression.html#casestudystopwords"><i class="fa fa-check"></i><b>6.4</b> Case study: removing stop words</a></li>
+<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#case-study-varying-n-grams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
+<li class="chapter" data-level="6.6" data-path="mlregression.html"><a href="mlregression.html#mlregressionlemmatization"><i class="fa fa-check"></i><b>6.6</b> Case study: lemmatization</a></li>
+<li class="chapter" data-level="6.7" data-path="mlregression.html"><a href="mlregression.html#case-study-feature-hashing"><i class="fa fa-check"></i><b>6.7</b> Case study: feature hashing</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="mlregression.html"><a href="mlregression.html#text-normalization"><i class="fa fa-check"></i><b>6.7.1</b> Text normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="mlregression.html"><a href="mlregression.html#what-evaluation-metrics-are-appropriate"><i class="fa fa-check"></i><b>6.8</b> What evaluation metrics are appropriate?</a></li>
+<li class="chapter" data-level="6.9" data-path="mlregression.html"><a href="mlregression.html#mlregressionfull"><i class="fa fa-check"></i><b>6.9</b> The full game: regression</a>
+<ul>
+<li class="chapter" data-level="6.9.1" data-path="mlregression.html"><a href="mlregression.html#preprocess-the-data"><i class="fa fa-check"></i><b>6.9.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="6.9.2" data-path="mlregression.html"><a href="mlregression.html#specify-the-model"><i class="fa fa-check"></i><b>6.9.2</b> Specify the model</a></li>
+<li class="chapter" data-level="6.9.3" data-path="mlregression.html"><a href="mlregression.html#tune-the-model"><i class="fa fa-check"></i><b>6.9.3</b> Tune the model</a></li>
+<li class="chapter" data-level="6.9.4" data-path="mlregression.html"><a href="mlregression.html#evaluate-the-modeling"><i class="fa fa-check"></i><b>6.9.4</b> Evaluate the modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="mlregression.html"><a href="mlregression.html#mlregressionsummary"><i class="fa fa-check"></i><b>6.10</b> Summary</a>
+<ul>
+<li class="chapter" data-level="6.10.1" data-path="mlregression.html"><a href="mlregression.html#in-this-chapter-you-learned-5"><i class="fa fa-check"></i><b>6.10.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="mlclassification.html"><a href="mlclassification.html"><i class="fa fa-check"></i><b>7</b> Classification</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="mlclassification.html"><a href="mlclassification.html#classfirstattemptlookatdata"><i class="fa fa-check"></i><b>7.1</b> A first classification model</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="mlclassification.html"><a href="mlclassification.html#classfirstmodel"><i class="fa fa-check"></i><b>7.1.1</b> Building our first classification model</a></li>
+<li class="chapter" data-level="7.1.2" data-path="mlclassification.html"><a href="mlclassification.html#evaluation"><i class="fa fa-check"></i><b>7.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="mlclassification.html"><a href="mlclassification.html#classnull"><i class="fa fa-check"></i><b>7.2</b> Compare to the null model</a></li>
+<li class="chapter" data-level="7.3" data-path="mlclassification.html"><a href="mlclassification.html#comparetolasso"><i class="fa fa-check"></i><b>7.3</b> Compare to a lasso classification model</a></li>
+<li class="chapter" data-level="7.4" data-path="mlclassification.html"><a href="mlclassification.html#tunelasso"><i class="fa fa-check"></i><b>7.4</b> Tuning lasso hyperparameters</a></li>
+<li class="chapter" data-level="7.5" data-path="mlclassification.html"><a href="mlclassification.html#casestudysparseencoding"><i class="fa fa-check"></i><b>7.5</b> Case study: sparse encoding</a></li>
+<li class="chapter" data-level="7.6" data-path="mlclassification.html"><a href="mlclassification.html#mlmulticlass"><i class="fa fa-check"></i><b>7.6</b> Two class or multiclass?</a></li>
+<li class="chapter" data-level="7.7" data-path="mlclassification.html"><a href="mlclassification.html#case-study-including-non-text-data"><i class="fa fa-check"></i><b>7.7</b> Case study: including non-text data</a></li>
+<li class="chapter" data-level="7.8" data-path="mlclassification.html"><a href="mlclassification.html#case-study-data-censoring"><i class="fa fa-check"></i><b>7.8</b> Case study: data censoring</a></li>
+<li class="chapter" data-level="7.9" data-path="mlclassification.html"><a href="mlclassification.html#customfeatures"><i class="fa fa-check"></i><b>7.9</b> Case study: custom features</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="mlclassification.html"><a href="mlclassification.html#detect-credit-cards"><i class="fa fa-check"></i><b>7.9.1</b> Detect credit cards</a></li>
+<li class="chapter" data-level="7.9.2" data-path="mlclassification.html"><a href="mlclassification.html#calculate-percentage-censoring"><i class="fa fa-check"></i><b>7.9.2</b> Calculate percentage censoring</a></li>
+<li class="chapter" data-level="7.9.3" data-path="mlclassification.html"><a href="mlclassification.html#detect-monetary-amounts"><i class="fa fa-check"></i><b>7.9.3</b> Detect monetary amounts</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="mlclassification.html"><a href="mlclassification.html#what-evaluation-metrics-are-appropriate-1"><i class="fa fa-check"></i><b>7.10</b> What evaluation metrics are appropriate?</a></li>
+<li class="chapter" data-level="7.11" data-path="mlclassification.html"><a href="mlclassification.html#mlclassificationfull"><i class="fa fa-check"></i><b>7.11</b> The full game: classification</a>
+<ul>
+<li class="chapter" data-level="7.11.1" data-path="mlclassification.html"><a href="mlclassification.html#feature-selection"><i class="fa fa-check"></i><b>7.11.1</b> Feature selection</a></li>
+<li class="chapter" data-level="7.11.2" data-path="mlclassification.html"><a href="mlclassification.html#specify-the-model-1"><i class="fa fa-check"></i><b>7.11.2</b> Specify the model</a></li>
+<li class="chapter" data-level="7.11.3" data-path="mlclassification.html"><a href="mlclassification.html#evaluate-the-modeling-1"><i class="fa fa-check"></i><b>7.11.3</b> Evaluate the modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="7.12" data-path="mlclassification.html"><a href="mlclassification.html#mlclassificationsummary"><i class="fa fa-check"></i><b>7.12</b> Summary</a>
+<ul>
+<li class="chapter" data-level="7.12.1" data-path="mlclassification.html"><a href="mlclassification.html#in-this-chapter-you-learned-6"><i class="fa fa-check"></i><b>7.12.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Deep Learning Methods</b></span></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html"><i class="fa fa-check"></i>Foreword</a>
+<ul>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#spending-your-data-budget"><i class="fa fa-check"></i>Spending your data budget</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#feature-engineering"><i class="fa fa-check"></i>Feature engineering</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#fitting-and-tuning"><i class="fa fa-check"></i>Fitting and tuning</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#model-evaluation"><i class="fa fa-check"></i>Model evaluation</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#putting-the-model-process-in-context"><i class="fa fa-check"></i>Putting the model process in context</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="dldnn.html"><a href="dldnn.html"><i class="fa fa-check"></i><b>8</b> Dense neural networks</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="dldnn.html"><a href="dldnn.html#kickstarter"><i class="fa fa-check"></i><b>8.1</b> Kickstarter data</a></li>
+<li class="chapter" data-level="8.2" data-path="dldnn.html"><a href="dldnn.html#firstdlclassification"><i class="fa fa-check"></i><b>8.2</b> A first deep learning model</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="dldnn.html"><a href="dldnn.html#dnnrecipe"><i class="fa fa-check"></i><b>8.2.1</b> Preprocessing for deep learning</a></li>
+<li class="chapter" data-level="8.2.2" data-path="dldnn.html"><a href="dldnn.html#onehotsequence"><i class="fa fa-check"></i><b>8.2.2</b> One-hot sequence embedding of text</a></li>
+<li class="chapter" data-level="8.2.3" data-path="dldnn.html"><a href="dldnn.html#simple-flattened-dense-network"><i class="fa fa-check"></i><b>8.2.3</b> Simple flattened dense network</a></li>
+<li class="chapter" data-level="8.2.4" data-path="dldnn.html"><a href="dldnn.html#evaluate-dnn"><i class="fa fa-check"></i><b>8.2.4</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="dldnn.html"><a href="dldnn.html#using-pre-trained-word-embeddings"><i class="fa fa-check"></i><b>8.3</b> Using pre-trained word embeddings</a></li>
+<li class="chapter" data-level="8.4" data-path="dldnn.html"><a href="dldnn.html#dnncross"><i class="fa fa-check"></i><b>8.4</b> Cross-validation for deep learning models</a></li>
+<li class="chapter" data-level="8.5" data-path="dldnn.html"><a href="dldnn.html#compare-and-evaluate-dnn-models"><i class="fa fa-check"></i><b>8.5</b> Compare and evaluate DNN models</a></li>
+<li class="chapter" data-level="8.6" data-path="dldnn.html"><a href="dldnn.html#dllimitations"><i class="fa fa-check"></i><b>8.6</b> Limitations of deep learning</a></li>
+<li class="chapter" data-level="8.7" data-path="dldnn.html"><a href="dldnn.html#dldnnsummary"><i class="fa fa-check"></i><b>8.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="8.7.1" data-path="dldnn.html"><a href="dldnn.html#in-this-chapter-you-learned-7"><i class="fa fa-check"></i><b>8.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="dllstm.html"><a href="dllstm.html"><i class="fa fa-check"></i><b>9</b> Long short-term memory (LSTM) networks</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="dllstm.html"><a href="dllstm.html#firstlstm"><i class="fa fa-check"></i><b>9.1</b> A first LSTM model</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="dllstm.html"><a href="dllstm.html#building-an-lstm"><i class="fa fa-check"></i><b>9.1.1</b> Building an LSTM</a></li>
+<li class="chapter" data-level="9.1.2" data-path="dllstm.html"><a href="dllstm.html#lstmevaluation"><i class="fa fa-check"></i><b>9.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="dllstm.html"><a href="dllstm.html#compare-to-a-recurrent-neural-network"><i class="fa fa-check"></i><b>9.2</b> Compare to a recurrent neural network</a></li>
+<li class="chapter" data-level="9.3" data-path="dllstm.html"><a href="dllstm.html#bilstm"><i class="fa fa-check"></i><b>9.3</b> Case study: bidirectional LSTM</a></li>
+<li class="chapter" data-level="9.4" data-path="dllstm.html"><a href="dllstm.html#case-study-stacking-lstm-layers"><i class="fa fa-check"></i><b>9.4</b> Case study: stacking LSTM layers</a></li>
+<li class="chapter" data-level="9.5" data-path="dllstm.html"><a href="dllstm.html#lstmpadding"><i class="fa fa-check"></i><b>9.5</b> Case study: padding</a></li>
+<li class="chapter" data-level="9.6" data-path="dllstm.html"><a href="dllstm.html#case-study-training-a-regression-model"><i class="fa fa-check"></i><b>9.6</b> Case study: training a regression model</a></li>
+<li class="chapter" data-level="9.7" data-path="dllstm.html"><a href="dllstm.html#case-study-vocabulary-size"><i class="fa fa-check"></i><b>9.7</b> Case study: vocabulary size</a></li>
+<li class="chapter" data-level="9.8" data-path="dllstm.html"><a href="dllstm.html#lstmfull"><i class="fa fa-check"></i><b>9.8</b> The full game: LSTM</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="dllstm.html"><a href="dllstm.html#lstmfullpreprocess"><i class="fa fa-check"></i><b>9.8.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="9.8.2" data-path="dllstm.html"><a href="dllstm.html#lstmfullmodel"><i class="fa fa-check"></i><b>9.8.2</b> Specify the model</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="dllstm.html"><a href="dllstm.html#dllstmsummary"><i class="fa fa-check"></i><b>9.9</b> Summary</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="dllstm.html"><a href="dllstm.html#in-this-chapter-you-learned-8"><i class="fa fa-check"></i><b>9.9.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="dlcnn.html"><a href="dlcnn.html"><i class="fa fa-check"></i><b>10</b> Convolutional neural networks</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="dlcnn.html"><a href="dlcnn.html#what-are-cnns"><i class="fa fa-check"></i><b>10.1</b> What are CNNs?</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="dlcnn.html"><a href="dlcnn.html#filters"><i class="fa fa-check"></i><b>10.1.1</b> Filters</a></li>
+<li class="chapter" data-level="10.1.2" data-path="dlcnn.html"><a href="dlcnn.html#kernel-size"><i class="fa fa-check"></i><b>10.1.2</b> Kernel size</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="dlcnn.html"><a href="dlcnn.html#firstcnn"><i class="fa fa-check"></i><b>10.2</b> A first CNN model</a></li>
+<li class="chapter" data-level="10.3" data-path="dlcnn.html"><a href="dlcnn.html#case-study-adding-more-layers"><i class="fa fa-check"></i><b>10.3</b> Case study: adding more layers</a></li>
+<li class="chapter" data-level="10.4" data-path="dlcnn.html"><a href="dlcnn.html#case-study-byte-pair-encoding"><i class="fa fa-check"></i><b>10.4</b> Case study: byte pair encoding</a></li>
+<li class="chapter" data-level="10.5" data-path="dlcnn.html"><a href="dlcnn.html#lime"><i class="fa fa-check"></i><b>10.5</b> Case study: explainability with LIME</a></li>
+<li class="chapter" data-level="10.6" data-path="dlcnn.html"><a href="dlcnn.html#case-study-hyperparameter-search"><i class="fa fa-check"></i><b>10.6</b> Case study: hyperparameter search</a></li>
+<li class="chapter" data-level="10.7" data-path="dlcnn.html"><a href="dlcnn.html#cross-validation-for-evaluation"><i class="fa fa-check"></i><b>10.7</b> Cross-validation for evaluation</a></li>
+<li class="chapter" data-level="10.8" data-path="dlcnn.html"><a href="dlcnn.html#cnnfull"><i class="fa fa-check"></i><b>10.8</b> The full game: CNN</a>
+<ul>
+<li class="chapter" data-level="10.8.1" data-path="dlcnn.html"><a href="dlcnn.html#cnnfullpreprocess"><i class="fa fa-check"></i><b>10.8.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="10.8.2" data-path="dlcnn.html"><a href="dlcnn.html#cnnfullmodel"><i class="fa fa-check"></i><b>10.8.2</b> Specify the model</a></li>
+</ul></li>
+<li class="chapter" data-level="10.9" data-path="dlcnn.html"><a href="dlcnn.html#dlcnnsummary"><i class="fa fa-check"></i><b>10.9</b> Summary</a>
+<ul>
+<li class="chapter" data-level="10.9.1" data-path="dlcnn.html"><a href="dlcnn.html#in-this-chapter-you-learned-9"><i class="fa fa-check"></i><b>10.9.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Conclusion</b></span></li>
+<li class="chapter" data-level="" data-path="text-models-in-the-real-world.html"><a href="text-models-in-the-real-world.html"><i class="fa fa-check"></i>Text models in the real world</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="regexp.html"><a href="regexp.html"><i class="fa fa-check"></i><b>A</b> Regular expressions</a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="regexp.html"><a href="regexp.html#literal-characters"><i class="fa fa-check"></i><b>A.1</b> Literal characters</a>
+<ul>
+<li class="chapter" data-level="A.1.1" data-path="regexp.html"><a href="regexp.html#meta-characters"><i class="fa fa-check"></i><b>A.1.1</b> Meta characters</a></li>
+</ul></li>
+<li class="chapter" data-level="A.2" data-path="regexp.html"><a href="regexp.html#full-stop-the-wildcard"><i class="fa fa-check"></i><b>A.2</b> Full stop, the wildcard</a></li>
+<li class="chapter" data-level="A.3" data-path="regexp.html"><a href="regexp.html#character-classes"><i class="fa fa-check"></i><b>A.3</b> Character classes</a>
+<ul>
+<li class="chapter" data-level="A.3.1" data-path="regexp.html"><a href="regexp.html#shorthand-character-classes"><i class="fa fa-check"></i><b>A.3.1</b> Shorthand character classes</a></li>
+</ul></li>
+<li class="chapter" data-level="A.4" data-path="regexp.html"><a href="regexp.html#quantifiers"><i class="fa fa-check"></i><b>A.4</b> Quantifiers</a></li>
+<li class="chapter" data-level="A.5" data-path="regexp.html"><a href="regexp.html#anchors"><i class="fa fa-check"></i><b>A.5</b> Anchors</a></li>
+<li class="chapter" data-level="A.6" data-path="regexp.html"><a href="regexp.html#additional-resources"><i class="fa fa-check"></i><b>A.6</b> Additional resources</a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="appendixdata.html"><a href="appendixdata.html"><i class="fa fa-check"></i><b>B</b> Data</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata.html"><a href="appendixdata.html#h.c.-andersen-fairy-tales"><i class="fa fa-check"></i><b>B.1</b> H.C. Andersen fairy tales</a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata.html"><a href="appendixdata.html#consumer-financial-protection-bureau-cfpb-complaints"><i class="fa fa-check"></i><b>B.2</b> Consumer Financial Protection Bureau (CFPB) complaints</a></li>
+<li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#opinions-of-the-supreme-court-of-the-united-states"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
+<li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-campaign-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Supervised Machine Learning for Text Analysis in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="stopwords" class="section level1" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Stop words</h1>
+<p>Once we have split text into tokens, it often becomes clear that not all words carry the same amount of information, if any information at all, for a predictive modeling task. Common words that carry little (or perhaps no) meaningful information are called <strong>stop words</strong>. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.</p>
+<p>The concept of stop words has a long history with Hans Peter Luhn credited with coining the term in 1960 <span class="citation">(<a href="#ref-Luhn1960" role="doc-biblioref">Luhn 1960</a>)</span>. Examples of these words in English are “a,” “the,” “of,” and “didn’t.” These words are very common and typically don’t add much to the meaning of a text but instead ensure the structure of a sentence is sound.</p>
+<div class="rmdnote">
+<p>
+Categorizing words as either informative or non-informative is limiting, and we prefer to consider words as having a more fluid or continuous amount of information associated with them. This informativeness is context-specific as well. In fact, stop words themselves are often important in genre or authorship identification.
+</p>
+</div>
+<p>Historically, one of the main reasons for removing stop words was to decrease the computational time for text mining; it can be regarded as a dimensionality reduction of text data and was commonly used in search engines to give better results <span class="citation">(<a href="#ref-Huston2010" role="doc-biblioref">Huston and Croft 2010</a>)</span>.</p>
+<p>Stop words can have different roles in a corpus. We generally categorize stop words into three groups: global, subject, and document stop words.</p>
+<p>Global stop words are words that are almost always low in meaning in a given language; these are words such as “of” and “and” in English which are needed to glue text together. These words are likely a safe bet for removal but they are small in number. You can find some global stop words in pre-made stop word lists (Section <a href="stopwords.html#premadestopwords">3.1</a>).</p>
+<p>Next up are subject-specific stop words. These words are uninformative for a given subject area. Subjects can be broad like finance and medicine or can be more specific like obituaries, health code violations, and job listings for librarians in Kansas.
+Words like “bath,” “bedroom,” and “entryway” are generally not considered stop words in English, but they may not provide much information for differentiating suburban house listings and could be subject stop words for certain analysis. You will likely need to manually construct such a stop word list (Section <a href="stopwords.html#homemadestopwords">3.2</a>). These kinds of stop words may improve your performance if you have the domain expertise to create a good list.</p>
+<p>Lastly, we have document level stop words. These words do not provide any or much information for a given document. These are difficult to classify and won’t be worth the trouble to identify. Even if you can find document stop words, it is not obvious how to incorporate this kind of information in a regression or classification task.</p>
+<div id="premadestopwords" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Using premade stop word lists</h2>
+<p>A quick option for using stop words is to get a list that has already been created. This is appealing because it is not difficult, but be aware that not all lists are created equal. <span class="citation"><a href="#ref-nothman-etal-2018-stop" role="doc-biblioref">Nothman, Qin, and Yurchak</a> (<a href="#ref-nothman-etal-2018-stop" role="doc-biblioref">2018</a>)</span> found some alarming results in a study of 52 stop word lists available in open-source software packages. Among some of the more grave issues were misspellings (“fify” instead of “fifty”), the inclusion of clearly informative words such as “computer” and “cry,” and internal inconsistencies such as including the word “has” but not the word “does.” This is not to say that you should never use a stop word list that has been included in an open-source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn’t changed since you used it last, and also to check that it is appropriate for your use case.</p>
+<p>There is a broad selection of stop word lists available today. For the purpose of this chapter, we will focus on three of the lists of English stop words provided by the <strong>stopwords</strong> package <span class="citation">(<a href="#ref-R-stopwords" role="doc-biblioref">Benoit, Muhr, and Watanabe 2019</a>)</span>. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s <span class="citation">(<a href="#ref-Lewis2014" role="doc-biblioref">Lewis et al. 2004</a>)</span>. The second is the English Snowball stop word list <span class="citation">(<a href="#ref-porter2001snowball" role="doc-biblioref">Martin F. Porter 2001</a>)</span>, and the last is the English list from the <a href="https://github.com/stopwords-iso/stopwords-iso">Stopwords ISO</a> collection. These stop word lists are all considered general purpose and not domain-specific.</p>
+<p>Before we start delving into the content inside the lists, let’s take a look at how many words are included in each.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="stopwords.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stopwords)</span>
+<span id="cb69-2"><a href="stopwords.html#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;smart&quot;</span>))</span>
+<span id="cb69-3"><a href="stopwords.html#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>))</span>
+<span id="cb69-4"><a href="stopwords.html#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;stopwords-iso&quot;</span>))</span></code></pre></div>
+<pre><code>#&gt; [1] 571
+#&gt; [1] 175
+#&gt; [1] 1298</code></pre>
+<p>The lengths of these lists are quite different, with the longest list being over seven times longer than the shortest! Let’s examine the overlap of the words that appear in the three lists in an UpSet plot in Figure <a href="stopwords.html#fig:stopwordoverlap">3.1</a>. An UpSet plot <span class="citation">(<a href="#ref-Lex2014" role="doc-biblioref">Lex et al. 2014</a>)</span> visualizes intersections and aggregates of intersections of sets using a matrix layout, presenting the number of elements as well as summary statistics.</p>
+<div class="figure" style="text-align: center"><span id="fig:stopwordoverlap"></span>
+<img src="03_stopwords_files/figure-html/stopwordoverlap-1.png" alt="Set intersections for three common stop word lists visualized as an UpSet plot" width="672" />
+<p class="caption">
+FIGURE 3.1: Set intersections for three common stop word lists visualized as an UpSet plot
+</p>
+</div>
+<p>The UpSet plot in Figure <a href="stopwords.html#fig:stopwordoverlap">3.1</a> shows us that these three lists are almost true subsets of each other. The only exception is a set of ten words that appear in Snowball and ISO but not in the SMART list. What are those words?</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="stopwords.html#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>),</span>
+<span id="cb71-2"><a href="stopwords.html#cb71-2" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;smart&quot;</span>))</span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;she&#39;s&quot;   &quot;he&#39;d&quot;    &quot;she&#39;d&quot;   &quot;he&#39;ll&quot;   &quot;she&#39;ll&quot;  &quot;shan&#39;t&quot;  &quot;mustn&#39;t&quot;
+#&gt;  [8] &quot;when&#39;s&quot;  &quot;why&#39;s&quot;   &quot;how&#39;s&quot;</code></pre>
+<p>All these words are contractions. This is <em>not</em> because the SMART lexicon doesn’t include contractions; if we look, there are almost fifty of them.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="stopwords.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_subset</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;smart&quot;</span>), <span class="st">&quot;&#39;&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;a&#39;s&quot;       &quot;ain&#39;t&quot;     &quot;aren&#39;t&quot;    &quot;c&#39;mon&quot;     &quot;c&#39;s&quot;       &quot;can&#39;t&quot;    
+#&gt;  [7] &quot;couldn&#39;t&quot;  &quot;didn&#39;t&quot;    &quot;doesn&#39;t&quot;   &quot;don&#39;t&quot;     &quot;hadn&#39;t&quot;    &quot;hasn&#39;t&quot;   
+#&gt; [13] &quot;haven&#39;t&quot;   &quot;he&#39;s&quot;      &quot;here&#39;s&quot;    &quot;i&#39;d&quot;       &quot;i&#39;ll&quot;      &quot;i&#39;m&quot;      
+#&gt; [19] &quot;i&#39;ve&quot;      &quot;isn&#39;t&quot;     &quot;it&#39;d&quot;      &quot;it&#39;ll&quot;     &quot;it&#39;s&quot;      &quot;let&#39;s&quot;    
+#&gt; [25] &quot;shouldn&#39;t&quot; &quot;t&#39;s&quot;       &quot;that&#39;s&quot;    &quot;there&#39;s&quot;   &quot;they&#39;d&quot;    &quot;they&#39;ll&quot;  
+#&gt; [31] &quot;they&#39;re&quot;   &quot;they&#39;ve&quot;   &quot;wasn&#39;t&quot;    &quot;we&#39;d&quot;      &quot;we&#39;ll&quot;     &quot;we&#39;re&quot;    
+#&gt; [37] &quot;we&#39;ve&quot;     &quot;weren&#39;t&quot;   &quot;what&#39;s&quot;    &quot;where&#39;s&quot;   &quot;who&#39;s&quot;     &quot;won&#39;t&quot;    
+#&gt; [43] &quot;wouldn&#39;t&quot;  &quot;you&#39;d&quot;     &quot;you&#39;ll&quot;    &quot;you&#39;re&quot;    &quot;you&#39;ve&quot;</code></pre>
+<p>We seem to have stumbled upon an inconsistency; why does SMART include <code>"he's"</code> but not <code>"she's"</code>? It is hard to say, but this could be worth rectifying before applying these stop word lists to an analysis or model preprocessing. This stop word list was likely generated by selecting the most frequent words across a large corpus of text that had more representation for text about men than women. This is once again a reminder that we should always look carefully at any pre-made word list or another artifact we use to make sure it works well with our needs<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>.</p>
+<div class="rmdwarning">
+<p>
+It is perfectly acceptable to start with a premade word list and remove or append additional words according to your particular use case.
+</p>
+</div>
+<p>When you select a stop word list, it is important that you consider its size and breadth. Having a small and concise list of words can moderately reduce your token count while not having too great of an influence on your models, assuming that you picked appropriate words. As the size of your stop word list grows, each word added will have a diminishing positive effect with the increasing risk that a meaningful word has been placed on the list by mistake. In Section <a href="mlregression.html#casestudystopwords">6.4</a>, we show the effects of different stop word lists on model training.</p>
+<div id="stop-word-removal-in-r" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Stop word removal in R</h3>
+<p>Now that we have seen stop word lists, we can move forward with removing these words. The particular way we remove stop words depends on the shape of our data. If you have your text in a tidy format with one word per row, you can use <code>filter()</code> from <strong>dplyr</strong> with a negated <code>%in%</code> if you have the stop words as a vector, or you can use <code>anti_join()</code> from <strong>dplyr</strong> if the stop words are in a <code>tibble()</code>. Like in our previous chapter, let’s examine the text of “The Fir-Tree” by Hans Christian Andersen, and use <strong>tidytext</strong> to tokenize the text into words.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="stopwords.html#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hcandersenr)</span>
+<span id="cb75-2"><a href="stopwords.html#cb75-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb75-3"><a href="stopwords.html#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb75-4"><a href="stopwords.html#cb75-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-5"><a href="stopwords.html#cb75-5" aria-hidden="true" tabindex="-1"></a>fir_tree <span class="ot">&lt;-</span> <span class="fu">hca_fairytales</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb75-6"><a href="stopwords.html#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(book <span class="sc">==</span> <span class="st">&quot;The fir tree&quot;</span>,</span>
+<span id="cb75-7"><a href="stopwords.html#cb75-7" aria-hidden="true" tabindex="-1"></a>         language <span class="sc">==</span> <span class="st">&quot;English&quot;</span>)</span>
+<span id="cb75-8"><a href="stopwords.html#cb75-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-9"><a href="stopwords.html#cb75-9" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="ot">&lt;-</span> fir_tree <span class="sc">%&gt;%</span></span>
+<span id="cb75-10"><a href="stopwords.html#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, text)</span></code></pre></div>
+<p>Let’s use the Snowball stop word list as an example. Since the stop words return from this function as a vector, we will use <code>filter()</code>.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="stopwords.html#cb76-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
+<span id="cb76-2"><a href="stopwords.html#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(word <span class="sc">%in%</span> <span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>)))</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1,547 x 3
+#&gt;    book         language word   
+#&gt;    &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;  
+#&gt;  1 The fir tree English  far    
+#&gt;  2 The fir tree English  forest 
+#&gt;  3 The fir tree English  warm   
+#&gt;  4 The fir tree English  sun    
+#&gt;  5 The fir tree English  fresh  
+#&gt;  6 The fir tree English  air    
+#&gt;  7 The fir tree English  made   
+#&gt;  8 The fir tree English  sweet  
+#&gt;  9 The fir tree English  resting
+#&gt; 10 The fir tree English  place  
+#&gt; # … with 1,537 more rows</code></pre>
+<p>If we use the <code>get_stopwords()</code> function from <strong>tidytext</strong> instead, then we can use the <code>anti_join()</code> function.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="stopwords.html#cb78-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
+<span id="cb78-2"><a href="stopwords.html#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>))</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 1,547 x 3
+#&gt;    book         language word   
+#&gt;    &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;  
+#&gt;  1 The fir tree English  far    
+#&gt;  2 The fir tree English  forest 
+#&gt;  3 The fir tree English  warm   
+#&gt;  4 The fir tree English  sun    
+#&gt;  5 The fir tree English  fresh  
+#&gt;  6 The fir tree English  air    
+#&gt;  7 The fir tree English  made   
+#&gt;  8 The fir tree English  sweet  
+#&gt;  9 The fir tree English  resting
+#&gt; 10 The fir tree English  place  
+#&gt; # … with 1,537 more rows</code></pre>
+<p>The result of these two stop word removals is the same since we used the same stop word list in both cases.</p>
+</div>
+</div>
+<div id="homemadestopwords" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Creating your own stop words list</h2>
+<p>Another way to get a stop word list is to create one yourself. Let’s explore a few different ways to find appropriate words to use. We will use the tokenized data from “The Fir-Tree” as a first example. Let’s take the words and rank them by their count or frequency.</p>
+<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
+<div style="column-count:5">
+<p>1: the</p>
+<p>2: and</p>
+<p>3: tree</p>
+<p>4: it</p>
+<p>5: a</p>
+<p>6: in</p>
+<p>7: of</p>
+<p>8: to</p>
+<p>9: i</p>
+<p>10: was</p>
+<p>11: they</p>
+<p>12: fir</p>
+<p>13: were</p>
+<p>14: all</p>
+<p>15: with</p>
+<p>16: but</p>
+<p>17: on</p>
+<p>18: then</p>
+<p>19: had</p>
+<p>20: is</p>
+<p>21: at</p>
+<p>22: little</p>
+<p>23: so</p>
+<p>24: not</p>
+<p>25: said</p>
+<p>26: what</p>
+<p>27: as</p>
+<p>28: that</p>
+<p>29: he</p>
+<p>30: you</p>
+<p>31: its</p>
+<p>32: out</p>
+<p>33: be</p>
+<p>34: them</p>
+<p>35: this</p>
+<p>36: branches</p>
+<p>37: came</p>
+<p>38: for</p>
+<p>39: now</p>
+<p>40: one</p>
+<p>41: story</p>
+<p>42: would</p>
+<p>43: forest</p>
+<p>44: have</p>
+<p>45: how</p>
+<p>46: know</p>
+<p>47: thought</p>
+<p>48: mice</p>
+<p>49: trees</p>
+<p>50: we</p>
+<p>51: been</p>
+<p>52: down</p>
+<p>53: oh</p>
+<p>54: very</p>
+<p>55: when</p>
+<p>56: where</p>
+<p>57: who</p>
+<p>58: children</p>
+<p>59: dumpty</p>
+<p>60: humpty</p>
+<p>61: or</p>
+<p>62: shall</p>
+<p>63: there</p>
+<p>64: while</p>
+<p>65: will</p>
+<p>66: after</p>
+<p>67: by</p>
+<p>68: come</p>
+<p>69: happy</p>
+<p>70: my</p>
+<p>71: old</p>
+<p>72: only</p>
+<p>73: their</p>
+<p>74: which</p>
+<p>75: again</p>
+<p>76: am</p>
+<p>77: are</p>
+<p>78: beautiful</p>
+<p>79: evening</p>
+<p>80: him</p>
+<p>81: like</p>
+<p>82: me</p>
+<p>83: more</p>
+<p>84: about</p>
+<p>85: christmas</p>
+<p>86: do</p>
+<p>87: fell</p>
+<p>88: fresh</p>
+<p>89: from</p>
+<p>90: here</p>
+<p>91: last</p>
+<p>92: much</p>
+<p>93: no</p>
+<p>94: princess</p>
+<p>95: tall</p>
+<p>96: young</p>
+<p>97: asked</p>
+<p>98: can</p>
+<p>99: could</p>
+<p>100: cried</p>
+<p>101: going</p>
+<p>102: grew</p>
+<p>103: if</p>
+<p>104: large</p>
+<p>105: looked</p>
+<p>106: made</p>
+<p>107: many</p>
+<p>108: seen</p>
+<p>109: stairs</p>
+<p>110: think</p>
+<p>111: too</p>
+<p>112: up</p>
+<p>113: yes</p>
+<p>114: air</p>
+<p>115: also</p>
+<p>116: away</p>
+<p>117: birds</p>
+<p>118: corner</p>
+<p>119: cut</p>
+<p>120: did</p>
+</div>
+<p>We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see <code>"tree"</code> at 3, <code>"fir"</code> at 12 and <code>"little"</code> at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a <strong>corpus</strong> of documents, not an individual document. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well.</p>
+<div class="rmdnote">
+<p>
+In NLP, a corpus is a set of texts or documents. The set of Hans Christian Andersen’s fairy tales can be considered a corpus, with each fairy tale a document within that corpus. The set of United States Supreme Court opinions can be considered a different corpus, with each written opinion being a document within <em>that</em> corpus. Both data sets are described in more detail in Appendix <span class="citation">(<a href="#ref-ref" role="doc-biblioref"><strong>ref?</strong></a>)</span>(appendixdata).
+</p>
+</div>
+<p>The word <code>"tree"</code> does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Let’s try a different approach, extracting high-frequency words from the corpus of <em>all</em> English fairy tales by H.C. Andersen.</p>
+<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
+<div style="column-count:5">
+<p>1: the</p>
+<p>2: and</p>
+<p>3: of</p>
+<p>4: a</p>
+<p>5: to</p>
+<p>6: in</p>
+<p>7: was</p>
+<p>8: it</p>
+<p>9: he</p>
+<p>10: that</p>
+<p>11: i</p>
+<p>12: she</p>
+<p>13: had</p>
+<p>14: his</p>
+<p>15: they</p>
+<p>16: but</p>
+<p>17: as</p>
+<p>18: her</p>
+<p>19: with</p>
+<p>20: for</p>
+<p>21: is</p>
+<p>22: on</p>
+<p>23: said</p>
+<p>24: you</p>
+<p>25: not</p>
+<p>26: were</p>
+<p>27: so</p>
+<p>28: all</p>
+<p>29: be</p>
+<p>30: at</p>
+<p>31: one</p>
+<p>32: there</p>
+<p>33: him</p>
+<p>34: from</p>
+<p>35: have</p>
+<p>36: little</p>
+<p>37: then</p>
+<p>38: which</p>
+<p>39: them</p>
+<p>40: this</p>
+<p>41: old</p>
+<p>42: out</p>
+<p>43: could</p>
+<p>44: when</p>
+<p>45: into</p>
+<p>46: now</p>
+<p>47: who</p>
+<p>48: my</p>
+<p>49: their</p>
+<p>50: by</p>
+<p>51: we</p>
+<p>52: will</p>
+<p>53: like</p>
+<p>54: are</p>
+<p>55: what</p>
+<p>56: if</p>
+<p>57: me</p>
+<p>58: up</p>
+<p>59: very</p>
+<p>60: would</p>
+<p>61: no</p>
+<p>62: been</p>
+<p>63: about</p>
+<p>64: over</p>
+<p>65: where</p>
+<p>66: an</p>
+<p>67: how</p>
+<p>68: only</p>
+<p>69: came</p>
+<p>70: or</p>
+<p>71: down</p>
+<p>72: great</p>
+<p>73: good</p>
+<p>74: do</p>
+<p>75: more</p>
+<p>76: here</p>
+<p>77: its</p>
+<p>78: did</p>
+<p>79: man</p>
+<p>80: see</p>
+<p>81: can</p>
+<p>82: through</p>
+<p>83: beautiful</p>
+<p>84: must</p>
+<p>85: has</p>
+<p>86: away</p>
+<p>87: thought</p>
+<p>88: still</p>
+<p>89: than</p>
+<p>90: well</p>
+<p>91: people</p>
+<p>92: time</p>
+<p>93: before</p>
+<p>94: day</p>
+<p>95: other</p>
+<p>96: stood</p>
+<p>97: too</p>
+<p>98: went</p>
+<p>99: come</p>
+<p>100: never</p>
+<p>101: much</p>
+<p>102: house</p>
+<p>103: know</p>
+<p>104: every</p>
+<p>105: looked</p>
+<p>106: many</p>
+<p>107: again</p>
+<p>108: eyes</p>
+<p>109: our</p>
+<p>110: quite</p>
+<p>111: young</p>
+<p>112: even</p>
+<p>113: shall</p>
+<p>114: tree</p>
+<p>115: go</p>
+<p>116: your</p>
+<p>117: long</p>
+<p>118: upon</p>
+<p>119: two</p>
+<p>120: water</p>
+</div>
+<p>This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine a priori how many different “meaningless” words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose.</p>
+<p>It is worth keeping in mind that such a list is not perfect. Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased. In our example here, all the fairy tales were written by the same European white man from the early 1800s.</p>
+<div class="rmdnote">
+<p>
+This bias can be minimized by removing words we would expect to be over-represented or to add words we expect to be under-represented.
+</p>
+</div>
+<p>Easy examples are to include the complements to the words in the list if they are not already present. Include “big” if “small” is present, “old” if “young” is present. This example list has words associated with women often listed lower in rank than words associated with men. With <code>"man"</code> being at rank 79 but <code>"woman"</code> at rank 179, choosing a threshold of 100 would lead to only one of these words being included. Depending on how important you think such nouns are going to be in your texts, consider either adding <code>"woman"</code> or deleting <code>"man"</code>.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
+<p>Figure <a href="stopwords.html#fig:genderrank">3.2</a> shows how the words associated with men have a higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.</p>
+<div class="figure" style="text-align: center"><span id="fig:genderrank"></span>
+<img src="03_stopwords_files/figure-html/genderrank-1.png" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="672" />
+<p class="caption">
+FIGURE 3.2: Tokens ranked according to total occurrences, with rank 1 having the most occurrences
+</p>
+</div>
+<p>Imagine now we would like to create a stop word list that spans multiple different genres, in such a way that the subject-specific stop words don’t overlap. For this case, we would like words to be denoted as a stop word only if it is a stop word in all the genres. You could find the words individually in each genre and use the right intersections. However, that approach might take a substantial amount of time.</p>
+<p>Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the <a href="https://www.tidytextmining.com/tfidf.html"><em>inverse document frequency</em></a> (IDF) of each word. The inverse document frequency of a word is a quantity that is low for commonly used words in a collection of documents and high for words not used often in a collection of documents. It is typically defined as</p>
+<p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span>
+If the word “dog” appears in 4 out of 100 documents then it would have an <code>idf("dog") = log(100/4) = 3.22</code> and if the word “cat” appears in 99 out of 100 documents then it would have an <code>idf("cat") = log(100/99) = 0.01</code>. Notice how the idf values goes to zero (as a matter of fact when a term appears in all the documents then the idf of that word is 0 <code>log(100/100) = log(1) = 0</code>), the more documents it is contained in.
+What happens if we create a stop word list based on words with the lowest IDF? The following function takes a tokenized dataframe and returns a dataframe with a column for each word and a column for the IDF.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="stopwords.html#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
+<span id="cb80-2"><a href="stopwords.html#cb80-2" aria-hidden="true" tabindex="-1"></a>calc_idf <span class="ot">&lt;-</span> <span class="cf">function</span>(df, word, document) {</span>
+<span id="cb80-3"><a href="stopwords.html#cb80-3" aria-hidden="true" tabindex="-1"></a>  words <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">pull</span>({{word}}) <span class="sc">%&gt;%</span> <span class="fu">unique</span>()</span>
+<span id="cb80-4"><a href="stopwords.html#cb80-4" aria-hidden="true" tabindex="-1"></a>  n_docs <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(<span class="fu">pull</span>(df, {{document}})))</span>
+<span id="cb80-5"><a href="stopwords.html#cb80-5" aria-hidden="true" tabindex="-1"></a>  n_words <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb80-6"><a href="stopwords.html#cb80-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nest</span>(<span class="at">data =</span> <span class="fu">c</span>({{word}})) <span class="sc">%&gt;%</span></span>
+<span id="cb80-7"><a href="stopwords.html#cb80-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(data) <span class="sc">%&gt;%</span></span>
+<span id="cb80-8"><a href="stopwords.html#cb80-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfc</span>(<span class="sc">~</span> words <span class="sc">%in%</span> <span class="fu">unique</span>(<span class="fu">pull</span>(.x, {{word}}))) <span class="sc">%&gt;%</span></span>
+<span id="cb80-9"><a href="stopwords.html#cb80-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowSums</span>()</span>
+<span id="cb80-10"><a href="stopwords.html#cb80-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb80-11"><a href="stopwords.html#cb80-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">word =</span> words,</span>
+<span id="cb80-12"><a href="stopwords.html#cb80-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">idf =</span> <span class="fu">log</span>(n_docs <span class="sc">/</span> n_words))</span>
+<span id="cb80-13"><a href="stopwords.html#cb80-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Here is the result when we try to create a cross-language list of stop words, by taking each fairy tale as a document. It is not very good!</p>
+<div class="rmdnote">
+<p>
+The overlap between words that appear in each language is very small, but these words are what we mostly see in this list.
+</p>
+</div>
+<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
+<div style="column-count:5">
+<p>1: a</p>
+<p>2: de</p>
+<p>3: man</p>
+<p>4: en</p>
+<p>5: da</p>
+<p>6: se</p>
+<p>7: es</p>
+<p>8: an</p>
+<p>9: in</p>
+<p>10: her</p>
+<p>11: me</p>
+<p>12: so</p>
+<p>13: no</p>
+<p>14: i</p>
+<p>15: for</p>
+<p>16: den</p>
+<p>17: at</p>
+<p>18: der</p>
+<p>19: was</p>
+<p>20: du</p>
+<p>21: er</p>
+<p>22: dem</p>
+<p>23: over</p>
+<p>24: sin</p>
+<p>25: he</p>
+<p>26: alle</p>
+<p>27: ja</p>
+<p>28: have</p>
+<p>29: to</p>
+<p>30: mit</p>
+<p>31: all</p>
+<p>32: oh</p>
+<p>33: will</p>
+<p>34: am</p>
+<p>35: la</p>
+<p>36: sang</p>
+<p>37: le</p>
+<p>38: des</p>
+<p>39: y</p>
+<p>40: un</p>
+<p>41: que</p>
+<p>42: on</p>
+<p>43: men</p>
+<p>44: stand</p>
+<p>45: al</p>
+<p>46: si</p>
+<p>47: son</p>
+<p>48: han</p>
+<p>49: ser</p>
+<p>50: et</p>
+<p>51: lo</p>
+<p>52: die</p>
+<p>53: just</p>
+<p>54: bien</p>
+<p>55: vor</p>
+<p>56: las</p>
+<p>57: del</p>
+<p>58: still</p>
+<p>59: land</p>
+<p>60: under</p>
+<p>61: has</p>
+<p>62: los</p>
+<p>63: by</p>
+<p>64: as</p>
+<p>65: not</p>
+<p>66: end</p>
+<p>67: fast</p>
+<p>68: hat</p>
+<p>69: see</p>
+<p>70: but</p>
+<p>71: from</p>
+<p>72: is</p>
+<p>73: and</p>
+<p>74: o</p>
+<p>75: alt</p>
+<p>76: war</p>
+<p>77: ni</p>
+<p>78: su</p>
+<p>79: time</p>
+<p>80: von</p>
+<p>81: hand</p>
+<p>82: the</p>
+<p>83: that</p>
+<p>84: it</p>
+<p>85: of</p>
+<p>86: there</p>
+<p>87: sit</p>
+<p>88: with</p>
+<p>89: por</p>
+<p>90: el</p>
+<p>91: con</p>
+<p>92: una</p>
+<p>93: be</p>
+<p>94: they</p>
+<p>95: one</p>
+<p>96: como</p>
+<p>97: pero</p>
+<p>98: them</p>
+<p>99: had</p>
+<p>100: vi</p>
+<p>101: das</p>
+<p>102: his</p>
+<p>103: les</p>
+<p>104: sagte</p>
+<p>105: ist</p>
+<p>106: ein</p>
+<p>107: und</p>
+<p>108: zu</p>
+<p>109: para</p>
+<p>110: sol</p>
+<p>111: auf</p>
+<p>112: sie</p>
+<p>113: nicht</p>
+<p>114: aber</p>
+<p>115: sich</p>
+<p>116: then</p>
+<p>117: were</p>
+<p>118: said</p>
+<p>119: into</p>
+<p>120: más</p>
+</div>
+<p>This didn’t work very well because there is very little overlap between common words. Instead, let us limit the calculation to only one language and calculate the IDF of each word we can find compared to words that appear in a lot of documents.</p>
+<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
+<div style="column-count:5">
+<p>1: a</p>
+<p>2: the</p>
+<p>3: and</p>
+<p>4: to</p>
+<p>5: in</p>
+<p>6: that</p>
+<p>7: it</p>
+<p>8: but</p>
+<p>9: of</p>
+<p>10: was</p>
+<p>11: as</p>
+<p>12: there</p>
+<p>13: on</p>
+<p>14: at</p>
+<p>15: is</p>
+<p>16: for</p>
+<p>17: with</p>
+<p>18: all</p>
+<p>19: not</p>
+<p>20: they</p>
+<p>21: one</p>
+<p>22: he</p>
+<p>23: his</p>
+<p>24: so</p>
+<p>25: them</p>
+<p>26: be</p>
+<p>27: from</p>
+<p>28: had</p>
+<p>29: then</p>
+<p>30: were</p>
+<p>31: said</p>
+<p>32: into</p>
+<p>33: by</p>
+<p>34: have</p>
+<p>35: which</p>
+<p>36: this</p>
+<p>37: up</p>
+<p>38: out</p>
+<p>39: what</p>
+<p>40: who</p>
+<p>41: no</p>
+<p>42: an</p>
+<p>43: now</p>
+<p>44: i</p>
+<p>45: only</p>
+<p>46: old</p>
+<p>47: like</p>
+<p>48: when</p>
+<p>49: if</p>
+<p>50: little</p>
+<p>51: over</p>
+<p>52: are</p>
+<p>53: very</p>
+<p>54: you</p>
+<p>55: him</p>
+<p>56: we</p>
+<p>57: great</p>
+<p>58: how</p>
+<p>59: their</p>
+<p>60: came</p>
+<p>61: been</p>
+<p>62: down</p>
+<p>63: would</p>
+<p>64: where</p>
+<p>65: or</p>
+<p>66: she</p>
+<p>67: can</p>
+<p>68: could</p>
+<p>69: about</p>
+<p>70: her</p>
+<p>71: will</p>
+<p>72: time</p>
+<p>73: good</p>
+<p>74: must</p>
+<p>75: my</p>
+<p>76: than</p>
+<p>77: away</p>
+<p>78: more</p>
+<p>79: has</p>
+<p>80: thought</p>
+<p>81: did</p>
+<p>82: other</p>
+<p>83: still</p>
+<p>84: do</p>
+<p>85: even</p>
+<p>86: before</p>
+<p>87: me</p>
+<p>88: know</p>
+<p>89: much</p>
+<p>90: see</p>
+<p>91: here</p>
+<p>92: well</p>
+<p>93: through</p>
+<p>94: day</p>
+<p>95: too</p>
+<p>96: people</p>
+<p>97: own</p>
+<p>98: come</p>
+<p>99: its</p>
+<p>100: whole</p>
+<p>101: just</p>
+<p>102: many</p>
+<p>103: never</p>
+<p>104: made</p>
+<p>105: stood</p>
+<p>106: yet</p>
+<p>107: looked</p>
+<p>108: again</p>
+<p>109: say</p>
+<p>110: may</p>
+<p>111: yes</p>
+<p>112: went</p>
+<p>113: every</p>
+<p>114: each</p>
+<p>115: such</p>
+<p>116: world</p>
+<p>117: some</p>
+<p>118: long</p>
+<p>119: eyes</p>
+<p>120: go</p>
+</div>
+<p>This time we get better results. The list starts with “a,” “the,” “and,” and “to” and continues with many more reasonable choices of stop words. We need to look at these results manually to turn this into a list. We need to go as far down in rank as we are comfortable with. You as a data practitioner are in full control of how you want to create the list. If you don’t want to include “little” you are still able to add “are” to your list even though it is lower on the list.</p>
+</div>
+<div id="all-stop-word-lists-are-context-specific" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> All stop word lists are context-specific</h2>
+<p>Context is important in text modeling, so it is important to ensure that the stop word lexicon you use reflects the word space that you are planning on using it in. One common concern to consider is how pronouns bring information to your text. Pronouns are included in many different stop word lists (although inconsistently) but they will often <em>not</em> be noise in text data. Similarly, <span class="citation"><a href="#ref-Bender2021" role="doc-biblioref">Emily M. Bender et al.</a> (<a href="#ref-Bender2021" role="doc-biblioref">2021</a>)</span> discuss how a list of about 400 “Dirty, Naughty, Obscene or Otherwise Bad Words” were used to filter and remove text before training a trillion parameter large language model, to protect it from learning offensive language, but the authors point out that in some community contexts, such words are reclaimed or used to describe marginalized identities.</p>
+<p>On the other hand, sometimes you will have to add in words yourself, depending on the domain. If you are working with texts for dessert recipes, certain ingredients (sugar, eggs, water) and actions (whisking, baking, stirring) may be frequent enough to pass your stop word threshold, but you may want to keep them as they may be informative. Throwing away “eggs” as a common word would make it harder or downright impossible to determine if certain recipes are vegan or not while whisking and stirring may be fine to remove as distinguishing between recipes that do and don’t require a whisk might not be that big of a deal.</p>
+</div>
+<div id="what-happens-when-you-remove-stop-words" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> What happens when you remove stop words</h2>
+<p>We have discussed different ways of finding and removing stop words; now let’s see what happens once you do remove them. First, let’s explore the impact of the number of words that are included in the list. Figure <a href="stopwords.html#fig:stopwordresults">3.3</a> shows what percentage of words are removed as a function of the number of words in a text. The different colors represent the three different stop word lists we have considered in this chapter.</p>
+<div class="figure" style="text-align: center"><span id="fig:stopwordresults"></span>
+<img src="03_stopwords_files/figure-html/stopwordresults-1.png" alt="Proportion of words removed for different stop word lists and different document lengths" width="672" />
+<p class="caption">
+FIGURE 3.3: Proportion of words removed for different stop word lists and different document lengths
+</p>
+</div>
+<p>We notice, as we would predict, that larger stop word lists remove more words than shorter stop word lists. In this example with fairy tales, over half of the words have been removed, with the largest list removing over 80% of the words. We observe that shorter texts have a lower percentage of stop words. Since we are looking at fairy tales, this could be explained by the fact that a story has to be told regardless of the length of the fairy tale, so shorter texts are going to be denser with more informative words.</p>
+<p>Another problem you may face is dealing with misspellings.</p>
+<div class="rmdwarning">
+<p>
+Most premade stop word lists assume that all the words are spelled correctly.
+</p>
+</div>
+<p>Handling misspellings when using premade lists can be done by manually adding common misspellings. You could imagine creating all words that are a certain string distance away from the stop words, but we do not recommend this as you would quickly include informative words this way.</p>
+<p>One of the downsides of creating your own stop word lists using frequencies is that you are limited to using words that you have already observed. It could happen that “she’d” is included in your training corpus but the word “he’d” did not reach the threshold. This is a case where you need to look at your words and adjust accordingly. Here the large premade stop word lists can serve as inspiration for missing words.</p>
+<p>In Section <a href="mlregression.html#casestudystopwords">6.4</a> we investigate the influence of removing stop words in the context of modeling. Given the right list of words, we see no harm to the model performance, and may even find improvement in due to noise reduction <span class="citation">(<a href="#ref-Feldman2007" role="doc-biblioref">Feldman, and Sanger 2007</a>)</span>.</p>
+</div>
+<div id="stop-words-in-languages-other-than-english" class="section level2" number="3.5">
+<h2><span class="header-section-number">3.5</span> Stop words in languages other than English</h2>
+<p>So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of “short” and “long” lists we have used so far are specific to English as a language. You should expect different languages to have a different number of “uninformative” words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.</p>
+<p>Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are tables showing the use of definite and indefinite articles in German <span class="citation">(<a href="#ref-germanarticles" role="doc-biblioref">Lingolia 2021</a>)</span>. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.</p>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#kqenozbqfz .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kqenozbqfz .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kqenozbqfz .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kqenozbqfz .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kqenozbqfz .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kqenozbqfz .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kqenozbqfz .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kqenozbqfz .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kqenozbqfz .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kqenozbqfz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kqenozbqfz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kqenozbqfz .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kqenozbqfz .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#kqenozbqfz .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kqenozbqfz .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kqenozbqfz .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kqenozbqfz .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kqenozbqfz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kqenozbqfz .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#kqenozbqfz .gt_left {
+  text-align: left;
+}
+
+#kqenozbqfz .gt_center {
+  text-align: center;
+}
+
+#kqenozbqfz .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kqenozbqfz .gt_font_normal {
+  font-weight: normal;
+}
+
+#kqenozbqfz .gt_font_bold {
+  font-weight: bold;
+}
+
+#kqenozbqfz .gt_font_italic {
+  font-style: italic;
+}
+
+#kqenozbqfz .gt_super {
+  font-size: 65%;
+}
+
+#kqenozbqfz .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="kqenozbqfz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="5" class="gt_heading gt_title gt_font_normal" style>German Definite Articles (the)</th>
+    </tr>
+    <tr>
+      <th colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Masculine</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Feminine</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Neuter</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Plural</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left gt_stub">Nominative</td>
+      <td class="gt_row gt_left">der</td>
+      <td class="gt_row gt_left">die</td>
+      <td class="gt_row gt_left">das</td>
+      <td class="gt_row gt_left">die</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Accusative</td>
+      <td class="gt_row gt_left">den</td>
+      <td class="gt_row gt_left">die</td>
+      <td class="gt_row gt_left">das</td>
+      <td class="gt_row gt_left">die</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Dative</td>
+      <td class="gt_row gt_left">dem</td>
+      <td class="gt_row gt_left">der</td>
+      <td class="gt_row gt_left">dem</td>
+      <td class="gt_row gt_left">den</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Genitive</td>
+      <td class="gt_row gt_left">des</td>
+      <td class="gt_row gt_left">der</td>
+      <td class="gt_row gt_left">des</td>
+      <td class="gt_row gt_left">der</td>
+    </tr>
+  </tbody>
+  
+  
+</table></div>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ffqjtedojy .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ffqjtedojy .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ffqjtedojy .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ffqjtedojy .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ffqjtedojy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ffqjtedojy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ffqjtedojy .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ffqjtedojy .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ffqjtedojy .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ffqjtedojy .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ffqjtedojy .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ffqjtedojy .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ffqjtedojy .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ffqjtedojy .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ffqjtedojy .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ffqjtedojy .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ffqjtedojy .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ffqjtedojy .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ffqjtedojy .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ffqjtedojy .gt_left {
+  text-align: left;
+}
+
+#ffqjtedojy .gt_center {
+  text-align: center;
+}
+
+#ffqjtedojy .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ffqjtedojy .gt_font_normal {
+  font-weight: normal;
+}
+
+#ffqjtedojy .gt_font_bold {
+  font-weight: bold;
+}
+
+#ffqjtedojy .gt_font_italic {
+  font-style: italic;
+}
+
+#ffqjtedojy .gt_super {
+  font-size: 65%;
+}
+
+#ffqjtedojy .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="ffqjtedojy" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="4" class="gt_heading gt_title gt_font_normal" style>German Indefinite Articles (a/an)</th>
+    </tr>
+    <tr>
+      <th colspan="4" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style></th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Masculine</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Feminine</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Neuter</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left gt_stub">Nominative</td>
+      <td class="gt_row gt_left">ein</td>
+      <td class="gt_row gt_left">eine</td>
+      <td class="gt_row gt_left">ein</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Accusative</td>
+      <td class="gt_row gt_left">einen</td>
+      <td class="gt_row gt_left">eine</td>
+      <td class="gt_row gt_left">ein</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Dative</td>
+      <td class="gt_row gt_left">einem</td>
+      <td class="gt_row gt_left">einer</td>
+      <td class="gt_row gt_left">einem</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left gt_stub">Genitive</td>
+      <td class="gt_row gt_left">eines</td>
+      <td class="gt_row gt_left">einer</td>
+      <td class="gt_row gt_left">eines</td>
+    </tr>
+  </tbody>
+  
+  
+</table></div>
+<p>Building lists of stop words in Chinese has been done both manually and automatically <span class="citation">(<a href="#ref-Zou2006ACC" role="doc-biblioref">Zou, Wang, Deng, Han, and Wang 2006</a>)</span> but so far none has been accepted as a standard <span class="citation">(<a href="#ref-Zou2006" role="doc-biblioref">Zou, Wang, Deng, and Han 2006</a>)</span>. A full discussion of stop word identification in Chinese text would be out of scope for this book, so we will just highlight some of the challenges that differentiate it from English.</p>
+<div class="rmdwarning">
+<p>
+Chinese text is much more complex than portrayed here. With different systems and billions of users, there is much we won’t be able to touch on here.
+</p>
+</div>
+<p>The main difference from English is the use of logograms instead of letters to convey information. However, Chinese characters should not be confused with Chinese words. The majority of words in modern Chinese are composed of multiple characters. This means that inferring the presence of words is more complicated and the notion of stop words will affect how this segmentation of characters is done.</p>
+</div>
+<div id="stopwordssummary" class="section level2" number="3.6">
+<h2><span class="header-section-number">3.6</span> Summary</h2>
+<p>In many standard NLP workflows, the removal of stop words is presented as a default or the correct choice without comment. Although removing stop words can improve the accuracy of your machine learning using text data, choices around such a step are complex. The content of existing stop word lists varies tremendously, and the available strategies for building your own can have subtle to not-so-subtle effects on your model results.</p>
+<div id="in-this-chapter-you-learned-2" class="section level3" number="3.6.1">
+<h3><span class="header-section-number">3.6.1</span> In this chapter, you learned:</h3>
+<ul>
+<li>what a stop word is and how to remove stop words from text data</li>
+<li>how different stop word lists can vary</li>
+<li>that the impact of stop word removal is different for different kinds of texts</li>
+<li>about the bias built in to stop word lists and strategies for building such lists</li>
+</ul>
+
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bender2021" class="csl-entry">
+Bender, Emily M., Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. 2021. <span>“On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜.”</span> In <em>Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency</em>, 610–23. FAccT ’21. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a>.
+</div>
+<div id="ref-R-stopwords" class="csl-entry">
+Benoit, Kenneth, David Muhr, and Kohei Watanabe. 2019. <em>Stopwords: Multilingual Stopword Lists</em>. <a href="https://CRAN.R-project.org/package=stopwords">https://CRAN.R-project.org/package=stopwords</a>.
+</div>
+<div id="ref-Feldman2007" class="csl-entry">
+Feldman, R., and J. Sanger. 2007. <em>The Text Mining Handbook</em>. Cambridge university press.
+</div>
+<div id="ref-Huston2010" class="csl-entry">
+Huston, Samuel, and W. Bruce Croft. 2010. <span>“Evaluating Verbose Query Processing Techniques.”</span> In <em>Proceedings of the 33rd International ACM SIGIR Conference on Research and Development in Information Retrieval</em>, 291–98. SIGIR ’10. New York, NY, USA: ACM. <a href="https://doi.org/10.1145/1835449.1835499">https://doi.org/10.1145/1835449.1835499</a>.
+</div>
+<div id="ref-Lewis2014" class="csl-entry">
+Lewis, David D., Yiming Yang, Tony G. Rose, and Fan Li. 2004. <span>“Rcv1: A New Benchmark Collection for Text Categorization Research.”</span> <em>J. Mach. Learn. Res.</em> 5 (December): 361–97. <a href="http://dl.acm.org/citation.cfm?id=1005332.1005345">http://dl.acm.org/citation.cfm?id=1005332.1005345</a>.
+</div>
+<div id="ref-Lex2014" class="csl-entry">
+Lex, Alexander, Nils Gehlenborg, Hendrik Strobelt, Romain Vuillemot, and Hanspeter Pfister. 2014. <span>“UpSet: Visualization of Intersecting Sets.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 20 (12): 1983–92.
+</div>
+<div id="ref-germanarticles" class="csl-entry">
+Lingolia. 2021. <span>“Articles in German Grammar.”</span> <a href="https://deutsch.lingolia.com/en/grammar/nouns-and-articles/articles-noun-markers">https://deutsch.lingolia.com/en/grammar/nouns-and-articles/articles-noun-markers</a>.
+</div>
+<div id="ref-Luhn1960" class="csl-entry">
+Luhn, H. P. 1960. <span>“Key Word-in-Context Index for Technical Literature (Kwic Index).”</span> <em>American Documentation</em> 11 (4): 288–95. <a href="https://doi.org/10.1002/asi.5090110403">https://doi.org/10.1002/asi.5090110403</a>.
+</div>
+<div id="ref-nothman-etal-2018-stop" class="csl-entry">
+Nothman, Joel, Hanmin Qin, and Roman Yurchak. 2018. <span>“Stop Word Lists in Free Open-Source Software Packages.”</span> In <em>Proceedings of Workshop for <span>NLP</span> Open Source Software (<span>NLP</span>-<span>OSS</span>)</em>, 7–12. Melbourne, Australia: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/W18-2502">https://doi.org/10.18653/v1/W18-2502</a>.
+</div>
+<div id="ref-porter2001snowball" class="csl-entry">
+Porter, Martin F. 2001. <span>“Snowball: A Language for Stemming Algorithms.”</span>
+</div>
+<div id="ref-Zou2006" class="csl-entry">
+Zou, Feng, Fu Lee Wang, Xiaotie Deng, and Song Han. 2006. <span>“Evaluation of Stop Word Lists in Chinese Language,”</span> January.
+</div>
+<div id="ref-Zou2006ACC" class="csl-entry">
+Zou, Feng, Fu Lee Wang, Xiaotie Deng, Song Han, and Lu Sheng Wang. 2006. <span>“Automatic Construction of Chinese Stop Word List.”</span> In <em>Proceedings of the 5th WSEAS International Conference on Applied Computer Science</em>, 1009–14. ACOS’06. Stevens Point, Wisconsin, USA: World Scientific; Engineering Academy; Society (WSEAS). <a href="http://dl.acm.org/citation.cfm?id=1973598.1973793">http://dl.acm.org/citation.cfm?id=1973598.1973793</a>.
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="4">
+<li id="fn4"><p>This advice applies to any kind of pre-made lexicon or word list, not just stop words. For instance, the same concerns apply to sentiment lexicons. The NRC sentiment lexicon of <span class="citation">(<a href="#ref-Mohammad13" role="doc-biblioref"><strong>Mohammad13?</strong></a>)</span> associates the word “white” with trust and the word “black” with sadness, which could have unintended consequences when analyzing text about racial groups.<a href="stopwords.html#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>On the other hand, the more biased stop word list may be helpful when modeling a corpus with gender imbalance, depending on your goal; words like “she” and “her” can identify where women are mentioned.<a href="stopwords.html#fnref5" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="tokenization.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stemming.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": null,
+"edit": {
+"link": "https://github.com/EmilHvitfeldt/smltar/edit/master/03_stopwords.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

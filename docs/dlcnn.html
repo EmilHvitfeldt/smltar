@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R</title>
+  <meta name="description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="generator" content="bookdown 0.21.6 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="github-repo" content="EmilHvitfeldt/smltar" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
+  
+  <meta name="twitter:description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
+  
+
+<meta name="author" content="Emil Hvitfeldt and Julia Silge" />
+
+
+<meta name="date" content="2021-03-16" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="dllstm.html"/>
+<link rel="next" href="text-models-in-the-real-world.html"/>
+<script src="libs/header-attrs-2.7.4/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
+<script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rel="stylesheet" href="smltar.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Supervised Machine Learning for Text Analysis in R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome to Supervised Machine Learning for Text Analysis in R</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#outline"><i class="fa fa-check"></i>Outline</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#topics-this-book-will-not-cover"><i class="fa fa-check"></i>Topics this book will not cover</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for?</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#acknowledgements"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#colophon"><i class="fa fa-check"></i>Colophon</a></li>
+</ul></li>
+<li class="part"><span><b>I Natural Language Features</b></span></li>
+<li class="chapter" data-level="1" data-path="language.html"><a href="language.html"><i class="fa fa-check"></i><b>1</b> Language and modeling</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="language.html"><a href="language.html#linguistics-for-text-analysis"><i class="fa fa-check"></i><b>1.1</b> Linguistics for text analysis</a></li>
+<li class="chapter" data-level="1.2" data-path="language.html"><a href="language.html#morphology"><i class="fa fa-check"></i><b>1.2</b> A glimpse into one area: morphology</a></li>
+<li class="chapter" data-level="1.3" data-path="language.html"><a href="language.html#different-languages"><i class="fa fa-check"></i><b>1.3</b> Different languages</a></li>
+<li class="chapter" data-level="1.4" data-path="language.html"><a href="language.html#other-ways-text-can-vary"><i class="fa fa-check"></i><b>1.4</b> Other ways text can vary</a></li>
+<li class="chapter" data-level="1.5" data-path="language.html"><a href="language.html#languagesummary"><i class="fa fa-check"></i><b>1.5</b> Summary</a>
+<ul>
+<li class="chapter" data-level="1.5.1" data-path="language.html"><a href="language.html#in-this-chapter-you-learned"><i class="fa fa-check"></i><b>1.5.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="tokenization.html"><a href="tokenization.html"><i class="fa fa-check"></i><b>2</b> Tokenization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="tokenization.html"><a href="tokenization.html#what-is-a-token"><i class="fa fa-check"></i><b>2.1</b> What is a token?</a></li>
+<li class="chapter" data-level="2.2" data-path="tokenization.html"><a href="tokenization.html#types-of-tokens"><i class="fa fa-check"></i><b>2.2</b> Types of tokens</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="tokenization.html"><a href="tokenization.html#character-tokens"><i class="fa fa-check"></i><b>2.2.1</b> Character tokens</a></li>
+<li class="chapter" data-level="2.2.2" data-path="tokenization.html"><a href="tokenization.html#word-tokens"><i class="fa fa-check"></i><b>2.2.2</b> Word tokens</a></li>
+<li class="chapter" data-level="2.2.3" data-path="tokenization.html"><a href="tokenization.html#tokenizingngrams"><i class="fa fa-check"></i><b>2.2.3</b> Tokenizing by n-grams</a></li>
+<li class="chapter" data-level="2.2.4" data-path="tokenization.html"><a href="tokenization.html#lines-sentence-and-paragraph-tokens"><i class="fa fa-check"></i><b>2.2.4</b> Lines, sentence, and paragraph tokens</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="tokenization.html"><a href="tokenization.html#where-does-tokenization-break-down"><i class="fa fa-check"></i><b>2.3</b> Where does tokenization break down?</a></li>
+<li class="chapter" data-level="2.4" data-path="tokenization.html"><a href="tokenization.html#building-your-own-tokenizer"><i class="fa fa-check"></i><b>2.4</b> Building your own tokenizer</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="tokenization.html"><a href="tokenization.html#tokenize-to-characters-only-keeping-letters"><i class="fa fa-check"></i><b>2.4.1</b> Tokenize to characters, only keeping letters</a></li>
+<li class="chapter" data-level="2.4.2" data-path="tokenization.html"><a href="tokenization.html#allow-for-hyphenated-words"><i class="fa fa-check"></i><b>2.4.2</b> Allow for hyphenated words</a></li>
+<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-into-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it into a function</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="tokenization.html"><a href="tokenization.html#tokenization-for-non-latin-alphabets"><i class="fa fa-check"></i><b>2.5</b> Tokenization for non-Latin alphabets</a></li>
+<li class="chapter" data-level="2.6" data-path="tokenization.html"><a href="tokenization.html#tokenization-benchmark"><i class="fa fa-check"></i><b>2.6</b> Tokenization benchmark</a></li>
+<li class="chapter" data-level="2.7" data-path="tokenization.html"><a href="tokenization.html#tokensummary"><i class="fa fa-check"></i><b>2.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="2.7.1" data-path="tokenization.html"><a href="tokenization.html#in-this-chapter-you-learned-1"><i class="fa fa-check"></i><b>2.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="stopwords.html"><a href="stopwords.html"><i class="fa fa-check"></i><b>3</b> Stop words</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="stopwords.html"><a href="stopwords.html#premadestopwords"><i class="fa fa-check"></i><b>3.1</b> Using premade stop word lists</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="stopwords.html"><a href="stopwords.html#stop-word-removal-in-r"><i class="fa fa-check"></i><b>3.1.1</b> Stop word removal in R</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="stopwords.html"><a href="stopwords.html#homemadestopwords"><i class="fa fa-check"></i><b>3.2</b> Creating your own stop words list</a></li>
+<li class="chapter" data-level="3.3" data-path="stopwords.html"><a href="stopwords.html#all-stop-word-lists-are-context-specific"><i class="fa fa-check"></i><b>3.3</b> All stop word lists are context-specific</a></li>
+<li class="chapter" data-level="3.4" data-path="stopwords.html"><a href="stopwords.html#what-happens-when-you-remove-stop-words"><i class="fa fa-check"></i><b>3.4</b> What happens when you remove stop words</a></li>
+<li class="chapter" data-level="3.5" data-path="stopwords.html"><a href="stopwords.html#stop-words-in-languages-other-than-english"><i class="fa fa-check"></i><b>3.5</b> Stop words in languages other than English</a></li>
+<li class="chapter" data-level="3.6" data-path="stopwords.html"><a href="stopwords.html#stopwordssummary"><i class="fa fa-check"></i><b>3.6</b> Summary</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="stopwords.html"><a href="stopwords.html#in-this-chapter-you-learned-2"><i class="fa fa-check"></i><b>3.6.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="stemming.html"><a href="stemming.html"><i class="fa fa-check"></i><b>4</b> Stemming</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="stemming.html"><a href="stemming.html#how-to-stem-text-in-r"><i class="fa fa-check"></i><b>4.1</b> How to stem text in R</a></li>
+<li class="chapter" data-level="4.2" data-path="stemming.html"><a href="stemming.html#should-you-use-stemming-at-all"><i class="fa fa-check"></i><b>4.2</b> Should you use stemming at all?</a></li>
+<li class="chapter" data-level="4.3" data-path="stemming.html"><a href="stemming.html#understand-a-stemming-algorithm"><i class="fa fa-check"></i><b>4.3</b> Understand a stemming algorithm</a></li>
+<li class="chapter" data-level="4.4" data-path="stemming.html"><a href="stemming.html#handling-punctuation-when-stemming"><i class="fa fa-check"></i><b>4.4</b> Handling punctuation when stemming</a></li>
+<li class="chapter" data-level="4.5" data-path="stemming.html"><a href="stemming.html#compare-some-stemming-options"><i class="fa fa-check"></i><b>4.5</b> Compare some stemming options</a></li>
+<li class="chapter" data-level="4.6" data-path="stemming.html"><a href="stemming.html#lemmatization"><i class="fa fa-check"></i><b>4.6</b> Lemmatization and stemming</a></li>
+<li class="chapter" data-level="4.7" data-path="stemming.html"><a href="stemming.html#stemming-and-stop-words"><i class="fa fa-check"></i><b>4.7</b> Stemming and stop words</a></li>
+<li class="chapter" data-level="4.8" data-path="stemming.html"><a href="stemming.html#stemmingsummary"><i class="fa fa-check"></i><b>4.8</b> Summary</a>
+<ul>
+<li class="chapter" data-level="4.8.1" data-path="stemming.html"><a href="stemming.html#in-this-chapter-you-learned-3"><i class="fa fa-check"></i><b>4.8.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="embeddings.html"><a href="embeddings.html"><i class="fa fa-check"></i><b>5</b> Word Embeddings</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="embeddings.html"><a href="embeddings.html#motivatingsparse"><i class="fa fa-check"></i><b>5.1</b> Motivating embeddings for sparse, high-dimensional data</a></li>
+<li class="chapter" data-level="5.2" data-path="embeddings.html"><a href="embeddings.html#understand-word-embeddings-by-finding-them-yourself"><i class="fa fa-check"></i><b>5.2</b> Understand word embeddings by finding them yourself</a></li>
+<li class="chapter" data-level="5.3" data-path="embeddings.html"><a href="embeddings.html#exploring-cfpb-word-embeddings"><i class="fa fa-check"></i><b>5.3</b> Exploring CFPB word embeddings</a></li>
+<li class="chapter" data-level="5.4" data-path="embeddings.html"><a href="embeddings.html#glove"><i class="fa fa-check"></i><b>5.4</b> Use pre-trained word embeddings</a></li>
+<li class="chapter" data-level="5.5" data-path="embeddings.html"><a href="embeddings.html#fairnessembeddings"><i class="fa fa-check"></i><b>5.5</b> Fairness and word embeddings</a></li>
+<li class="chapter" data-level="5.6" data-path="embeddings.html"><a href="embeddings.html#using-word-embeddings-in-the-real-world"><i class="fa fa-check"></i><b>5.6</b> Using word embeddings in the real world</a></li>
+<li class="chapter" data-level="5.7" data-path="embeddings.html"><a href="embeddings.html#embeddingssummary"><i class="fa fa-check"></i><b>5.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="5.7.1" data-path="embeddings.html"><a href="embeddings.html#in-this-chapter-you-learned-4"><i class="fa fa-check"></i><b>5.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Machine Learning Methods</b></span></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html"><i class="fa fa-check"></i>Foreword</a>
+<ul>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#should-we-even-be-doing-this"><i class="fa fa-check"></i>Should we even be doing this?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-bias-is-already-in-the-data"><i class="fa fa-check"></i>What bias is already in the data?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#can-the-code-and-data-be-audited"><i class="fa fa-check"></i>Can the code and data be audited?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-are-the-error-rates-for-sub-groups"><i class="fa fa-check"></i>What are the error rates for sub-groups?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-is-the-accuracy-of-a-simple-rule-based-alternative"><i class="fa fa-check"></i>What is the accuracy of a simple rule-based alternative?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#what-processes-are-in-place-to-handle-appeals-or-mistakes"><i class="fa fa-check"></i>What processes are in place to handle appeals or mistakes?</a></li>
+<li class="chapter" data-level="" data-path="mlforeword.html"><a href="mlforeword.html#how-diverse-is-the-team-that-built-it"><i class="fa fa-check"></i>How diverse is the team that built it?</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="mlregression.html"><a href="mlregression.html"><i class="fa fa-check"></i><b>6</b> Regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="mlregression.html"><a href="mlregression.html#firstmlregression"><i class="fa fa-check"></i><b>6.1</b> A first regression model</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="mlregression.html"><a href="mlregression.html#firstregression"><i class="fa fa-check"></i><b>6.1.1</b> Building our first regression model</a></li>
+<li class="chapter" data-level="6.1.2" data-path="mlregression.html"><a href="mlregression.html#firstregressionevaluation"><i class="fa fa-check"></i><b>6.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="mlregression.html"><a href="mlregression.html#regnull"><i class="fa fa-check"></i><b>6.2</b> Compare to the null model</a></li>
+<li class="chapter" data-level="6.3" data-path="mlregression.html"><a href="mlregression.html#comparerf"><i class="fa fa-check"></i><b>6.3</b> Compare to a random forest model</a></li>
+<li class="chapter" data-level="6.4" data-path="mlregression.html"><a href="mlregression.html#casestudystopwords"><i class="fa fa-check"></i><b>6.4</b> Case study: removing stop words</a></li>
+<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#case-study-varying-n-grams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
+<li class="chapter" data-level="6.6" data-path="mlregression.html"><a href="mlregression.html#mlregressionlemmatization"><i class="fa fa-check"></i><b>6.6</b> Case study: lemmatization</a></li>
+<li class="chapter" data-level="6.7" data-path="mlregression.html"><a href="mlregression.html#case-study-feature-hashing"><i class="fa fa-check"></i><b>6.7</b> Case study: feature hashing</a>
+<ul>
+<li class="chapter" data-level="6.7.1" data-path="mlregression.html"><a href="mlregression.html#text-normalization"><i class="fa fa-check"></i><b>6.7.1</b> Text normalization</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="mlregression.html"><a href="mlregression.html#what-evaluation-metrics-are-appropriate"><i class="fa fa-check"></i><b>6.8</b> What evaluation metrics are appropriate?</a></li>
+<li class="chapter" data-level="6.9" data-path="mlregression.html"><a href="mlregression.html#mlregressionfull"><i class="fa fa-check"></i><b>6.9</b> The full game: regression</a>
+<ul>
+<li class="chapter" data-level="6.9.1" data-path="mlregression.html"><a href="mlregression.html#preprocess-the-data"><i class="fa fa-check"></i><b>6.9.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="6.9.2" data-path="mlregression.html"><a href="mlregression.html#specify-the-model"><i class="fa fa-check"></i><b>6.9.2</b> Specify the model</a></li>
+<li class="chapter" data-level="6.9.3" data-path="mlregression.html"><a href="mlregression.html#tune-the-model"><i class="fa fa-check"></i><b>6.9.3</b> Tune the model</a></li>
+<li class="chapter" data-level="6.9.4" data-path="mlregression.html"><a href="mlregression.html#evaluate-the-modeling"><i class="fa fa-check"></i><b>6.9.4</b> Evaluate the modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="mlregression.html"><a href="mlregression.html#mlregressionsummary"><i class="fa fa-check"></i><b>6.10</b> Summary</a>
+<ul>
+<li class="chapter" data-level="6.10.1" data-path="mlregression.html"><a href="mlregression.html#in-this-chapter-you-learned-5"><i class="fa fa-check"></i><b>6.10.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="mlclassification.html"><a href="mlclassification.html"><i class="fa fa-check"></i><b>7</b> Classification</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="mlclassification.html"><a href="mlclassification.html#classfirstattemptlookatdata"><i class="fa fa-check"></i><b>7.1</b> A first classification model</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="mlclassification.html"><a href="mlclassification.html#classfirstmodel"><i class="fa fa-check"></i><b>7.1.1</b> Building our first classification model</a></li>
+<li class="chapter" data-level="7.1.2" data-path="mlclassification.html"><a href="mlclassification.html#evaluation"><i class="fa fa-check"></i><b>7.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="mlclassification.html"><a href="mlclassification.html#classnull"><i class="fa fa-check"></i><b>7.2</b> Compare to the null model</a></li>
+<li class="chapter" data-level="7.3" data-path="mlclassification.html"><a href="mlclassification.html#comparetolasso"><i class="fa fa-check"></i><b>7.3</b> Compare to a lasso classification model</a></li>
+<li class="chapter" data-level="7.4" data-path="mlclassification.html"><a href="mlclassification.html#tunelasso"><i class="fa fa-check"></i><b>7.4</b> Tuning lasso hyperparameters</a></li>
+<li class="chapter" data-level="7.5" data-path="mlclassification.html"><a href="mlclassification.html#casestudysparseencoding"><i class="fa fa-check"></i><b>7.5</b> Case study: sparse encoding</a></li>
+<li class="chapter" data-level="7.6" data-path="mlclassification.html"><a href="mlclassification.html#mlmulticlass"><i class="fa fa-check"></i><b>7.6</b> Two class or multiclass?</a></li>
+<li class="chapter" data-level="7.7" data-path="mlclassification.html"><a href="mlclassification.html#case-study-including-non-text-data"><i class="fa fa-check"></i><b>7.7</b> Case study: including non-text data</a></li>
+<li class="chapter" data-level="7.8" data-path="mlclassification.html"><a href="mlclassification.html#case-study-data-censoring"><i class="fa fa-check"></i><b>7.8</b> Case study: data censoring</a></li>
+<li class="chapter" data-level="7.9" data-path="mlclassification.html"><a href="mlclassification.html#customfeatures"><i class="fa fa-check"></i><b>7.9</b> Case study: custom features</a>
+<ul>
+<li class="chapter" data-level="7.9.1" data-path="mlclassification.html"><a href="mlclassification.html#detect-credit-cards"><i class="fa fa-check"></i><b>7.9.1</b> Detect credit cards</a></li>
+<li class="chapter" data-level="7.9.2" data-path="mlclassification.html"><a href="mlclassification.html#calculate-percentage-censoring"><i class="fa fa-check"></i><b>7.9.2</b> Calculate percentage censoring</a></li>
+<li class="chapter" data-level="7.9.3" data-path="mlclassification.html"><a href="mlclassification.html#detect-monetary-amounts"><i class="fa fa-check"></i><b>7.9.3</b> Detect monetary amounts</a></li>
+</ul></li>
+<li class="chapter" data-level="7.10" data-path="mlclassification.html"><a href="mlclassification.html#what-evaluation-metrics-are-appropriate-1"><i class="fa fa-check"></i><b>7.10</b> What evaluation metrics are appropriate?</a></li>
+<li class="chapter" data-level="7.11" data-path="mlclassification.html"><a href="mlclassification.html#mlclassificationfull"><i class="fa fa-check"></i><b>7.11</b> The full game: classification</a>
+<ul>
+<li class="chapter" data-level="7.11.1" data-path="mlclassification.html"><a href="mlclassification.html#feature-selection"><i class="fa fa-check"></i><b>7.11.1</b> Feature selection</a></li>
+<li class="chapter" data-level="7.11.2" data-path="mlclassification.html"><a href="mlclassification.html#specify-the-model-1"><i class="fa fa-check"></i><b>7.11.2</b> Specify the model</a></li>
+<li class="chapter" data-level="7.11.3" data-path="mlclassification.html"><a href="mlclassification.html#evaluate-the-modeling-1"><i class="fa fa-check"></i><b>7.11.3</b> Evaluate the modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="7.12" data-path="mlclassification.html"><a href="mlclassification.html#mlclassificationsummary"><i class="fa fa-check"></i><b>7.12</b> Summary</a>
+<ul>
+<li class="chapter" data-level="7.12.1" data-path="mlclassification.html"><a href="mlclassification.html#in-this-chapter-you-learned-6"><i class="fa fa-check"></i><b>7.12.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Deep Learning Methods</b></span></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html"><i class="fa fa-check"></i>Foreword</a>
+<ul>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#spending-your-data-budget"><i class="fa fa-check"></i>Spending your data budget</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#feature-engineering"><i class="fa fa-check"></i>Feature engineering</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#fitting-and-tuning"><i class="fa fa-check"></i>Fitting and tuning</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#model-evaluation"><i class="fa fa-check"></i>Model evaluation</a></li>
+<li class="chapter" data-level="" data-path="dlforeword.html"><a href="dlforeword.html#putting-the-model-process-in-context"><i class="fa fa-check"></i>Putting the model process in context</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="dldnn.html"><a href="dldnn.html"><i class="fa fa-check"></i><b>8</b> Dense neural networks</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="dldnn.html"><a href="dldnn.html#kickstarter"><i class="fa fa-check"></i><b>8.1</b> Kickstarter data</a></li>
+<li class="chapter" data-level="8.2" data-path="dldnn.html"><a href="dldnn.html#firstdlclassification"><i class="fa fa-check"></i><b>8.2</b> A first deep learning model</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="dldnn.html"><a href="dldnn.html#dnnrecipe"><i class="fa fa-check"></i><b>8.2.1</b> Preprocessing for deep learning</a></li>
+<li class="chapter" data-level="8.2.2" data-path="dldnn.html"><a href="dldnn.html#onehotsequence"><i class="fa fa-check"></i><b>8.2.2</b> One-hot sequence embedding of text</a></li>
+<li class="chapter" data-level="8.2.3" data-path="dldnn.html"><a href="dldnn.html#simple-flattened-dense-network"><i class="fa fa-check"></i><b>8.2.3</b> Simple flattened dense network</a></li>
+<li class="chapter" data-level="8.2.4" data-path="dldnn.html"><a href="dldnn.html#evaluate-dnn"><i class="fa fa-check"></i><b>8.2.4</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="8.3" data-path="dldnn.html"><a href="dldnn.html#using-pre-trained-word-embeddings"><i class="fa fa-check"></i><b>8.3</b> Using pre-trained word embeddings</a></li>
+<li class="chapter" data-level="8.4" data-path="dldnn.html"><a href="dldnn.html#dnncross"><i class="fa fa-check"></i><b>8.4</b> Cross-validation for deep learning models</a></li>
+<li class="chapter" data-level="8.5" data-path="dldnn.html"><a href="dldnn.html#compare-and-evaluate-dnn-models"><i class="fa fa-check"></i><b>8.5</b> Compare and evaluate DNN models</a></li>
+<li class="chapter" data-level="8.6" data-path="dldnn.html"><a href="dldnn.html#dllimitations"><i class="fa fa-check"></i><b>8.6</b> Limitations of deep learning</a></li>
+<li class="chapter" data-level="8.7" data-path="dldnn.html"><a href="dldnn.html#dldnnsummary"><i class="fa fa-check"></i><b>8.7</b> Summary</a>
+<ul>
+<li class="chapter" data-level="8.7.1" data-path="dldnn.html"><a href="dldnn.html#in-this-chapter-you-learned-7"><i class="fa fa-check"></i><b>8.7.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="dllstm.html"><a href="dllstm.html"><i class="fa fa-check"></i><b>9</b> Long short-term memory (LSTM) networks</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="dllstm.html"><a href="dllstm.html#firstlstm"><i class="fa fa-check"></i><b>9.1</b> A first LSTM model</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="dllstm.html"><a href="dllstm.html#building-an-lstm"><i class="fa fa-check"></i><b>9.1.1</b> Building an LSTM</a></li>
+<li class="chapter" data-level="9.1.2" data-path="dllstm.html"><a href="dllstm.html#lstmevaluation"><i class="fa fa-check"></i><b>9.1.2</b> Evaluation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="dllstm.html"><a href="dllstm.html#compare-to-a-recurrent-neural-network"><i class="fa fa-check"></i><b>9.2</b> Compare to a recurrent neural network</a></li>
+<li class="chapter" data-level="9.3" data-path="dllstm.html"><a href="dllstm.html#bilstm"><i class="fa fa-check"></i><b>9.3</b> Case study: bidirectional LSTM</a></li>
+<li class="chapter" data-level="9.4" data-path="dllstm.html"><a href="dllstm.html#case-study-stacking-lstm-layers"><i class="fa fa-check"></i><b>9.4</b> Case study: stacking LSTM layers</a></li>
+<li class="chapter" data-level="9.5" data-path="dllstm.html"><a href="dllstm.html#lstmpadding"><i class="fa fa-check"></i><b>9.5</b> Case study: padding</a></li>
+<li class="chapter" data-level="9.6" data-path="dllstm.html"><a href="dllstm.html#case-study-training-a-regression-model"><i class="fa fa-check"></i><b>9.6</b> Case study: training a regression model</a></li>
+<li class="chapter" data-level="9.7" data-path="dllstm.html"><a href="dllstm.html#case-study-vocabulary-size"><i class="fa fa-check"></i><b>9.7</b> Case study: vocabulary size</a></li>
+<li class="chapter" data-level="9.8" data-path="dllstm.html"><a href="dllstm.html#lstmfull"><i class="fa fa-check"></i><b>9.8</b> The full game: LSTM</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="dllstm.html"><a href="dllstm.html#lstmfullpreprocess"><i class="fa fa-check"></i><b>9.8.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="9.8.2" data-path="dllstm.html"><a href="dllstm.html#lstmfullmodel"><i class="fa fa-check"></i><b>9.8.2</b> Specify the model</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="dllstm.html"><a href="dllstm.html#dllstmsummary"><i class="fa fa-check"></i><b>9.9</b> Summary</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="dllstm.html"><a href="dllstm.html#in-this-chapter-you-learned-8"><i class="fa fa-check"></i><b>9.9.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="dlcnn.html"><a href="dlcnn.html"><i class="fa fa-check"></i><b>10</b> Convolutional neural networks</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="dlcnn.html"><a href="dlcnn.html#what-are-cnns"><i class="fa fa-check"></i><b>10.1</b> What are CNNs?</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="dlcnn.html"><a href="dlcnn.html#filters"><i class="fa fa-check"></i><b>10.1.1</b> Filters</a></li>
+<li class="chapter" data-level="10.1.2" data-path="dlcnn.html"><a href="dlcnn.html#kernel-size"><i class="fa fa-check"></i><b>10.1.2</b> Kernel size</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="dlcnn.html"><a href="dlcnn.html#firstcnn"><i class="fa fa-check"></i><b>10.2</b> A first CNN model</a></li>
+<li class="chapter" data-level="10.3" data-path="dlcnn.html"><a href="dlcnn.html#case-study-adding-more-layers"><i class="fa fa-check"></i><b>10.3</b> Case study: adding more layers</a></li>
+<li class="chapter" data-level="10.4" data-path="dlcnn.html"><a href="dlcnn.html#case-study-byte-pair-encoding"><i class="fa fa-check"></i><b>10.4</b> Case study: byte pair encoding</a></li>
+<li class="chapter" data-level="10.5" data-path="dlcnn.html"><a href="dlcnn.html#lime"><i class="fa fa-check"></i><b>10.5</b> Case study: explainability with LIME</a></li>
+<li class="chapter" data-level="10.6" data-path="dlcnn.html"><a href="dlcnn.html#case-study-hyperparameter-search"><i class="fa fa-check"></i><b>10.6</b> Case study: hyperparameter search</a></li>
+<li class="chapter" data-level="10.7" data-path="dlcnn.html"><a href="dlcnn.html#cross-validation-for-evaluation"><i class="fa fa-check"></i><b>10.7</b> Cross-validation for evaluation</a></li>
+<li class="chapter" data-level="10.8" data-path="dlcnn.html"><a href="dlcnn.html#cnnfull"><i class="fa fa-check"></i><b>10.8</b> The full game: CNN</a>
+<ul>
+<li class="chapter" data-level="10.8.1" data-path="dlcnn.html"><a href="dlcnn.html#cnnfullpreprocess"><i class="fa fa-check"></i><b>10.8.1</b> Preprocess the data</a></li>
+<li class="chapter" data-level="10.8.2" data-path="dlcnn.html"><a href="dlcnn.html#cnnfullmodel"><i class="fa fa-check"></i><b>10.8.2</b> Specify the model</a></li>
+</ul></li>
+<li class="chapter" data-level="10.9" data-path="dlcnn.html"><a href="dlcnn.html#dlcnnsummary"><i class="fa fa-check"></i><b>10.9</b> Summary</a>
+<ul>
+<li class="chapter" data-level="10.9.1" data-path="dlcnn.html"><a href="dlcnn.html#in-this-chapter-you-learned-9"><i class="fa fa-check"></i><b>10.9.1</b> In this chapter, you learned:</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Conclusion</b></span></li>
+<li class="chapter" data-level="" data-path="text-models-in-the-real-world.html"><a href="text-models-in-the-real-world.html"><i class="fa fa-check"></i>Text models in the real world</a></li>
+<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="chapter" data-level="A" data-path="regexp.html"><a href="regexp.html"><i class="fa fa-check"></i><b>A</b> Regular expressions</a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="regexp.html"><a href="regexp.html#literal-characters"><i class="fa fa-check"></i><b>A.1</b> Literal characters</a>
+<ul>
+<li class="chapter" data-level="A.1.1" data-path="regexp.html"><a href="regexp.html#meta-characters"><i class="fa fa-check"></i><b>A.1.1</b> Meta characters</a></li>
+</ul></li>
+<li class="chapter" data-level="A.2" data-path="regexp.html"><a href="regexp.html#full-stop-the-wildcard"><i class="fa fa-check"></i><b>A.2</b> Full stop, the wildcard</a></li>
+<li class="chapter" data-level="A.3" data-path="regexp.html"><a href="regexp.html#character-classes"><i class="fa fa-check"></i><b>A.3</b> Character classes</a>
+<ul>
+<li class="chapter" data-level="A.3.1" data-path="regexp.html"><a href="regexp.html#shorthand-character-classes"><i class="fa fa-check"></i><b>A.3.1</b> Shorthand character classes</a></li>
+</ul></li>
+<li class="chapter" data-level="A.4" data-path="regexp.html"><a href="regexp.html#quantifiers"><i class="fa fa-check"></i><b>A.4</b> Quantifiers</a></li>
+<li class="chapter" data-level="A.5" data-path="regexp.html"><a href="regexp.html#anchors"><i class="fa fa-check"></i><b>A.5</b> Anchors</a></li>
+<li class="chapter" data-level="A.6" data-path="regexp.html"><a href="regexp.html#additional-resources"><i class="fa fa-check"></i><b>A.6</b> Additional resources</a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="appendixdata.html"><a href="appendixdata.html"><i class="fa fa-check"></i><b>B</b> Data</a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata.html"><a href="appendixdata.html#h.c.-andersen-fairy-tales"><i class="fa fa-check"></i><b>B.1</b> H.C. Andersen fairy tales</a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata.html"><a href="appendixdata.html#consumer-financial-protection-bureau-cfpb-complaints"><i class="fa fa-check"></i><b>B.2</b> Consumer Financial Protection Bureau (CFPB) complaints</a></li>
+<li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#opinions-of-the-supreme-court-of-the-united-states"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
+<li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-campaign-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Supervised Machine Learning for Text Analysis in R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="dlcnn" class="section level1" number="10">
+<h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks</h1>
+<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Kim 2014</a>)</span>, which can learn local, spatial structure within a dataset.</p>
+<p>CNNs can be well-suited for modeling text data text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN takes data (like text) as input and then hopefully produces output that represents specific structures in the data.</p>
+<div class="rmdnote">
+<p>
+Let’s take more time with CNNs in this chapter to explore their construction, different features, and the hyperparameters we can tune.
+</p>
+</div>
+<div id="what-are-cnns" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> What are CNNs?</h2>
+<p>CNNs can work with data of different dimensions (like two-dimensional images or three-dimensional video), but for text modeling, we typically work in one dimension. The illustrations and explanations in this chapter use only one dimension to match the text use case.
+Figure <a href="dlcnn.html#fig:cnn-architecture">10.1</a> illustrates a typical CNN architecture.
+The input sequence in this example uses character tokens, but it could also use word tokens.
+A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small tensor which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.</p>
+<div class="figure" style="text-align: center"><span id="fig:cnn-architecture"></span>
+<img src="diagram-files/cnn-architecture.png" alt="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value." width="100%" />
+<p class="caption">
+FIGURE 10.1: A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value.
+</p>
+</div>
+<p>This figure isn’t entirely accurate because we technically don’t feed characters into a CNN, but instead use sequence one-hot encoding (Section <a href="dldnn.html#onehotsequence">8.2.2</a>) with a possible word embedding.
+Let’s talk about two of the most important CNN concepts, <strong>filters</strong> and <strong>kernel size</strong>.</p>
+<div id="filters" class="section level3" number="10.1.1">
+<h3><span class="header-section-number">10.1.1</span> Filters</h3>
+<p>The kernel is a small tensor of the same dimensionality as the input tensor that slides along the input tensor. When it is sliding, it performs element-wise multiplication of the values in the input tensor and its weights and then sums up the values to get a single value.
+Sometimes an activation function is applied as well.
+It is these weights that are trained with gradient descent to find the best fit.
+In Keras, the <code>filters</code> represent how many different kernels are trained in each layer. You typically start with fewer filters at the beginning of your network and then increase them as you go along.</p>
+</div>
+<div id="kernel-size" class="section level3" number="10.1.2">
+<h3><span class="header-section-number">10.1.2</span> Kernel size</h3>
+<p>The most prominent hyperparameter is the kernel size.
+The kernel size is the size of the tensor (one-dimensional is this case) that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output tensor, as we see in Figure <a href="dlcnn.html#fig:cnn-kernel-size">10.2</a>.</p>
+<div class="figure" style="text-align: center"><span id="fig:cnn-kernel-size"></span>
+<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value." width="100%" />
+<p class="caption">
+FIGURE 10.2: The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value.
+</p>
+</div>
+<p>Larger kernels will detect larger and less frequent patterns where smaller kernels will find fine-grained features.
+Notice how the choice of token will affect how we think about kernel size.
+For character tokenization, a kernel size of 5 will (in early layers) find patterns in subwords more often than patterns across words, since five characters will not span multiple words.
+By contrast, a kernel size of 5 for word tokenization will learn patterns within sentences instead.</p>
+<div class="rmdwarning">
+<p>
+Kernels must have an odd length.
+</p>
+</div>
+</div>
+</div>
+<div id="firstcnn" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> A first CNN model</h2>
+<p>We will be using the same data which we examine in Section <a href="dldnn.html#kickstarter">8.1</a> and use in Chapters <a href="dldnn.html#dldnn">8</a> and <a href="dllstm.html#dllstm">9</a>. This dataset contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections <a href="dldnn.html#dnnrecipe">8.2.1</a> and <a href="dllstm.html#firstlstm">9.1</a>.</p>
+<p>Our first start CNN will look a lot like what is shown in Figure <a href="dlcnn.html#fig:cnn-architecture">10.1</a>.
+We start with an embedding layer, followed by a single one-dimensional convolution layer <code>layer_conv_1d()</code>, then a global max pooling layer <code>layer_global_max_pooling_1d()</code>, a densely connected layer, and ending with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.</p>
+<div class="sourceCode" id="cb559"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb559-1"><a href="dlcnn.html#cb559-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb559-2"><a href="dlcnn.html#cb559-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb559-3"><a href="dlcnn.html#cb559-3" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb559-4"><a href="dlcnn.html#cb559-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb559-5"><a href="dlcnn.html#cb559-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb559-6"><a href="dlcnn.html#cb559-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb559-7"><a href="dlcnn.html#cb559-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb559-8"><a href="dlcnn.html#cb559-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb559-9"><a href="dlcnn.html#cb559-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb559-10"><a href="dlcnn.html#cb559-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb559-11"><a href="dlcnn.html#cb559-11" aria-hidden="true" tabindex="-1"></a>simple_cnn_model</span></code></pre></div>
+<pre><code>#&gt; Model
+#&gt; Model: &quot;sequential&quot;
+#&gt; ________________________________________________________________________________
+#&gt; Layer (type)                        Output Shape                    Param #     
+#&gt; ================================================================================
+#&gt; embedding (Embedding)               (None, 30, 16)                  320016      
+#&gt; ________________________________________________________________________________
+#&gt; conv1d (Conv1D)                     (None, 26, 32)                  2592        
+#&gt; ________________________________________________________________________________
+#&gt; global_max_pooling1d (GlobalMaxPool (None, 32)                      0           
+#&gt; ________________________________________________________________________________
+#&gt; dense_1 (Dense)                     (None, 64)                      2112        
+#&gt; ________________________________________________________________________________
+#&gt; dense (Dense)                       (None, 1)                       65          
+#&gt; ================================================================================
+#&gt; Total params: 324,785
+#&gt; Trainable params: 324,785
+#&gt; Non-trainable params: 0
+#&gt; ________________________________________________________________________________</code></pre>
+<p>We are using the same embedding layer with the same <code>max_length</code> as in the previous networks so there is nothing new there.
+The <code>layer_global_max_pooling_1d()</code> layer collapses the remaining CNN output into one dimension so we can finish it off with a densely connected layer and the sigmoid activation function.</p>
+<p>This might not end up being the best CNN configuration, but it is a good starting point.
+One of the challenges when working with CNNs is to ensure that we manage the dimensionality correctly. The length of the sequence decreases by <code>(kernel_size - 1)</code> for each layer. For this input, we have a sequence of length <code>max_length = 30</code>, which is decreased by <code>(5 - 1) = 4</code> resulting in a sequence of 26, as show in the printed output of <code>simple_cnn_model</code>. We could create seven layers with <code>kernel_size = 5</code>, since we would end with <code>30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2</code> elements in the resulting sequence. However, we would not be able to do a network with 3 layers of
+<code>kernel_size = 7</code> followed by 3 layers of <code>kernel_size = 5</code> since the resulting sequence would be <code>30 - 6 - 6 - 6 - 4 - 4 - 4 = 0</code> and we must have a positive length for our sequence.
+Remember that <code>kernel_size</code> is not the only argument that will change the length of the resulting sequence.</p>
+<div class="rmdnote">
+<p>
+Constructing a sequence layer by layer and using Keras’ print method to check the configuration is a great way to make sure your architecture is valid.
+</p>
+</div>
+<p>The compilation and fitting are the same as we have seen before, using a validation split created with tidymodels as shown in Sections <a href="dldnn.html#evaluate-dnn">8.2.4</a> and <a href="dllstm.html#lstmevaluation">9.1.2</a>.</p>
+<div class="sourceCode" id="cb561"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb561-1"><a href="dlcnn.html#cb561-1" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb561-2"><a href="dlcnn.html#cb561-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb561-3"><a href="dlcnn.html#cb561-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb561-4"><a href="dlcnn.html#cb561-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb561-5"><a href="dlcnn.html#cb561-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb561-6"><a href="dlcnn.html#cb561-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb561-7"><a href="dlcnn.html#cb561-7" aria-hidden="true" tabindex="-1"></a>cnn_history <span class="ot">&lt;-</span> simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb561-8"><a href="dlcnn.html#cb561-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb561-9"><a href="dlcnn.html#cb561-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb561-10"><a href="dlcnn.html#cb561-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb561-11"><a href="dlcnn.html#cb561-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb561-12"><a href="dlcnn.html#cb561-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb561-13"><a href="dlcnn.html#cb561-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="rmdnote">
+<p>
+We are using the <code>“adam”</code> optimizer since it performs well for many kinds of models. You may have to experiment to find the optimizer that works best for your model and data.
+</p>
+</div>
+<p>Now that the model is done fitting, we can evaluate it on the validation data set using the same <code>keras_predict()</code> function we created in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a> and used throughout Chapters <a href="dldnn.html#dldnn">8</a> and <a href="dllstm.html#dllstm">9</a>.</p>
+<div class="sourceCode" id="cb562"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb562-1"><a href="dlcnn.html#cb562-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(simple_cnn_model, kick_assess, state_assess)</span>
+<span id="cb562-2"><a href="dlcnn.html#cb562-2" aria-hidden="true" tabindex="-1"></a>val_res</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 50,524 x 3
+#&gt;          .pred_1 .pred_class state
+#&gt;            &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
+#&gt;  1 0.00136       0           0    
+#&gt;  2 0.000497      0           0    
+#&gt;  3 0.00221       0           0    
+#&gt;  4 0.0000120     0           0    
+#&gt;  5 0.992         1           1    
+#&gt;  6 0.998         1           1    
+#&gt;  7 0.00000000945 0           0    
+#&gt;  8 0.000290      0           0    
+#&gt;  9 0.334         0           1    
+#&gt; 10 0.999         1           1    
+#&gt; # … with 50,514 more rows</code></pre>
+<p>We can calculate some standard metrics with <code>metrics()</code>.</p>
+<div class="sourceCode" id="cb564"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb564-1"><a href="dlcnn.html#cb564-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res, state, .pred_class, .pred_1)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 3
+#&gt;   .metric     .estimator .estimate
+#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 accuracy    binary         0.812
+#&gt; 2 kap         binary         0.624
+#&gt; 3 mn_log_loss binary         0.955
+#&gt; 4 roc_auc     binary         0.863</code></pre>
+<p>We see some improvement over the densely connected network from Chapter <a href="dldnn.html#dldnn">8</a>, our best performing model on the Kickstarter data so far.</p>
+<p>The heatmap in Figure <a href="dlcnn.html#fig:cnnheatmap">10.3</a> shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model.</p>
+<div class="sourceCode" id="cb566"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb566-1"><a href="dlcnn.html#cb566-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
+<span id="cb566-2"><a href="dlcnn.html#cb566-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb566-3"><a href="dlcnn.html#cb566-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:cnnheatmap"></span>
+<img src="10_dl_cnn_files/figure-html/cnnheatmap-1.png" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
+<p class="caption">
+FIGURE 10.3: Confusion matrix for first CNN model predictions of Kickstarter campaign success
+</p>
+</div>
+<p>The ROC curve in Figure <a href="dlcnn.html#fig:cnnroccurve">10.4</a> shows how the model performs at different thresholds.</p>
+<div class="sourceCode" id="cb567"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb567-1"><a href="dlcnn.html#cb567-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
+<span id="cb567-2"><a href="dlcnn.html#cb567-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb567-3"><a href="dlcnn.html#cb567-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb567-4"><a href="dlcnn.html#cb567-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb567-5"><a href="dlcnn.html#cb567-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
+<span id="cb567-6"><a href="dlcnn.html#cb567-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:cnnroccurve"></span>
+<img src="10_dl_cnn_files/figure-html/cnnroccurve-1.png" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
+<p class="caption">
+FIGURE 10.4: ROC curve for first CNN model predictions of Kickstarter campaign success
+</p>
+</div>
+</div>
+<div id="case-study-adding-more-layers" class="section level2" number="10.3">
+<h2><span class="header-section-number">10.3</span> Case study: adding more layers</h2>
+<p>Now that we know how our basic CNN performs, we can see what happens when we apply some common modifications to it.
+This case study will examine:</p>
+<ul>
+<li>how we can add additional convolutional layers to our base model and</li>
+<li>how additional dense layers can be added.</li>
+</ul>
+<p>Let’s start by adding another fully connected layer. We take the architecture we used in <code>simple_cnn_model</code> and add another <code>layer_dense()</code> after the first <code>layer_dense()</code> in the model.
+Increasing the depth of the model via the fully connected layers allows the model to find more complex patterns.
+There is, however, a trade-off. Adding more layers adds more weights to the model, making it more complex and harder to train. If you don’t have enough data or the patterns you are trying to classify aren’t that complex, then model performance will suffer since the model will start overfitting as it starts picking up on patterns in the data that aren’t there.</p>
+<div class="rmdwarning">
+<p>
+When working with CNNs, the different layers perform different tasks. A convolutional layer extracts local patterns as it slides along the sequences, while a fully connected layer finds global patterns.
+</p>
+</div>
+<p>We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. Yoshua Bengio has a simple rule for this <span class="citation">(<a href="#ref-bengio2012practical" role="doc-biblioref">Bengio 2012</a>)</span>:</p>
+<blockquote>
+<p>Just keep adding layers until the test error does not improve anymore.</p>
+</blockquote>
+<div class="sourceCode" id="cb568"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb568-1"><a href="dlcnn.html#cb568-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb568-2"><a href="dlcnn.html#cb568-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb568-3"><a href="dlcnn.html#cb568-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb568-4"><a href="dlcnn.html#cb568-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb568-5"><a href="dlcnn.html#cb568-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb568-6"><a href="dlcnn.html#cb568-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb568-7"><a href="dlcnn.html#cb568-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb568-8"><a href="dlcnn.html#cb568-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb568-9"><a href="dlcnn.html#cb568-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb568-10"><a href="dlcnn.html#cb568-10" aria-hidden="true" tabindex="-1"></a>cnn_double_dense</span></code></pre></div>
+<pre><code>#&gt; Model
+#&gt; Model: &quot;sequential_1&quot;
+#&gt; ________________________________________________________________________________
+#&gt; Layer (type)                        Output Shape                    Param #     
+#&gt; ================================================================================
+#&gt; embedding_1 (Embedding)             (None, 30, 16)                  320016      
+#&gt; ________________________________________________________________________________
+#&gt; conv1d_1 (Conv1D)                   (None, 26, 32)                  2592        
+#&gt; ________________________________________________________________________________
+#&gt; global_max_pooling1d_1 (GlobalMaxPo (None, 32)                      0           
+#&gt; ________________________________________________________________________________
+#&gt; dense_4 (Dense)                     (None, 64)                      2112        
+#&gt; ________________________________________________________________________________
+#&gt; dense_3 (Dense)                     (None, 64)                      4160        
+#&gt; ________________________________________________________________________________
+#&gt; dense_2 (Dense)                     (None, 1)                       65          
+#&gt; ================================================================================
+#&gt; Total params: 328,945
+#&gt; Trainable params: 328,945
+#&gt; Non-trainable params: 0
+#&gt; ________________________________________________________________________________</code></pre>
+<p>We can compile and fit this new model. We will try to keep as much as we can constant as we compare the different models.</p>
+<div class="sourceCode" id="cb570"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb570-1"><a href="dlcnn.html#cb570-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb570-2"><a href="dlcnn.html#cb570-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb570-3"><a href="dlcnn.html#cb570-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb570-4"><a href="dlcnn.html#cb570-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb570-5"><a href="dlcnn.html#cb570-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb570-6"><a href="dlcnn.html#cb570-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb570-7"><a href="dlcnn.html#cb570-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb570-8"><a href="dlcnn.html#cb570-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb570-9"><a href="dlcnn.html#cb570-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb570-10"><a href="dlcnn.html#cb570-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb570-11"><a href="dlcnn.html#cb570-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb570-12"><a href="dlcnn.html#cb570-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb570-13"><a href="dlcnn.html#cb570-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb571"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb571-1"><a href="dlcnn.html#cb571-1" aria-hidden="true" tabindex="-1"></a>val_res_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
+<span id="cb571-2"><a href="dlcnn.html#cb571-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_dense,</span>
+<span id="cb571-3"><a href="dlcnn.html#cb571-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
+<span id="cb571-4"><a href="dlcnn.html#cb571-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
+<span id="cb571-5"><a href="dlcnn.html#cb571-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb571-6"><a href="dlcnn.html#cb571-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb571-7"><a href="dlcnn.html#cb571-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_dense, state, .pred_class, .pred_1)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 3
+#&gt;   .metric     .estimator .estimate
+#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 accuracy    binary         0.807
+#&gt; 2 kap         binary         0.613
+#&gt; 3 mn_log_loss binary         0.994
+#&gt; 4 roc_auc     binary         0.859</code></pre>
+<p>This model performs well, but it is not entirely clear that it is working much better than the first CNN model we tried. This could be an indication that the original model had enough fully connected layers for the amount of training data we have available.</p>
+<div class="rmdwarning">
+<p>
+If we have two models with nearly identical performance, we should choose the less complex of the two, since it will have faster performance.
+</p>
+</div>
+<p>We can also change the number of convolutional layers, by adding more such layers.</p>
+<div class="sourceCode" id="cb573"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb573-1"><a href="dlcnn.html#cb573-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb573-2"><a href="dlcnn.html#cb573-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb573-3"><a href="dlcnn.html#cb573-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb573-4"><a href="dlcnn.html#cb573-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb573-5"><a href="dlcnn.html#cb573-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_max_pooling_1d</span>(<span class="at">pool_size =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb573-6"><a href="dlcnn.html#cb573-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb573-7"><a href="dlcnn.html#cb573-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb573-8"><a href="dlcnn.html#cb573-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb573-9"><a href="dlcnn.html#cb573-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb573-10"><a href="dlcnn.html#cb573-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb573-11"><a href="dlcnn.html#cb573-11" aria-hidden="true" tabindex="-1"></a>cnn_double_conv</span></code></pre></div>
+<pre><code>#&gt; Model
+#&gt; Model: &quot;sequential_2&quot;
+#&gt; ________________________________________________________________________________
+#&gt; Layer (type)                        Output Shape                    Param #     
+#&gt; ================================================================================
+#&gt; embedding_2 (Embedding)             (None, 30, 16)                  320016      
+#&gt; ________________________________________________________________________________
+#&gt; conv1d_3 (Conv1D)                   (None, 26, 32)                  2592        
+#&gt; ________________________________________________________________________________
+#&gt; max_pooling1d (MaxPooling1D)        (None, 13, 32)                  0           
+#&gt; ________________________________________________________________________________
+#&gt; conv1d_2 (Conv1D)                   (None, 11, 64)                  6208        
+#&gt; ________________________________________________________________________________
+#&gt; global_max_pooling1d_2 (GlobalMaxPo (None, 64)                      0           
+#&gt; ________________________________________________________________________________
+#&gt; dense_6 (Dense)                     (None, 64)                      4160        
+#&gt; ________________________________________________________________________________
+#&gt; dense_5 (Dense)                     (None, 1)                       65          
+#&gt; ================================================================================
+#&gt; Total params: 333,041
+#&gt; Trainable params: 333,041
+#&gt; Non-trainable params: 0
+#&gt; ________________________________________________________________________________</code></pre>
+<p>There are a lot of different ways we can extend the network by adding convolutional layers with <code>layer_conv_1d()</code>. We must consider the individual characteristics of each layer, with respect to kernel size, as well as other CNN parameters we have not discussed in detail yet like stride, padding, and dilation rate. We also have to consider the progression of these layers within the network itself.
+The model is using an increasing number of filters in each layer, doubling the number of filters for each layer. This is to ensure that there are more filters later on to capture enough of the global information.</p>
+<p>This model is using kernel size 5 twice. There aren’t any hard rules about how you structure kernel sizes, but the sizes you choose will change what features the model can detect.</p>
+<div class="rmdwarning">
+<p>
+The early layers extract general or low-level features while the later layers learn finer detail or high-level features in the data. The choice of kernel size determines the size of these features.
+</p>
+</div>
+<p>Having a small kernel size in the first layer will let the model detect low-level features locally.</p>
+<p>We are also including a max-pooling layer with <code>layer_max_pooling_1d()</code> between the convolutional layers. This layer performs a pooling operation that calculates the maximum values in its pooling window; in this model, that is set to 2.
+This is done in the hope that the pooled features will be able to perform better by weeding out the small weights.
+This is another parameter you can tinker with when you are designing the network.</p>
+<p>We compile this model like the others, again trying to keep as much as we can constant. The only thing that changed in this model compared to the first is the addition of a <code>layer_max_pooling_1d()</code> and a <code>layer_conv_1d()</code>.</p>
+<div class="sourceCode" id="cb575"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb575-1"><a href="dlcnn.html#cb575-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb575-2"><a href="dlcnn.html#cb575-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb575-3"><a href="dlcnn.html#cb575-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb575-4"><a href="dlcnn.html#cb575-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb575-5"><a href="dlcnn.html#cb575-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb575-6"><a href="dlcnn.html#cb575-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb575-7"><a href="dlcnn.html#cb575-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb575-8"><a href="dlcnn.html#cb575-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb575-9"><a href="dlcnn.html#cb575-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb575-10"><a href="dlcnn.html#cb575-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb575-11"><a href="dlcnn.html#cb575-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb575-12"><a href="dlcnn.html#cb575-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb575-13"><a href="dlcnn.html#cb575-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb576"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb576-1"><a href="dlcnn.html#cb576-1" aria-hidden="true" tabindex="-1"></a>val_res_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
+<span id="cb576-2"><a href="dlcnn.html#cb576-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_conv,</span>
+<span id="cb576-3"><a href="dlcnn.html#cb576-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
+<span id="cb576-4"><a href="dlcnn.html#cb576-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
+<span id="cb576-5"><a href="dlcnn.html#cb576-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb576-6"><a href="dlcnn.html#cb576-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb576-7"><a href="dlcnn.html#cb576-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_conv, state, .pred_class, .pred_1)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 3
+#&gt;   .metric     .estimator .estimate
+#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 accuracy    binary         0.803
+#&gt; 2 kap         binary         0.606
+#&gt; 3 mn_log_loss binary         1.04 
+#&gt; 4 roc_auc     binary         0.854</code></pre>
+<p>This model also performs well compared to earlier results. Let us extract the the prediction using <code>keras_predict()</code> we defined in <a href="dldnn.html#evaluate-dnn">8.2.4</a>.</p>
+<div class="sourceCode" id="cb578"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb578-1"><a href="dlcnn.html#cb578-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb578-2"><a href="dlcnn.html#cb578-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res, <span class="at">model =</span> <span class="st">&quot;Basic CNN&quot;</span>),</span>
+<span id="cb578-3"><a href="dlcnn.html#cb578-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_dense, <span class="at">model =</span> <span class="st">&quot;Double Dense&quot;</span>),</span>
+<span id="cb578-4"><a href="dlcnn.html#cb578-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_conv, <span class="at">model =</span> <span class="st">&quot;Double Conv&quot;</span>)</span>
+<span id="cb578-5"><a href="dlcnn.html#cb578-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb578-6"><a href="dlcnn.html#cb578-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb578-7"><a href="dlcnn.html#cb578-7" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 151,572 x 4
+#&gt;          .pred_1 .pred_class state model    
+#&gt;            &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;    
+#&gt;  1 0.00136       0           0     Basic CNN
+#&gt;  2 0.000497      0           0     Basic CNN
+#&gt;  3 0.00221       0           0     Basic CNN
+#&gt;  4 0.0000120     0           0     Basic CNN
+#&gt;  5 0.992         1           1     Basic CNN
+#&gt;  6 0.998         1           1     Basic CNN
+#&gt;  7 0.00000000945 0           0     Basic CNN
+#&gt;  8 0.000290      0           0     Basic CNN
+#&gt;  9 0.334         0           1     Basic CNN
+#&gt; 10 0.999         1           1     Basic CNN
+#&gt; # … with 151,562 more rows</code></pre>
+<p>Now that the results are combined in <code>all_cnn_model_predictions</code> we can calculate group-wise evaluation statistics by grouping them by the <code>model</code> variable.</p>
+<div class="sourceCode" id="cb580"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb580-1"><a href="dlcnn.html#cb580-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb580-2"><a href="dlcnn.html#cb580-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb580-3"><a href="dlcnn.html#cb580-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 12 x 4
+#&gt;    model        .metric     .estimator .estimate
+#&gt;    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt;  1 Basic CNN    accuracy    binary         0.812
+#&gt;  2 Double Conv  accuracy    binary         0.803
+#&gt;  3 Double Dense accuracy    binary         0.807
+#&gt;  4 Basic CNN    kap         binary         0.624
+#&gt;  5 Double Conv  kap         binary         0.606
+#&gt;  6 Double Dense kap         binary         0.613
+#&gt;  7 Basic CNN    mn_log_loss binary         0.955
+#&gt;  8 Double Conv  mn_log_loss binary         1.04 
+#&gt;  9 Double Dense mn_log_loss binary         0.994
+#&gt; 10 Basic CNN    roc_auc     binary         0.863
+#&gt; 11 Double Conv  roc_auc     binary         0.854
+#&gt; 12 Double Dense roc_auc     binary         0.859</code></pre>
+<p>We can also compute ROC curves for all our models so far. Figure <a href="dlcnn.html#fig:allcnnroccurve">10.5</a> shows the three different ROC curves together in one chart.</p>
+<div class="sourceCode" id="cb582"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb582-1"><a href="dlcnn.html#cb582-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb582-2"><a href="dlcnn.html#cb582-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb582-3"><a href="dlcnn.html#cb582-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb582-4"><a href="dlcnn.html#cb582-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb582-5"><a href="dlcnn.html#cb582-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb582-6"><a href="dlcnn.html#cb582-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
+<span id="cb582-7"><a href="dlcnn.html#cb582-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:allcnnroccurve"></span>
+<img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.png" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
+<p class="caption">
+FIGURE 10.5: ROC curve for three CNN variants’ predictions of Kickstarter campaign success
+</p>
+</div>
+<p>The curves are <em>very</em> close in this chart, indicating that we don’t have much to gain by adding more layers and that they don’t improve performance substantively.
+This doesn’t mean that we are done with CNNs! There are still many things we can explore, like different tokenization approahces and hyperparameters that can be trained.</p>
+</div>
+<div id="case-study-byte-pair-encoding" class="section level2" number="10.4">
+<h2><span class="header-section-number">10.4</span> Case study: byte pair encoding</h2>
+<p>In our models in this chapter so far we have used words as the token of interest. We saw in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> how n-grams could be used in modeling as well.
+One of the reasons why the Kickstarter dataset is hard to work with is because the text is quite short so we don’t get that many individual tokens to work with.
+Another choice of token is <em>subwords</em>, where we split the text into smaller units than words and especially some longer words will be broken into multiple subword units. One way to tokenize text into subword units is byte pair encoding proposed by <span class="citation"><a href="#ref-Gage1994ANA" role="doc-biblioref">Gage</a> (<a href="#ref-Gage1994ANA" role="doc-biblioref">1994</a>)</span>.
+This algorithm has been repurposed to work on text by iteratively merging frequently occurring subword pairs.
+Using subwords in text is used in methods such as <a href="https://github.com/google-research/bert">BERT</a> and <a href="https://openai.com/blog/better-language-models/">GPT-2</a> with great success.
+The byte pair encoding algorithm has a hyperparameter controlling the size of the vocabulary. Setting it to higher values allows the models to find more rarely used character sequences in the text.</p>
+<p>Byte pair encoding offers a good trade-off between character level and word level information, and can also encode unknown words. For example, suppose that the model is aware of the word “woman.” A simple tokenizer such as those we used before would have to put a word such as “womanhood” into an unknown bucket or ignore it completely, whereas the byte pair encoding should be able to pick up on the subwords “woman” and “hood” (or “woman,” “h,” and “ood,” depending on if the model found “hood” as a common enough subword).
+Using a subword tokenizer such as byte pair encoding should let us see the text with more granularity since we will have more and smaller tokens for each observation.</p>
+
+<div class="rmdnote">
+Character level CNNs have also proven successful in some contexts. They have been explored by <span class="citation"><a href="#ref-Zhang2015" role="doc-biblioref">Zhang, Zhao, and LeCun</a> (<a href="#ref-Zhang2015" role="doc-biblioref">2015</a>)</span> and work quite well on some shorter texts such as headlines and tweets <span class="citation">(<a href="#ref-Vosoughi2016" role="doc-biblioref">Vosoughi, Vijayaraghavan, and Roy 2016</a>)</span>.
+</div>
+<p>We need to remind ourselves that these models don’t contain any linguistic knowledge at all, they only “learn” the morphological patterns of sequences of characters (Section <a href="language.html#morphology">1.2</a>) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.</p>
+<p>Since we are using a completely different preprocessing approach, we need to specify a new feature engineering recipe. The textrecipes package has a tokenization engine to perform byte pair encoding, but we need to determine the vocabulary size and the appropriate sequence length. This function takes a character vector and a vocabulary size and returns a dataframe with the number of tokens in each observation.</p>
+<div class="sourceCode" id="cb583"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb583-1"><a href="dlcnn.html#cb583-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb583-2"><a href="dlcnn.html#cb583-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb583-3"><a href="dlcnn.html#cb583-3" aria-hidden="true" tabindex="-1"></a>get_bpe_token_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(vocab_size, x) {</span>
+<span id="cb583-4"><a href="dlcnn.html#cb583-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(<span class="sc">~</span>text, <span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">text =</span> x)) <span class="sc">%&gt;%</span></span>
+<span id="cb583-5"><a href="dlcnn.html#cb583-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_mutate</span>(<span class="at">text =</span> <span class="fu">tolower</span>(text)) <span class="sc">%&gt;%</span></span>
+<span id="cb583-6"><a href="dlcnn.html#cb583-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_tokenize</span>(text,</span>
+<span id="cb583-7"><a href="dlcnn.html#cb583-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
+<span id="cb583-8"><a href="dlcnn.html#cb583-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> vocab_size)) <span class="sc">%&gt;%</span></span>
+<span id="cb583-9"><a href="dlcnn.html#cb583-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb583-10"><a href="dlcnn.html#cb583-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb583-11"><a href="dlcnn.html#cb583-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(<span class="at">n_tokens =</span> <span class="fu">lengths</span>(textrecipes<span class="sc">:::</span><span class="fu">get_tokens</span>(text)),</span>
+<span id="cb583-12"><a href="dlcnn.html#cb583-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">vocab_size =</span> vocab_size)</span>
+<span id="cb583-13"><a href="dlcnn.html#cb583-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>We can use <code>map()</code> to try a handful of different vocabulary sizes</p>
+<div class="sourceCode" id="cb584"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb584-1"><a href="dlcnn.html#cb584-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb584-2"><a href="dlcnn.html#cb584-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">20000</span>),</span>
+<span id="cb584-3"><a href="dlcnn.html#cb584-3" aria-hidden="true" tabindex="-1"></a>  get_bpe_token_dist,</span>
+<span id="cb584-4"><a href="dlcnn.html#cb584-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_train<span class="sc">$</span>blurb</span>
+<span id="cb584-5"><a href="dlcnn.html#cb584-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb584-6"><a href="dlcnn.html#cb584-6" aria-hidden="true" tabindex="-1"></a>bpe_token_dist</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 808,368 x 2
+#&gt;    n_tokens vocab_size
+#&gt;       &lt;int&gt;      &lt;dbl&gt;
+#&gt;  1       16       2500
+#&gt;  2       34       2500
+#&gt;  3       22       2500
+#&gt;  4       26       2500
+#&gt;  5       13       2500
+#&gt;  6       19       2500
+#&gt;  7       33       2500
+#&gt;  8       24       2500
+#&gt;  9       35       2500
+#&gt; 10       37       2500
+#&gt; # … with 808,358 more rows</code></pre>
+<p>If we compare with the word count distribution we saw in Figure <a href="dldnn.html#fig:kickstarterwordlength">8.3</a>, then we see in Figure <a href="dlcnn.html#fig:kickstartersubwordlength">10.6</a> that any of these choices for vocabulary size will result in more tokens overall.</p>
+<div class="sourceCode" id="cb586"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb586-1"><a href="dlcnn.html#cb586-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="sc">%&gt;%</span></span>
+<span id="cb586-2"><a href="dlcnn.html#cb586-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n_tokens)) <span class="sc">+</span></span>
+<span id="cb586-3"><a href="dlcnn.html#cb586-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb586-4"><a href="dlcnn.html#cb586-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>vocab_size) <span class="sc">+</span></span>
+<span id="cb586-5"><a href="dlcnn.html#cb586-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of subwords per campaign blurb&quot;</span>,</span>
+<span id="cb586-6"><a href="dlcnn.html#cb586-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:kickstartersubwordlength"></span>
+<img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.png" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
+<p class="caption">
+FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes
+</p>
+</div>
+<p>Let’s pick a vocabulary size of 10,000 and a corresponding sequence length of 40. To use byte pair encoding as a tokenizer in textrecipes set <code>engine = "tokenizers.bpe"</code>; the vocabulary size can be denoted using the <code>training_options</code> argument. Everything else in the recipe stays the same.</p>
+<div class="sourceCode" id="cb587"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb587-1"><a href="dlcnn.html#cb587-1" aria-hidden="true" tabindex="-1"></a>max_subwords <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb587-2"><a href="dlcnn.html#cb587-2" aria-hidden="true" tabindex="-1"></a>bpe_max_length <span class="ot">&lt;-</span> <span class="dv">40</span></span>
+<span id="cb587-3"><a href="dlcnn.html#cb587-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb587-4"><a href="dlcnn.html#cb587-4" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span>blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb587-5"><a href="dlcnn.html#cb587-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">blurb =</span> <span class="fu">tolower</span>(blurb)) <span class="sc">%&gt;%</span></span>
+<span id="cb587-6"><a href="dlcnn.html#cb587-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb,</span>
+<span id="cb587-7"><a href="dlcnn.html#cb587-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
+<span id="cb587-8"><a href="dlcnn.html#cb587-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> max_subwords)) <span class="sc">%&gt;%</span></span>
+<span id="cb587-9"><a href="dlcnn.html#cb587-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> bpe_max_length)</span>
+<span id="cb587-10"><a href="dlcnn.html#cb587-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb587-11"><a href="dlcnn.html#cb587-11" aria-hidden="true" tabindex="-1"></a>bpe_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(bpe_rec)</span>
+<span id="cb587-12"><a href="dlcnn.html#cb587-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb587-13"><a href="dlcnn.html#cb587-13" aria-hidden="true" tabindex="-1"></a>bpe_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb587-14"><a href="dlcnn.html#cb587-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb587-15"><a href="dlcnn.html#cb587-15" aria-hidden="true" tabindex="-1"></a>bpe_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb587-16"><a href="dlcnn.html#cb587-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<p>Our model will be very similar to the baseline CNN model from Section <a href="dlcnn.html#firstcnn">10.2</a>; we’ll use a larger kernel size of 7 to account for the finer detail in the tokens.</p>
+<div class="sourceCode" id="cb588"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb588-1"><a href="dlcnn.html#cb588-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb588-2"><a href="dlcnn.html#cb588-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb588-3"><a href="dlcnn.html#cb588-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> bpe_max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb588-4"><a href="dlcnn.html#cb588-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb588-5"><a href="dlcnn.html#cb588-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb588-6"><a href="dlcnn.html#cb588-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb588-7"><a href="dlcnn.html#cb588-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb588-8"><a href="dlcnn.html#cb588-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb588-9"><a href="dlcnn.html#cb588-9" aria-hidden="true" tabindex="-1"></a>cnn_bpe</span></code></pre></div>
+<pre><code>#&gt; Model
+#&gt; Model: &quot;sequential_3&quot;
+#&gt; ________________________________________________________________________________
+#&gt; Layer (type)                        Output Shape                    Param #     
+#&gt; ================================================================================
+#&gt; embedding_3 (Embedding)             (None, 40, 16)                  320016      
+#&gt; ________________________________________________________________________________
+#&gt; conv1d_4 (Conv1D)                   (None, 34, 32)                  3616        
+#&gt; ________________________________________________________________________________
+#&gt; global_max_pooling1d_3 (GlobalMaxPo (None, 32)                      0           
+#&gt; ________________________________________________________________________________
+#&gt; dense_8 (Dense)                     (None, 64)                      2112        
+#&gt; ________________________________________________________________________________
+#&gt; dense_7 (Dense)                     (None, 1)                       65          
+#&gt; ================================================================================
+#&gt; Total params: 325,809
+#&gt; Trainable params: 325,809
+#&gt; Non-trainable params: 0
+#&gt; ________________________________________________________________________________</code></pre>
+<p>We can compile and train like we have done so many times now.</p>
+<div class="sourceCode" id="cb590"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb590-1"><a href="dlcnn.html#cb590-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb590-2"><a href="dlcnn.html#cb590-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb590-3"><a href="dlcnn.html#cb590-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb590-4"><a href="dlcnn.html#cb590-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb590-5"><a href="dlcnn.html#cb590-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb590-6"><a href="dlcnn.html#cb590-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb590-7"><a href="dlcnn.html#cb590-7" aria-hidden="true" tabindex="-1"></a>bpe_history <span class="ot">&lt;-</span> cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb590-8"><a href="dlcnn.html#cb590-8" aria-hidden="true" tabindex="-1"></a>  bpe_analysis,</span>
+<span id="cb590-9"><a href="dlcnn.html#cb590-9" aria-hidden="true" tabindex="-1"></a>  state_analysis,</span>
+<span id="cb590-10"><a href="dlcnn.html#cb590-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb590-11"><a href="dlcnn.html#cb590-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(bpe_assess, state_assess),</span>
+<span id="cb590-12"><a href="dlcnn.html#cb590-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span></span>
+<span id="cb590-13"><a href="dlcnn.html#cb590-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb590-14"><a href="dlcnn.html#cb590-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb590-15"><a href="dlcnn.html#cb590-15" aria-hidden="true" tabindex="-1"></a>bpe_history</span></code></pre></div>
+<pre><code>#&gt; 
+#&gt; Final epoch (plot to see history):
+#&gt;         loss: 0.03524
+#&gt;     accuracy: 0.9937
+#&gt;     val_loss: 0.9766
+#&gt; val_accuracy: 0.8117</code></pre>
+<p>The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher detail tokenizer.</p>
+<p>The confusion matrix in <a href="dlcnn.html#fig:bpeheatmap">10.7</a> also gives us clear information that there isn’t much bias between the two classes with this new tokenizer.</p>
+<div class="sourceCode" id="cb592"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb592-1"><a href="dlcnn.html#cb592-1" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(cnn_bpe, bpe_assess, state_assess)</span>
+<span id="cb592-2"><a href="dlcnn.html#cb592-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb592-3"><a href="dlcnn.html#cb592-3" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="sc">%&gt;%</span></span>
+<span id="cb592-4"><a href="dlcnn.html#cb592-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb592-5"><a href="dlcnn.html#cb592-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:bpeheatmap"></span>
+<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.png" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
+<p class="caption">
+FIGURE 10.7: Confusion matrix for CNN model using byte pair encoding tokenization
+</p>
+</div>
+<p>What are the subwords being used in this model? We can extract them from <code>step_sequence_onehot()</code> using <code>tidy()</code> on the prepped recipe. All the tokens that start with an <code>"h"</code> are seen here.</p>
+<div class="sourceCode" id="cb593"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb593-1"><a href="dlcnn.html#cb593-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
+<span id="cb593-2"><a href="dlcnn.html#cb593-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb593-3"><a href="dlcnn.html#cb593-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb593-4"><a href="dlcnn.html#cb593-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(token, <span class="st">&quot;^h&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb593-5"><a href="dlcnn.html#cb593-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;h&quot;       &quot;ha&quot;      &quot;hab&quot;     &quot;hal&quot;     &quot;ham&quot;     &quot;hand&quot;    &quot;he&quot;     
+#&gt;  [8] &quot;head&quot;    &quot;heart&quot;   &quot;hearted&quot; &quot;heast&quot;   &quot;hed&quot;     &quot;hedul&quot;   &quot;heim&quot;   
+#&gt; [15] &quot;hel&quot;     &quot;help&quot;    &quot;hem&quot;     &quot;hen&quot;     &quot;hent&quot;    &quot;her&quot;     &quot;here&quot;   
+#&gt; [22] &quot;hern&quot;    &quot;hero&quot;    &quot;hes&quot;     &quot;hes,&quot;    &quot;hes.&quot;    &quot;hest&quot;    &quot;het&quot;    
+#&gt; [29] &quot;hetic&quot;   &quot;hett&quot;    &quot;hib&quot;     &quot;hic&quot;     &quot;hing&quot;    &quot;hing.&quot;   &quot;hip&quot;    
+#&gt; [36] &quot;hist&quot;    &quot;hn&quot;      &quot;hol&quot;     &quot;hold&quot;    &quot;hood&quot;    &quot;hop&quot;     &quot;hor&quot;    
+#&gt; [43] &quot;hous&quot;    &quot;house&quot;   &quot;how&quot;     &quot;hr&quot;      &quot;hs&quot;      &quot;hu&quot;</code></pre>
+<p>Notice how some of these subword tokens are full words and some are part of words. This is what allows the model to be able to “read” long unknown words by combining many smaller sub words.
+We can also look at common long words.</p>
+<div class="sourceCode" id="cb595"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb595-1"><a href="dlcnn.html#cb595-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
+<span id="cb595-2"><a href="dlcnn.html#cb595-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb595-3"><a href="dlcnn.html#cb595-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb595-4"><a href="dlcnn.html#cb595-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">nchar</span>(token))) <span class="sc">%&gt;%</span></span>
+<span id="cb595-5"><a href="dlcnn.html#cb595-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">25</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb595-6"><a href="dlcnn.html#cb595-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
+<pre><code>#&gt;  [1] &quot;▁singer-songwriter&quot; &quot;▁singer/songwriter&quot; &quot;▁post-apocalyptic&quot; 
+#&gt;  [4] &quot;▁interchangeable&quot;   &quot;▁singer/songwrit&quot;   &quot;▁entertainment.&quot;   
+#&gt;  [7] &quot;▁feature-length&quot;    &quot;▁groundbreaking&quot;    &quot;▁illustrations.&quot;   
+#&gt; [10] &quot;▁professionally&quot;    &quot;▁relationships.&quot;    &quot;▁self-published&quot;   
+#&gt; [13] &quot;▁sustainability&quot;    &quot;▁transformation&quot;    &quot;▁unconventional&quot;   
+#&gt; [16] &quot;▁architectural&quot;     &quot;▁automatically&quot;     &quot;▁award-winning&quot;    
+#&gt; [19] &quot;▁collaborating&quot;     &quot;▁collaboration&quot;     &quot;▁collaborative&quot;    
+#&gt; [22] &quot;▁coming-of-age&quot;     &quot;▁communication&quot;     &quot;▁comprehensive&quot;    
+#&gt; [25] &quot;▁consciousness&quot;</code></pre>
+<p>These twenty-five words were common enough to get their own subword token, and helps us understand the nature of these Kickstarter crowdfunding campaigns.</p>
+<div class="rmdwarning">
+<p>
+Examining the longest subword tokens gives you a good sense of the data you are working with!
+</p>
+</div>
+</div>
+<div id="lime" class="section level2" number="10.5">
+<h2><span class="header-section-number">10.5</span> Case study: explainability with LIME</h2>
+<p>We noted in Section <a href="dldnn.html#dllimitations">8.6</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using the <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short. The lime package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that has driven the outcome of the prediction.</p>
+<div class="rmdnote">
+<p>
+As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.
+</p>
+</div>
+<p>To use this package we need to write a helper function to get the data in the format we want. The <code>lime()</code> function takes two mandatory arguments, <code>x</code> and <code>model</code>. The <code>model</code> argument is the trained model we are trying to explain. The <code>lime()</code> function works out of the box with Keras models so we should be good to go. The <code>x</code> argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting <code>x</code> to be a character vector so we’ll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.</p>
+<div class="sourceCode" id="cb597"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb597-1"><a href="dlcnn.html#cb597-1" aria-hidden="true" tabindex="-1"></a>kick_prepped_rec <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb597-2"><a href="dlcnn.html#cb597-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb597-3"><a href="dlcnn.html#cb597-3" aria-hidden="true" tabindex="-1"></a>text_to_matrix <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb597-4"><a href="dlcnn.html#cb597-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(</span>
+<span id="cb597-5"><a href="dlcnn.html#cb597-5" aria-hidden="true" tabindex="-1"></a>    kick_prepped_rec,</span>
+<span id="cb597-6"><a href="dlcnn.html#cb597-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_data =</span> <span class="fu">tibble</span>(<span class="at">blurb =</span> x),</span>
+<span id="cb597-7"><a href="dlcnn.html#cb597-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span></span>
+<span id="cb597-8"><a href="dlcnn.html#cb597-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb597-9"><a href="dlcnn.html#cb597-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="rmdnote">
+<p>
+Since the function needs to be able to work with just the <code>x</code> parameter alone, we need to put <code>prepped_recipe</code> inside the function rather than passing it in as an argument. This will work with R’s scoping rules but does require you to create a new function for each recipe.
+</p>
+</div>
+<p>Let’s select a couple of training observations to explain.</p>
+<div class="sourceCode" id="cb598"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb598-1"><a href="dlcnn.html#cb598-1" aria-hidden="true" tabindex="-1"></a>sentence_to_explain <span class="ot">&lt;-</span> kickstarter_train <span class="sc">%&gt;%</span></span>
+<span id="cb598-2"><a href="dlcnn.html#cb598-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb598-3"><a href="dlcnn.html#cb598-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span>
+<span id="cb598-4"><a href="dlcnn.html#cb598-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb598-5"><a href="dlcnn.html#cb598-5" aria-hidden="true" tabindex="-1"></a>sentence_to_explain</span></code></pre></div>
+<pre><code>#&gt; [1] &quot;The new way of learning English made simple, interesting and practical!&quot;                                              
+#&gt; [2] &quot;New author prepared to publish Book One of my Crime Trilogy: The Worst of Times.  Aiming for March 2013 release date!&quot;</code></pre>
+<p>We now load the lime package and pass observations into <code>lime()</code> along with the model we are trying to explain and the preprocess function.</p>
+<div class="rmdwarning">
+<p>
+Be sure that the preprocess function <em>matches</em> the preprocessing that was used to train the model.
+</p>
+</div>
+<div class="sourceCode" id="cb600"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb600-1"><a href="dlcnn.html#cb600-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lime)</span>
+<span id="cb600-2"><a href="dlcnn.html#cb600-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb600-3"><a href="dlcnn.html#cb600-3" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
+<span id="cb600-4"><a href="dlcnn.html#cb600-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
+<span id="cb600-5"><a href="dlcnn.html#cb600-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
+<span id="cb600-6"><a href="dlcnn.html#cb600-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
+<span id="cb600-7"><a href="dlcnn.html#cb600-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn18" class="footnote-ref" id="fnref18"><sup>18</sup></a>. We set <code>n_features = 12</code> so we can look at the 12 most important features. If we were dealing with longer text you might want to change <code>n_features</code> to capture the effect of as many features you want.</p>
+<div class="sourceCode" id="cb601"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb601-1"><a href="dlcnn.html#cb601-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
+<span id="cb601-2"><a href="dlcnn.html#cb601-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
+<span id="cb601-3"><a href="dlcnn.html#cb601-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
+<span id="cb601-4"><a href="dlcnn.html#cb601-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
+<span id="cb601-5"><a href="dlcnn.html#cb601-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
+<span id="cb601-6"><a href="dlcnn.html#cb601-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb601-7"><a href="dlcnn.html#cb601-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb601-8"><a href="dlcnn.html#cb601-8" aria-hidden="true" tabindex="-1"></a>explanation</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 23 x 13
+#&gt;    model_type    case label label_prob model_r2 model_intercept model_prediction
+#&gt;  * &lt;chr&gt;        &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
+#&gt;  1 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  2 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  3 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  4 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  5 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  6 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  7 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  8 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt;  9 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt; 10 classificat…     1 1          0.999    0.411           0.644             1.03
+#&gt; # … with 13 more rows, and 6 more variables: feature &lt;chr&gt;,
+#&gt; #   feature_value &lt;chr&gt;, feature_weight &lt;dbl&gt;, feature_desc &lt;chr&gt;, data &lt;chr&gt;,
+#&gt; #   prediction &lt;list&gt;</code></pre>
+<p>The output comes in a tibble format where <code>feature</code> and <code>feature_weight</code> are included, but fortunately lime contains some functions to visualize these weights. Figure <a href="dlcnn.html#fig:limeplotfeatures">10.8</a> shows the result of using <code>plot_features()</code>, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Blue bars indicate that the weights <em>support</em> the prediction in the direction and red bars indicate <em>contradictions</em>. This chart is great for finding the most prominent features in an observation.</p>
+<div class="sourceCode" id="cb603"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb603-1"><a href="dlcnn.html#cb603-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_features</span>(explanation)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:limeplotfeatures"></span>
+<img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.png" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
+<p class="caption">
+FIGURE 10.8: Plot of most important features for a CNN model predicting two observations.
+</p>
+</div>
+<p>Figure <a href="dlcnn.html#fig:limeplottextexplanations">10.9</a> shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.</p>
+<div class="sourceCode" id="cb604"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb604-1"><a href="dlcnn.html#cb604-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:limeplottextexplanations"></span>
+<div id="htmlwidget-6f4296aeaafbdc18239e" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6f4296aeaafbdc18239e">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='negative_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='negative_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.91%)<br/>Explainer fit: 0.41<\/sub> <\/p><br/><p> New <span class='positive_1'>author<\/span> prepared to <span class='positive_1'>publish<\/span> <span class='positive_1'>Book<\/span> <span class='negative_1'>One<\/span> of my <span class='negative_1'>Crime<\/span> Trilogy: <span class='negative_1'>The<\/span> <span class='positive_1'>Worst<\/span> of Times.  <span class='negative_1'>Aiming<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>March<\/span> 2013 <span class='negative_1'>release<\/span> <span class='negative_1'>date<\/span>! <\/br> <sub>Label predicted: 1 (99.51%)<br/>Explainer fit: 0.3<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+FIGURE 10.9: Feature highlighting of words for two examples explained by a CNN model.
+</p>
+</div>
+<div class="rmdnote">
+<p>
+The <code>interactive_text_explanations()</code> function can be used to launch an interactive Shiny app where you can explore the model weights.
+</p>
+</div>
+<p>One of the ways a deep learning model is hard to explain is that changes to a part of the input can affect how the input is being used as a whole. Remember that in bag-of-words models adding another token when predicting would just add another unit in the weight; this is not always the case when using deep learning models.
+The following example shows this effect. We have created two very similar sentences in <code>fake_sentences</code>.</p>
+<div class="sourceCode" id="cb605"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb605-1"><a href="dlcnn.html#cb605-1" aria-hidden="true" tabindex="-1"></a>fake_sentences <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb605-2"><a href="dlcnn.html#cb605-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the whole family&quot;</span>,</span>
+<span id="cb605-3"><a href="dlcnn.html#cb605-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the family&quot;</span></span>
+<span id="cb605-4"><a href="dlcnn.html#cb605-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb605-5"><a href="dlcnn.html#cb605-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb605-6"><a href="dlcnn.html#cb605-6" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
+<span id="cb605-7"><a href="dlcnn.html#cb605-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
+<span id="cb605-8"><a href="dlcnn.html#cb605-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
+<span id="cb605-9"><a href="dlcnn.html#cb605-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
+<span id="cb605-10"><a href="dlcnn.html#cb605-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb605-11"><a href="dlcnn.html#cb605-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb605-12"><a href="dlcnn.html#cb605-12" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
+<span id="cb605-13"><a href="dlcnn.html#cb605-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
+<span id="cb605-14"><a href="dlcnn.html#cb605-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
+<span id="cb605-15"><a href="dlcnn.html#cb605-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
+<span id="cb605-16"><a href="dlcnn.html#cb605-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
+<span id="cb605-17"><a href="dlcnn.html#cb605-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Explanations based on these two sentences are fairly similar as we can see in Figure <a href="dlcnn.html#fig:robustlimeplottextexplanations">10.10</a>. However, notice how the removal of the word “whole” affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.</p>
+<div class="sourceCode" id="cb606"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb606-1"><a href="dlcnn.html#cb606-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:robustlimeplottextexplanations"></span>
+<div id="htmlwidget-70d9f6c036110bc23ac3" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-70d9f6c036110bc23ac3">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_5'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.96%)<br/>Explainer fit: 0.93<\/sub> <\/p><br/><p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.9<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+FIGURE 10.10: Feature highlighting of words in two examples explained by a CNN model.
+</p>
+</div>
+<p>It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.</p>
+</div>
+<div id="case-study-hyperparameter-search" class="section level2" number="10.6">
+<h2><span class="header-section-number">10.6</span> Case study: hyperparameter search</h2>
+<p>So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Chapters <a href="mlclassification.html#mlclassificationfull">7.11</a> and <a href="mlregression.html#mlregressionfull">6.9</a> using the tune package. We can use the <a href="https://tensorflow.rstudio.com/tools/tfruns/overview/">tfruns</a> package to run multiple Keras models and compare the results.</p>
+<p>This workflow will be a little different than what we have seen in the book so far since we will have to create a .R file that contain the necessary modeling steps and then we use that file to run multiple models. A file named <code>cnn-spec.R</code> is created and you can see the raw file <a href="https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R">here</a>. The first thing we need to do is specify what hyperparameters we want to change. By convention, we name this object <code>FLAGS</code> and it is created using the <code>flags()</code> function. For each parameter we want to tune, we add a corresponding <code>flag_*()</code> function, which can be <code>flag_integer()</code>, <code>flag_boolean()</code>, <code>flag_numeric()</code>, or <code>flag_string()</code> depending on what we need to tune.</p>
+<div class="rmdwarning">
+<p>
+Be sure you are using the right type for each of these flags; Keras is quite picky! If Keras is expecting an integer and gets a numeric then you will get an error.
+</p>
+</div>
+<div class="sourceCode" id="cb607"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb607-1"><a href="dlcnn.html#cb607-1" aria-hidden="true" tabindex="-1"></a>FLAGS <span class="ot">&lt;-</span> <span class="fu">flags</span>(</span>
+<span id="cb607-2"><a href="dlcnn.html#cb607-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;kernel_size1&quot;</span>, <span class="dv">5</span>),</span>
+<span id="cb607-3"><a href="dlcnn.html#cb607-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;strides1&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb607-4"><a href="dlcnn.html#cb607-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Notice how we are giving each flag a name and a possible value. The value doesn’t actually do anything, as it is not used once we start running multiple models, but it needs to be the right type for the model we are using.</p>
+<p>Next, we specify the Keras model we want to run.</p>
+<div class="sourceCode" id="cb608"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb608-1"><a href="dlcnn.html#cb608-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb608-2"><a href="dlcnn.html#cb608-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb608-3"><a href="dlcnn.html#cb608-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb608-4"><a href="dlcnn.html#cb608-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>,</span>
+<span id="cb608-5"><a href="dlcnn.html#cb608-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">kernel_size =</span> FLAGS<span class="sc">$</span>kernel_size1,</span>
+<span id="cb608-6"><a href="dlcnn.html#cb608-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> FLAGS<span class="sc">$</span>strides1,</span>
+<span id="cb608-7"><a href="dlcnn.html#cb608-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb608-8"><a href="dlcnn.html#cb608-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb608-9"><a href="dlcnn.html#cb608-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb608-10"><a href="dlcnn.html#cb608-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb608-11"><a href="dlcnn.html#cb608-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb608-12"><a href="dlcnn.html#cb608-12" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb608-13"><a href="dlcnn.html#cb608-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb608-14"><a href="dlcnn.html#cb608-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb608-15"><a href="dlcnn.html#cb608-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb608-16"><a href="dlcnn.html#cb608-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>We specify the hyperparameters we want to change by marking them as <code>FLAGS$name</code>. So in this model, we are trying different values of <code>kernel_size</code> and <code>strides</code>, which are denoted by the <code>kernel_size1</code> and <code>strides1</code> flag respectively.</p>
+<p>Lastly, we have to specify how is trained and evaluated.</p>
+<div class="sourceCode" id="cb609"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb609-1"><a href="dlcnn.html#cb609-1" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span></span>
+<span id="cb609-2"><a href="dlcnn.html#cb609-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb609-3"><a href="dlcnn.html#cb609-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> kick_analysis,</span>
+<span id="cb609-4"><a href="dlcnn.html#cb609-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> state_analysis,</span>
+<span id="cb609-5"><a href="dlcnn.html#cb609-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb609-6"><a href="dlcnn.html#cb609-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb609-7"><a href="dlcnn.html#cb609-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb609-8"><a href="dlcnn.html#cb609-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb609-9"><a href="dlcnn.html#cb609-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb609-10"><a href="dlcnn.html#cb609-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history)</span>
+<span id="cb609-11"><a href="dlcnn.html#cb609-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb609-12"><a href="dlcnn.html#cb609-12" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span> <span class="fu">evaluate</span>(</span>
+<span id="cb609-13"><a href="dlcnn.html#cb609-13" aria-hidden="true" tabindex="-1"></a>  kick_assess, state_assess</span>
+<span id="cb609-14"><a href="dlcnn.html#cb609-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb609-15"><a href="dlcnn.html#cb609-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb609-16"><a href="dlcnn.html#cb609-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test accuracy:&quot;</span>, score[<span class="st">&quot;accuracy&quot;</span>], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<p>This is mostly the same as what we have seen before. When we are running these different models the scripts will be run in the environment they are initialized from, so the models will have access to objects like <code>prepped_training</code> and <code>kickstarter_train</code> and we don’t have to create them inside the file.</p>
+<p>Now that we have the file set up we need to specify the different hyperparameters we want to look at. Three different values for the kernel size and 2 different values for the stride length give us <code>3 * 2 = 6</code> different runs.</p>
+<div class="sourceCode" id="cb610"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb610-1"><a href="dlcnn.html#cb610-1" aria-hidden="true" tabindex="-1"></a>hyperparams <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb610-2"><a href="dlcnn.html#cb610-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel_size1 =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>),</span>
+<span id="cb610-3"><a href="dlcnn.html#cb610-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">strides1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb610-4"><a href="dlcnn.html#cb610-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="rmdnote">
+<p>
+This is a small selection of hyperparameters and ranges. There is much more room for experimentation.
+</p>
+</div>
+<p>Now we have everything we need to do some hyperparameter searching. Load up tfruns and pass the name of the file we just created along with <code>hyperparams</code> to the <code>tuning_run()</code> function.</p>
+<div class="sourceCode" id="cb611"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb611-1"><a href="dlcnn.html#cb611-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tfruns)</span>
+<span id="cb611-2"><a href="dlcnn.html#cb611-2" aria-hidden="true" tabindex="-1"></a>runs <span class="ot">&lt;-</span> <span class="fu">tuning_run</span>(</span>
+<span id="cb611-3"><a href="dlcnn.html#cb611-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;cnn-spec.R&quot;</span>,</span>
+<span id="cb611-4"><a href="dlcnn.html#cb611-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">runs_dir =</span> <span class="st">&quot;_tuning&quot;</span>,</span>
+<span id="cb611-5"><a href="dlcnn.html#cb611-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">flags =</span> hyperparams</span>
+<span id="cb611-6"><a href="dlcnn.html#cb611-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb611-7"><a href="dlcnn.html#cb611-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb611-8"><a href="dlcnn.html#cb611-8" aria-hidden="true" tabindex="-1"></a>runs_results <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">ls_runs</span>())</span></code></pre></div>
+<p>You don’t have to, but we have manually specified the <code>runs_dir</code> argument, which is where the results of the tuning will be saved.</p>
+<p>A summary of all the runs in the folder can be retrieved with <code>ls_runs()</code>; here we use <code>as_tibble()</code> to get the results as a tibble.</p>
+<div class="sourceCode" id="cb612"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb612-1"><a href="dlcnn.html#cb612-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 12 x 28
+#&gt;    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
+#&gt;    &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;
+#&gt;  1 _tuning/2021-03-1…  0.994    NA            NA          0.0333           0.993
+#&gt;  2 _tuning/2021-03-1…  0.979    NA            NA          0.0379           0.991
+#&gt;  3 _tuning/2021-03-1…  0.964    NA            NA          0.0508           0.987
+#&gt;  4 _tuning/2021-03-1…  0.950    NA            NA          0.036            0.992
+#&gt;  5 _tuning/2021-03-1…  0.974    NA            NA          0.0323           0.993
+#&gt;  6 _tuning/2021-03-1…  0.951    NA            NA          0.0426           0.990
+#&gt;  7 _tuning/2021-03-1… NA         1.01          0.809      0.0322           0.993
+#&gt;  8 _tuning/2021-03-1… NA         1.00          0.804      0.0387           0.991
+#&gt;  9 _tuning/2021-03-1… NA         0.987         0.805      0.0476           0.988
+#&gt; 10 _tuning/2021-03-1… NA         0.954         0.811      0.0312           0.994
+#&gt; 11 _tuning/2021-03-1… NA         0.930         0.814      0.0339           0.993
+#&gt; 12 _tuning/2021-03-1… NA         0.922         0.807      0.0543           0.986
+#&gt; # … with 22 more variables: metric_val_loss &lt;dbl&gt;, metric_val_accuracy &lt;dbl&gt;,
+#&gt; #   flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;, samples &lt;int&gt;,
+#&gt; #   batch_size &lt;int&gt;, epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;,
+#&gt; #   model &lt;chr&gt;, loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;,
+#&gt; #   script &lt;chr&gt;, start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;,
+#&gt; #   source_code &lt;chr&gt;, context &lt;chr&gt;, type &lt;chr&gt;, NA. &lt;dbl&gt;</code></pre>
+<p>We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.</p>
+<div class="sourceCode" id="cb614"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb614-1"><a href="dlcnn.html#cb614-1" aria-hidden="true" tabindex="-1"></a>best_runs <span class="ot">&lt;-</span> runs_results <span class="sc">%&gt;%</span></span>
+<span id="cb614-2"><a href="dlcnn.html#cb614-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(metric_val_accuracy, flag_kernel_size1, flag_strides1) <span class="sc">%&gt;%</span></span>
+<span id="cb614-3"><a href="dlcnn.html#cb614-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
+<span id="cb614-4"><a href="dlcnn.html#cb614-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb614-5"><a href="dlcnn.html#cb614-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 12 x 3
+#&gt;    metric_val_accuracy flag_kernel_size1 flag_strides1
+#&gt;                  &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
+#&gt;  1               0.814                 5             1
+#&gt;  2               0.813                 7             1
+#&gt;  3               0.812                 3             1
+#&gt;  4               0.811                 7             1
+#&gt;  5               0.81                  5             1
+#&gt;  6               0.809                 7             2
+#&gt;  7               0.809                 5             2
+#&gt;  8               0.808                 3             2
+#&gt;  9               0.808                 7             2
+#&gt; 10               0.807                 3             1
+#&gt; 11               0.805                 3             2
+#&gt; 12               0.804                 5             2</code></pre>
+<p>There isn’t a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.</p>
+</div>
+<div id="cross-validation-for-evaluation" class="section level2" number="10.7">
+<h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
+<p>In Section <a href="dldnn.html#dnncross">8.4</a>, we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter dataset we are using is big enough that we have enough data to use a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. However, it is important to understand how to implement other resampling strategies for situations when your data budget may not be as plentiful or when your needs to computing performance metrics are more precise.</p>
+<div class="sourceCode" id="cb616"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb616-1"><a href="dlcnn.html#cb616-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<span id="cb616-2"><a href="dlcnn.html#cb616-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb616-3"><a href="dlcnn.html#cb616-3" aria-hidden="true" tabindex="-1"></a>kick_folds</span></code></pre></div>
+<pre><code>#&gt; #  5-fold cross-validation 
+#&gt; # A tibble: 5 x 2
+#&gt;   splits                 id   
+#&gt;   &lt;list&gt;                 &lt;chr&gt;
+#&gt; 1 &lt;split [161673/40419]&gt; Fold1
+#&gt; 2 &lt;split [161673/40419]&gt; Fold2
+#&gt; 3 &lt;split [161674/40418]&gt; Fold3
+#&gt; 4 &lt;split [161674/40418]&gt; Fold4
+#&gt; 5 &lt;split [161674/40418]&gt; Fold5</code></pre>
+<p>Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model <code>v</code> times and get <code>v</code> measures, for more reliability.</p>
+<p>Last time we saw how to create a custom function to handle preprocessing, fitting, and evaluation. We will use the same approach of creating the function, but this time use the model specification from Section <a href="dlcnn.html#firstcnn">10.2</a>.</p>
+<div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a>fit_split <span class="ot">&lt;-</span> <span class="cf">function</span>(split, prepped_rec) {</span>
+<span id="cb618-2"><a href="dlcnn.html#cb618-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## preprocessing</span></span>
+<span id="cb618-3"><a href="dlcnn.html#cb618-3" aria-hidden="true" tabindex="-1"></a>  x_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">analysis</span>(split),</span>
+<span id="cb618-4"><a href="dlcnn.html#cb618-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb618-5"><a href="dlcnn.html#cb618-5" aria-hidden="true" tabindex="-1"></a>  x_val   <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">assessment</span>(split),</span>
+<span id="cb618-6"><a href="dlcnn.html#cb618-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb618-7"><a href="dlcnn.html#cb618-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb618-8"><a href="dlcnn.html#cb618-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create model</span></span>
+<span id="cb618-9"><a href="dlcnn.html#cb618-9" aria-hidden="true" tabindex="-1"></a>  y_train <span class="ot">&lt;-</span> <span class="fu">analysis</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
+<span id="cb618-10"><a href="dlcnn.html#cb618-10" aria-hidden="true" tabindex="-1"></a>  y_val   <span class="ot">&lt;-</span> <span class="fu">assessment</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
+<span id="cb618-11"><a href="dlcnn.html#cb618-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb618-12"><a href="dlcnn.html#cb618-12" aria-hidden="true" tabindex="-1"></a>  mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb618-13"><a href="dlcnn.html#cb618-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb618-14"><a href="dlcnn.html#cb618-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb618-15"><a href="dlcnn.html#cb618-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb618-16"><a href="dlcnn.html#cb618-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb618-17"><a href="dlcnn.html#cb618-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb618-18"><a href="dlcnn.html#cb618-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb618-19"><a href="dlcnn.html#cb618-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compile</span>(</span>
+<span id="cb618-20"><a href="dlcnn.html#cb618-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb618-21"><a href="dlcnn.html#cb618-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb618-22"><a href="dlcnn.html#cb618-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb618-23"><a href="dlcnn.html#cb618-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb618-24"><a href="dlcnn.html#cb618-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb618-25"><a href="dlcnn.html#cb618-25" aria-hidden="true" tabindex="-1"></a>  <span class="do">## fit model</span></span>
+<span id="cb618-26"><a href="dlcnn.html#cb618-26" aria-hidden="true" tabindex="-1"></a>  mod <span class="sc">%&gt;%</span></span>
+<span id="cb618-27"><a href="dlcnn.html#cb618-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(</span>
+<span id="cb618-28"><a href="dlcnn.html#cb618-28" aria-hidden="true" tabindex="-1"></a>      x_train,</span>
+<span id="cb618-29"><a href="dlcnn.html#cb618-29" aria-hidden="true" tabindex="-1"></a>      y_train,</span>
+<span id="cb618-30"><a href="dlcnn.html#cb618-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb618-31"><a href="dlcnn.html#cb618-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">validation_data =</span> <span class="fu">list</span>(x_val, y_val),</span>
+<span id="cb618-32"><a href="dlcnn.html#cb618-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb618-33"><a href="dlcnn.html#cb618-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb618-34"><a href="dlcnn.html#cb618-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb618-35"><a href="dlcnn.html#cb618-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb618-36"><a href="dlcnn.html#cb618-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">## evaluate model</span></span>
+<span id="cb618-37"><a href="dlcnn.html#cb618-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keras_predict</span>(mod, x_val, y_val) <span class="sc">%&gt;%</span></span>
+<span id="cb618-38"><a href="dlcnn.html#cb618-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span>
+<span id="cb618-39"><a href="dlcnn.html#cb618-39" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>We can <code>map()</code> this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.</p>
+<div class="sourceCode" id="cb619"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb619-1"><a href="dlcnn.html#cb619-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="ot">&lt;-</span> kick_folds <span class="sc">%&gt;%</span></span>
+<span id="cb619-2"><a href="dlcnn.html#cb619-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">validation =</span> <span class="fu">map</span>(splits, fit_split, kick_prep))</span>
+<span id="cb619-3"><a href="dlcnn.html#cb619-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb619-4"><a href="dlcnn.html#cb619-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
+<pre><code>#&gt; #  5-fold cross-validation 
+#&gt; # A tibble: 5 x 3
+#&gt;   splits                 id    validation      
+#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;          
+#&gt; 1 &lt;split [161673/40419]&gt; Fold1 &lt;tibble [4 × 3]&gt;
+#&gt; 2 &lt;split [161673/40419]&gt; Fold2 &lt;tibble [4 × 3]&gt;
+#&gt; 3 &lt;split [161674/40418]&gt; Fold3 &lt;tibble [4 × 3]&gt;
+#&gt; 4 &lt;split [161674/40418]&gt; Fold4 &lt;tibble [4 × 3]&gt;
+#&gt; 5 &lt;split [161674/40418]&gt; Fold5 &lt;tibble [4 × 3]&gt;</code></pre>
+<p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
+<div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="dlcnn.html#cb621-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
+<span id="cb621-2"><a href="dlcnn.html#cb621-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 20 x 5
+#&gt;    splits                 id    .metric     .estimator .estimate
+#&gt;    &lt;list&gt;                 &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt;  1 &lt;split [161673/40419]&gt; Fold1 accuracy    binary         0.825
+#&gt;  2 &lt;split [161673/40419]&gt; Fold1 kap         binary         0.650
+#&gt;  3 &lt;split [161673/40419]&gt; Fold1 mn_log_loss binary         0.897
+#&gt;  4 &lt;split [161673/40419]&gt; Fold1 roc_auc     binary         0.872
+#&gt;  5 &lt;split [161673/40419]&gt; Fold2 accuracy    binary         0.825
+#&gt;  6 &lt;split [161673/40419]&gt; Fold2 kap         binary         0.650
+#&gt;  7 &lt;split [161673/40419]&gt; Fold2 mn_log_loss binary         0.870
+#&gt;  8 &lt;split [161673/40419]&gt; Fold2 roc_auc     binary         0.874
+#&gt;  9 &lt;split [161674/40418]&gt; Fold3 accuracy    binary         0.825
+#&gt; 10 &lt;split [161674/40418]&gt; Fold3 kap         binary         0.649
+#&gt; 11 &lt;split [161674/40418]&gt; Fold3 mn_log_loss binary         0.889
+#&gt; 12 &lt;split [161674/40418]&gt; Fold3 roc_auc     binary         0.872
+#&gt; 13 &lt;split [161674/40418]&gt; Fold4 accuracy    binary         0.824
+#&gt; 14 &lt;split [161674/40418]&gt; Fold4 kap         binary         0.647
+#&gt; 15 &lt;split [161674/40418]&gt; Fold4 mn_log_loss binary         0.903
+#&gt; 16 &lt;split [161674/40418]&gt; Fold4 roc_auc     binary         0.872
+#&gt; 17 &lt;split [161674/40418]&gt; Fold5 accuracy    binary         0.828
+#&gt; 18 &lt;split [161674/40418]&gt; Fold5 kap         binary         0.654
+#&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         0.879
+#&gt; 20 &lt;split [161674/40418]&gt; Fold5 roc_auc     binary         0.876</code></pre>
+<p>We can summarize the unnested results to match what we normally would get from <code>collect_metrics()</code></p>
+<div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="dlcnn.html#cb623-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
+<span id="cb623-2"><a href="dlcnn.html#cb623-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation) <span class="sc">%&gt;%</span></span>
+<span id="cb623-3"><a href="dlcnn.html#cb623-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(.metric) <span class="sc">%&gt;%</span></span>
+<span id="cb623-4"><a href="dlcnn.html#cb623-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb623-5"><a href="dlcnn.html#cb623-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(.estimate),</span>
+<span id="cb623-6"><a href="dlcnn.html#cb623-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb623-7"><a href="dlcnn.html#cb623-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_err =</span> <span class="fu">sd</span>(.estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb623-8"><a href="dlcnn.html#cb623-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 4
+#&gt;   .metric      mean     n  std_err
+#&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
+#&gt; 1 accuracy    0.826     5 0.000560
+#&gt; 2 kap         0.650     5 0.00110 
+#&gt; 3 mn_log_loss 0.888     5 0.00586 
+#&gt; 4 roc_auc     0.873     5 0.000840</code></pre>
+<p>The metrics have little variance just like they did last time, which is reassuring that our model is robust with respect to the evaluation metrics.</p>
+</div>
+<div id="cnnfull" class="section level2" number="10.8">
+<h2><span class="header-section-number">10.8</span> The full game: CNN</h2>
+<p>We’ve come a long way in this chapter, and looked at the many different modifications to the simple CNN model we started with. Most of the alterations didn’t add much so this final model is not going to be much different than what we have seen so far.</p>
+<div id="cnnfullpreprocess" class="section level3" number="10.8.1">
+<h3><span class="header-section-number">10.8.1</span> Preprocess the data</h3>
+<p>For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.</p>
+<div class="sourceCode" id="cb625"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb625-1"><a href="dlcnn.html#cb625-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
+<span id="cb625-2"><a href="dlcnn.html#cb625-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb625-3"><a href="dlcnn.html#cb625-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb625-4"><a href="dlcnn.html#cb625-4" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb625-5"><a href="dlcnn.html#cb625-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb625-6"><a href="dlcnn.html#cb625-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb625-7"><a href="dlcnn.html#cb625-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
+<span id="cb625-8"><a href="dlcnn.html#cb625-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb625-9"><a href="dlcnn.html#cb625-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb625-10"><a href="dlcnn.html#cb625-10" aria-hidden="true" tabindex="-1"></a>kick_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb625-11"><a href="dlcnn.html#cb625-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb625-12"><a href="dlcnn.html#cb625-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
+<pre><code>#&gt; [1] 202092     30</code></pre>
+</div>
+<div id="cnnfullmodel" class="section level3" number="10.8.2">
+<h3><span class="header-section-number">10.8.2</span> Specify the model</h3>
+<p>Instead of using specific validation data that we can then compute performance metrics for, let’s go back to specifying <code>validation_split = 0.1</code> and let the Keras model choose the validation set.</p>
+<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="dlcnn.html#cb627-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb627-2"><a href="dlcnn.html#cb627-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb627-3"><a href="dlcnn.html#cb627-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb627-4"><a href="dlcnn.html#cb627-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>,</span>
+<span id="cb627-5"><a href="dlcnn.html#cb627-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb627-6"><a href="dlcnn.html#cb627-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb627-7"><a href="dlcnn.html#cb627-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb627-8"><a href="dlcnn.html#cb627-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb627-9"><a href="dlcnn.html#cb627-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb627-10"><a href="dlcnn.html#cb627-10" aria-hidden="true" tabindex="-1"></a>final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb627-11"><a href="dlcnn.html#cb627-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb627-12"><a href="dlcnn.html#cb627-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb627-13"><a href="dlcnn.html#cb627-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb627-14"><a href="dlcnn.html#cb627-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb627-15"><a href="dlcnn.html#cb627-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb627-16"><a href="dlcnn.html#cb627-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb627-17"><a href="dlcnn.html#cb627-17" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb627-18"><a href="dlcnn.html#cb627-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb627-19"><a href="dlcnn.html#cb627-19" aria-hidden="true" tabindex="-1"></a>    kick_matrix,</span>
+<span id="cb627-20"><a href="dlcnn.html#cb627-20" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
+<span id="cb627-21"><a href="dlcnn.html#cb627-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb627-22"><a href="dlcnn.html#cb627-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
+<span id="cb627-23"><a href="dlcnn.html#cb627-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb627-24"><a href="dlcnn.html#cb627-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb627-25"><a href="dlcnn.html#cb627-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb627-26"><a href="dlcnn.html#cb627-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb627-27"><a href="dlcnn.html#cb627-27" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
+<pre><code>#&gt; 
+#&gt; Final epoch (plot to see history):
+#&gt;         loss: 0.03223
+#&gt;     accuracy: 0.9932
+#&gt;     val_loss: 0.7614
+#&gt; val_accuracy: 0.8538</code></pre>
+<p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
+<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a>kick_matrix_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
+<span id="cb629-2"><a href="dlcnn.html#cb629-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb629-3"><a href="dlcnn.html#cb629-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_matrix_test, kickstarter_test<span class="sc">$</span>state)</span>
+<span id="cb629-4"><a href="dlcnn.html#cb629-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 4 x 3
+#&gt;   .metric     .estimator .estimate
+#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+#&gt; 1 accuracy    binary         0.850
+#&gt; 2 kap         binary         0.700
+#&gt; 3 mn_log_loss binary         0.791
+#&gt; 4 roc_auc     binary         0.893</code></pre>
+<p>This is our best performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dlcnn.html#fig:cnnfinalroc">10.11</a>.</p>
+<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="dlcnn.html#cb631-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb631-2"><a href="dlcnn.html#cb631-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb631-3"><a href="dlcnn.html#cb631-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:cnnfinalroc"></span>
+<img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.png" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<p class="caption">
+FIGURE 10.11: ROC curve for final CNN model predictions on testing set of Kickstarter campaign success
+</p>
+</div>
+<p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model’s performance using a confusion matrix as well, in Figure <a href="dlcnn.html#fig:cnnheatmapfinal">10.12</a>.</p>
+<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="dlcnn.html#cb632-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb632-2"><a href="dlcnn.html#cb632-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb632-3"><a href="dlcnn.html#cb632-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:cnnheatmapfinal"></span>
+<img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.png" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<p class="caption">
+FIGURE 10.12: Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success
+</p>
+</div>
+<p>Notice that this final model performs better then any of the models we have tried so far in this chapter, Chapter <a href="dldnn.html#dldnn">8</a>, and Chapter <a href="dllstm.html#dllstm">9</a>.</p>
+<div class="rmdnote">
+<p>
+For this particular dataset of short text blurbs, a CNN model able to learn local features performed the best, better than either a densely connected neural network or an LSTM.
+</p>
+</div>
+</div>
+</div>
+<div id="dlcnnsummary" class="section level2" number="10.9">
+<h2><span class="header-section-number">10.9</span> Summary</h2>
+<p>CNNs are a type of neural network that can learn local spatial patterns. They essentially perform feature extraction, which can then be used efficiently in later layers of a network. Their simplicity and fast running time, compared to models like LSTMs, makes them excellent candidates for supervised models for text.</p>
+<div id="in-this-chapter-you-learned-9" class="section level3" number="10.9.1">
+<h3><span class="header-section-number">10.9.1</span> In this chapter, you learned:</h3>
+<ul>
+<li>how to preprocess text data for CNN models</li>
+<li>about CNN network architectures</li>
+<li>how CNN layers can be stacked to extract patterns of varying detail</li>
+<li>how byte pair encoding can be used to tokenize for finer detail</li>
+<li>how to do hyperparameter search in Keras with tfruns</li>
+<li>how to evaluate CNN models for text</li>
+</ul>
+
+</div>
+</div>
+</div>
+
+
+
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bengio2012practical" class="csl-entry">
+Bengio, Yoshua. 2012. <span>“Practical Recommendations for Gradient-Based Training of Deep Architectures.”</span> <a href="http://arxiv.org/abs/1206.5533">http://arxiv.org/abs/1206.5533</a>.
+</div>
+<div id="ref-Gage1994ANA" class="csl-entry">
+Gage, P. 1994. <span>“A New Algorithm for Data Compression.”</span> <em>The C Users Journal Archive</em> 12: 23–38.
+</div>
+<div id="ref-kim2014" class="csl-entry">
+Kim, Yoon. 2014. <span>“Convolutional Neural Networks for Sentence Classification.”</span> In <em>Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (<span>EMNLP</span>)</em>, 1746–51. Doha, Qatar: Association for Computational Linguistics. <a href="https://doi.org/10.3115/v1/D14-1181">https://doi.org/10.3115/v1/D14-1181</a>.
+</div>
+<div id="ref-ribeiro2016why" class="csl-entry">
+Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> <a href="http://arxiv.org/abs/1602.04938">http://arxiv.org/abs/1602.04938</a>.
+</div>
+<div id="ref-Vosoughi2016" class="csl-entry">
+Vosoughi, Soroush, Prashanth Vijayaraghavan, and Deb Roy. 2016. <span>“Tweet2Vec: Learning Tweet Embeddings Using Character-Level CNN-LSTM Encoder-Decoder.”</span> In, 1041–44. <a href="https://doi.org/10.1145/2911451.2914762">https://doi.org/10.1145/2911451.2914762</a>.
+</div>
+<div id="ref-Zhang2015" class="csl-entry">
+Zhang, Xiang, Junbo Zhao, and Yann LeCun. 2015. <span>“Character-Level Convolutional Networks for Text Classification.”</span> In <em>Proceedings of the 28th International Conference on Neural Information Processing Systems - Volume 1</em>, 649–57. NIPS’15. Cambridge, MA, USA: MIT Press.
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="18">
+<li id="fn18"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref18" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="dllstm.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="text-models-in-the-real-world.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": null,
+"edit": {
+"link": "https://github.com/EmilHvitfeldt/smltar/edit/master/10_dl_cnn.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
