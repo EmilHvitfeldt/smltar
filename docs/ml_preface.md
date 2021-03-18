@@ -1,0 +1,42 @@
+# (PART) Machine Learning Methods {-}
+
+# Foreword {#mlforeword .unnumbered}
+
+It's time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context. In the next two chapters, we will focus putting into practice such machine learning algorithms as:
+
+- naive Bayes, 
+- support vector machines (SVM) [@Boser1992], and 
+- regularized linear models such as implemented in [glmnet](https://glmnet.stanford.edu/) [@Friedman2010].
+
+We start in Chapter \@ref(mlregression) with exploring regression models and continue in Chapter \@ref(mlclassification) with classification models. We will use the [tidymodels](https://www.tidymodels.org/) framework for resampling, preprocessing, fitting, and evaluation. As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the foreword for the deep learning chapters.
+
+Before we starting fitting these models to real datasets, let's consider how to think about algorithmic bias for predictive modeling.
+Rachel Thomas proposed a checklist at [ODSC West 2019](https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/) for algorithmic basic in machine learning.
+
+## Should we even be doing this? {-}
+
+This is always the first step. Machine learning algorithms involve math and data, but that does not mean they are neutral. They can be used for purposes that are helpful, harmful, or even unethical.
+
+## What bias is already in the data? {-}
+
+Chapter \@ref(mlregression) uses a dataset of United States Supreme Court opinions, with an uneven distribution of years. There are many more opinions from more recent decades than from earlier ones. Bias like this is extremely common in datasets and must be considered in modeling. In this case, we show how using regularized linear models results in better predictions across years than other approaches (Section \@ref(comparerf)).
+
+## Can the code and data be audited? {-}
+
+In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the datasets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.
+
+## What are the error rates for sub-groups? {-}
+
+In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the [yardstick](https://yardstick.tidymodels.org/) package makes this task well within the reach of data practitioners.
+
+## What is the accuracy of a simple rule-based alternative? {-}
+
+Chapter \@ref(mlclassification) shows how to train models to predict the category of a user complaint using sophisticated preprocessing steps and machine learning algorithms, but such a complaint could be categorized using simple regular expressions (Appendix \@ref(regexp)), perhaps combined with other rules. Straightforward heuristics are easy to implement, maintain, and audit, compared to machine learning models; consider comparing the accuracy of models to simpler options.
+
+## What processes are in place to handle appeals or mistakes? {-}
+
+If models such as those built in Chapter \@ref(mlclassification) were put into production by an organization, what would happen if a complaint was classified incorrectly? We as data practitioners typically (hopefully) have a reasonable estimate of the true positive rate and true negative rate for models we train, so processes to handle misclassifications can be built with a good understanding of how often they will be used.
+
+## How diverse is the team that built it? {-}
+
+The two-person team that wrote this book includes perspectives from a man and woman, and from someone who has always lived inside the United States and someone who is from a European country. However, we are both white with similar educational backgrounds. We must be aware of how the limited life experiences of individuals training and assessing machine learning models can cause unintentional harm.
