@@ -587,8 +587,6 @@ This regex used to remove the punctuation is a little complicated so let's discu
 \begin{rmdnote}
 If you are in a situation where you want to avoid the dependencies that
 come with \texttt{purrr}, you can use \texttt{lapply()} instead.
-
-\texttt{lapply(str\_remove\_all,\ pattern\ =\ "\textbackslash{}\^{}{[}:punct:{]}+\textbar{}{[}:punct:{]}+\$")}
 \end{rmdnote}
 
 Now let's see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen. 
