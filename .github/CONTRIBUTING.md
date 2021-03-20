@@ -9,15 +9,16 @@ Here are some helpful hints in getting the code in the book 📖 to run:
 If you have both Anaconda and miniconda installed on your computer, you may have trouble installing and using the `"spacyr"` engine. To successfully install spaCy into an environment that R can find and use, first create a miniconda environment and then install spaCy into it.
 
 ```r
-reticulate::conda_create("r-spacyr", 
+reticulate::conda_create("spacy_condaenv", 
                          conda = "/path/to/Library/r-miniconda/bin/python", 
                          packages = "python==3.6.9")
 spacyr::spacy_install(conda = "/path/to/Library/r-miniconda/bin/python", 
-                      envname = "r-spacyr")
+                      python_version = "3.6.9",
+                      envname = "spacy_condaenv")
 ```
 
 Then, include a line such as this in any script using the `"spacyr"` engine for tokenization or text handling:
 
 ```r
-spacyr::spacy_initialize(condaenv = "r-spacyr")
+spacyr::spacy_initialize()
 ```
