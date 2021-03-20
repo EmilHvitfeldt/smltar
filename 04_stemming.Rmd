@@ -100,13 +100,13 @@ Notice that the code here is a little different (we had to use `unnest()`) and t
 hunspell_stem("discontented")
 ```
 
-We have **two** stems! This stemmer works differently; it uses both morphological analysis of a word and existing dictionaries to find possible stems. It's possible to end up with more than one, and it's possible for a stem to be a word that is not related by meaning to the original word. For example, one of the stems of "number" is "numb" with this library. The Hunspell library was built to be a spell checker, so depending on your analytical purposes, it may not be an appropriate choice.
+We have *two* stems! This stemmer works differently; it uses both morphological analysis of a word and existing dictionaries to find possible stems. It's possible to end up with more than one, and it's possible for a stem to be a word that is not related by meaning to the original word. For example, one of the stems of "number" is "numb" with this library. The Hunspell library was built to be a spell checker, so depending on your analytical purposes, it may not be an appropriate choice.
 
 ## Should you use stemming at all?
 
 You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.
 
-Why does stemming often help, if you are training a machine learning model for text? Stemming **reduces the feature space** of text data. Let's see this in action, with a dataset of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard dataset of stopwords?
+Why does stemming often help, if you are training a machine learning model for text? Stemming *reduces the feature space* of text data. Let's see this in action, with a dataset of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard dataset of stopwords?
 
 ```{r tidy_hca}
 library(scotus)
