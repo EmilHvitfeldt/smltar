@@ -99,10 +99,10 @@ scotus_wf
 Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a support vector machine (SVM) model. While they don't see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification [@Joachims1998] and can give good performance [@Vantu2016].
 
 ```{block2, type = "rmdnote"}
-An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section \@ref(tktk) for tuning model hyperparameters).
+An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section \@ref(tunelasso) for tuning model hyperparameters).
 ```
 
-Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let's use the **LiblineaR** engine [R-LiblineaR].
+Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let's use the **LiblineaR** engine [@R-LiblineaR].
 
 ```{r svmspec}
 svm_spec <- svm_linear() %>%
@@ -127,7 +127,7 @@ svm_fit %>%
   arrange(-estimate)
 ```
 
-The term `Bias` here means the same thing as an intercept. We see here, what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
+The term `Bias` here means the same thing as an intercept. We see here what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
 
 What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?
 
@@ -156,7 +156,7 @@ Yet another option for evaluating or comparing models is to use a separate valid
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
 set.seed(123)
@@ -416,11 +416,11 @@ The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig
 This result is not generalizable to all data sets and contexts, but the approach outlined in this section **is** generalizable. 
 ```
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results for smart and stopword-iso are worse than removing no stopwords at all (remember that the RMSE was `r first_attemp_rmse` years in Section \@ref(firstregressionevaluation)). This indicates that removing a small stop word list is a good choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was `r first_attemp_rmse` years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
 
-This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
+When removing stop words does appear to help a model, it's good to know that removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
 
-## Case study: varying n-grams 
+## Case study: varying n-grams {#casestudyngrams}
 
 Each model trained so far in this chapter has involved single words or _unigrams_, but using n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words, as well as effects from word order, that can be predictive.
 
@@ -490,7 +490,7 @@ These sets of results contain metrics computed for the model with that tokenizat
 collect_metrics(bigram_rs)
 ```
 
-We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
+We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse).
 
 ```{r ngramrmse, dependson="ngramrs", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
 list(`1` = unigram_rs,
@@ -511,9 +511,9 @@ list(`1` = unigram_rs,
   )
 ```
 
-Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much. 
+Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using unigrams alone performs best for this corpus of Supreme Court opinions. To be able to incorporate the more complex information in bigrams or trigrams, we would need to increase the number of tokens in the model considerably. 
 
-Keep in mind that adding n-grams is computationally expensive, especially compared to the improvement in model performance gained. We can benchmark the whole model workflow, including preprocessing and modeling. Using bigrams plus unigrams takes more than twice as long to train than only unigrams, and adding in trigrams as well takes almost five times as long as training on unigrams alone.
+Keep in mind that adding n-grams is computationally expensive to start with, especially compared to the typical improvement in model performance gained. We can benchmark the whole model workflow, including preprocessing and modeling. Using bigrams plus unigrams takes more than twice as long to train than only unigrams (number of tokens held constant), and adding in trigrams as well takes almost five times as long as training on unigrams alone.
 
 ## Case study: lemmatization {#mlregressionlemmatization}
 
@@ -798,27 +798,20 @@ In this chapter, we started from the beginning and then explored both different 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - _tune_ the number of tokens used in the model to find a value that fits our needs,
 - include both unigrams and bigrams,
-- remove the Snowball stop word lexicon,
 - choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and
 - finally evaluate on the testing set, which we have not touched at all yet.
+
+We will include a much larger number of tokens than before, which should give us the latitude to include both unigrams and bigrams, despite the result we saw in Section \@ref(casestudyngrams).
 
 ### Preprocess the data
 
 First, let's create the data preprocessing recipe. By setting the tokenization options to `list(n = 2, n_min = 1)`, we will include both unigrams and bigrams in our model. 
 
-```{block, type = "rmdnote"}
-We can remove the Snowball lexicon of stop words from the text with the option `stopwords = stopwords::stopwords(source = "snowball")`; this will remove the stop words before tokenizing so that neither the unigrams or bigrams will include these stop words. 
-```
-
 When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value. Before we set `max_tokens = 1e3` to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.
 
 ```{r finalscotusrec, dependson="scotussplit"}
 final_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(
-    text, token = "ngrams",
-    options = list(n = 2, n_min = 1,
-                   stopwords = stopwords::stopwords(source = "snowball"))
-  ) %>%
+  step_tokenize(text, token = "ngrams", options = list(n = 2, n_min = 1)) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
@@ -854,7 +847,7 @@ tune_wf
 Before we tune the model, we need to set up a set of possible parameter values to try. 
 
 ```{block, type = "rmdwarning"}
-There is _one_ tunable parameters in this model, the maximum number of tokens included in the model. 
+There is _one_ tunable parameter in this model, the maximum number of tokens included in the model. 
 ```
 
 Let's include different possible values for this parameter starting from the value we've already tried, for a combination of six models.
@@ -902,7 +895,9 @@ final_rs %>%
   )
 ```
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model, with the default 2% loss.
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
+
+Let's choose by percent loss compared to the best model, with the default 2% loss.
 
 ```{r chosenmae, dependson="finalscotusrs"}
 chosen_mae <- final_rs %>%
@@ -969,10 +964,10 @@ scotus_fit %>%
   )
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "therefore" and "assembly", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "contended" and "therefore", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
-Some of these features are unigrams and some are bigrams, but notice that none of either include stop words included in the Snowball lexicon because we removed them.
+Some of these features are unigrams and some are bigrams.
 ```
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
