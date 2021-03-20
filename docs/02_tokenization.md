@@ -39,8 +39,8 @@ These elements don't contain any metadata or information to tell us which charac
 In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input into pieces (tokens) that correspond to the type [@Manning:2008:IIR:1394399]. Figure \@ref(fig:tokenizationdiag) outlines this process.
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/tokenization-black-box.png" alt="A black box representation of a tokenizer. The text has been lowercased and punctuation has been removed before the text is split." width="90%" />
-<p class="caption">(\#fig:tokenizationdiag)A black box representation of a tokenizer. The text has been lowercased and punctuation has been removed before the text is split.</p>
+<img src="diagram-files/tokenization-black-box.png" alt="A black box representation of a tokenizer.The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split." width="90%" />
+<p class="caption">(\#fig:tokenizationdiag)A black box representation of a tokenizer.The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.</p>
 </div>
 
 Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.
@@ -832,11 +832,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       75.7ms   78.1ms     12.7     4.57MB     1.41
-#> 2 tokenizers   88.9ms   92.5ms     10.8     1.01MB     1.20
-#> 3 text2vec     77.6ms   79.5ms     12.6    19.33MB     1.40
-#> 4 quanteda    137.2ms  145.3ms      6.96     8.7MB     2.98
-#> 5 base R      303.4ms  308.4ms      3.24   10.51MB     1.39
+#> 1 corpus       92.5ms    101ms     10.0     4.57MB    0    
+#> 2 tokenizers  115.3ms    120ms      8.31    1.01MB    0.924
+#> 3 text2vec     97.7ms    102ms      9.81   19.32MB    1.09 
+#> 4 quanteda    183.1ms    190ms      5.28     8.7MB    1.32 
+#> 5 base R        353ms    360ms      2.76   10.51MB    1.18
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.
