@@ -90,14 +90,13 @@ complaints_rec <-
 ```
 
 Now we add steps to process the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
-Next we remove stop words with `step_stopwords()`; the default choice is the Snowball stop word list, but custom lists can be provided too. Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
+Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
 
 ```{r complaintrec4, dependson="complaintrec1"}
 library(textrecipes)
 
 complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
@@ -220,7 +219,7 @@ nb_rs_predictions %>%
   autoplot(type = "heatmap")
 ```
 
-In Figure \@ref(fig:firstheatmap), the diagonal squares have darker shades than the off diagonal squares. This is a good sign, meaning that our model is right more often then not! However, this first model is struggling somewhat since there are close to even odds when predicting something from the "Other" class.
+In Figure \@ref(fig:firstheatmap), the square for "Credit"/"Credit" has a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not for the positive case! However, this first model is struggling somewhat since such a high number of observations from the "Other" class are being mispredicted.
 
 ```{block, type = "rmdwarning"}
 One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.
@@ -415,7 +414,7 @@ tune_rs %>%
   show_best("roc_auc")
 ```
 
-```{r tunersauc, dependson="complaintstuners"}
+```{r tunersauc, include=FALSE, dependson="complaintstuners"}
 tune_rs_auc <- show_best(tune_rs, "roc_auc") %>%
   pull(mean) %>%
   max() %>%
@@ -475,7 +474,7 @@ We can change how our text data is represented to take advantage of its sparsity
 
 To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package hardhat.
 
-```{block, type = "rmdwarning"}
+```{block, type = "rmdpackage"}
 The [hardhat](https://hardhat.tidymodels.org/) package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
 ```
 
@@ -588,8 +587,8 @@ There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
 We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
 
-```{block, type = "rmdnote"}
-The themis package provides many more algorithms to deal with imbalanced data.
+```{block, type = "rmdpacakge"}
+The **themis** package provides many more algorithms to deal with imbalanced data during data preprocessing.
 ```
 
 We have to create a new recipe specification from scratch, since we are dealing with new training data this time.
@@ -602,7 +601,6 @@ multicomplaints_rec <-
   recipe(product ~ consumer_complaint_narrative,
          data = multicomplaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative) %>%
   step_downsample(product)
@@ -664,7 +662,7 @@ In binary classification, there is one right answer and one wrong answer; in thi
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap, opts.label = "fig.square", fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal"}
+```{r multiheatmap, fig.width = 9, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -680,7 +678,7 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r multiheatmapminusdiag, opts.label = "fig.square", fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal"}
+```{r multiheatmapminusdiag, fig.width = 9, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -751,7 +749,6 @@ Now we add steps to process the text of the complaints, as before.
 ```{r complaintrec8, dependson="complaintrec1"}
 more_vars_rec <- more_vars_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
@@ -960,7 +957,7 @@ As long as you can reasonably formulate what you are trying to count, chances ar
 This is where having a little bit of knowledge about regular expressions pays off.
 
 ```{block2, type = "rmdnote"}
-The **textfeatures** [R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.
+The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.
 ```
 
 Your specific domain knowledge may provide specific guidance about feature engineering for text.
@@ -1153,9 +1150,8 @@ For our final model, let's use some of the domain-specific features we developed
 - train on the same set of cross-validation resamples used throughout this chapter,
 - include text (but not `tags` or date features, since those did not result in better performance),
 - tune the number of tokens used in the model,
-- include trigrams, bigrams, and unigrams,
+- include bigrams and unigrams,
 - include custom-engineered features,
-- remove the Snowball stop word lexicon, and
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
@@ -1195,9 +1191,8 @@ This data set has many more than 50 of the most common 2000 tokens, but it can s
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_ngram(consumer_complaint_narrative,
-             num_tokens = 3, min_num_tokens = 1) %>%
+             num_tokens = 2, min_num_tokens = 1) %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1363,7 +1358,7 @@ complaints_imp %>%
 Tokens (unigrams or bigrams) like "bank", "interest", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
 
 ```{block, type = "rmdnote"}
-Most of these features are unigrams but a few are bigrams, like "checking account". Notice that almost all are tokens learned directly from the text, but that `percent_censoring`, one of our hand-crafted custom features, is a top feature in terms of variable importance. The more censored a complaint is, the more likely it is to be about credit reporting.
+TODO: CHECK THIS -- Most of these features are unigrams but a few are bigrams, like "checking account". Notice that almost all are tokens learned directly from the text, but that `percent_censoring`, one of our hand-crafted custom features, is a top feature in terms of variable importance. The more censored a complaint is, the more likely it is to be about credit reporting.
 ```
 
 ## Summary {#mlclassificationsummary}
