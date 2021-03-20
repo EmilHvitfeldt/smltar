@@ -165,8 +165,7 @@ Another way to get a stop word list is to create one yourself. Let's explore a f
 
 
 ```{=html}
-<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
-<div style="column-count:5">
+<div style="column-count:5;font-size:11pt;line-height:11.5pt">
 <p>1: the</p>
 <p>2: and</p>
 <p>3: tree</p>
@@ -303,8 +302,7 @@ The word `"tree"` does seem important as it is about the main character, but it 
 
 
 ```{=html}
-<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
-<div style="column-count:5">
+<div style="column-count:5;font-size:11pt;line-height:11.5pt">
 <p>1: the</p>
 <p>2: and</p>
 <p>3: of</p>
@@ -480,8 +478,7 @@ Here is the result when we try to create a cross-language list of stop words, by
 
 
 ```{=html}
-<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
-<div style="column-count:5">
+<div style="column-count:5;font-size:11pt;line-height:11.5pt">
 <p>1: a</p>
 <p>2: de</p>
 <p>3: man</p>
@@ -611,8 +608,7 @@ This didn't work very well because there is very little overlap between common w
 
 
 ```{=html}
-<style>p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}</style>
-<div style="column-count:5">
+<div style="column-count:5;font-size:11pt;line-height:11.5pt">
 <p>1: a</p>
 <p>2: the</p>
 <p>3: and</p>
