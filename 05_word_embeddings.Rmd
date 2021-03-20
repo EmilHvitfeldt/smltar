@@ -252,11 +252,11 @@ tidy_word_vectors %>%
   filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE))
 ```
 
-We now find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
+We now find words about interest, charges, and overdrafts. The top two words are "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
-```{r embeddingpca, dependson="tidywordvectors", fig.width=8, fig.height=12, fig.cap="Word embeddings for Consumer Finance Protection Bureau complaints"}
+```{r embeddingpca, dependson="tidywordvectors", fig.width=8, fig.asp = 1.5, fig.cap="Word embeddings for Consumer Finance Protection Bureau complaints"}
 tidy_word_vectors %>%
     filter(dimension <= 24) %>%
     group_by(dimension) %>%
@@ -343,7 +343,13 @@ We've already explored some sets of "synonyms" in the embedding space we determi
 nearest_neighbors <- function(df, token) {
   df %>%
     widely(
-      ~ . %*% (.[token, ]),
+      ~ {
+        y <- .[rep(token, nrow(.)), ]
+        res <- rowSums(. * y) / 
+          (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
+
+        matrix(res, ncol = 1, dimnames = list(x = names(res)))
+        },
       sort = TRUE,
       maximum_size = NULL
     )(item1, dimension, value) %>%
@@ -425,7 +431,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 - Women's first names are more associated with family and men's first names are more associated with career.
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
-Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/)] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
+Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034).] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
 Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
