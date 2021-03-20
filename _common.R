@@ -67,8 +67,7 @@ library(htmltools)
 library(quanteda)
 
 
-columnize <- function(words, ncol = 5,
-                      style = "p { font-family:'Cabin', sans-serif;font-size:11pt;line-height:11.5pt;padding:0;margin:0}") {
+columnize <- function(words, ncol = 5) {
   
   tagList(
     tags$style(style),
@@ -76,7 +75,8 @@ columnize <- function(words, ncol = 5,
       words %>%
         map(tags$p) %>%
         tagList(),
-      style = sprintf("column-count:%d", as.integer(ncol))
+      style = sprintf("column-count:%d;font-size:11pt;line-height:11.5pt", 
+                      as.integer(ncol))
     )
   )
   
