@@ -117,6 +117,7 @@ info_new <- tibble(
 )
 info_old <- contribs_old %>% select(login, name, blog)
 info_all <- bind_rows(info_old, info_new)
+contribs_all <- bind_rows(contribs_old, contribs_new)
 contribs_all <- contribs_all %>% 
   left_join(info_all, by = "login") %>% 
   arrange(login)
@@ -132,7 +133,7 @@ contributors <- contributors %>%
     login = paste0("\\@", login),
     desc = ifelse(is.na(name), login, paste0(name, " (", login, ")"))
   )
-cat("This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to all ", nrow(contributors), " people who contributed via GitHub pull requests (in alphabetical order by username): ", sep = "")
+cat("This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to the ", nrow(contributors), " people who contributed via GitHub pull requests (in alphabetical order by username): ", sep = "")
 cat(paste0(contributors$desc, collapse = ", "))
 cat(".\n")
 ```
