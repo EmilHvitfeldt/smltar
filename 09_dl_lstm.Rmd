@@ -42,7 +42,7 @@ kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_sequence_onehot(blurb, sequence_length = max_length)
 ```
 
-After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words with integers representing each token in the vocabulary of `r scales::comma(max_words)` words, as described in detal in Section \@ref(onehotsequence). This is different than the representations we used in Chapters \@ref(mlclassification) and \@ref(mlregression), mainly because all the information about word sequence is encoded in this representation.
+After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words with integers representing each token in the vocabulary of `r scales::comma(max_words)` words, as described in detail in Section \@ref(onehotsequence). This is different than the representations we used in Chapters \@ref(mlclassification) and \@ref(mlregression), mainly because all the information about word sequence is encoded in this representation.
 
 ```{block, type = "rmdwarning"}
 Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).
@@ -624,7 +624,7 @@ We've learned a lot about how to model this dataset over the course of this chap
 
 - We can use `dropout` to reduce overfitting.
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
-- The bidirectional LSTM performed than the regular LSTM, so let's set up each LSTM layer to be able to learn sequences in both directions.
+- The bidirectional LSTM performed better than the regular LSTM, so let's set up each LSTM layer to be able to learn sequences in both directions.
 
 Instead of using specific validation data that we can then compute performance metrics for, let's go back to specifying `validation_split = 0.1` and let the Keras model choose the validation set.
 
