@@ -479,13 +479,14 @@ str_split("This isn't a sentence with hyphenated-words.", "[:space:]") %>%
   map(~ str_remove_all(.x, "^[:punct:]+|[:punct:]+$"))
 ```
 
-This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). These will alternate (`|`) so that we get matches from both sides of the words. The reason we use the quantifier `+` is that there are cases where a word is followed by multiple characters we don't want, such as `"okay..."` and `"Really?!!!"`. We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list. (The example here only has one element.) 
+This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. 
 
-```{block, type = "rmdnote"}
-If you are in a situation where you want to avoid using the **purrr** package, you can use `lapply()` instead. 
+- The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). 
+- The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). 
+- These will alternate (`|`) so that we get matches from both sides of the words. 
+- The reason we use the quantifier `+` is that there are cases where a word is followed by multiple characters we don't want, such as `"okay..."` and `"Really?!!!"`. 
 
-`lapply(str_remove_all, pattern = "\^[:punct:]+|[:punct:]+$")`
-```
+We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list. (The example here only has one element.) 
 
 Now let's see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen. 
 
