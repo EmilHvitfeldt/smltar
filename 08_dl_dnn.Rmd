@@ -13,7 +13,7 @@ Keras provides extensive support for creating and training many kinds of deep le
 The tidymodels framework is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.
 ```
 
-This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
+This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. Furthermore, we will use this chapter as a bridge between the bag-of-words approached we saw in the last section to non-bag-of-words approached we will be working on within these remaining chapters. Keras allows us to incorporate not just the word counts but also their positioning.
 
 Figure \@ref(fig:dnndiag) depicts the neural network architecture *feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The number of layers and nodes within each layer vary and are selected by the practitioner.
 
@@ -301,7 +301,7 @@ dense_model %>% compile(
 ```
 
 ```{block, type = "rmdnote"}
-Notice how the `compile()` function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code.
+Notice how the `compile()` function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code. This is [conscious decision](https://keras.rstudio.com/articles/faq.html#why-are-keras-objects-modified-in-place-) that was made during the creating of the Keras R package to match the data structures and behavior of the underlying Keras library.
 ```
 
 Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
@@ -379,7 +379,7 @@ dense_model %>% compile(
 )
 ```
 
-Now we can fit this model with dropout to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
+Now we can fit this model to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
 
 ```{r val_history}
 val_history <- dense_model %>%

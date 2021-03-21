@@ -198,9 +198,7 @@ There is, however, a trade-off. Adding more layers adds more weights to the mode
 When working with CNNs, the different layers perform different tasks. A convolutional layer extracts local patterns as it slides along the sequences, while a fully connected layer finds global patterns. 
 ```
 
-We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. Yoshua Bengio has a simple rule for this [@bengio2012practical]: 
-
-> Just keep adding layers until the test error does not improve anymore.
+We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
 
 ```{r}
 cnn_double_dense <- keras_model_sequential() %>%
@@ -505,7 +503,6 @@ We noted in Section \@ref(dllimitations) that one of the significant limitations
 As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.
 ```
 
-
 To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
 
 ```{r}
@@ -609,6 +606,10 @@ plot_text_explanations(explanation)
 ```
 
 It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
+
+```{block, type = "rmdnote"}
+The **lime** package is not just limited to explaining CNNs. **lime** can be used with any of the models we have used in this book, even the ones trained with **parsnip**.
+```
 
 ## Case study: hyperparameter search
 
