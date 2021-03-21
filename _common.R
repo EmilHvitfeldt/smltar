@@ -147,3 +147,9 @@ tidy.LiblineaR <- function(x, ...) {
   
   ret
 }
+
+conf_mat_resampled <- function(x) {
+  tune::conf_mat_resampled(x, tidy = FALSE) %>%
+    as.table() %>%
+    conf_mat()
+}
