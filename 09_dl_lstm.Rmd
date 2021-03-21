@@ -175,7 +175,7 @@ state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 Let's also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
 
 ```{block, type = "rmdwarning"}
-When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting [@Srivastava2014].
+When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting [@Srivastava2014]. Dropout is not exclusive to LSTM models, and can be used in many kinds of other network architectures. One way to add dropout to a network is by adding a dropout layer with `layer_dropout()`.
 ```
 
 ```{r}
