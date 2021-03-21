@@ -314,15 +314,10 @@ How small is too small? It is hard to make definitive statements because being a
 
 In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to **pre-trained** word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the [textdata](https://cran.r-project.org/package=textdata) package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
 
-```{r eval=FALSE}
+```{r glove6b, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
 library(textdata)
 
 glove6b <- embedding_glove6b(dimensions = 100)
-glove6b
-```
-
-```{r glove6b, echo=FALSE, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
-load("data/glove6b.rda")
 glove6b
 ```
 
