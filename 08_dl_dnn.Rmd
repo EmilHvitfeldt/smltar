@@ -15,13 +15,13 @@ The tidymodels framework is modular, so we can use it for certain tasks without 
 
 This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
 
-Figure \@ref(fig:dnndiag) depicts the neural network architecture *feed-forward*. The input comes in at once and is deeply connected with the first hidden layer. The neurons in any given layer are only connected to the next layer. The number of layers and nodes within each layer should be selected by the practitioner.
+Figure \@ref(fig:dnndiag) depicts the neural network architecture *feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The number of layers and nodes within each layer vary and are selected by the practitioner.
 
-```{r rnndiag, echo= FALSE, fig.cap="A high-level diagram of a feed-forward neural network. The lines connecting the nodes have been shaded differently to illustrate how the network has different weights.", out.width="90%"}
+```{r rnndiag, echo= FALSE, fig.cap="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.", out.width="90%"}
 knitr::include_graphics("diagram-files/dnn-architecture.png")
 ```
 
-Figure \@ref(fig:dnndiag) shows the input as words, this is not an accurate representation of a neural network. These words will in practice be represented by embedding vectors since these networks can only work with numeric variables.
+Figure \@ref(fig:dnndiag) shows the input units with words, but this is not an entirely accurate representation of a neural network. These words will in practice be represented by embedding vectors because these networks can only work with numeric variables.
 
 ## Kickstarter data {#kickstarter}
 
