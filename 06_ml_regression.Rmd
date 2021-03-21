@@ -42,6 +42,10 @@ This sample of opinions reflects the distribution over time of available opinion
 
 Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
+```{block, type = "rmdpackage"}
+**tidymodels** is a collection of packages for modeling and machine learning using tidyverse principles. These packages facilities preprocessing, modeling and evaluation.
+```
+
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
 set.seed(1234)
@@ -55,6 +59,10 @@ scotus_test <- testing(scotus_split)
 ```
 
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
+
+```{block, type = "rmdpackage"}
+**textrecipes** extends the **recipes** package by providing steps that turn columns containing text into numeric columns. These steps can perform the actions we explored in the first section of this book.
+```
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
