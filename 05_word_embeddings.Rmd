@@ -217,7 +217,7 @@ nearest_neighbors <- function(df, token) {
 }
 ```
 
-This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and summations to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word and returns a dataframe sorted by similarity.
+This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and sums to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
 
 What words are closest to `"error"` in the data set of CFPB complaints, as determined by our word embeddings?
 
@@ -244,7 +244,7 @@ tidy_word_vectors %>%
     nearest_neighbors("fee")
 ```
 
-We find a lot of dollar amounts which makes sense. Let us filter out the numbers to see what words are similar to `"fee'`
+We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to `"fee'`
 
 ```{r dependson=c("tidywordvectors", "nearestsynonyms")}
 tidy_word_vectors %>%
