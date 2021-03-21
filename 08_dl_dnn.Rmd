@@ -301,7 +301,7 @@ dense_model %>% compile(
 ```
 
 ```{block, type = "rmdnote"}
-Notice how the `compile()` function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code.
+Notice how the `compile()` function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code. This is [conscious decision](https://keras.rstudio.com/articles/faq.html#why-are-keras-objects-modified-in-place-) that was made during the creating of the Keras R package to match the data structures and behavior of the underlying Keras library.
 ```
 
 Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
