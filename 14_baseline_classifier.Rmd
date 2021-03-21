@@ -1,0 +1,105 @@
+# Baseline linear classifier {#appendixbaseline}
+
+In Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn) we demonstrate in detail how to train and evaluate different kinds of deep learning classifiers for the Kickstarter data set of campaign blurbs and whether each campaign was successful or not. This Appendix shows a baseline linear classification model for this data set using machine learning techniques like those used in Chapters \@ref(mlregression) and \@ref(mlclassification). It serves the purpose of comparison with the deep learning techniques, and also as a succinct summary of a basic supervised machine learning analysis for text.
+
+This machine learning analysis is presented with only minimal narrative; see Chapters \@ref(mlregression) and \@ref(mlclassification) for more explanation and details.
+
+
+## Read in the data
+
+```{r}
+library(tidyverse)
+kickstarter <- read_csv("data/kickstarter.csv.gz") %>%
+  mutate(state = as.factor(state))
+
+kickstarter
+```
+
+## Split into test/train and create resampling folds
+
+```{r}
+library(tidymodels)
+set.seed(1234)
+kickstarter_split <- kickstarter %>%
+  filter(nchar(blurb) >= 15) %>%
+  initial_split()
+
+kickstarter_train <- training(kickstarter_split)
+kickstarter_test <- testing(kickstarter_split)
+
+set.seed(123)
+kickstarter_folds <- vfold_cv(kickstarter_train)
+kickstarter_folds
+```
+
+
+## Recipe for data preprocessing
+
+```{r}
+kickstarter_rec <- recipe(state ~ blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = 5e3) %>%
+  step_tfidf(blurb)
+
+kickstarter_rec
+```
+
+## Lasso regularized classification model
+
+```{r}
+lasso_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+
+lasso_spec
+```
+
+## A model workflow
+
+We need a few more components before we can tune our workflow. Let's use a sparse data encoding (Section \@ref(casestudysparseencoding)).
+
+```{r}
+library(hardhat)
+sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
+```
+
+Let's create a grid of possible regularization penalties to try.
+
+```{r}
+lambda_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 20)
+lambda_grid
+```
+
+Now these can be combined in a tuneable `workflow()`.
+
+```{r}
+kickstarter_wf <- workflow() %>%
+  add_recipe(kickstarter_rec, blueprint = sparse_bp) %>%
+  add_model(lasso_spec)
+
+kickstarter_wf
+```
+
+## Tune the workflow
+
+```{r}
+set.seed(2020)
+lasso_rs <- tune_grid(
+  kickstarter_wf,
+  kickstarter_folds,
+  grid = lambda_grid
+)
+
+lasso_rs
+```
+
+What are the best models?
+
+```{r}
+show_best(lasso_rs, "roc_auc")
+show_best(lasso_rs, "accuracy")
+```
+
+```{r}
+autoplot(lasso_rs)
+```
