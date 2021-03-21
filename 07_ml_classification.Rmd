@@ -112,6 +112,10 @@ Let's start with a naive Bayes model [@kim2006; @Kibriya2005; @Eibe2006], which 
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
+```{block, type = "rmdpackage"}
+**discrim** is an extension package for **parsnip** that contains model definitions for various discriminant analysis models. Naive Bayes being on of them.
+```
+
 ```{r nbspec}
 library(discrim)
 nb_spec <- naive_Bayes() %>%
@@ -585,7 +589,7 @@ There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
 We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
 
-```{block, type = "rmdpacakge"}
+```{block, type = "rmdpackage"}
 The **themis** package provides many more algorithms to deal with imbalanced data during data preprocessing.
 ```
 

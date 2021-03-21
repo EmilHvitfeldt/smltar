@@ -7,6 +7,10 @@ To build features for supervised machine learning from natural language, we need
 In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the [**hcandersenr**](https://cran.r-project.org/package=hcandersenr) package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
+```{block, type = "rmdpackage"}
+**tidyverse** is a collection of packages for data manipulation, exploration and visualization.
+```
+
 ```{r, linewidth=80}
 library(tokenizers)
 library(tidyverse)
@@ -82,6 +86,10 @@ sample_vector <- c("Far down in the forest",
 sample_tibble <- tibble(text = sample_vector)
 ```
 
+```{block, type = "rmdpackage"}
+**tokenizers** contains functions to split text into tokens of varying kinds. Including tokens such as words, letters, n-grams, lines and paragraphs.
+```
+
 The tokenization achieved by using `tokenize_words()` on `sample_vector`:
 
 ```{r}
@@ -93,6 +101,10 @@ will yield the same results as using `unnest_tokens()` on `sample_tibble`; the o
 ```{r}
 sample_tibble %>%
   unnest_tokens(word, text, token = "words")
+```
+
+```{block, type = "rmdpackage"}
+**tidytext** provides functions to allow conversion of text to and from tidy formats. This allows us to work seamlessly with other tidy functions from **tidyverse** for further analysis.
 ```
 
 Arguments used in `tokenize_words()` can be passed through `unnest_tokens()` using the ["the dots"](https://adv-r.hadley.nz/functions.html#fun-dot-dot-dot), `...`.
