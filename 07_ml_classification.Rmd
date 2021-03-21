@@ -214,7 +214,7 @@ nb_rs_predictions %>%
 The area under each of these curves is the `roc_auc` metric we have computed. If the curve was close to the diagonal line, then the model's predictions would be no better than random guessing.
 
 Another way to evaluate our model is to evaluate the confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
-`conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to look at an overall confusion matrix rather than having to look at each resample one at a time.
+The function `conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.
 
 ```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'"}
 nb_rs_predictions %>%
