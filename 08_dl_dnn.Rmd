@@ -273,8 +273,8 @@ dense_model
 Let us step through this model specification one layer at a time.
 
 - We initiate the Keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
-- Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` tensor.
-- The next `layer_flatten()` layer takes the two-dimensional tensors for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` tensor for each observation. 
+- Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` data cube.
+- The next `layer_flatten()` layer takes the matrix for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` long vector for each observation. 
 - Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.
 
 We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an **optimizer** and a **loss function** to be able to compile. 

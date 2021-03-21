@@ -17,10 +17,9 @@ Let's take more time with CNNs in this chapter to explore their construction, di
 
 CNNs can work with data of different dimensions (like two-dimensional images or three-dimensional video), but for text modeling, we typically work in one dimension. The illustrations and explanations in this chapter use only one dimension to match the text use case. 
 Figure \@ref(fig:cnn-architecture) illustrates a typical CNN architecture.
-The input sequence in this example uses character tokens, but it could also use word tokens.
-A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small tensor which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
+A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small data cube which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
 
-```{r cnn-architecture, echo= FALSE, fig.cap="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value.", out.width="100%"}
+```{r cnn-architecture, echo= FALSE, fig.cap="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value.", out.width="100%"}
 knitr::include_graphics("diagram-files/cnn-architecture.png")
 ```
 
@@ -29,7 +28,7 @@ Let's talk about two of the most important CNN concepts, **filters** and **kerne
 
 ### Filters
 
-The kernel is a small tensor of the same dimensionality as the input tensor that slides along the input tensor. When it is sliding, it performs element-wise multiplication of the values in the input tensor and its weights and then sums up the values to get a single value. 
+The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its weights and then sums up the values to get a single value. 
 Sometimes an activation function is applied as well.
 It is these weights that are trained with gradient descent to find the best fit.
 In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer filters at the beginning of your network and then increase them as you go along. 
@@ -37,9 +36,9 @@ In Keras, the `filters` represent how many different kernels are trained in each
 ### Kernel size
 
 The most prominent hyperparameter is the kernel size. 
-The kernel size is the size of the tensor (one-dimensional is this case) that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output tensor, as we see in Figure \@ref(fig:cnn-kernel-size).
+The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as we see in Figure \@ref(fig:cnn-kernel-size).
 
-```{r cnn-kernel-size, echo= FALSE, fig.cap="The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value.", out.width="100%"}
+```{r cnn-kernel-size, echo= FALSE, fig.cap="The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to calculate one value.", out.width="100%"}
 knitr::include_graphics("diagram-files/cnn-kernel-size.png")
 ```
 
@@ -918,11 +917,11 @@ knitr::knit_exit()
 
 The stride is the second big hyperparameter that controls the kernels in a CNN. The stride length determines how much the kernel moves along the sequence between each calculation. A stride length of 1 means that the kernel moves over one place at a time, this way we get maximal overlap.
 
-```{r cnn-stride, echo= FALSE, fig.cap="The stride length affects the size of the resulting tensor. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting tensor by skipping windows."}
+```{r cnn-stride, echo= FALSE, fig.cap="The stride length affects the size of the vector. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting vector by skipping windows."}
 knitr::include_graphics("diagram-files/cnn-stride.png")
 ```
 
-In figure \@ref(fig:cnn-stride) we see that if the kernel size and stride length are equal then there is no overlap. We can decrease the size of the output tensor by increasing the stride length. Be careful not to set the stride length to be larger than the kernel size, otherwise, then you will skip over some of the information.
+In figure \@ref(fig:cnn-stride) we see that if the kernel size and stride length are equal then there is no overlap. We can decrease the size of the output vector by increasing the stride length. Be careful not to set the stride length to be larger than the kernel size, otherwise, then you will skip over some of the information.
 
 ### Dilation
 
