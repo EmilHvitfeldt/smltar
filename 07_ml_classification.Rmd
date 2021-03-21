@@ -1190,9 +1190,8 @@ This data set has many more than 50 of the most common 2000 tokens, but it can s
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
-  step_tokenize(consumer_complaint_narrative) %>%
-  step_ngram(consumer_complaint_narrative,
-             num_tokens = 2, min_num_tokens = 1) %>%
+  step_tokenize(consumer_complaint_narrative, token = "ngrams",
+                options = list(n = 2, n_min = 1)) %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
