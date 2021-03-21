@@ -69,13 +69,13 @@ Here we use `composition = "matrix"` because the Keras modeling functions operat
 
 An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to understand text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
 
-Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, A, looks at some of the input and outputs a value. Doing this process some information is being held inside A to make the network "remember" this updated network A is then applied to the next input where it predicts new output and its memory is being updated.
+Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, $A$, operates on some of the input and outputs a value. During this process, some information is held inside $A$ to make the network "remember" this updated network. Network $A$ is then applied to the next input where it predicts new output and its memory is updated.
 
 ```{r rnndiag, echo= FALSE, fig.cap="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.", out.width="90%"}
 knitr::include_graphics("diagram-files/rnn-architecture.png")
 ```
 
-The exact shape and function of network A are beyond the reach of this book, for further study, Christopher Olah's blog post [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) gives a good technical overview of how LSTM networks work.
+The exact shape and function of network $A$ are beyond the reach of this book. For further study, Christopher Olah's blog post ["Understanding LSTM Networks"](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) gives a good technical overview of how LSTM networks work.
 
 The Keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
 
@@ -239,7 +239,7 @@ val_res %>%
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network A in figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically it is just a single tanh layer. This is much simpler than what happens in LSTMs.
+An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network $A$ in figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically just a single `tanh()` layer. This is much simpler than what happens in LSTMs.
 
 ```{block, type = "rmdwarning"}
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
