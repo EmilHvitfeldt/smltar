@@ -248,7 +248,7 @@ We find a lot of dollar amounts, which makes sense. Let us filter out the number
 
 ```{r dependson=c("tidywordvectors", "nearestsynonyms")}
 tidy_word_vectors %>%
-    nearest_neighbors("fee") %>%
+  nearest_neighbors("fee") %>%
   filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE))
 ```
 
@@ -263,8 +263,8 @@ tidy_word_vectors %>%
     top_n(12, abs(value)) %>%
     ungroup %>%
     mutate(item1 = reorder_within(item1, value, dimension)) %>%
-    ggplot(aes(item1, value, fill = as.factor(dimension))) +
-    geom_col(show.legend = FALSE) +
+    ggplot(aes(item1, value, fill = dimension)) +
+    geom_col(alpha = 0.8, show.legend = FALSE) +
     facet_wrap(~dimension, scales = "free_y", ncol = 4) +
     scale_x_reordered() +
     coord_flip() +
