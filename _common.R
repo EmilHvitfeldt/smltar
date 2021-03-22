@@ -70,7 +70,6 @@ library(quanteda)
 columnize <- function(words, ncol = 5) {
   
   tagList(
-    tags$style(style),
     tags$div(
       words %>%
         map(tags$p) %>%
