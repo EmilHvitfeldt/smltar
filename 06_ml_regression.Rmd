@@ -303,7 +303,7 @@ collect_metrics(rf_rs)
 This looks pretty promising, so let's explore the predictions for this random forest model.
 
 ```{r rfpredict, dependson="scotusrfrs", opts.label = "fig.large", fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
-rf_predictions %>%
+collect_predictions(rf_rs) %>%
   ggplot(aes(year, .pred, color = id)) +
   geom_abline(lty = 2, color = "gray80", size = 1.5) +
   geom_point(alpha = 0.3) +
