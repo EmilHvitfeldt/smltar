@@ -1178,13 +1178,13 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization and stop word removal will be similar to the other models in this chapter, but this time we'll include trigrams, bigrams, and unigrams in the model.
+The tokenization will be similar to the other models in this chapter, but this time we'll include bigrams and unigrams in the model.
 In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
 Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
 
 ```{block, type = "rmdnote"}
-This data set has many more than 50 of the most common 2000 tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
+This data set has many more than 50 of even the most common 5000 or more tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
@@ -1218,7 +1218,7 @@ Let's include different possible values for each parameter, for a combination of
 ```{r finalcomplaintsgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(1e3, 6e3)),
+  max_tokens(range = c(500, 4e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
@@ -1237,8 +1237,7 @@ tune_rs <- tune_grid(
   sparse_wf_v2,
   complaints_folds,
   grid = final_grid,
-  metrics = metric_set(accuracy, sensitivity, specificity),
-  control = control_resamples(save_pred = TRUE)
+  metrics = metric_set(accuracy, sensitivity, specificity)
 )
 ```
 
@@ -1248,26 +1247,21 @@ We have fitted these classification models!
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:complaintsfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization. 
 
-```{block, type = "rmdnote"}
-Pay attention to how increasing regularization affects performance as more tokens are included.
-```
-
-```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.cap="Regularization becomes more important for performance as more tokens are included in the model"}
+```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.asp=1, fig.cap="Model performance is similar for the higher token options so we can choose a simpler model"}
 autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
-    title = paste("Lasso model performance across regularization penalties",
-                  "and number of tokens", sep = "\n"),
-    subtitle = paste("The best model includes a high number of tokens",
+    title = "Model performance across regularization penalties and tokens",
+    subtitle = paste("The best model includes a higher number of tokens",
                      "but also significant regularization")
   )
 ```
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let's choose a simpler model within some limit around that numerically best result, with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss), and let's say we care most about overall accuracy (rather than sensitivity or specificity).
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let's choose a simpler model within some limit around that numerically best result, with more regularization that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss), and let's say we care most about overall accuracy (rather than sensitivity or specificity).
 
 ```{r chooseacc, dependson="finalscotusrs"}
 choose_acc <- tune_rs %>%
-  select_by_pct_loss(metric = "accuracy", max_tokens)
+  select_by_pct_loss(metric = "accuracy", -penalty)
 
 choose_acc
 ```
@@ -1321,7 +1315,7 @@ collect_predictions(final_fitted)  %>%
 
 The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:complaintsvip).
 
-```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
+```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
 library(vip)
 
 complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
@@ -1346,18 +1340,44 @@ complaints_imp %>%
   facet_wrap(~Sign, scales = "free") +
   labs(
     y = NULL,
-    title = paste("Variable importance for predicting that a complaint",
-                  "is about credit reporting", sep = "\n"),
+    title = "Variable importance for predicting the topic of a CFPB complaint",
     subtitle = paste("These features are the most important in predicting",
                      "whether a complaint is about credit or not")
   )
 ```
 
-Tokens (unigrams or bigrams) like "bank", "interest", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens (unigrams or bigrams) like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
 
 ```{block, type = "rmdnote"}
-TODO: CHECK THIS -- Most of these features are unigrams but a few are bigrams, like "checking account". Notice that almost all are tokens learned directly from the text, but that `percent_censoring`, one of our hand-crafted custom features, is a top feature in terms of variable importance. The more censored a complaint is, the more likely it is to be about credit reporting.
+Most of these features are unigrams but a few are bigrams, like "subsection a". Notice that this bigram would have been removed if stop words were filtered out.
 ```
+
+The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like `percent_censoring` or `max_money` are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.
+
+We can gain some final insight into our model by looking at observations from the test set that it *misclassified*. Let's bind together the predictions on the test set with the original `complaints_test` data. Then let's look at complaints that were labeled as about credit reporting in the original data but that our final model thought had a low probability of being about credit reporting.
+
+```{r}
+complaints_bind <- collect_predictions(final_fitted) %>%
+  bind_cols(complaints_test %>% select(-product))
+
+complaints_bind %>%
+  filter(product == "Credit", .pred_Credit < 0.2) %>%
+  select(consumer_complaint_narrative) %>%
+  slice_sample(n = 10)
+```
+
+We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.
+
+What about misclassifications in the other direction, observations in the test set that were *not* labeled as about credit reporting but that our final model gave a high probability of being about credit reporting?
+
+```{r}
+complaints_bind %>%
+  filter(product == "Other", .pred_Credit > 0.8) %>%
+  select(consumer_complaint_narrative) %>%
+  slice_sample(n = 10)
+```
+
+Again, these are "mistakes" on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.
 
 ## Summary {#mlclassificationsummary}
 
@@ -1365,14 +1385,13 @@ You can use classification modeling to predict labels or categorical variables f
 Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
 This is important as bag-of-word text models can involve thousands of tokens.
 We also saw that regularized linear models, such as lasso, often work well for text data sets.
-Your own domain knowledge about your text data is incredibly valuable, and using that knowledge in careful engineering of custom features can improve your model.
+Your own domain knowledge about your text data is valuable, and using that knowledge in careful engineering of custom features can improve your model in some cases.
 
 ### In this chapter, you learned:
 
 - how text data can be used in a classification model
-- to tune hyperparameters in the data preprocessing stage
+- to tune hyperparameters of a model
 - how to compare different model types
 - that models can combine both text and non-text predictors
-- how feature hashing can be used as a fast alternative to bag-of-words
 - about engineering custom features for machine learning
 - about performance metrics for classification models
