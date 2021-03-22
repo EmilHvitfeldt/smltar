@@ -217,8 +217,7 @@ Another way to evaluate our model is to evaluate the confusion matrix. A confusi
 The function `conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.
 
 ```{r firstheatmap, dependson="nbrs", fig.cap="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'"}
-nb_rs_predictions %>%
-  conf_mat_resampled() %>%
+conf_mat_resampled(nb_rs) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -332,8 +331,7 @@ Let's finish this section by generating a confusion matrix, shown in Figure \@re
 Our lasso model is much better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are much more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
 
 ```{r lassoheatmap, dependson="lassorsmetrics", fig.cap="Confusion matrix for a lasso regularized classifier, with more symmetric results"}
-lasso_rs_predictions %>%
-  conf_mat_resampled() %>%
+conf_mat_resampled(lasso_rs) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -668,7 +666,8 @@ To get a more detailed view of how our classifier is performing, let us look at 
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
-  conf_mat_resampled() %>%
+  filter(id == "Fold01") %>%
+  conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap") +
   scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
   scale_x_discrete(labels = function(x) str_wrap(x, 20))
@@ -683,8 +682,9 @@ A trick to deal with this problem is to remove all the correctly predicted obser
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
+  filter(id == "Fold01") %>%
   filter(.pred_class != product) %>%
-  conf_mat_resampled() %>%
+  conf_mat(product, .pred_class) %>%
   autoplot(type = "heatmap") +
   scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
   scale_x_discrete(labels = function(x) str_wrap(x, 20))
@@ -1128,8 +1128,7 @@ Many of the metrics used for classification are functions of the true positive, 
 The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.
 
 ```{r}
-nb_rs_predictions %>%
-  conf_mat_resampled()
+conf_mat_resampled(nb_rs)
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
