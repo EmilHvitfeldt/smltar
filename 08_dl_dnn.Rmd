@@ -464,15 +464,10 @@ All the models in Section \@ref(firstdlclassification) included an embedding lay
 
 We start by obtaining pre-trained embeddings. The GloVe embeddings that we used in Section \@ref(glove) are a good place to start. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models directly.
 
-```{r eval=FALSE}
+```{r glove6b12d, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
 library(textdata)
 
 glove6b <- embedding_glove6b(dimensions = 50) %>% select(1:13)
-```
-
-```{r glove6b12d, echo=FALSE, R.options = list(tibble.max_extra_cols=9, tibble.print_min=10, tibble.width=80)}
-load("data/glove6b.rda")
-glove6b <- glove6b[, 1:13]
 glove6b
 ```
 
