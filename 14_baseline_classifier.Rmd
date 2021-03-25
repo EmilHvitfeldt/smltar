@@ -36,6 +36,8 @@ kickstarter_folds
 ## Recipe for data preprocessing
 
 ```{r}
+library(textrecipes)
+
 kickstarter_rec <- recipe(state ~ blurb, data = kickstarter_train) %>%
   step_tokenize(blurb) %>%
   step_tokenfilter(blurb, max_tokens = 5e3) %>%
