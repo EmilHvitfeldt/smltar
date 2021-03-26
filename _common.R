@@ -38,6 +38,7 @@ suppressPackageStartupMessages(library(tidymodels))
 theme_set(theme_light())
 
 update_geom_defaults("col", list(fill = "#8097ae", alpha = 0.9))
+update_geom_defaults("bar", list(fill = "#8097ae", alpha = 0.9))
 update_geom_defaults("point", list(color = "#566675"))
 update_geom_defaults("line", list(color = "#566675", alpha = 0.7))
 
