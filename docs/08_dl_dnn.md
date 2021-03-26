@@ -16,7 +16,7 @@ Figure \@ref(fig:dnndiag) depicts the neural network architecture *feed-forward*
 
 <div class="figure" style="text-align: center">
 <img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
-<p class="caption">(\#fig:rnndiag)A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.</p>
+<p class="caption">(\#fig:dnndiag)A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.</p>
 </div>
 
 Figure \@ref(fig:dnndiag) shows the input units with words, but this is not an entirely accurate representation of a neural network. These words will in practice be represented by embedding vectors because these networks can only work with numeric variables.
