@@ -42,10 +42,6 @@ This sample of opinions reflects the distribution over time of available opinion
 
 Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
-```{block, type = "rmdpackage"}
-**tidymodels** is a collection of packages for modeling and machine learning using tidyverse principles. These packages facilities preprocessing, modeling and evaluation.
-```
-
 ```{r scotussplit, dependson="scotussample"}
 library(tidymodels)
 set.seed(1234)
@@ -58,11 +54,13 @@ scotus_train <- training(scotus_split)
 scotus_test <- testing(scotus_split)
 ```
 
-Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
+Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. 
 
 ```{block, type = "rmdpackage"}
-**textrecipes** extends the **recipes** package by providing steps that turn columns containing text into numeric columns. These steps can perform the actions we explored in the first section of this book.
+The **recipes** package is part of **tidymodels** and provides infrastructure for data preprocessing and feature engineering. The **textrecipes** package extends **recipes** by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
 ```
+
+What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
@@ -164,7 +162,13 @@ Yet another option for evaluating or comparing models is to use a separate valid
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
+
+```{block, type = "rmdpackage"}
+In **tidymodels**, the package for data splitting and resampling is **rsample**.
+```
+
+Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 ```{r scotusfolds, dependson="scotussplit"}
 set.seed(123)
@@ -903,7 +907,7 @@ final_rs %>%
   )
 ```
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be one of the ones with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
 
 Let's choose by percent loss compared to the best model, with the default 2% loss.
 
@@ -972,15 +976,15 @@ scotus_fit %>%
   )
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "contended" and "therefore", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years and those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
 
 ```{block, type = "rmdnote"}
-Some of these features are unigrams and some are bigrams.
+Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
 ```
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
 
-```{r scotusfinalpredvis, dependson="finalscotusrs", opts.label = "fig.large", fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed"}
+```{r scotusfinalpredvis, dependson="finalscotusrs", opts.label = "fig.large", fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams"}
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
