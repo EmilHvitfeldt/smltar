@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21.6 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21.7 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-16" />
+<meta name="date" content="2021-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="language.html"/>
 <link rel="next" href="stopwords.html"/>
-<script src="libs/header-attrs-2.7.3/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.4/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -164,13 +164,14 @@ div.csl-indent {
 <li><a href="./">Supervised Machine Learning for Text Analysis in R</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome to Supervised Machine Learning for Text Analysis in R</a>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome to Supervised Machine Learning for Text Analysis in R</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html"><i class="fa fa-check"></i>Preface</a>
 <ul>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#outline"><i class="fa fa-check"></i>Outline</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#topics-this-book-will-not-cover"><i class="fa fa-check"></i>Topics this book will not cover</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for?</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgements"><i class="fa fa-check"></i>Acknowledgements</a></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html#colophon"><i class="fa fa-check"></i>Colophon</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#outline"><i class="fa fa-check"></i>Outline</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#topics-this-book-will-not-cover"><i class="fa fa-check"></i>Topics this book will not cover</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#who-is-this-book-for"><i class="fa fa-check"></i>Who is this book for?</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#acknowledgements"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li class="chapter" data-level="" data-path="preface.html"><a href="preface.html#colophon"><i class="fa fa-check"></i>Colophon</a></li>
 </ul></li>
 <li class="part"><span><b>I Natural Language Features</b></span></li>
 <li class="chapter" data-level="1" data-path="language.html"><a href="language.html"><i class="fa fa-check"></i><b>1</b> Language and modeling</a>
@@ -199,7 +200,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="2.4.1" data-path="tokenization.html"><a href="tokenization.html#tokenize-to-characters-only-keeping-letters"><i class="fa fa-check"></i><b>2.4.1</b> Tokenize to characters, only keeping letters</a></li>
 <li class="chapter" data-level="2.4.2" data-path="tokenization.html"><a href="tokenization.html#allow-for-hyphenated-words"><i class="fa fa-check"></i><b>2.4.2</b> Allow for hyphenated words</a></li>
-<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-into-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it into a function</a></li>
+<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-in-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it in a function</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="tokenization.html"><a href="tokenization.html#tokenization-for-non-latin-alphabets"><i class="fa fa-check"></i><b>2.5</b> Tokenization for non-Latin alphabets</a></li>
 <li class="chapter" data-level="2.6" data-path="tokenization.html"><a href="tokenization.html#tokenization-benchmark"><i class="fa fa-check"></i><b>2.6</b> Tokenization benchmark</a></li>
@@ -271,7 +272,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.2" data-path="mlregression.html"><a href="mlregression.html#regnull"><i class="fa fa-check"></i><b>6.2</b> Compare to the null model</a></li>
 <li class="chapter" data-level="6.3" data-path="mlregression.html"><a href="mlregression.html#comparerf"><i class="fa fa-check"></i><b>6.3</b> Compare to a random forest model</a></li>
 <li class="chapter" data-level="6.4" data-path="mlregression.html"><a href="mlregression.html#casestudystopwords"><i class="fa fa-check"></i><b>6.4</b> Case study: removing stop words</a></li>
-<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#case-study-varying-n-grams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
+<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#casestudyngrams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
 <li class="chapter" data-level="6.6" data-path="mlregression.html"><a href="mlregression.html#mlregressionlemmatization"><i class="fa fa-check"></i><b>6.6</b> Case study: lemmatization</a></li>
 <li class="chapter" data-level="6.7" data-path="mlregression.html"><a href="mlregression.html#case-study-feature-hashing"><i class="fa fa-check"></i><b>6.7</b> Case study: feature hashing</a>
 <ul>
@@ -421,6 +422,15 @@ div.csl-indent {
 <li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#opinions-of-the-supreme-court-of-the-united-states"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
 <li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-campaign-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
 </ul></li>
+<li class="chapter" data-level="C" data-path="appendixbaseline.html"><a href="appendixbaseline.html"><i class="fa fa-check"></i><b>C</b> Baseline linear classifier</a>
+<ul>
+<li class="chapter" data-level="C.1" data-path="appendixbaseline.html"><a href="appendixbaseline.html#read-in-the-data"><i class="fa fa-check"></i><b>C.1</b> Read in the data</a></li>
+<li class="chapter" data-level="C.2" data-path="appendixbaseline.html"><a href="appendixbaseline.html#split-into-testtrain-and-create-resampling-folds"><i class="fa fa-check"></i><b>C.2</b> Split into test/train and create resampling folds</a></li>
+<li class="chapter" data-level="C.3" data-path="appendixbaseline.html"><a href="appendixbaseline.html#recipe-for-data-preprocessing"><i class="fa fa-check"></i><b>C.3</b> Recipe for data preprocessing</a></li>
+<li class="chapter" data-level="C.4" data-path="appendixbaseline.html"><a href="appendixbaseline.html#lasso-regularized-classification-model"><i class="fa fa-check"></i><b>C.4</b> Lasso regularized classification model</a></li>
+<li class="chapter" data-level="C.5" data-path="appendixbaseline.html"><a href="appendixbaseline.html#a-model-workflow"><i class="fa fa-check"></i><b>C.5</b> A model workflow</a></li>
+<li class="chapter" data-level="C.6" data-path="appendixbaseline.html"><a href="appendixbaseline.html#tune-the-workflow"><i class="fa fa-check"></i><b>C.6</b> Tune the workflow</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
@@ -447,8 +457,13 @@ div.csl-indent {
 <p>To build features for supervised machine learning from natural language, we need some way of representing raw text as numbers so we can perform computation on them. Typically, one of the first steps in this transformation from natural language to feature, or any of kind of text analysis, is <em>tokenization</em>. Knowing what tokenization and tokens are, along with the related concept of an n-gram, is important for almost any natural language processing task.</p>
 <div id="what-is-a-token" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> What is a token?</h2>
-<p>In R, text is typically represented with the <strong>character</strong> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <a href="https://cran.r-project.org/package=hcandersenr"><strong>hcandersenr</strong></a> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+<p>In R, text is typically represented with the <strong>character</strong> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <a href="https://cran.r-project.org/package=hcandersenr"><strong>hcandersenr</strong></a> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled “The Fir Tree,” we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.</p>
+<div class="rmdpackage">
+<p>
+<strong>tidyverse</strong> is a collection of packages for data manipulation, exploration and visualization.
+</p>
+</div>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="tokenization.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tokenizers)</span>
 <span id="cb1-2"><a href="tokenization.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="tokenization.html#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
@@ -477,7 +492,7 @@ These elements don’t contain any metadata or information to tell us which char
 FIGURE 2.1: A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.
 </p>
 </div>
-<p>Most commonly, the meaningful unit or type of token that we want to split text into units of is a <strong>word</strong>. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous <span class="citation">(<a href="#ref-Bender13" role="doc-biblioref">Bender 2013</a>)</span>. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like “didn’t” may more accurately be considered two words with no space.</p>
+<p>Most commonly, the meaningful unit or type of token that we want to split text into units of is a <strong>word</strong>. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous <span class="citation">(<a href="#ref-Bender13" role="doc-biblioref">Emily M. Bender 2013</a>)</span>. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like “didn’t” may more accurately be considered two words with no space.</p>
 <p>To understand the process of tokenization, let’s start with a overly simple definition for a word: any selection of alphanumeric (letters and numbers) symbols. Let’s use some regular expressions (or regex for short, see Appendix <a href="regexp.html#regexp">A</a>) with <code>strsplit()</code> to split the first two lines of “The Fir Tree” by any characters that are not alphanumeric.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="tokenization.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(the_fir_tree[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="st">&quot;[^a-zA-Z0-9]+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
@@ -533,6 +548,11 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="tokenization.html#cb7-1" aria-hidden="true" tabindex="-1"></a>sample_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Far down in the forest&quot;</span>,</span>
 <span id="cb7-2"><a href="tokenization.html#cb7-2" aria-hidden="true" tabindex="-1"></a>                   <span class="st">&quot;grew a pretty little fir-tree&quot;</span>)</span>
 <span id="cb7-3"><a href="tokenization.html#cb7-3" aria-hidden="true" tabindex="-1"></a>sample_tibble <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">text =</span> sample_vector)</span></code></pre></div>
+<div class="rmdpackage">
+<p>
+<strong>tokenizers</strong> contains functions to split text into tokens of varying kinds. Including tokens such as words, letters, n-grams, lines and paragraphs.
+</p>
+</div>
 <p>The tokenization achieved by using <code>tokenize_words()</code> on <code>sample_vector</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="tokenization.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tokenize_words</span>(sample_vector)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
@@ -557,6 +577,11 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 #&gt;  9 little
 #&gt; 10 fir   
 #&gt; 11 tree</code></pre>
+<div class="rmdpackage">
+<p>
+<strong>tidytext</strong> provides functions to allow conversion of text to and from tidy formats. This allows us to work seamlessly with other tidy functions from <strong>tidyverse</strong> for further analysis.
+</p>
+</div>
 <p>Arguments used in <code>tokenize_words()</code> can be passed through <code>unnest_tokens()</code> using the <a href="https://adv-r.hadley.nz/functions.html#fun-dot-dot-dot">“the dots”</a>, <code>...</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="tokenization.html#cb12-1" aria-hidden="true" tabindex="-1"></a>sample_tibble <span class="sc">%&gt;%</span></span>
 <span id="cb12-2"><a href="tokenization.html#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, text, <span class="at">token =</span> <span class="st">&quot;words&quot;</span>, <span class="at">strip_punct =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
@@ -617,7 +642,7 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;\U0001f1e8\U0001f1e6&quot; &quot;\U0001f1e6\U0001f1f6&quot; &quot;\U0001f1ea\U0001f1fa&quot;
 #&gt; [4] &quot;\U0001f1ef\U0001f1f5&quot;</code></pre>
-<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
+<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
 </div>
 <div id="word-tokens" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Word tokens</h3>
@@ -844,7 +869,7 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 <div id="allow-for-hyphenated-words" class="section level3" number="2.4.2">
 <h3><span class="header-section-number">2.4.2</span> Allow for hyphenated words</h3>
 <p>In our examples so far, we have noticed that the string “fir-tree” is typically split into two tokens. Let’s explore two different approaches for how to handle this hyphenated word as one token. First, let’s split on white space; this is a decent way to identify words in English and some other languages, and it does not split hyphenated words as the hyphen character isn’t considered a white-space. Second, let’s find a regex to match words with a hyphen and extract those.</p>
-<p>Splitting by white-space is not too difficult because we can use character classes, as shown in Table <a href="#tab:characterclasses"><strong>??</strong></a>. We will use the white space character class <code>[:space:]</code> to split our sentence.</p>
+<p>Splitting by white-space is not too difficult because we can use character classes, as shown in Table <a href="regexp.html#tab:characterclasses">A.2</a>. We will use the white space character class <code>[:space:]</code> to split our sentence.</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="tokenization.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_split</span>(<span class="st">&quot;This isn&#39;t a sentence with hyphenated-words.&quot;</span>, <span class="st">&quot;[:space:]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;This&quot;              &quot;isn&#39;t&quot;             &quot;a&quot;                
@@ -855,15 +880,14 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;This&quot;             &quot;isn&#39;t&quot;            &quot;a&quot;                &quot;sentence&quot;        
 #&gt; [5] &quot;with&quot;             &quot;hyphenated-words&quot;</code></pre>
-<p>This regex used to remove the punctuation is a little complicated so let’s discuss it, piece by piece. The regex <code>^[:punct:]+</code> will look at the beginning of the string (<code>^</code>) to match any punctuation characters (<code>[:punct:]</code>) where it will select one or more (<code>+</code>). The other regex <code>[:punct:]+$</code> will look for punctuation characters (<code>[:punct:]</code>) that appear one or more times (<code>+</code>) at the end of the string (<code>$</code>). These will alternate (<code>|</code>) so that we get matches from both sides of the words. The reason we use the quantifier <code>+</code> is that there are cases where a word is followed by multiple characters we don’t want, such as <code>"okay..."</code> and <code>"Really?!!!"</code>. We are using <code>map()</code> since <code>str_split()</code> returns a list, and we want <code>str_remove_all()</code> to be applied to each element in the list. (The example here only has one element.)</p>
-<div class="rmdnote">
-<p>
-If you are in a situation where you want to avoid using the <strong>purrr</strong> package, you can use <code>lapply()</code> instead.
-</p>
-<p>
-<code>lapply(str_remove_all, pattern = “^[:punct:]+|[:punct:]+$”)</code>
-</p>
-</div>
+<p>This regex used to remove the punctuation is a little complicated so let’s discuss it, piece by piece.</p>
+<ul>
+<li>The regex <code>^[:punct:]+</code> will look at the beginning of the string (<code>^</code>) to match any punctuation characters (<code>[:punct:]</code>) where it will select one or more (<code>+</code>).</li>
+<li>The other regex <code>[:punct:]+$</code> will look for punctuation characters (<code>[:punct:]</code>) that appear one or more times (<code>+</code>) at the end of the string (<code>$</code>).</li>
+<li>These will alternate (<code>|</code>) so that we get matches from both sides of the words.</li>
+<li>The reason we use the quantifier <code>+</code> is that there are cases where a word is followed by multiple characters we don’t want, such as <code>"okay..."</code> and <code>"Really?!!!"</code>.</li>
+</ul>
+<p>We are using <code>map()</code> since <code>str_split()</code> returns a list, and we want <code>str_remove_all()</code> to be applied to each element in the list. (The example here only has one element.)</p>
 <p>Now let’s see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen.</p>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="tokenization.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract_all</span>(</span>
 <span id="cb53-2"><a href="tokenization.html#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">string =</span> <span class="st">&quot;This isn&#39;t a sentence with hyphenated-words.&quot;</span>,</span>
@@ -897,8 +921,8 @@ If you are in a situation where you want to avoid using the <strong>purrr</stron
 #&gt; [5] &quot;with&quot;             &quot;hyphenated-words&quot;</code></pre>
 <p>That is getting to be quite a complex regex, but we are now getting the same answer as before.</p>
 </div>
-<div id="wrapping-it-into-a-function" class="section level3" number="2.4.3">
-<h3><span class="header-section-number">2.4.3</span> Wrapping it into a function</h3>
+<div id="wrapping-it-in-a-function" class="section level3" number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Wrapping it in a function</h3>
 <p>We have shown how we can use regular expressions to extract the tokens we want, perhaps to use in modeling. So far, the code has been rather unstructured. We would ideally wrap these tasks into functions that can be used the same way <code>tokenize_words()</code> is used.</p>
 <p>Let’s start with the example with hyphenated words. To make the function a little more flexible, let’s add an option to transform all the output to lowercase.</p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="tokenization.html#cb61-1" aria-hidden="true" tabindex="-1"></a>tokenize_hyphenated_words <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">lowercase =</span> <span class="cn">TRUE</span>) {</span>
@@ -982,11 +1006,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 x 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       92.5ms    101ms     10.0     4.57MB    0    
-#&gt; 2 tokenizers  115.3ms    120ms      8.31    1.01MB    0.924
-#&gt; 3 text2vec     97.7ms    102ms      9.81   19.32MB    1.09 
-#&gt; 4 quanteda    183.1ms    190ms      5.28     8.7MB    1.32 
-#&gt; 5 base R        353ms    360ms      2.76   10.51MB    1.18</code></pre>
+#&gt; 1 corpus       74.7ms   78.3ms     12.8     4.57MB     1.42
+#&gt; 2 tokenizers   89.3ms   91.2ms     11.0     1.01MB     1.22
+#&gt; 3 text2vec       76ms     77ms     12.9    19.34MB     1.43
+#&gt; 4 quanteda    140.5ms  143.1ms      6.95     8.7MB     1.74
+#&gt; 5 base R      308.6ms  310.1ms      3.22   10.51MB     1.38</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">
@@ -1007,7 +1031,7 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender13" class="csl-entry">
-Bender, Emily M. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3): 1–184.
+———. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3): 1–184.
 </div>
 <div id="ref-Gagolewski19" class="csl-entry">
 Gagolewski, Marek. 2019. <em>R Package Stringi: Character String Processing Facilities</em>. <a href="http://www.gagolewski.com/software/stringi/">http://www.gagolewski.com/software/stringi/</a>.
@@ -1019,7 +1043,7 @@ Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2
 Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2019. <span>“Toward Fast and Accurate Neural Chinese Word Segmentation with Multi-Criteria Learning.”</span>
 </div>
 <div id="ref-R-hcandersenr" class="csl-entry">
-Hvitfeldt, Emil. 2019. <em>Hcandersenr: H.c. Andersens Fairy Tales</em>. <a href="https://CRAN.R-project.org/package=hcandersenr">https://CRAN.R-project.org/package=hcandersenr</a>.
+Hvitfeldt, Emil. 2019a. <em>Hcandersenr: H.c. Andersens Fairy Tales</em>. <a href="https://CRAN.R-project.org/package=hcandersenr">https://CRAN.R-project.org/package=hcandersenr</a>.
 </div>
 <div id="ref-ma-etal-2018-state" class="csl-entry">
 Ma, Ji, Kuzman Ganchev, and David Weiss. 2018. <span>“State-of-the-Art <span>C</span>hinese Word Segmentation with Bi-<span>LSTM</span>s.”</span> In <em>Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing</em>, 4902–8. Brussels, Belgium: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/D18-1529">https://doi.org/10.18653/v1/D18-1529</a>.
@@ -1042,8 +1066,8 @@ Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analy
 </div>
 <div class="footnotes">
 <hr />
-<ol start="1">
-<li id="fn1"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref1" class="footnote-back">↩︎</a></p></li>
+<ol start="3">
+<li id="fn3"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref3" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

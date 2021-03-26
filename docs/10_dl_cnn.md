@@ -14,12 +14,11 @@ CNNs can be well-suited for modeling text data text often contains quite a lot o
 
 CNNs can work with data of different dimensions (like two-dimensional images or three-dimensional video), but for text modeling, we typically work in one dimension. The illustrations and explanations in this chapter use only one dimension to match the text use case. 
 Figure \@ref(fig:cnn-architecture) illustrates a typical CNN architecture.
-The input sequence in this example uses character tokens, but it could also use word tokens.
-A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small tensor which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
+A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small data cube which we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-architecture.png" alt="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value." width="100%" />
-<p class="caption">(\#fig:cnn-architecture)A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the tensor size, ending with single output value.</p>
+<img src="diagram-files/cnn-architecture.png" alt="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value." width="100%" />
+<p class="caption">(\#fig:cnn-architecture)A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value.</p>
 </div>
 
 This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use sequence one-hot encoding (Section \@ref(onehotsequence)) with a possible word embedding.
@@ -27,7 +26,7 @@ Let's talk about two of the most important CNN concepts, **filters** and **kerne
 
 ### Filters
 
-The kernel is a small tensor of the same dimensionality as the input tensor that slides along the input tensor. When it is sliding, it performs element-wise multiplication of the values in the input tensor and its weights and then sums up the values to get a single value. 
+The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its weights and then sums up the values to get a single value. 
 Sometimes an activation function is applied as well.
 It is these weights that are trained with gradient descent to find the best fit.
 In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer filters at the beginning of your network and then increase them as you go along. 
@@ -35,11 +34,11 @@ In Keras, the `filters` represent how many different kernels are trained in each
 ### Kernel size
 
 The most prominent hyperparameter is the kernel size. 
-The kernel size is the size of the tensor (one-dimensional is this case) that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output tensor, as we see in Figure \@ref(fig:cnn-kernel-size).
+The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as we see in Figure \@ref(fig:cnn-kernel-size).
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value." width="100%" />
-<p class="caption">(\#fig:cnn-kernel-size)The kernel size affects the size of the resulting tensor. A kernel size of 3 uses the information from three values to calculate one value.</p>
+<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to calculate one value." width="100%" />
+<p class="caption">(\#fig:cnn-kernel-size)The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to calculate one value.</p>
 </div>
 
 Larger kernels will detect larger and less frequent patterns where smaller kernels will find fine-grained features. 
@@ -143,20 +142,20 @@ val_res
 ```
 
 ```
-#> # A tibble: 50,524 x 3
-#>          .pred_1 .pred_class state
-#>            <dbl> <fct>       <fct>
-#>  1 0.00136       0           0    
-#>  2 0.000497      0           0    
-#>  3 0.00221       0           0    
-#>  4 0.0000120     0           0    
-#>  5 0.992         1           1    
-#>  6 0.998         1           1    
-#>  7 0.00000000945 0           0    
-#>  8 0.000290      0           0    
-#>  9 0.334         0           1    
-#> 10 0.999         1           1    
-#> # … with 50,514 more rows
+#> # A tibble: 50,522 x 3
+#>         .pred_1 .pred_class state
+#>           <dbl> <fct>       <fct>
+#>  1 0.0000000589 0           0    
+#>  2 0.000144     0           0    
+#>  3 0.000190     0           0    
+#>  4 0.00929      0           0    
+#>  5 0.00752      0           0    
+#>  6 0.995        1           0    
+#>  7 0.000563     0           0    
+#>  8 0.0000185    0           0    
+#>  9 0.00538      0           0    
+#> 10 0.000931     0           0    
+#> # … with 50,512 more rows
 ```
 
 We can calculate some standard metrics with `metrics()`.
@@ -170,10 +169,10 @@ metrics(val_res, state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.812
-#> 2 kap         binary         0.624
-#> 3 mn_log_loss binary         0.955
-#> 4 roc_auc     binary         0.863
+#> 1 accuracy    binary         0.811
+#> 2 kap         binary         0.621
+#> 3 mn_log_loss binary         0.971
+#> 4 roc_auc     binary         0.862
 ```
 
 We see some improvement over the densely connected network from Chapter \@ref(dldnn), our best performing model on the Kickstarter data so far.
@@ -226,9 +225,7 @@ There is, however, a trade-off. Adding more layers adds more weights to the mode
 <p>When working with CNNs, the different layers perform different tasks. A convolutional layer extracts local patterns as it slides along the sequences, while a fully connected layer finds global patterns.</p>
 </div>
 
-We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. Yoshua Bengio has a simple rule for this [@bengio2012practical]: 
-
-> Just keep adding layers until the test error does not improve anymore.
+We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
 
 
 ```r
@@ -302,9 +299,9 @@ metrics(val_res_double_dense, state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.807
-#> 2 kap         binary         0.613
-#> 3 mn_log_loss binary         0.994
+#> 1 accuracy    binary         0.809
+#> 2 kap         binary         0.617
+#> 3 mn_log_loss binary         1.00 
 #> 4 roc_auc     binary         0.859
 ```
 
@@ -406,9 +403,9 @@ metrics(val_res_double_conv, state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.803
-#> 2 kap         binary         0.606
-#> 3 mn_log_loss binary         1.04 
+#> 1 accuracy    binary         0.807
+#> 2 kap         binary         0.614
+#> 3 mn_log_loss binary         1.07 
 #> 4 roc_auc     binary         0.854
 ```
 
@@ -426,20 +423,20 @@ all_cnn_model_predictions
 ```
 
 ```
-#> # A tibble: 151,572 x 4
-#>          .pred_1 .pred_class state model    
-#>            <dbl> <fct>       <fct> <chr>    
-#>  1 0.00136       0           0     Basic CNN
-#>  2 0.000497      0           0     Basic CNN
-#>  3 0.00221       0           0     Basic CNN
-#>  4 0.0000120     0           0     Basic CNN
-#>  5 0.992         1           1     Basic CNN
-#>  6 0.998         1           1     Basic CNN
-#>  7 0.00000000945 0           0     Basic CNN
-#>  8 0.000290      0           0     Basic CNN
-#>  9 0.334         0           1     Basic CNN
-#> 10 0.999         1           1     Basic CNN
-#> # … with 151,562 more rows
+#> # A tibble: 151,566 x 4
+#>         .pred_1 .pred_class state model    
+#>           <dbl> <fct>       <fct> <chr>    
+#>  1 0.0000000589 0           0     Basic CNN
+#>  2 0.000144     0           0     Basic CNN
+#>  3 0.000190     0           0     Basic CNN
+#>  4 0.00929      0           0     Basic CNN
+#>  5 0.00752      0           0     Basic CNN
+#>  6 0.995        1           0     Basic CNN
+#>  7 0.000563     0           0     Basic CNN
+#>  8 0.0000185    0           0     Basic CNN
+#>  9 0.00538      0           0     Basic CNN
+#> 10 0.000931     0           0     Basic CNN
+#> # … with 151,556 more rows
 ```
 
 Now that the results are combined in `all_cnn_model_predictions` we can calculate group-wise evaluation statistics by grouping them by the `model` variable.
@@ -455,16 +452,16 @@ all_cnn_model_predictions %>%
 #> # A tibble: 12 x 4
 #>    model        .metric     .estimator .estimate
 #>    <chr>        <chr>       <chr>          <dbl>
-#>  1 Basic CNN    accuracy    binary         0.812
-#>  2 Double Conv  accuracy    binary         0.803
-#>  3 Double Dense accuracy    binary         0.807
-#>  4 Basic CNN    kap         binary         0.624
-#>  5 Double Conv  kap         binary         0.606
-#>  6 Double Dense kap         binary         0.613
-#>  7 Basic CNN    mn_log_loss binary         0.955
-#>  8 Double Conv  mn_log_loss binary         1.04 
-#>  9 Double Dense mn_log_loss binary         0.994
-#> 10 Basic CNN    roc_auc     binary         0.863
+#>  1 Basic CNN    accuracy    binary         0.811
+#>  2 Double Conv  accuracy    binary         0.807
+#>  3 Double Dense accuracy    binary         0.809
+#>  4 Basic CNN    kap         binary         0.621
+#>  5 Double Conv  kap         binary         0.614
+#>  6 Double Dense kap         binary         0.617
+#>  7 Basic CNN    mn_log_loss binary         0.971
+#>  8 Double Conv  mn_log_loss binary         1.07 
+#>  9 Double Dense mn_log_loss binary         1.00 
+#> 10 Basic CNN    roc_auc     binary         0.862
 #> 11 Double Conv  roc_auc     binary         0.854
 #> 12 Double Dense roc_auc     binary         0.859
 ```
@@ -538,20 +535,20 @@ bpe_token_dist
 ```
 
 ```
-#> # A tibble: 808,368 x 2
+#> # A tibble: 808,372 x 2
 #>    n_tokens vocab_size
 #>       <int>      <dbl>
-#>  1       16       2500
-#>  2       34       2500
-#>  3       22       2500
-#>  4       26       2500
-#>  5       13       2500
-#>  6       19       2500
-#>  7       33       2500
-#>  8       24       2500
-#>  9       35       2500
-#> 10       37       2500
-#> # … with 808,358 more rows
+#>  1        9       2500
+#>  2       35       2500
+#>  3       27       2500
+#>  4       32       2500
+#>  5       22       2500
+#>  6       45       2500
+#>  7       35       2500
+#>  8       29       2500
+#>  9       39       2500
+#> 10       33       2500
+#> # … with 808,362 more rows
 ```
 
 If we compare with the word count distribution we saw in Figure \@ref(fig:kickstarterwordlength), then we see in Figure \@ref(fig:kickstartersubwordlength) that any of these choices for vocabulary size will result in more tokens overall.
@@ -654,10 +651,10 @@ bpe_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03524
-#>     accuracy: 0.9937
-#>     val_loss: 0.9766
-#> val_accuracy: 0.8117
+#>         loss: 0.03545
+#>     accuracy: 0.9936
+#>     val_loss: 0.9515
+#> val_accuracy: 0.8119
 ```
 
 The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher detail tokenizer.
@@ -690,13 +687,11 @@ bpe_rec %>%
 ```
 
 ```
-#>  [1] "h"       "ha"      "hab"     "hal"     "ham"     "hand"    "he"     
-#>  [8] "head"    "heart"   "hearted" "heast"   "hed"     "hedul"   "heim"   
-#> [15] "hel"     "help"    "hem"     "hen"     "hent"    "her"     "here"   
-#> [22] "hern"    "hero"    "hes"     "hes,"    "hes."    "hest"    "het"    
-#> [29] "hetic"   "hett"    "hib"     "hic"     "hing"    "hing."   "hip"    
-#> [36] "hist"    "hn"      "hol"     "hold"    "hood"    "hop"     "hor"    
-#> [43] "hous"    "house"   "how"     "hr"      "hs"      "hu"
+#>  [1] "h"     "ha"    "hab"   "ham"   "hand"  "he"    "head"  "heart" "heast"
+#> [10] "hed"   "heim"  "hel"   "help"  "hem"   "hen"   "her"   "here"  "hern" 
+#> [19] "hero"  "hes"   "hes,"  "hes."  "hest"  "het"   "hetic" "hett"  "hib"  
+#> [28] "hic"   "hing"  "hing." "hip"   "hist"  "hn"    "ho"    "hol"   "hold" 
+#> [37] "hood"  "hop"   "hor"   "hous"  "house" "how"   "hr"    "hs"    "hu"
 ```
 
 Notice how some of these subword tokens are full words and some are part of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
@@ -714,14 +709,14 @@ bpe_rec %>%
 
 ```
 #>  [1] "▁singer-songwriter" "▁singer/songwriter" "▁post-apocalyptic" 
-#>  [4] "▁interchangeable"   "▁singer/songwrit"   "▁entertainment."   
-#>  [7] "▁feature-length"    "▁groundbreaking"    "▁illustrations."   
-#> [10] "▁professionally"    "▁relationships."    "▁self-published"   
-#> [13] "▁sustainability"    "▁transformation"    "▁unconventional"   
-#> [16] "▁architectural"     "▁automatically"     "▁award-winning"    
-#> [19] "▁collaborating"     "▁collaboration"     "▁collaborative"    
-#> [22] "▁coming-of-age"     "▁communication"     "▁comprehensive"    
-#> [25] "▁consciousness"
+#>  [4] "▁environmentally"   "▁interchangeable"   "▁post-production"  
+#>  [7] "▁singer/songwrit"   "▁entertainment."    "▁feature-length"   
+#> [10] "▁groundbreaking"    "▁illustrations."    "▁professionally"   
+#> [13] "▁relationships."    "▁self-published"    "▁sustainability"   
+#> [16] "▁transformation"    "▁unconventional"    "▁architectural"    
+#> [19] "▁automatically"     "▁award-winning"     "▁collaborating"    
+#> [22] "▁collaboration"     "▁collaborative"     "▁coming-of-age"    
+#> [25] "▁communication"
 ```
 
 These twenty-five words were common enough to get their own subword token, and helps us understand the nature of these Kickstarter crowdfunding campaigns.
@@ -733,12 +728,15 @@ These twenty-five words were common enough to get their own subword token, and h
 
 ## Case study: explainability with LIME {#lime}
 
-We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box" one, is using the *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. The lime package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that has driven the outcome of the prediction. 
+We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box" one, is using the *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. 
 
 <div class="rmdnote">
 <p>As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.</p>
 </div>
 
+<div class="rmdpackage">
+<p>The <strong>lime</strong> package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that has driven the outcome of the prediction.</p>
+</div>
 
 To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
 
@@ -771,8 +769,8 @@ sentence_to_explain
 ```
 
 ```
-#> [1] "The new way of learning English made simple, interesting and practical!"                                              
-#> [2] "New author prepared to publish Book One of my Crime Trilogy: The Worst of Times.  Aiming for March 2013 release date!"
+#> [1] "Exploring paint and its place in a digital world."                                                                  
+#> [2] "Mike Fassio wants a side-by-side photo of me and Hazel eating cake with our bare hands.  Let's make this a reality!"
 ```
 
 We now load the lime package and pass observations into `lime()` along with the model we are trying to explain and the preprocess function.
@@ -807,20 +805,20 @@ explanation
 ```
 
 ```
-#> # A tibble: 23 x 13
+#> # A tibble: 21 x 13
 #>    model_type    case label label_prob model_r2 model_intercept model_prediction
 #>  * <chr>        <int> <chr>      <dbl>    <dbl>           <dbl>            <dbl>
-#>  1 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  2 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  3 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  4 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  5 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  6 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  7 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  8 classificat…     1 1          0.999    0.411           0.644             1.03
-#>  9 classificat…     1 1          0.999    0.411           0.644             1.03
-#> 10 classificat…     1 1          0.999    0.411           0.644             1.03
-#> # … with 13 more rows, and 6 more variables: feature <chr>,
+#>  1 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  2 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  3 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  4 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  5 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  6 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  7 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  8 classificat…     1 1          0.990    0.220           0.789            0.995
+#>  9 classificat…     1 1          0.990    0.220           0.789            0.995
+#> 10 classificat…     2 1          1.00     0.494           0.373            0.965
+#> # … with 11 more rows, and 6 more variables: feature <chr>,
 #> #   feature_value <chr>, feature_weight <dbl>, feature_desc <chr>, data <chr>,
 #> #   prediction <list>
 ```
@@ -847,8 +845,8 @@ plot_text_explanations(explanation)
 <div class="figure" style="text-align: center">
 
 ```{=html}
-<div id="htmlwidget-6f4296aeaafbdc18239e" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6f4296aeaafbdc18239e">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='negative_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='negative_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.91%)<br/>Explainer fit: 0.41<\/sub> <\/p><br/><p> New <span class='positive_1'>author<\/span> prepared to <span class='positive_1'>publish<\/span> <span class='positive_1'>Book<\/span> <span class='negative_1'>One<\/span> of my <span class='negative_1'>Crime<\/span> Trilogy: <span class='negative_1'>The<\/span> <span class='positive_1'>Worst<\/span> of Times.  <span class='negative_1'>Aiming<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>March<\/span> 2013 <span class='negative_1'>release<\/span> <span class='negative_1'>date<\/span>! <\/br> <sub>Label predicted: 1 (99.51%)<br/>Explainer fit: 0.3<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-72c99cf26d794b2c72aa" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-72c99cf26d794b2c72aa">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Exploring<\/span> <span class='negative_1'>paint<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>its<\/span> <span class='positive_2'>place<\/span> <span class='positive_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_1'>digital<\/span> <span class='positive_1'>world<\/span>. <\/br> <sub>Label predicted: 1 (98.98%)<br/>Explainer fit: 0.22<\/sub> <\/p><br/><p> <span class='negative_1'>Mike<\/span> Fassio <span class='positive_1'>wants<\/span> <span class='negative_1'>a<\/span> side-by-side <span class='positive_1'>photo<\/span> of <span class='positive_1'>me<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>Hazel<\/span> <span class='negative_1'>eating<\/span> <span class='positive_2'>cake<\/span> with our <span class='positive_1'>bare<\/span> <span class='negative_1'>hands<\/span>.  Let's <span class='positive_1'>make<\/span> this <span class='negative_1'>a<\/span> reality! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.49<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:limeplottextexplanations)Feature highlighting of words for two examples explained by a CNN model.</p>
@@ -892,14 +890,18 @@ plot_text_explanations(explanation)
 <div class="figure" style="text-align: center">
 
 ```{=html}
-<div id="htmlwidget-70d9f6c036110bc23ac3" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-70d9f6c036110bc23ac3">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_5'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.96%)<br/>Explainer fit: 0.93<\/sub> <\/p><br/><p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.9<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-edc6d7175589f8998c64" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-edc6d7175589f8998c64">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (100%)<br/>Explainer fit: 0.81<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:robustlimeplottextexplanations)Feature highlighting of words in two examples explained by a CNN model.</p>
 </div>
 
 It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
+
+<div class="rmdnote">
+<p>The LIME algorithm and <strong>lime</strong> R package are not limited to explaining CNNs. This approach can be used with any of the models we have used in this book, even the ones trained with <strong>parsnip</strong>.</p>
+</div>
 
 ## Case study: hyperparameter search
 
@@ -1007,27 +1009,26 @@ runs_results
 ```
 
 ```
-#> # A tibble: 12 x 28
+#> # A tibble: 24 x 28
 #>    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #>    <chr>               <dbl>     <dbl>         <dbl>       <dbl>           <dbl>
-#>  1 _tuning/2021-03-1…  0.994    NA            NA          0.0333           0.993
-#>  2 _tuning/2021-03-1…  0.979    NA            NA          0.0379           0.991
-#>  3 _tuning/2021-03-1…  0.964    NA            NA          0.0508           0.987
-#>  4 _tuning/2021-03-1…  0.950    NA            NA          0.036            0.992
-#>  5 _tuning/2021-03-1…  0.974    NA            NA          0.0323           0.993
-#>  6 _tuning/2021-03-1…  0.951    NA            NA          0.0426           0.990
-#>  7 _tuning/2021-03-1… NA         1.01          0.809      0.0322           0.993
-#>  8 _tuning/2021-03-1… NA         1.00          0.804      0.0387           0.991
-#>  9 _tuning/2021-03-1… NA         0.987         0.805      0.0476           0.988
-#> 10 _tuning/2021-03-1… NA         0.954         0.811      0.0312           0.994
-#> 11 _tuning/2021-03-1… NA         0.930         0.814      0.0339           0.993
-#> 12 _tuning/2021-03-1… NA         0.922         0.807      0.0543           0.986
-#> # … with 22 more variables: metric_val_loss <dbl>, metric_val_accuracy <dbl>,
-#> #   flag_kernel_size1 <int>, flag_strides1 <int>, samples <int>,
-#> #   batch_size <int>, epochs <int>, epochs_completed <int>, metrics <chr>,
-#> #   model <chr>, loss_function <chr>, optimizer <chr>, learning_rate <dbl>,
-#> #   script <chr>, start <dttm>, end <dttm>, completed <lgl>, output <chr>,
-#> #   source_code <chr>, context <chr>, type <chr>, NA. <dbl>
+#>  1 _tuning/2021-03-25… 0.988        NA            NA      0.0328           0.993
+#>  2 _tuning/2021-03-25… 0.991        NA            NA      0.0351           0.992
+#>  3 _tuning/2021-03-25… 0.953        NA            NA      0.0507           0.987
+#>  4 _tuning/2021-03-25… 0.977        NA            NA      0.0311           0.994
+#>  5 _tuning/2021-03-25… 0.964        NA            NA      0.0322           0.993
+#>  6 _tuning/2021-03-25… 0.940        NA            NA      0.0443           0.989
+#>  7 _tuning/2021-03-24… 0.988        NA            NA      0.0328           0.993
+#>  8 _tuning/2021-03-24… 0.991        NA            NA      0.0351           0.992
+#>  9 _tuning/2021-03-24… 0.953        NA            NA      0.0507           0.987
+#> 10 _tuning/2021-03-24… 0.977        NA            NA      0.0311           0.994
+#> # … with 14 more rows, and 22 more variables: metric_val_loss <dbl>,
+#> #   metric_val_accuracy <dbl>, flag_kernel_size1 <int>, flag_strides1 <int>,
+#> #   samples <int>, batch_size <int>, epochs <int>, epochs_completed <int>,
+#> #   metrics <chr>, model <chr>, loss_function <chr>, optimizer <chr>,
+#> #   learning_rate <dbl>, script <chr>, start <dttm>, end <dttm>,
+#> #   completed <lgl>, output <chr>, source_code <chr>, context <chr>,
+#> #   type <chr>, NA. <dbl>
 ```
 
 We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.
@@ -1042,21 +1043,20 @@ best_runs
 ```
 
 ```
-#> # A tibble: 12 x 3
+#> # A tibble: 24 x 3
 #>    metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                  <dbl>             <int>         <int>
 #>  1               0.814                 5             1
 #>  2               0.813                 7             1
-#>  3               0.812                 3             1
-#>  4               0.811                 7             1
-#>  5               0.81                  5             1
-#>  6               0.809                 7             2
-#>  7               0.809                 5             2
-#>  8               0.808                 3             2
-#>  9               0.808                 7             2
-#> 10               0.807                 3             1
-#> 11               0.805                 3             2
-#> 12               0.804                 5             2
+#>  3               0.812                 5             1
+#>  4               0.812                 5             1
+#>  5               0.812                 3             1
+#>  6               0.811                 7             1
+#>  7               0.811                 7             1
+#>  8               0.811                 7             1
+#>  9               0.81                  5             1
+#> 10               0.809                 7             2
+#> # … with 14 more rows
 ```
 
 There isn't a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.
@@ -1077,11 +1077,11 @@ kick_folds
 #> # A tibble: 5 x 2
 #>   splits                 id   
 #>   <list>                 <chr>
-#> 1 <split [161673/40419]> Fold1
-#> 2 <split [161673/40419]> Fold2
-#> 3 <split [161674/40418]> Fold3
-#> 4 <split [161674/40418]> Fold4
-#> 5 <split [161674/40418]> Fold5
+#> 1 <split [161674/40419]> Fold1
+#> 2 <split [161674/40419]> Fold2
+#> 3 <split [161674/40419]> Fold3
+#> 4 <split [161675/40418]> Fold4
+#> 5 <split [161675/40418]> Fold5
 ```
 
 Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures, for more reliability.
@@ -1146,11 +1146,11 @@ cv_fitted
 #> # A tibble: 5 x 3
 #>   splits                 id    validation      
 #>   <list>                 <chr> <list>          
-#> 1 <split [161673/40419]> Fold1 <tibble [4 × 3]>
-#> 2 <split [161673/40419]> Fold2 <tibble [4 × 3]>
-#> 3 <split [161674/40418]> Fold3 <tibble [4 × 3]>
-#> 4 <split [161674/40418]> Fold4 <tibble [4 × 3]>
-#> 5 <split [161674/40418]> Fold5 <tibble [4 × 3]>
+#> 1 <split [161674/40419]> Fold1 <tibble [4 × 3]>
+#> 2 <split [161674/40419]> Fold2 <tibble [4 × 3]>
+#> 3 <split [161674/40419]> Fold3 <tibble [4 × 3]>
+#> 4 <split [161675/40418]> Fold4 <tibble [4 × 3]>
+#> 5 <split [161675/40418]> Fold5 <tibble [4 × 3]>
 ```
 
 Now we can use `unnest()` to find the metrics we computed.
@@ -1165,26 +1165,26 @@ cv_fitted %>%
 #> # A tibble: 20 x 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.825
-#>  2 <split [161673/40419]> Fold1 kap         binary         0.650
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.897
-#>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.872
-#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.825
-#>  6 <split [161673/40419]> Fold2 kap         binary         0.650
-#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.870
-#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.874
-#>  9 <split [161674/40418]> Fold3 accuracy    binary         0.825
-#> 10 <split [161674/40418]> Fold3 kap         binary         0.649
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.889
-#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.872
-#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.824
-#> 14 <split [161674/40418]> Fold4 kap         binary         0.647
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.903
-#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.872
-#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.828
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.654
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.879
-#> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.876
+#>  1 <split [161674/40419]> Fold1 accuracy    binary         0.822
+#>  2 <split [161674/40419]> Fold1 kap         binary         0.644
+#>  3 <split [161674/40419]> Fold1 mn_log_loss binary         0.901
+#>  4 <split [161674/40419]> Fold1 roc_auc     binary         0.872
+#>  5 <split [161674/40419]> Fold2 accuracy    binary         0.822
+#>  6 <split [161674/40419]> Fold2 kap         binary         0.644
+#>  7 <split [161674/40419]> Fold2 mn_log_loss binary         0.877
+#>  8 <split [161674/40419]> Fold2 roc_auc     binary         0.874
+#>  9 <split [161674/40419]> Fold3 accuracy    binary         0.826
+#> 10 <split [161674/40419]> Fold3 kap         binary         0.651
+#> 11 <split [161674/40419]> Fold3 mn_log_loss binary         0.905
+#> 12 <split [161674/40419]> Fold3 roc_auc     binary         0.873
+#> 13 <split [161675/40418]> Fold4 accuracy    binary         0.825
+#> 14 <split [161675/40418]> Fold4 kap         binary         0.649
+#> 15 <split [161675/40418]> Fold4 mn_log_loss binary         0.886
+#> 16 <split [161675/40418]> Fold4 roc_auc     binary         0.872
+#> 17 <split [161675/40418]> Fold5 accuracy    binary         0.825
+#> 18 <split [161675/40418]> Fold5 kap         binary         0.650
+#> 19 <split [161675/40418]> Fold5 mn_log_loss binary         0.902
+#> 20 <split [161675/40418]> Fold5 roc_auc     binary         0.872
 ```
 
 We can summarize the unnested results to match what we normally would get from `collect_metrics()`
@@ -1205,10 +1205,10 @@ cv_fitted %>%
 #> # A tibble: 4 x 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.826     5 0.000560
-#> 2 kap         0.650     5 0.00110 
-#> 3 mn_log_loss 0.888     5 0.00586 
-#> 4 roc_auc     0.873     5 0.000840
+#> 1 accuracy    0.824     5 0.000818
+#> 2 kap         0.648     5 0.00152 
+#> 3 mn_log_loss 0.894     5 0.00534 
+#> 4 roc_auc     0.873     5 0.000465
 ```
 
 The metrics have little variance just like they did last time, which is reassuring that our model is robust with respect to the evaluation metrics. 
@@ -1238,7 +1238,7 @@ dim(kick_matrix)
 ```
 
 ```
-#> [1] 202092     30
+#> [1] 202093     30
 ```
 
 ### Specify the model {#cnnfullmodel}
@@ -1279,10 +1279,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03223
-#>     accuracy: 0.9932
-#>     val_loss: 0.7614
-#> val_accuracy: 0.8538
+#>         loss: 0.03354
+#>     accuracy: 0.9931
+#>     val_loss: 0.7288
+#> val_accuracy: 0.8609
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -1299,10 +1299,10 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.850
-#> 2 kap         binary         0.700
-#> 3 mn_log_loss binary         0.791
-#> 4 roc_auc     binary         0.893
+#> 1 accuracy    binary         0.851
+#> 2 kap         binary         0.702
+#> 3 mn_log_loss binary         0.778
+#> 4 roc_auc     binary         0.894
 ```
 
 This is our best performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:cnnfinalroc).

@@ -7,6 +7,10 @@ To build features for supervised machine learning from natural language, we need
 In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the [**hcandersenr**](https://cran.r-project.org/package=hcandersenr) package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
+<div class="rmdpackage">
+<p><strong>tidyverse</strong> is a collection of packages for data manipulation, exploration and visualization.</p>
+</div>
+
 
 ```r
 library(tokenizers)
@@ -121,6 +125,10 @@ sample_vector <- c("Far down in the forest",
 sample_tibble <- tibble(text = sample_vector)
 ```
 
+<div class="rmdpackage">
+<p><strong>tokenizers</strong> contains functions to split text into tokens of varying kinds. Including tokens such as words, letters, n-grams, lines and paragraphs.</p>
+</div>
+
 The tokenization achieved by using `tokenize_words()` on `sample_vector`:
 
 
@@ -160,6 +168,10 @@ sample_tibble %>%
 #> 10 fir   
 #> 11 tree
 ```
+
+<div class="rmdpackage">
+<p><strong>tidytext</strong> provides functions to allow conversion of text to and from tidy formats. This allows us to work seamlessly with other tidy functions from <strong>tidyverse</strong> for further analysis.</p>
+</div>
 
 Arguments used in `tokenize_words()` can be passed through `unnest_tokens()` using the ["the dots"](https://adv-r.hadley.nz/functions.html#fun-dot-dot-dot), `...`.
 
@@ -642,12 +654,14 @@ str_split("This isn't a sentence with hyphenated-words.", "[:space:]") %>%
 #> [5] "with"             "hyphenated-words"
 ```
 
-This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). These will alternate (`|`) so that we get matches from both sides of the words. The reason we use the quantifier `+` is that there are cases where a word is followed by multiple characters we don't want, such as `"okay..."` and `"Really?!!!"`. We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list. (The example here only has one element.) 
+This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. 
 
-<div class="rmdnote">
-<p>If you are in a situation where you want to avoid using the <strong>purrr</strong> package, you can use <code>lapply()</code> instead.</p>
-<p><code>lapply(str_remove_all, pattern = "\^[:punct:]+|[:punct:]+$")</code></p>
-</div>
+- The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). 
+- The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). 
+- These will alternate (`|`) so that we get matches from both sides of the words. 
+- The reason we use the quantifier `+` is that there are cases where a word is followed by multiple characters we don't want, such as `"okay..."` and `"Really?!!!"`. 
+
+We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list. (The example here only has one element.) 
 
 Now let's see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen. 
 
@@ -714,7 +728,7 @@ str_extract_all(
 
 That is getting to be quite a complex regex, but we are now getting the same answer as before. 
 
-### Wrapping it into a function
+### Wrapping it in a function
 
 We have shown how we can use regular expressions to extract the tokens we want, perhaps to use in modeling. So far, the code has been rather unstructured. We would ideally wrap these tasks into functions that can be used the same way `tokenize_words()` is used.
 
@@ -832,11 +846,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       92.5ms    101ms     10.0     4.57MB    0    
-#> 2 tokenizers  115.3ms    120ms      8.31    1.01MB    0.924
-#> 3 text2vec     97.7ms    102ms      9.81   19.32MB    1.09 
-#> 4 quanteda    183.1ms    190ms      5.28     8.7MB    1.32 
-#> 5 base R        353ms    360ms      2.76   10.51MB    1.18
+#> 1 corpus       74.7ms   78.3ms     12.8     4.57MB     1.42
+#> 2 tokenizers   89.3ms   91.2ms     11.0     1.01MB     1.22
+#> 3 text2vec       76ms     77ms     12.9    19.34MB     1.43
+#> 4 quanteda    140.5ms  143.1ms      6.95     8.7MB     1.74
+#> 5 base R      308.6ms  310.1ms      3.22   10.51MB     1.38
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.

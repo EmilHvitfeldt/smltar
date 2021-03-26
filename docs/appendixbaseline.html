@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Foreword | Supervised Machine Learning for Text Analysis in R</title>
-  <meta name="description" content="Foreword | Supervised Machine Learning for Text Analysis in R" />
+  <title>C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R</title>
+  <meta name="description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta name="generator" content="bookdown 0.21.7 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Foreword | Supervised Machine Learning for Text Analysis in R" />
+  <meta property="og:title" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Foreword | Supervised Machine Learning for Text Analysis in R" />
+  <meta property="og:description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Foreword | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="twitter:title" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   
-  <meta name="twitter:description" content="Foreword | Supervised Machine Learning for Text Analysis in R" />
+  <meta name="twitter:description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   
 
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="embeddings.html"/>
-<link rel="next" href="mlregression.html"/>
+<link rel="prev" href="appendixdata.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs-2.7.4/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -452,54 +452,204 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="mlforeword" class="section level1 unnumbered">
-<h1>Foreword</h1>
-<p>It’s time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context. In the next two chapters, we will focus putting into practice such machine learning algorithms as:</p>
-<ul>
-<li>naive Bayes,</li>
-<li>support vector machines (SVM) <span class="citation">(<a href="#ref-Boser1992" role="doc-biblioref">Boser, Guyon, and Vapnik 1992</a>)</span>, and</li>
-<li>regularized linear models such as implemented in <a href="https://glmnet.stanford.edu/">glmnet</a> <span class="citation">(<a href="#ref-Friedman2010" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010</a>)</span>.</li>
-</ul>
-<p>We start in Chapter <a href="mlregression.html#mlregression">6</a> with exploring regression models and continue in Chapter <a href="mlclassification.html#mlclassification">7</a> with classification models. We will use the <a href="https://www.tidymodels.org/">tidymodels</a> framework for resampling, preprocessing, fitting, and evaluation. As you read through these next chapters, notice the modeling <em>process</em> moving through these stages; we’ll discuss the structure of this process in more detail in the foreword for the deep learning chapters.</p>
-<p>Before we starting fitting these models to real datasets, let’s consider how to think about algorithmic bias for predictive modeling.
-Rachel Thomas proposed a checklist at <a href="https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/">ODSC West 2019</a> for algorithmic basic in machine learning.</p>
-<div id="should-we-even-be-doing-this" class="section level2 unnumbered">
-<h2>Should we even be doing this?</h2>
-<p>This is always the first step. Machine learning algorithms involve math and data, but that does not mean they are neutral. They can be used for purposes that are helpful, harmful, or even unethical.</p>
+<div id="appendixbaseline" class="section level1" number="13">
+<h1><span class="header-section-number">C</span> Baseline linear classifier</h1>
+<p>In Chapters <a href="dldnn.html#dldnn">8</a>, <a href="dllstm.html#dllstm">9</a>, and <a href="dlcnn.html#dlcnn">10</a> we demonstrate in detail how to train and evaluate different kinds of deep learning classifiers for the Kickstarter data set of campaign blurbs and whether each campaign was successful or not. This Appendix shows a baseline linear classification model for this data set using machine learning techniques like those used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. It serves the purpose of comparison with the deep learning techniques, and also as a succinct summary of a basic supervised machine learning analysis for text.</p>
+<p>This machine learning analysis is presented with only minimal narrative; see Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> for more explanation and details.</p>
+<div id="read-in-the-data" class="section level2" number="13.1">
+<h2><span class="header-section-number">C.1</span> Read in the data</h2>
+<div class="sourceCode" id="cb679"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb679-1"><a href="appendixbaseline.html#cb679-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb679-2"><a href="appendixbaseline.html#cb679-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb679-3"><a href="appendixbaseline.html#cb679-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
+<span id="cb679-4"><a href="appendixbaseline.html#cb679-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb679-5"><a href="appendixbaseline.html#cb679-5" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 269,790 x 3
+#&gt;    blurb                                                        state created_at
+#&gt;    &lt;chr&gt;                                                        &lt;fct&gt; &lt;date&gt;    
+#&gt;  1 Exploring paint and its place in a digital world.            0     2015-03-17
+#&gt;  2 Mike Fassio wants a side-by-side photo of me and Hazel eati… 0     2014-07-11
+#&gt;  3 I need your help to get a nice graphics tablet and Photosho… 0     2014-07-30
+#&gt;  4 I want to create a Nature Photograph Series of photos of wi… 0     2015-05-08
+#&gt;  5 I want to bring colour to the world in my own artistic skil… 0     2015-02-01
+#&gt;  6 We start from some lovely pictures made by us and we decide… 0     2015-11-18
+#&gt;  7 Help me raise money to get a drawing tablet                  0     2015-04-03
+#&gt;  8 I would like to share my art with the world and to do that … 0     2014-10-15
+#&gt;  9 Post Card don’t set out to simply decorate stories. Our goa… 0     2015-06-25
+#&gt; 10 My name is Siu Lon Liu and I am an illustrator seeking fund… 0     2014-07-19
+#&gt; # … with 269,780 more rows</code></pre>
 </div>
-<div id="what-bias-is-already-in-the-data" class="section level2 unnumbered">
-<h2>What bias is already in the data?</h2>
-<p>Chapter <a href="mlregression.html#mlregression">6</a> uses a dataset of United States Supreme Court opinions, with an uneven distribution of years. There are many more opinions from more recent decades than from earlier ones. Bias like this is extremely common in datasets and must be considered in modeling. In this case, we show how using regularized linear models results in better predictions across years than other approaches (Section <a href="mlregression.html#comparerf">6.3</a>).</p>
+<div id="split-into-testtrain-and-create-resampling-folds" class="section level2" number="13.2">
+<h2><span class="header-section-number">C.2</span> Split into test/train and create resampling folds</h2>
+<div class="sourceCode" id="cb681"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb681-1"><a href="appendixbaseline.html#cb681-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb681-2"><a href="appendixbaseline.html#cb681-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb681-3"><a href="appendixbaseline.html#cb681-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
+<span id="cb681-4"><a href="appendixbaseline.html#cb681-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb681-5"><a href="appendixbaseline.html#cb681-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
+<span id="cb681-6"><a href="appendixbaseline.html#cb681-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb681-7"><a href="appendixbaseline.html#cb681-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
+<span id="cb681-8"><a href="appendixbaseline.html#cb681-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span>
+<span id="cb681-9"><a href="appendixbaseline.html#cb681-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb681-10"><a href="appendixbaseline.html#cb681-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb681-11"><a href="appendixbaseline.html#cb681-11" aria-hidden="true" tabindex="-1"></a>kickstarter_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train)</span>
+<span id="cb681-12"><a href="appendixbaseline.html#cb681-12" aria-hidden="true" tabindex="-1"></a>kickstarter_folds</span></code></pre></div>
+<pre><code>#&gt; #  10-fold cross-validation 
+#&gt; # A tibble: 10 x 2
+#&gt;    splits                 id    
+#&gt;    &lt;list&gt;                 &lt;chr&gt; 
+#&gt;  1 &lt;split [181883/20210]&gt; Fold01
+#&gt;  2 &lt;split [181883/20210]&gt; Fold02
+#&gt;  3 &lt;split [181883/20210]&gt; Fold03
+#&gt;  4 &lt;split [181884/20209]&gt; Fold04
+#&gt;  5 &lt;split [181884/20209]&gt; Fold05
+#&gt;  6 &lt;split [181884/20209]&gt; Fold06
+#&gt;  7 &lt;split [181884/20209]&gt; Fold07
+#&gt;  8 &lt;split [181884/20209]&gt; Fold08
+#&gt;  9 &lt;split [181884/20209]&gt; Fold09
+#&gt; 10 &lt;split [181884/20209]&gt; Fold10</code></pre>
 </div>
-<div id="can-the-code-and-data-be-audited" class="section level2 unnumbered">
-<h2>Can the code and data be audited?</h2>
-<p>In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the datasets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.</p>
+<div id="recipe-for-data-preprocessing" class="section level2" number="13.3">
+<h2><span class="header-section-number">C.3</span> Recipe for data preprocessing</h2>
+<div class="sourceCode" id="cb683"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb683-1"><a href="appendixbaseline.html#cb683-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb683-2"><a href="appendixbaseline.html#cb683-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb683-3"><a href="appendixbaseline.html#cb683-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb683-4"><a href="appendixbaseline.html#cb683-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb683-5"><a href="appendixbaseline.html#cb683-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb683-6"><a href="appendixbaseline.html#cb683-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
+<span id="cb683-7"><a href="appendixbaseline.html#cb683-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb683-8"><a href="appendixbaseline.html#cb683-8" aria-hidden="true" tabindex="-1"></a>kickstarter_rec</span></code></pre></div>
+<pre><code>#&gt; Data Recipe
+#&gt; 
+#&gt; Inputs:
+#&gt; 
+#&gt;       role #variables
+#&gt;    outcome          1
+#&gt;  predictor          1
+#&gt; 
+#&gt; Operations:
+#&gt; 
+#&gt; Tokenization for blurb
+#&gt; Text filtering for blurb
+#&gt; Term frequency-inverse document frequency with blurb</code></pre>
 </div>
-<div id="what-are-the-error-rates-for-sub-groups" class="section level2 unnumbered">
-<h2>What are the error rates for sub-groups?</h2>
-<p>In Section <a href="mlclassification.html#mlmulticlass">7.6</a> we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the <a href="https://yardstick.tidymodels.org/">yardstick</a> package makes this task well within the reach of data practitioners.</p>
+<div id="lasso-regularized-classification-model" class="section level2" number="13.4">
+<h2><span class="header-section-number">C.4</span> Lasso regularized classification model</h2>
+<div class="sourceCode" id="cb685"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb685-1"><a href="appendixbaseline.html#cb685-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb685-2"><a href="appendixbaseline.html#cb685-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb685-3"><a href="appendixbaseline.html#cb685-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb685-4"><a href="appendixbaseline.html#cb685-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb685-5"><a href="appendixbaseline.html#cb685-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
+<pre><code>#&gt; Logistic Regression Model Specification (classification)
+#&gt; 
+#&gt; Main Arguments:
+#&gt;   penalty = tune()
+#&gt;   mixture = 1
+#&gt; 
+#&gt; Computational engine: glmnet</code></pre>
 </div>
-<div id="what-is-the-accuracy-of-a-simple-rule-based-alternative" class="section level2 unnumbered">
-<h2>What is the accuracy of a simple rule-based alternative?</h2>
-<p>Chapter <a href="mlclassification.html#mlclassification">7</a> shows how to train models to predict the category of a user complaint using sophisticated preprocessing steps and machine learning algorithms, but such a complaint could be categorized using simple regular expressions (Appendix <a href="regexp.html#regexp">A</a>), perhaps combined with other rules. Straightforward heuristics are easy to implement, maintain, and audit, compared to machine learning models; consider comparing the accuracy of models to simpler options.</p>
+<div id="a-model-workflow" class="section level2" number="13.5">
+<h2><span class="header-section-number">C.5</span> A model workflow</h2>
+<p>We need a few more components before we can tune our workflow. Let’s use a sparse data encoding (Section <a href="mlclassification.html#casestudysparseencoding">7.5</a>).</p>
+<div class="sourceCode" id="cb687"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb687-1"><a href="appendixbaseline.html#cb687-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
+<span id="cb687-2"><a href="appendixbaseline.html#cb687-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
+<p>Let’s create a grid of possible regularization penalties to try.</p>
+<div class="sourceCode" id="cb688"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb688-1"><a href="appendixbaseline.html#cb688-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
+<span id="cb688-2"><a href="appendixbaseline.html#cb688-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 20 x 1
+#&gt;      penalty
+#&gt;        &lt;dbl&gt;
+#&gt;  1 0.00001  
+#&gt;  2 0.0000183
+#&gt;  3 0.0000336
+#&gt;  4 0.0000616
+#&gt;  5 0.000113 
+#&gt;  6 0.000207 
+#&gt;  7 0.000379 
+#&gt;  8 0.000695 
+#&gt;  9 0.00127  
+#&gt; 10 0.00234  
+#&gt; 11 0.00428  
+#&gt; 12 0.00785  
+#&gt; 13 0.0144   
+#&gt; 14 0.0264   
+#&gt; 15 0.0483   
+#&gt; 16 0.0886   
+#&gt; 17 0.162    
+#&gt; 18 0.298    
+#&gt; 19 0.546    
+#&gt; 20 1</code></pre>
+<p>Now these can be combined in a tuneable <code>workflow()</code>.</p>
+<div class="sourceCode" id="cb690"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb690-1"><a href="appendixbaseline.html#cb690-1" aria-hidden="true" tabindex="-1"></a>kickstarter_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb690-2"><a href="appendixbaseline.html#cb690-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kickstarter_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
+<span id="cb690-3"><a href="appendixbaseline.html#cb690-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb690-4"><a href="appendixbaseline.html#cb690-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb690-5"><a href="appendixbaseline.html#cb690-5" aria-hidden="true" tabindex="-1"></a>kickstarter_wf</span></code></pre></div>
+<pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
+#&gt; Preprocessor: Recipe
+#&gt; Model: logistic_reg()
+#&gt; 
+#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────
+#&gt; 3 Recipe Steps
+#&gt; 
+#&gt; ● step_tokenize()
+#&gt; ● step_tokenfilter()
+#&gt; ● step_tfidf()
+#&gt; 
+#&gt; ── Model ───────────────────────────────────────────────────────────────────────
+#&gt; Logistic Regression Model Specification (classification)
+#&gt; 
+#&gt; Main Arguments:
+#&gt;   penalty = tune()
+#&gt;   mixture = 1
+#&gt; 
+#&gt; Computational engine: glmnet</code></pre>
 </div>
-<div id="what-processes-are-in-place-to-handle-appeals-or-mistakes" class="section level2 unnumbered">
-<h2>What processes are in place to handle appeals or mistakes?</h2>
-<p>If models such as those built in Chapter <a href="mlclassification.html#mlclassification">7</a> were put into production by an organization, what would happen if a complaint was classified incorrectly? We as data practitioners typically (hopefully) have a reasonable estimate of the true positive rate and true negative rate for models we train, so processes to handle misclassifications can be built with a good understanding of how often they will be used.</p>
-</div>
-<div id="how-diverse-is-the-team-that-built-it" class="section level2 unnumbered">
-<h2>How diverse is the team that built it?</h2>
-<p>The two-person team that wrote this book includes perspectives from a man and woman, and from someone who has always lived inside the United States and someone who is from a European country. However, we are both white with similar educational backgrounds. We must be aware of how the limited life experiences of individuals training and assessing machine learning models can cause unintentional harm.</p>
+<div id="tune-the-workflow" class="section level2" number="13.6">
+<h2><span class="header-section-number">C.6</span> Tune the workflow</h2>
+<div class="sourceCode" id="cb692"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb692-1"><a href="appendixbaseline.html#cb692-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
+<span id="cb692-2"><a href="appendixbaseline.html#cb692-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb692-3"><a href="appendixbaseline.html#cb692-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
+<span id="cb692-4"><a href="appendixbaseline.html#cb692-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_folds,</span>
+<span id="cb692-5"><a href="appendixbaseline.html#cb692-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid</span>
+<span id="cb692-6"><a href="appendixbaseline.html#cb692-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb692-7"><a href="appendixbaseline.html#cb692-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb692-8"><a href="appendixbaseline.html#cb692-8" aria-hidden="true" tabindex="-1"></a>lasso_rs</span></code></pre></div>
+<pre><code>#&gt; # Tuning results
+#&gt; # 10-fold cross-validation 
+#&gt; # A tibble: 10 x 4
+#&gt;    splits                 id     .metrics          .notes          
+#&gt;    &lt;list&gt;                 &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
+#&gt;  1 &lt;split [181883/20210]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  2 &lt;split [181883/20210]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  3 &lt;split [181883/20210]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  4 &lt;split [181884/20209]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  5 &lt;split [181884/20209]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  6 &lt;split [181884/20209]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  7 &lt;split [181884/20209]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  8 &lt;split [181884/20209]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  9 &lt;split [181884/20209]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt; 10 &lt;split [181884/20209]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+<p>What are the best models?</p>
+<div class="sourceCode" id="cb694"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb694-1"><a href="appendixbaseline.html#cb694-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 5 x 7
+#&gt;     penalty .metric .estimator  mean     n  std_err .config              
+#&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+#&gt; 1 0.000695  roc_auc binary     0.752    10 0.000856 Preprocessor1_Model08
+#&gt; 2 0.000379  roc_auc binary     0.752    10 0.000889 Preprocessor1_Model07
+#&gt; 3 0.000207  roc_auc binary     0.751    10 0.000903 Preprocessor1_Model06
+#&gt; 4 0.000113  roc_auc binary     0.751    10 0.000914 Preprocessor1_Model05
+#&gt; 5 0.0000616 roc_auc binary     0.751    10 0.000920 Preprocessor1_Model04</code></pre>
+<div class="sourceCode" id="cb696"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb696-1"><a href="appendixbaseline.html#cb696-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 5 x 7
+#&gt;     penalty .metric  .estimator  mean     n  std_err .config              
+#&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+#&gt; 1 0.000379  accuracy binary     0.684    10 0.000764 Preprocessor1_Model07
+#&gt; 2 0.000695  accuracy binary     0.684    10 0.000732 Preprocessor1_Model08
+#&gt; 3 0.000207  accuracy binary     0.684    10 0.000905 Preprocessor1_Model06
+#&gt; 4 0.0000616 accuracy binary     0.684    10 0.000909 Preprocessor1_Model04
+#&gt; 5 0.000113  accuracy binary     0.684    10 0.000879 Preprocessor1_Model05</code></pre>
+<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="appendixbaseline.html#cb698-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
+<p><img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 
-</div>
-</div>
-<h3>References</h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Boser1992" class="csl-entry">
-Boser, Bernhard E, Isabelle M Guyon, and Vladimir N Vapnik. 1992. <span>“A Training Algorithm for Optimal Margin Classifiers.”</span> In <em>Proceedings of the Fifth Annual Workshop on Computational Learning Theory</em>, 144–52.
-</div>
-<div id="ref-Friedman2010" class="csl-entry">
-Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2010. <span>“Regularization Paths for Generalized Linear Models via Coordinate Descent.”</span> <em>Journal of Statistical Software</em> 33 (1): 1–22. <a href="http://www.jstatsoft.org/v33/i01/">http://www.jstatsoft.org/v33/i01/</a>.
 </div>
 </div>
             </section>
@@ -507,8 +657,8 @@ Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2010. <span>“Regulariz
           </div>
         </div>
       </div>
-<a href="embeddings.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="mlregression.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="appendixdata.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -535,7 +685,7 @@ gitbook.start({
 },
 "fontsettings": null,
 "edit": {
-"link": "https://github.com/EmilHvitfeldt/smltar/edit/master/ml_preface.Rmd",
+"link": "https://github.com/EmilHvitfeldt/smltar/edit/master/14_baseline_classifier.Rmd",
 "text": "Edit"
 },
 "history": {

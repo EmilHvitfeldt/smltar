@@ -282,7 +282,7 @@ nearest_neighbors <- function(df, token) {
 }
 ```
 
-This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and summations to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word and returns a dataframe sorted by similarity.
+This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and sums to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.
 
 What words are closest to `"error"` in the data set of CFPB complaints, as determined by our word embeddings?
 
@@ -363,12 +363,12 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
-We find a lot of dollar amounts which makes sense. Let us filter out the numbers to see what words are similar to `"fee'`
+We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to `"fee'`
 
 
 ```r
 tidy_word_vectors %>%
-    nearest_neighbors("fee") %>%
+  nearest_neighbors("fee") %>%
   filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE))
 ```
 
@@ -389,7 +389,7 @@ tidy_word_vectors %>%
 #> # … with 7,037 more rows
 ```
 
-We now find words about interest, charges, and overdrafts. The top two words and "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
+We now find words about interest, charges, and overdrafts. The top two words are "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
@@ -401,8 +401,8 @@ tidy_word_vectors %>%
     top_n(12, abs(value)) %>%
     ungroup %>%
     mutate(item1 = reorder_within(item1, value, dimension)) %>%
-    ggplot(aes(item1, value, fill = as.factor(dimension))) +
-    geom_col(show.legend = FALSE) +
+    ggplot(aes(item1, value, fill = dimension)) +
+    geom_col(alpha = 0.8, show.legend = FALSE) +
     facet_wrap(~dimension, scales = "free_y", ncol = 4) +
     scale_x_reordered() +
     coord_flip() +
@@ -470,7 +470,6 @@ glove6b <- embedding_glove6b(dimensions = 100)
 glove6b
 ```
 
-
 ```
 #> # A tibble: 400,000 x 101
 #>    token      d1      d2      d3      d4      d5      d6      d7      d8      d9
@@ -526,7 +525,13 @@ We've already explored some sets of "synonyms" in the embedding space we determi
 nearest_neighbors <- function(df, token) {
   df %>%
     widely(
-      ~ . %*% (.[token, ]),
+      ~ {
+        y <- .[rep(token, nrow(.)), ]
+        res <- rowSums(. * y) / 
+          (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
+
+        matrix(res, ncol = 1, dimnames = list(x = names(res)))
+        },
       sort = TRUE,
       maximum_size = NULL
     )(item1, dimension, value) %>%
@@ -546,16 +551,16 @@ tidy_glove %>%
 #> # A tibble: 400,000 x 2
 #>    item1       value
 #>    <chr>       <dbl>
-#>  1 error        34.6
-#>  2 errors       28.1
-#>  3 data         19.8
-#>  4 inning       19.4
-#>  5 game         19.3
-#>  6 percentage   19.3
-#>  7 probability  19.2
-#>  8 unforced     19.1
-#>  9 fault        19.1
-#> 10 point        19.0
+#>  1 error       1.   
+#>  2 errors      0.792
+#>  3 mistake     0.664
+#>  4 correct     0.621
+#>  5 incorrect   0.613
+#>  6 fault       0.607
+#>  7 difference  0.594
+#>  8 mistakes    0.586
+#>  9 calculation 0.584
+#> 10 probability 0.583
 #> # … with 399,990 more rows
 ```
 
@@ -571,18 +576,18 @@ tidy_glove %>%
 
 ```
 #> # A tibble: 400,000 x 2
-#>    item1     value
-#>    <chr>     <dbl>
-#>  1 month      32.4
-#>  2 year       31.2
-#>  3 last       30.6
-#>  4 week       30.5
-#>  5 wednesday  29.6
-#>  6 tuesday    29.5
-#>  7 monday     29.3
-#>  8 thursday   29.1
-#>  9 percent    28.9
-#> 10 friday     28.9
+#>    item1    value
+#>    <chr>    <dbl>
+#>  1 month    1    
+#>  2 week     0.939
+#>  3 last     0.924
+#>  4 months   0.898
+#>  5 year     0.893
+#>  6 weeks    0.865
+#>  7 earlier  0.859
+#>  8 tuesday  0.846
+#>  9 ago      0.844
+#> 10 thursday 0.841
 #> # … with 399,990 more rows
 ```
 
@@ -600,16 +605,16 @@ tidy_glove %>%
 #> # A tibble: 400,000 x 2
 #>    item1        value
 #>    <chr>        <dbl>
-#>  1 fee           39.8
-#>  2 fees          30.7
-#>  3 pay           26.6
-#>  4 $             26.4
-#>  5 salary        25.9
-#>  6 payment       25.9
-#>  7 £             25.4
-#>  8 tax           24.9
-#>  9 payments      23.8
-#> 10 subscription  23.1
+#>  1 fee          1.   
+#>  2 fees         0.832
+#>  3 payment      0.741
+#>  4 pay          0.711
+#>  5 salary       0.700
+#>  6 paid         0.668
+#>  7 payments     0.653
+#>  8 subscription 0.647
+#>  9 paying       0.623
+#> 10 expenses     0.619
 #> # … with 399,990 more rows
 ```
 
@@ -665,7 +670,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 - Women's first names are more associated with family and men's first names are more associated with career.
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
-Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/)] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
+Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034).] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
 Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 

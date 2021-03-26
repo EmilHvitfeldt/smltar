@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-03-16"
+date: "2021-03-24"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
@@ -89,13 +89,13 @@ We would like to thank Max Kuhn and Davis Vaughan for their investment in the ti
 
 
 
-This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to all 3 people who contributed via GitHub pull requests (in alphabetical order by username): \@fellennert, Tanner Stauss (\@tmstauss), Darrin Speegle (\@speegled).
+This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to the 4 people who contributed via GitHub pull requests (in alphabetical order by username): \@fellennert, Riva Quiroga (\@rivaquiroga), Darrin Speegle (\@speegled), Tanner Stauss (\@tmstauss).
 
 Note box icons by Smashicons from flaticon.com
 
 ## Colophon {-}
 
-This book was written in [RStudio](http://www.rstudio.com/ide/) using [bookdown](http://bookdown.org/). The [website](https://smltar.com/) is hosted via [Netlify](http://netlify.com/), and automatically built after every push by [GitHub Actions](https://help.github.com/actions). The complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [ggplot2](https://ggplot2.tidyverse.org/) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors, modified code can be found [here](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
+This book was written in [RStudio](http://www.rstudio.com/ide/) using [bookdown](http://bookdown.org/). The [website](https://smltar.com/) is hosted via [GitHub Pages](https://pages.github.com/), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [ggplot2](https://ggplot2.tidyverse.org/) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors, modified code can be found [here](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
 This version of the book was built with R version 4.0.3 (2020-10-10) and the following packages:
 
@@ -121,7 +121,7 @@ This version of the book was built with R version 4.0.3 (2020-10-10) and the fol
 |lime           |0.5.2      |standard (\@0.5.2)                       |
 |lobstr         |1.1.1      |CRAN (R 4.0.0)                           |
 |naivebayes     |0.9.7      |CRAN (R 4.0.0)                           |
-|parsnip        |0.1.5.9001 |Github (tidymodels/parsnip\@5865c53)     |
+|parsnip        |0.1.5.9002 |Github (tidymodels/parsnip\@110257f)     |
 |quanteda       |2.1.2      |CRAN (R 4.0.2)                           |
 |ranger         |0.12.1     |CRAN (R 4.0.0)                           |
 |remotes        |2.2.0      |CRAN (R 4.0.2)                           |
@@ -131,7 +131,7 @@ This version of the book was built with R version 4.0.3 (2020-10-10) and the fol
 |scotus         |0.0.0.9000 |Github (EmilHvitfeldt/scotus\@8374be1)   |
 |servr          |0.21       |CRAN (R 4.0.2)                           |
 |sessioninfo    |1.1.1      |CRAN (R 4.0.0)                           |
-|slider         |0.1.5      |CRAN (R 4.0.2)                           |
+|slider         |0.2.0      |standard (\@0.2.0)                       |
 |SnowballC      |0.7.0      |CRAN (R 4.0.0)                           |
 |spacyr         |1.2.1      |CRAN (R 4.0.0)                           |
 |stopwords      |2.2        |CRAN (R 4.0.3)                           |
