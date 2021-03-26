@@ -9,8 +9,8 @@ These chapters on deep learning are broken up by network architecture instead of
 We'll use Keras [@R-keras] with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
 Keras provides extensive support for creating and training many kinds of deep learning models, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 
 
-```{block, type = "rmdnote"}
-The tidymodels framework is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.
+```{block, type = "rmdpackage"}
+The **tidymodels** framework of R packages is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.
 ```
 
 This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. We can also use this type of network architecture as a bridge between the bag-of-words approaches we explored in detail in Chapters \@ref(mlregression) and \@ref(mlclassification) to non-bag-of-words approaches we will use in Chapters \@ref(dllstm) and \@ref(dlcnn). Deep learning allows us to incorporate not just word counts but also word sequences and positions.
@@ -139,6 +139,11 @@ kickstarter_train %>%
 ```
 
 Given that we don't have many words for this particular dataset to begin with, let's err on the side of longer sequences so we don't lose valuable data. Let's try 30 words for our threshold `max_length`, and let's include 20,000 words in our vocabulary.
+
+```{block2, type = "rmdpackage"}
+We will use the **recipes** and **textrecipes** packages for data preprocessing and feature engineering for our deep learning models, just like we did for our models in Chapters \@ref(mlregression) and \@ref(mlclassification). To use a recipe, we first specify it with the variables we want to include and the steps we want to use in feature engineering.
+```
+
 
 ```{r prepped_recipe}
 library(textrecipes)
@@ -282,7 +287,7 @@ We still have a few things left to add to this model before we can fit it to the
 When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network's weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself^[https://keras.io/api/optimizers/]; you can even create custom optimizers if what you need isn't on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.
 
 ```{block, type = "rmdnote"}
-An optimizer can either be set with the name of the optimizer as a character or by supplying the function `optimizer_*()` where `*` is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
+An optimizer can either be set with the name of the optimizer as a character or by supplying the function `optimizer_foo()` where `foo` is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
 ```
 
 During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras^[https://keras.io/api/losses/]. These loss function typically has two arguments, the true value and the predicted value, and returns a measure of how close they are. 
@@ -612,7 +617,7 @@ metrics(pte2_res, state, .pred_class)
 
 This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
 
-```{block, type = "rmdnote"}
+```{block2, type = "rmdnote"}
 If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with, both for the reasons laid out there and for the issues highlighted in Section \@ref(fairnessembeddings).
 ```
 
