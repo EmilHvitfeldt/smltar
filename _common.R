@@ -34,7 +34,7 @@ alpha_viridis <- function(...) {
 }
 
 suppressPackageStartupMessages(library(tidyverse))
-
+suppressPackageStartupMessages(library(tidymodels))
 theme_set(theme_light())
 
 update_geom_defaults("col", list(fill = "#8097ae", alpha = 0.9))
