@@ -138,7 +138,7 @@ dim(complaints_train)
 ```
 
 ```
-#> [1] 87910    18
+#> [1] 87911    18
 ```
 
 ```r
@@ -146,7 +146,7 @@ dim(complaints_test)
 ```
 
 ```
-#> [1] 29304    18
+#> [1] 29303    18
 ```
 
 Next we need to preprocess this data to prepare it for modeling; we have text data, and we need to build numeric features for machine learning from that text.
@@ -161,7 +161,7 @@ complaints_rec <-
 ```
 
 Now we add steps to process the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
-Next we remove stop words with `step_stopwords()`; the default choice is the Snowball stop word list, but custom lists can be provided too. Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
+Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
 
 
 ```r
@@ -169,7 +169,6 @@ library(textrecipes)
 
 complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
@@ -185,6 +184,10 @@ complaint_wf <- workflow() %>%
 Let's start with a naive Bayes model [@kim2006; @Kibriya2005; @Eibe2006], which is available in the tidymodels package **discrim**.
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
+
+<div class="rmdpackage">
+<p><strong>discrim</strong> is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models. Naive Bayes being on of them.</p>
+</div>
 
 
 ```r
@@ -232,16 +235,16 @@ complaints_folds
 #> # A tibble: 10 x 2
 #>    splits               id    
 #>    <list>               <chr> 
-#>  1 <split [79119/8791]> Fold01
-#>  2 <split [79119/8791]> Fold02
-#>  3 <split [79119/8791]> Fold03
-#>  4 <split [79119/8791]> Fold04
-#>  5 <split [79119/8791]> Fold05
-#>  6 <split [79119/8791]> Fold06
-#>  7 <split [79119/8791]> Fold07
-#>  8 <split [79119/8791]> Fold08
-#>  9 <split [79119/8791]> Fold09
-#> 10 <split [79119/8791]> Fold10
+#>  1 <split [79119/8792]> Fold01
+#>  2 <split [79120/8791]> Fold02
+#>  3 <split [79120/8791]> Fold03
+#>  4 <split [79120/8791]> Fold04
+#>  5 <split [79120/8791]> Fold05
+#>  6 <split [79120/8791]> Fold06
+#>  7 <split [79120/8791]> Fold07
+#>  8 <split [79120/8791]> Fold08
+#>  9 <split [79120/8791]> Fold09
+#> 10 <split [79120/8791]> Fold10
 ```
 
 Each of these splits contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.
@@ -267,10 +270,9 @@ nb_wf
 #> Model: naive_Bayes()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 4 Recipe Steps
+#> 3 Recipe Steps
 #> 
 #> ● step_tokenize()
-#> ● step_stopwords()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -308,13 +310,13 @@ nb_rs_metrics
 
 ```
 #> # A tibble: 2 x 6
-#>   .metric  .estimator  mean     n std_err .config             
-#>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 accuracy binary     0.684    10 0.00401 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.881    10 0.00160 Preprocessor1_Model1
+#>   .metric  .estimator  mean     n  std_err .config             
+#>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
+#> 1 accuracy binary     0.678    10 0.00635  Preprocessor1_Model1
+#> 2 roc_auc  binary     0.874    10 0.000833 Preprocessor1_Model1
 ```
 
-The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 68.4%.
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 67.8%.
 
 <div class="rmdnote">
 <p>Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.</p>
@@ -345,13 +347,11 @@ nb_rs_predictions %>%
 The area under each of these curves is the `roc_auc` metric we have computed. If the curve was close to the diagonal line, then the model's predictions would be no better than random guessing.
 
 Another way to evaluate our model is to evaluate the confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
-There is not a trivial way to visualize multiple confusion matrices, so we can look at them individually for a single fold.
+The function `conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.
 
 
 ```r
-nb_rs_predictions %>%
-  filter(id == "Fold01") %>%
-  conf_mat(product, .pred_class) %>%
+conf_mat_resampled(nb_rs) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -360,7 +360,7 @@ nb_rs_predictions %>%
 <p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'</p>
 </div>
 
-In Figure \@ref(fig:firstheatmap), the diagonal squares have darker shades than the off diagonal squares. This is a good sign, meaning that our model is right more often then not! However, this first model is struggling somewhat since there are close to even odds when predicting something from the "Other" class.
+In Figure \@ref(fig:firstheatmap), the square for "Credit"/"Credit" has a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not for the positive case! However, this first model is struggling somewhat since such a high number of observations from the "Other" class are being mispredicted.
 
 <div class="rmdwarning">
 <p>One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.</p>
@@ -400,7 +400,7 @@ null_rs %>%
 #> # A tibble: 2 x 6
 #>   .metric  .estimator  mean     n std_err .config             
 #>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 accuracy binary     0.526    10 0.00143 Preprocessor1_Model1
+#> 1 accuracy binary     0.526    10 0.00149 Preprocessor1_Model1
 #> 2 roc_auc  binary     0.5      10 0       Preprocessor1_Model1
 ```
 
@@ -409,7 +409,7 @@ The accuracy and ROC AUC indicate that this null model is, like in the regressio
 
 ## Compare to a lasso classification model {#comparetolasso}
 
-Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani2016], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
+Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani1996], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
 
 <div class="rmdnote">
 <p>Using regularization helps us choose a simpler model that we expect to generalize better to new observations, and variable selection helps us identify which features to include in our model.</p>
@@ -490,8 +490,8 @@ lasso_rs_metrics
 #> # A tibble: 2 x 6
 #>   .metric  .estimator  mean     n  std_err .config             
 #>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.868    10 0.000964 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.936    10 0.000651 Preprocessor1_Model1
+#> 1 accuracy binary     0.863    10 0.000988 Preprocessor1_Model1
+#> 2 roc_auc  binary     0.936    10 0.000817 Preprocessor1_Model1
 ```
 
 This looks pretty promising, considering we haven't yet done any tuning on the lasso hyperparameters.
@@ -520,9 +520,7 @@ Our lasso model is much better at separating the classes than the naive Bayes mo
 
 
 ```r
-lasso_rs_predictions %>%
-  filter(id == "Fold01") %>%
-  conf_mat(product, .pred_class) %>%
+conf_mat_resampled(lasso_rs) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -619,16 +617,16 @@ tune_rs
 #> # A tibble: 10 x 5
 #>    splits             id     .metrics        .notes         .predictions        
 #>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  2 <split [79119/879… Fold02 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  3 <split [79119/879… Fold03 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  4 <split [79119/879… Fold04 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  5 <split [79119/879… Fold05 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  6 <split [79119/879… Fold06 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  7 <split [79119/879… Fold07 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  8 <split [79119/879… Fold08 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  9 <split [79119/879… Fold09 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#> 10 <split [79119/879… Fold10 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  1 <split [79119/879… Fold01 <tibble [60 × … <tibble [0 × … <tibble [263,760 × …
+#>  2 <split [79120/879… Fold02 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  3 <split [79120/879… Fold03 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  4 <split [79120/879… Fold04 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  5 <split [79120/879… Fold05 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  6 <split [79120/879… Fold06 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  7 <split [79120/879… Fold07 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  8 <split [79120/879… Fold08 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  9 <split [79120/879… Fold09 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#> 10 <split [79120/879… Fold10 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
 ```
 
 <div class="rmdwarning">
@@ -646,16 +644,16 @@ collect_metrics(tune_rs)
 #> # A tibble: 60 x 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
-#>  1 1.00e-10 accuracy binary     0.884    10 0.000992 Preprocessor1_Model01
-#>  2 1.00e-10 roc_auc  binary     0.947    10 0.000636 Preprocessor1_Model01
-#>  3 2.21e-10 accuracy binary     0.884    10 0.000992 Preprocessor1_Model02
-#>  4 2.21e-10 roc_auc  binary     0.947    10 0.000636 Preprocessor1_Model02
-#>  5 4.89e-10 accuracy binary     0.884    10 0.000992 Preprocessor1_Model03
-#>  6 4.89e-10 roc_auc  binary     0.947    10 0.000636 Preprocessor1_Model03
-#>  7 1.08e- 9 accuracy binary     0.884    10 0.000992 Preprocessor1_Model04
-#>  8 1.08e- 9 roc_auc  binary     0.947    10 0.000636 Preprocessor1_Model04
-#>  9 2.40e- 9 accuracy binary     0.884    10 0.000992 Preprocessor1_Model05
-#> 10 2.40e- 9 roc_auc  binary     0.947    10 0.000636 Preprocessor1_Model05
+#>  1 1.00e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model01
+#>  2 1.00e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model01
+#>  3 2.21e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model02
+#>  4 2.21e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model02
+#>  5 4.89e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model03
+#>  6 4.89e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model03
+#>  7 1.08e- 9 accuracy binary     0.884    10 0.00109  Preprocessor1_Model04
+#>  8 1.08e- 9 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model04
+#>  9 2.40e- 9 accuracy binary     0.884    10 0.00109  Preprocessor1_Model05
+#> 10 2.40e- 9 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model05
 #> # … with 50 more rows
 ```
 
@@ -687,20 +685,14 @@ tune_rs %>%
 #> # A tibble: 5 x 7
 #>    penalty .metric .estimator  mean     n  std_err .config              
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 3.56e- 4 roc_auc binary     0.947    10 0.000635 Preprocessor1_Model20
-#> 2 1.61e- 4 roc_auc binary     0.947    10 0.000637 Preprocessor1_Model19
-#> 3 7.88e- 4 roc_auc binary     0.947    10 0.000624 Preprocessor1_Model21
-#> 4 1.00e-10 roc_auc binary     0.947    10 0.000636 Preprocessor1_Model01
-#> 5 2.21e-10 roc_auc binary     0.947    10 0.000636 Preprocessor1_Model02
+#> 1 3.56e- 4 roc_auc binary     0.947    10 0.000779 Preprocessor1_Model20
+#> 2 1.61e- 4 roc_auc binary     0.947    10 0.000783 Preprocessor1_Model19
+#> 3 7.28e- 5 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model18
+#> 4 1.00e-10 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model01
+#> 5 2.21e-10 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model02
 ```
 
 
-```r
-tune_rs_auc <- show_best(tune_rs, "roc_auc") %>%
-  pull(mean) %>%
-  max() %>%
-  round(3)
-```
 
 The best value for ROC AUC from this tuning run is 0.947. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`, or a simpler model with higher regularization with `select_by_pct_loss()` or `select_by_one_std_err()` Let's choose the model with the best ROC AUC within one standard error of the numerically best model [@Breiman1984].
 
@@ -714,9 +706,9 @@ chosen_auc
 
 ```
 #> # A tibble: 1 x 9
-#>   penalty .metric .estimator  mean     n  std_err .config           .best .bound
-#>     <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>             <dbl>  <dbl>
-#> 1 0.00174 roc_auc binary     0.947    10 0.000616 Preprocessor1_Mo… 0.947  0.947
+#>    penalty .metric .estimator  mean     n  std_err .config          .best .bound
+#>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>            <dbl>  <dbl>
+#> 1 0.000788 roc_auc binary     0.947    10 0.000778 Preprocessor1_M… 0.947  0.946
 ```
 
 Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
@@ -734,10 +726,9 @@ final_lasso
 #> Model: logistic_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 4 Recipe Steps
+#> 3 Recipe Steps
 #> 
 #> ● step_tokenize()
-#> ● step_stopwords()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -745,13 +736,13 @@ final_lasso
 #> Logistic Regression Model Specification (classification)
 #> 
 #> Main Arguments:
-#>   penalty = 0.00174332882219999
+#>   penalty = 0.000788046281566992
 #>   mixture = 1
 #> 
 #> Computational engine: glmnet
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 0.00174. This workflow is ready to go! It can now be fit to our training data.
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 7.9\times 10^{-4}. This workflow is ready to go! It can now be fit to our training data.
 
 
 ```r
@@ -770,18 +761,18 @@ fitted_lasso %>%
 
 ```
 #> # A tibble: 501 x 3
-#>    term                                        estimate penalty
-#>    <chr>                                          <dbl>   <dbl>
-#>  1 tfidf_consumer_complaint_narrative_funds       10.2  0.00174
-#>  2 tfidf_consumer_complaint_narrative_debt         8.63 0.00174
-#>  3 tfidf_consumer_complaint_narrative_money        7.20 0.00174
-#>  4 tfidf_consumer_complaint_narrative_escrow       7.05 0.00174
-#>  5 tfidf_consumer_complaint_narrative_interest     6.97 0.00174
-#>  6 tfidf_consumer_complaint_narrative_transfer     6.93 0.00174
-#>  7 tfidf_consumer_complaint_narrative_collect      6.49 0.00174
-#>  8 tfidf_consumer_complaint_narrative_cash         6.30 0.00174
-#>  9 tfidf_consumer_complaint_narrative_refund       6.06 0.00174
-#> 10 tfidf_consumer_complaint_narrative_fees         6.00 0.00174
+#>    term                                        estimate  penalty
+#>    <chr>                                          <dbl>    <dbl>
+#>  1 tfidf_consumer_complaint_narrative_funds        27.0 0.000788
+#>  2 tfidf_consumer_complaint_narrative_debt         21.0 0.000788
+#>  3 tfidf_consumer_complaint_narrative_money        17.9 0.000788
+#>  4 tfidf_consumer_complaint_narrative_escrow       17.0 0.000788
+#>  5 tfidf_consumer_complaint_narrative_interest     15.6 0.000788
+#>  6 tfidf_consumer_complaint_narrative_collect      15.6 0.000788
+#>  7 tfidf_consumer_complaint_narrative_transfer     15.5 0.000788
+#>  8 tfidf_consumer_complaint_narrative_fees         14.3 0.000788
+#>  9 tfidf_consumer_complaint_narrative_deposit      13.9 0.000788
+#> 10 tfidf_consumer_complaint_narrative_sure         13.7 0.000788
 #> # … with 491 more rows
 ```
 
@@ -799,18 +790,18 @@ fitted_lasso %>%
 
 ```
 #> # A tibble: 501 x 3
-#>    term                                          estimate penalty
-#>    <chr>                                            <dbl>   <dbl>
-#>  1 tfidf_consumer_complaint_narrative_experian     -25.3  0.00174
-#>  2 tfidf_consumer_complaint_narrative_transunion   -23.0  0.00174
-#>  3 tfidf_consumer_complaint_narrative_equifax      -22.3  0.00174
-#>  4 tfidf_consumer_complaint_narrative_reporting    -11.4  0.00174
-#>  5 tfidf_consumer_complaint_narrative_inquiries     -8.83 0.00174
-#>  6 tfidf_consumer_complaint_narrative_report        -7.83 0.00174
-#>  7 tfidf_consumer_complaint_narrative_compliance    -7.21 0.00174
-#>  8 tfidf_consumer_complaint_narrative_inquiry       -7.03 0.00174
-#>  9 tfidf_consumer_complaint_narrative_credit        -6.57 0.00174
-#> 10 tfidf_consumer_complaint_narrative_score         -5.86 0.00174
+#>    term                                          estimate  penalty
+#>    <chr>                                            <dbl>    <dbl>
+#>  1 tfidf_consumer_complaint_narrative_experian      -61.7 0.000788
+#>  2 tfidf_consumer_complaint_narrative_transunion    -53.7 0.000788
+#>  3 tfidf_consumer_complaint_narrative_equifax       -51.1 0.000788
+#>  4 tfidf_consumer_complaint_narrative_reporting     -22.4 0.000788
+#>  5 tfidf_consumer_complaint_narrative_compliance    -17.8 0.000788
+#>  6 tfidf_consumer_complaint_narrative_report        -16.7 0.000788
+#>  7 tfidf_consumer_complaint_narrative_inquiries     -16.5 0.000788
+#>  8 tfidf_consumer_complaint_narrative_score         -15.8 0.000788
+#>  9 tfidf_consumer_complaint_narrative_credit        -14.1 0.000788
+#> 10 tfidf_consumer_complaint_narrative_inquiry       -13.6 0.000788
 #> # … with 491 more rows
 ```
 
@@ -824,7 +815,7 @@ We can change how our text data is represented to take advantage of its sparsity
 
 To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package hardhat.
 
-<div class="rmdwarning">
+<div class="rmdpackage">
 <p>The <a href="https://hardhat.tidymodels.org/">hardhat</a> package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don’t use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.</p>
 </div>
 
@@ -851,10 +842,9 @@ sparse_wf
 #> Model: logistic_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 4 Recipe Steps
+#> 3 Recipe Steps
 #> 
 #> ● step_tokenize()
-#> ● step_stopwords()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -922,16 +912,16 @@ sparse_rs
 #> # A tibble: 10 x 4
 #>    splits               id     .metrics          .notes          
 #>    <list>               <chr>  <list>            <list>          
-#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
-#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  1 <split [79119/8792]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  2 <split [79120/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  3 <split [79120/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  4 <split [79120/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  5 <split [79120/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  6 <split [79120/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  7 <split [79120/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  8 <split [79120/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  9 <split [79120/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
+#> 10 <split [79120/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
 ```
 
 How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of `set_engine("glmnet")`?
@@ -944,13 +934,13 @@ sparse_rs %>%
 
 ```
 #> # A tibble: 5 x 7
-#>    penalty .metric .estimator  mean     n  std_err .config              
-#>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000379 roc_auc binary     0.947    10 0.000634 Preprocessor1_Model07
-#> 2 0.000207 roc_auc binary     0.947    10 0.000637 Preprocessor1_Model06
-#> 3 0.000695 roc_auc binary     0.947    10 0.000627 Preprocessor1_Model08
-#> 4 0.000113 roc_auc binary     0.947    10 0.000637 Preprocessor1_Model05
-#> 5 0.00001  roc_auc binary     0.947    10 0.000636 Preprocessor1_Model01
+#>     penalty .metric .estimator  mean     n  std_err .config              
+#>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
+#> 1 0.000379  roc_auc binary     0.947    10 0.000780 Preprocessor1_Model07
+#> 2 0.000207  roc_auc binary     0.947    10 0.000781 Preprocessor1_Model06
+#> 3 0.000113  roc_auc binary     0.947    10 0.000786 Preprocessor1_Model05
+#> 4 0.00001   roc_auc binary     0.947    10 0.000788 Preprocessor1_Model01
+#> 5 0.0000183 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model02
 ```
 
 The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.947. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 3.6\times 10^{-4}) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
@@ -1011,15 +1001,15 @@ multicomplaints_train %>%
 #> # A tibble: 9 x 2
 #>       n product                                                                 
 #>   <int> <chr>                                                                   
-#> 1 41714 Credit reporting, credit repair services, or other personal consumer re…
-#> 2 16784 Debt collection                                                         
-#> 3  8637 Credit card or prepaid card                                             
+#> 1 41628 Credit reporting, credit repair services, or other personal consumer re…
+#> 2 16722 Debt collection                                                         
+#> 3  8695 Credit card or prepaid card                                             
 #> 4  7067 Mortgage                                                                
-#> 5  5164 Checking or savings account                                             
-#> 6  2932 Student loan                                                            
-#> 7  2014 Vehicle loan or lease                                                   
-#> 8  1942 Money transfer, virtual currency, or money service                      
-#> 9  1656 Payday loan, title loan, or personal loan
+#> 5  5238 Checking or savings account                                             
+#> 6  2960 Student loan                                                            
+#> 7  2028 Vehicle loan or lease                                                   
+#> 8  1926 Money transfer, virtual currency, or money service                      
+#> 9  1647 Payday loan, title loan, or personal loan
 ```
 
 There is significant imbalance between the classes that we must address, with over twenty times more cases of the majority class than there is of the smallest class.
@@ -1037,8 +1027,8 @@ There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
 We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
 
-<div class="rmdnote">
-<p>The themis package provides many more algorithms to deal with imbalanced data.</p>
+<div class="rmdpackage">
+<p>The <strong>themis</strong> package provides many more algorithms to deal with imbalanced data during data preprocessing.</p>
 </div>
 
 We have to create a new recipe specification from scratch, since we are dealing with new training data this time.
@@ -1052,7 +1042,6 @@ multicomplaints_rec <-
   recipe(product ~ consumer_complaint_narrative,
          data = multicomplaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative) %>%
   step_downsample(product)
@@ -1103,10 +1092,9 @@ multi_lasso_wf
 #> Model: multinom_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 5 Recipe Steps
+#> 4 Recipe Steps
 #> 
 #> ● step_tokenize()
-#> ● step_stopwords()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> ● step_downsample()
@@ -1141,16 +1129,16 @@ multi_lasso_rs
 #> # A tibble: 10 x 5
 #>    splits             id     .metrics        .notes         .predictions        
 #>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  2 <split [79119/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  3 <split [79119/879… Fold03 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  4 <split [79119/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  5 <split [79119/879… Fold05 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  6 <split [79119/879… Fold06 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  7 <split [79119/879… Fold07 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  8 <split [79119/879… Fold08 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  9 <split [79119/879… Fold09 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#> 10 <split [79119/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,840 × …
+#>  2 <split [79120/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  3 <split [79120/879… Fold03 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  4 <split [79120/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  5 <split [79120/879… Fold05 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  6 <split [79120/879… Fold06 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  7 <split [79120/879… Fold07 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  8 <split [79120/879… Fold08 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  9 <split [79120/879… Fold09 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#> 10 <split [79120/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
 ```
 
 What do we see, in terms of performance metrics?
@@ -1167,14 +1155,14 @@ best_acc
 #> # A tibble: 5 x 7
 #>    penalty .metric  .estimator  mean     n std_err .config              
 #>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1 0.00234  accuracy multiclass 0.747    10 0.00180 Preprocessor1_Model10
-#> 2 0.00127  accuracy multiclass 0.743    10 0.00175 Preprocessor1_Model09
-#> 3 0.00428  accuracy multiclass 0.743    10 0.00184 Preprocessor1_Model11
-#> 4 0.000695 accuracy multiclass 0.736    10 0.00189 Preprocessor1_Model08
-#> 5 0.00785  accuracy multiclass 0.732    10 0.00213 Preprocessor1_Model12
+#> 1 0.00234  accuracy multiclass 0.733    10 0.00243 Preprocessor1_Model10
+#> 2 0.00127  accuracy multiclass 0.728    10 0.00226 Preprocessor1_Model09
+#> 3 0.00428  accuracy multiclass 0.727    10 0.00211 Preprocessor1_Model11
+#> 4 0.000695 accuracy multiclass 0.721    10 0.00199 Preprocessor1_Model08
+#> 5 0.00785  accuracy multiclass 0.716    10 0.00207 Preprocessor1_Model12
 ```
 
-The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 74.7%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
+The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 73.3%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
 
 <div class="rmdwarning">
 <p>In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.</p>
@@ -1195,7 +1183,7 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="672" />
+<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="864" />
 <p class="caption">(\#fig:multiheatmap)Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal</p>
 </div>
 
@@ -1218,7 +1206,7 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="672" />
+<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="864" />
 <p class="caption">(\#fig:multiheatmapminusdiag)Confusion matrix for multiclass lasso regularized classifier without diagonal</p>
 </div>
 
@@ -1285,7 +1273,6 @@ Now we add steps to process the text of the complaints, as before.
 ```r
 more_vars_rec <- more_vars_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
@@ -1307,7 +1294,7 @@ more_vars_wf
 #> Model: logistic_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 9 Recipe Steps
+#> 8 Recipe Steps
 #> 
 #> ● step_date()
 #> ● step_rm()
@@ -1315,7 +1302,6 @@ more_vars_wf
 #> ● step_unknown()
 #> ● step_dummy()
 #> ● step_tokenize()
-#> ● step_stopwords()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -1351,13 +1337,13 @@ more_vars_rs %>%
 
 ```
 #> # A tibble: 5 x 7
-#>    penalty .metric .estimator  mean     n  std_err .config              
-#>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000379 roc_auc binary     0.947    10 0.000648 Preprocessor1_Model07
-#> 2 0.000207 roc_auc binary     0.947    10 0.000650 Preprocessor1_Model06
-#> 3 0.000695 roc_auc binary     0.947    10 0.000643 Preprocessor1_Model08
-#> 4 0.000113 roc_auc binary     0.947    10 0.000651 Preprocessor1_Model05
-#> 5 0.00001  roc_auc binary     0.947    10 0.000652 Preprocessor1_Model01
+#>     penalty .metric .estimator  mean     n  std_err .config              
+#>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
+#> 1 0.000379  roc_auc binary     0.947    10 0.000771 Preprocessor1_Model07
+#> 2 0.000207  roc_auc binary     0.947    10 0.000772 Preprocessor1_Model06
+#> 3 0.000113  roc_auc binary     0.947    10 0.000776 Preprocessor1_Model05
+#> 4 0.00001   roc_auc binary     0.947    10 0.000779 Preprocessor1_Model01
+#> 5 0.0000183 roc_auc binary     0.947    10 0.000779 Preprocessor1_Model02
 ```
 
 We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.947, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 3.8\times 10^{-4} but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
@@ -1378,16 +1364,16 @@ finalize_workflow(more_vars_wf,
 #> # A tibble: 21 x 4
 #>    term                    estimate  penalty term_rank
 #>    <chr>                      <dbl>    <dbl>     <int>
-#>  1 (Intercept)               0.647  0.000379       340
-#>  2 date_received_month_Dec  -0.341  0.000379       399
-#>  3 date_received_month_Aug  -0.166  0.000379       436
-#>  4 date_received_dow_Mon     0.100  0.000379       448
-#>  5 date_received_month_Apr   0.0871 0.000379       450
-#>  6 tags_Servicemember       -0.0785 0.000379       451
-#>  7 date_received_month_Feb  -0.0716 0.000379       453
-#>  8 tags_unknown             -0.0556 0.000379       455
-#>  9 date_received_dow_Tue     0.0503 0.000379       456
-#> 10 date_received_month_Jul  -0.0478 0.000379       457
+#>  1 date_received_month_Dec  -0.380  0.000379       412
+#>  2 (Intercept)               0.211  0.000379       429
+#>  3 date_received_month_Aug  -0.141  0.000379       438
+#>  4 date_received_dow_Mon     0.131  0.000379       440
+#>  5 date_received_month_Jul  -0.0944 0.000379       445
+#>  6 tags_Servicemember       -0.0839 0.000379       448
+#>  7 date_received_month_Apr   0.0767 0.000379       450
+#>  8 tags_unknown             -0.0645 0.000379       453
+#>  9 date_received_month_Feb  -0.0544 0.000379       454
+#> 10 date_received_month_Jun  -0.0444 0.000379       455
 #> # … with 11 more rows
 ```
 
@@ -1581,7 +1567,7 @@ Your domain knowledge allows you to build more predictive features than the naiv
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of knowledge about regular expressions pays off.
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">The **textfeatures** [R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdnote}
 
 Your specific domain knowledge may provide specific guidance about feature engineering for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
@@ -1825,7 +1811,7 @@ nb_rs_predictions %>%
 #> # A tibble: 1 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 recall  binary         0.955
+#> 1 recall  binary         0.340
 ```
 
 We can also compute the recall for each resample using `group_by()`.
@@ -1841,16 +1827,16 @@ nb_rs_predictions %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 recall  binary         0.957
-#>  2 Fold02 recall  binary         0.963
-#>  3 Fold03 recall  binary         0.942
-#>  4 Fold04 recall  binary         0.956
-#>  5 Fold05 recall  binary         0.956
-#>  6 Fold06 recall  binary         0.950
-#>  7 Fold07 recall  binary         0.950
-#>  8 Fold08 recall  binary         0.955
-#>  9 Fold09 recall  binary         0.970
-#> 10 Fold10 recall  binary         0.952
+#>  1 Fold01 recall  binary         0.314
+#>  2 Fold02 recall  binary         0.322
+#>  3 Fold03 recall  binary         0.280
+#>  4 Fold04 recall  binary         0.412
+#>  5 Fold05 recall  binary         0.325
+#>  6 Fold06 recall  binary         0.375
+#>  7 Fold07 recall  binary         0.344
+#>  8 Fold08 recall  binary         0.277
+#>  9 Fold09 recall  binary         0.329
+#> 10 Fold10 recall  binary         0.422
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
@@ -1858,16 +1844,13 @@ The confusion matrix, a contingency table of observed classes and predicted clas
 
 
 ```r
-nb_rs_predictions %>%
-  filter(id == "Fold01") %>%
-  conf_mat(product, .pred_class)
+conf_mat_resampled(nb_rs)
 ```
 
 ```
-#>           Truth
-#> Prediction Credit Other
-#>     Credit   3927  2709
-#>     Other     176  1979
+#>        Credit  Other
+#> Credit 1417.9 2749.0
+#> Other    81.0 4543.2
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
@@ -1887,9 +1870,8 @@ For our final model, let's use some of the domain-specific features we developed
 - train on the same set of cross-validation resamples used throughout this chapter,
 - include text (but not `tags` or date features, since those did not result in better performance),
 - tune the number of tokens used in the model,
-- include trigrams, bigrams, and unigrams,
+- include bigrams and unigrams,
 - include custom-engineered features,
-- remove the Snowball stop word lexicon, and
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
@@ -1919,22 +1901,20 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization and stop word removal will be similar to the other models in this chapter, but this time we'll include trigrams, bigrams, and unigrams in the model.
+The tokenization will be similar to the other models in this chapter, but this time we'll include bigrams and unigrams in the model.
 In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
 Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
 
 <div class="rmdnote">
-<p>This data set has many more than 50 of the most common 2000 tokens, but it can still be good practice to specify <code>min_times</code> to be safe. Your choice for <code>min_times</code> should depend on your data and how robust you need your model to be.</p>
+<p>This data set has many more than 50 of even the most common 5000 or more tokens, but it can still be good practice to specify <code>min_times</code> to be safe. Your choice for <code>min_times</code> should depend on your data and how robust you need your model to be.</p>
 </div>
 
 
 ```r
 complaints_rec_v2 <- complaints_rec_v2 %>%
-  step_tokenize(consumer_complaint_narrative) %>%
-  step_stopwords(consumer_complaint_narrative) %>%
-  step_ngram(consumer_complaint_narrative,
-             num_tokens = 3, min_num_tokens = 1) %>%
+  step_tokenize(consumer_complaint_narrative, token = "ngrams",
+                options = list(n = 2, n_min = 1)) %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1958,13 +1938,11 @@ sparse_wf_v2
 #> Model: logistic_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 7 Recipe Steps
+#> 5 Recipe Steps
 #> 
 #> ● step_mutate()
 #> ● step_textfeature()
 #> ● step_tokenize()
-#> ● step_stopwords()
-#> ● step_ngram()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -1990,7 +1968,7 @@ Let's include different possible values for each parameter, for a combination of
 ```r
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(1e3, 6e3)),
+  max_tokens(range = c(500, 4e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
@@ -2001,16 +1979,16 @@ final_grid
 #> # A tibble: 100 x 2
 #>     penalty max_tokens
 #>       <dbl>      <int>
-#>  1 0.0001         1000
-#>  2 0.000162       1000
-#>  3 0.000264       1000
-#>  4 0.000428       1000
-#>  5 0.000695       1000
-#>  6 0.00113        1000
-#>  7 0.00183        1000
-#>  8 0.00298        1000
-#>  9 0.00483        1000
-#> 10 0.00785        1000
+#>  1 0.0001          500
+#>  2 0.000162        500
+#>  3 0.000264        500
+#>  4 0.000428        500
+#>  5 0.000695        500
+#>  6 0.00113         500
+#>  7 0.00183         500
+#>  8 0.00298         500
+#>  9 0.00483         500
+#> 10 0.00785         500
 #> # … with 90 more rows
 ```
 
@@ -2027,8 +2005,7 @@ tune_rs <- tune_grid(
   sparse_wf_v2,
   complaints_folds,
   grid = final_grid,
-  metrics = metric_set(accuracy, sensitivity, specificity),
-  control = control_resamples(save_pred = TRUE)
+  metrics = metric_set(accuracy, sensitivity, specificity)
 )
 ```
 
@@ -2038,33 +2015,28 @@ We have fitted these classification models!
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:complaintsfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization. 
 
-<div class="rmdnote">
-<p>Pay attention to how increasing regularization affects performance as more tokens are included.</p>
-</div>
-
 
 ```r
 autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
-    title = paste("Lasso model performance across regularization penalties",
-                  "and number of tokens", sep = "\n"),
-    subtitle = paste("The best model includes a high number of tokens",
+    title = "Model performance across regularization penalties and tokens",
+    subtitle = paste("The best model includes a higher number of tokens",
                      "but also significant regularization")
   )
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Regularization becomes more important for performance as more tokens are included in the model" width="672" />
-<p class="caption">(\#fig:complaintsfinaltunevis)Regularization becomes more important for performance as more tokens are included in the model</p>
+<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model" width="672" />
+<p class="caption">(\#fig:complaintsfinaltunevis)Model performance is similar for the higher token options so we can choose a simpler model</p>
 </div>
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let's choose a simpler model within some limit around that numerically best result, with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss), and let's say we care most about overall accuracy (rather than sensitivity or specificity).
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let's choose a simpler model within some limit around that numerically best result, with more regularization that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss), and let's say we care most about overall accuracy (rather than sensitivity or specificity).
 
 
 ```r
 choose_acc <- tune_rs %>%
-  select_by_pct_loss(metric = "accuracy", max_tokens)
+  select_by_pct_loss(metric = "accuracy", -penalty)
 
 choose_acc
 ```
@@ -2073,7 +2045,7 @@ choose_acc
 #> # A tibble: 1 x 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
-#> 1 0.00483       2250 accuracy binary     0.885    10 0.00118 Prepro… 0.902  1.90
+#> 1 0.00483       1375 accuracy binary     0.881    10 9.98e-4 Prepro… 0.899  1.92
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -2090,13 +2062,11 @@ final_wf
 #> Model: logistic_reg()
 #> 
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
-#> 7 Recipe Steps
+#> 5 Recipe Steps
 #> 
 #> ● step_mutate()
 #> ● step_textfeature()
 #> ● step_tokenize()
-#> ● step_stopwords()
-#> ● step_ngram()
 #> ● step_tokenfilter()
 #> ● step_tfidf()
 #> 
@@ -2131,8 +2101,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 x 4
 #>   .metric  .estimator .estimate .config             
 #>   <chr>    <chr>          <dbl> <chr>               
-#> 1 accuracy binary         0.885 Preprocessor1_Model1
-#> 2 roc_auc  binary         0.950 Preprocessor1_Model1
+#> 1 accuracy binary         0.884 Preprocessor1_Model1
+#> 2 roc_auc  binary         0.949 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -2199,23 +2169,83 @@ complaints_imp %>%
   facet_wrap(~Sign, scales = "free") +
   labs(
     y = NULL,
-    title = paste("Variable importance for predicting that a complaint",
-                  "is about credit reporting", sep = "\n"),
+    title = "Variable importance for predicting the topic of a CFPB complaint",
     subtitle = paste("These features are the most important in predicting",
                      "whether a complaint is about credit or not")
   )
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier" width="672" />
-<p class="caption">(\#fig:complaintsvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
+<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
+<p class="caption">(\#fig:complaintsvip)Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
 </div>
 
-Tokens (unigrams or bigrams) like "bank", "interest", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens (unigrams or bigrams) like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
 
 <div class="rmdnote">
-<p>Most of these features are unigrams but a few are bigrams, like “checking account”. Notice that almost all are tokens learned directly from the text, but that <code>percent_censoring</code>, one of our hand-crafted custom features, is a top feature in terms of variable importance. The more censored a complaint is, the more likely it is to be about credit reporting.</p>
+<p>Most of these features are unigrams but a few are bigrams, like “subsection a”. Notice that this bigram would have been removed if stop words were filtered out.</p>
 </div>
+
+The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like `percent_censoring` or `max_money` are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.
+
+We can gain some final insight into our model by looking at observations from the test set that it *misclassified*. Let's bind together the predictions on the test set with the original `complaints_test` data. Then let's look at complaints that were labeled as about credit reporting in the original data but that our final model thought had a low probability of being about credit reporting.
+
+
+```r
+complaints_bind <- collect_predictions(final_fitted) %>%
+  bind_cols(complaints_test %>% select(-product))
+
+complaints_bind %>%
+  filter(product == "Credit", .pred_Credit < 0.2) %>%
+  select(consumer_complaint_narrative) %>%
+  slice_sample(n = 10)
+```
+
+```
+#> # A tibble: 10 x 1
+#>    consumer_complaint_narrative                                                 
+#>    <chr>                                                                        
+#>  1 "I checked my credit report because I keep getting denied when I try to get …
+#>  2 "CRA continually reports debt not owed by myself after several attempts to r…
+#>  3 "Contacted by Convergent Outsourcing , Inc., XXXX XXXX. XXXX about an old XX…
+#>  4 "I PAID OFF AN AUTO LOAN WITH XXXX XXXX AND ALSO PAID OFF ANOTHER ACCOUNT XX…
+#>  5 "NCB MANAGMENT SERVICES is reporting on my Credit Report that I have a Balan…
+#>  6 "After reconciling my bank account. I noticed a monthly recurring transactio…
+#>  7 "I have had two capital one accounts since XXXX. I have never made any late …
+#>  8 "I went to TJ Maxx with my sister on XX/XX/18 at the XXXX, Alabama locaction…
+#>  9 "I was notified another lender that these are not categorized as 'educationa…
+#> 10 "Back in the late XX/XX/XXXX's early XX/XX/XXXX 's I took out loans in the a…
+```
+
+We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.
+
+What about misclassifications in the other direction, observations in the test set that were *not* labeled as about credit reporting but that our final model gave a high probability of being about credit reporting?
+
+
+```r
+complaints_bind %>%
+  filter(product == "Other", .pred_Credit > 0.8) %>%
+  select(consumer_complaint_narrative) %>%
+  slice_sample(n = 10)
+```
+
+```
+#> # A tibble: 10 x 1
+#>    consumer_complaint_narrative                                                 
+#>    <chr>                                                                        
+#>  1 "I am a victim of identity theft. please remove this fraudulent charge from …
+#>  2 "Fed Loan is inaccurately reporting the status of the Student loan payment s…
+#>  3 "I have sent letters and call the all ( 3 ) credit bureaus who handle credit…
+#>  4 "Experian is still reporting a account on my credit report that isnt mine! I…
+#>  5 "FCRA states information reporting has to be 100 % verifiable and 100 % accu…
+#>  6 "There have been multiple times advising the company that the accounts are n…
+#>  7 "These are not my Accounts."                                                 
+#>  8 "According to section XXXX XXXX XXXX XXXX XXXX in amount of {$710.00} must r…
+#>  9 "Here is another account that is reporting incorrect information XXXX XXXX i…
+#> 10 "Fed loan service is reporting a loan twice on my XXXX credit report. \nTher…
+```
+
+Again, these are "mistakes" on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.
 
 ## Summary {#mlclassificationsummary}
 
@@ -2223,14 +2253,13 @@ You can use classification modeling to predict labels or categorical variables f
 Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
 This is important as bag-of-word text models can involve thousands of tokens.
 We also saw that regularized linear models, such as lasso, often work well for text data sets.
-Your own domain knowledge about your text data is incredibly valuable, and using that knowledge in careful engineering of custom features can improve your model.
+Your own domain knowledge about your text data is valuable, and using that knowledge in careful engineering of custom features can improve your model in some cases.
 
 ### In this chapter, you learned:
 
 - how text data can be used in a classification model
-- to tune hyperparameters in the data preprocessing stage
+- to tune hyperparameters of a model
 - how to compare different model types
 - that models can combine both text and non-text predictors
-- how feature hashing can be used as a fast alternative to bag-of-words
 - about engineering custom features for machine learning
 - about performance metrics for classification models

@@ -10,8 +10,16 @@ Keras provides extensive support for creating and training many kinds of deep le
 <p>The tidymodels framework is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.</p>
 </div>
 
+This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. We can also use this type of network architecture as a bridge between the bag-of-words approaches we explored in detail in Chapters \@ref(mlregression) and \@ref(mlclassification) to non-bag-of-words approaches we will use in Chapters \@ref(dllstm) and \@ref(dlcnn). Deep learning allows us to incorporate not just word counts but also word sequences and positions.
 
-This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text.
+Figure \@ref(fig:dnndiag) depicts the neural network architecture *feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The number of layers and nodes within each layer vary and are selected by the practitioner.
+
+<div class="figure" style="text-align: center">
+<img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
+<p class="caption">(\#fig:rnndiag)A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.</p>
+</div>
+
+Figure \@ref(fig:dnndiag) shows the input units with words, but this is not an entirely accurate representation of a neural network. These words will in practice be represented by embedding vectors because these networks can only work with numeric variables.
 
 ## Kickstarter data {#kickstarter}
 
@@ -183,7 +191,7 @@ kickstarter_train <- training(kickstarter_split)
 kickstarter_test <- testing(kickstarter_split)
 ```
 
-There are 202,092 blurbs in the training set and 67,365 in the testing set.
+There are 202,093 blurbs in the training set and 67,364 in the testing set.
 
 ### Preprocessing for deep learning {#dnnrecipe}
 
@@ -303,20 +311,20 @@ prep(small_spec) %>%
 #> # A tibble: 14 x 4
 #>    terms vocabulary token       id                   
 #>    <chr>      <int> <chr>       <chr>                
-#>  1 text           1 adventure   sequence_onehot_9p9uj
-#>  2 text           2 and         sequence_onehot_9p9uj
-#>  3 text           3 book        sequence_onehot_9p9uj
-#>  4 text           4 dice        sequence_onehot_9p9uj
-#>  5 text           5 game        sequence_onehot_9p9uj
-#>  6 text           6 ghosts      sequence_onehot_9p9uj
-#>  7 text           7 goblins     sequence_onehot_9p9uj
-#>  8 text           8 i           sequence_onehot_9p9uj
-#>  9 text           9 illustrated sequence_onehot_9p9uj
-#> 10 text          10 me          sequence_onehot_9p9uj
-#> 11 text          11 monsters    sequence_onehot_9p9uj
-#> 12 text          12 myself      sequence_onehot_9p9uj
-#> 13 text          13 of          sequence_onehot_9p9uj
-#> 14 text          14 spooky      sequence_onehot_9p9uj
+#>  1 text           1 adventure   sequence_onehot_9SVGf
+#>  2 text           2 and         sequence_onehot_9SVGf
+#>  3 text           3 book        sequence_onehot_9SVGf
+#>  4 text           4 dice        sequence_onehot_9SVGf
+#>  5 text           5 game        sequence_onehot_9SVGf
+#>  6 text           6 ghosts      sequence_onehot_9SVGf
+#>  7 text           7 goblins     sequence_onehot_9SVGf
+#>  8 text           8 i           sequence_onehot_9SVGf
+#>  9 text           9 illustrated sequence_onehot_9SVGf
+#> 10 text          10 me          sequence_onehot_9SVGf
+#> 11 text          11 monsters    sequence_onehot_9SVGf
+#> 12 text          12 myself      sequence_onehot_9SVGf
+#> 13 text          13 of          sequence_onehot_9SVGf
+#> 14 text          14 spooky      sequence_onehot_9SVGf
 ```
 
 If we take a look at the resulting matrix, we have one row per observation. The first row starts with some padded zeroes but then contains 1, 4, and 5, which we can use together with the vocabulary to construct the original sentence.
@@ -403,10 +411,10 @@ dim(kick_train)
 ```
 
 ```
-#> [1] 202092     30
+#> [1] 202093     30
 ```
 
-The matrix `kick_train` has 202,092 rows, corresponding to the rows of the training data, and 30 columns, corresponding to our chosen sequence length.
+The matrix `kick_train` has 202,093 rows, corresponding to the rows of the training data, and 30 columns, corresponding to our chosen sequence length.
 
 
 ### Simple flattened dense network
@@ -451,8 +459,8 @@ dense_model
 Let us step through this model specification one layer at a time.
 
 - We initiate the Keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
-- Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` tensor.
-- The next `layer_flatten()` layer takes the two-dimensional tensors for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` tensor for each observation. 
+- Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` data cube.
+- The next `layer_flatten()` layer takes the matrix for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` long vector for each observation. 
 - Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.
 
 We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an **optimizer** and a **loss function** to be able to compile. 
@@ -480,7 +488,7 @@ dense_model %>% compile(
 ```
 
 <div class="rmdnote">
-<p>Notice how the <code>compile()</code> function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code.</p>
+<p>Notice how the <code>compile()</code> function modifies the model in place. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code. This is a <a href="https://keras.rstudio.com/articles/faq.html#why-are-keras-objects-modified-in-place-">conscious decision</a> that was made during the creating of the Keras R package to match the data structures and behavior of the underlying Keras library.</p>
 </div>
 
 Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
@@ -534,7 +542,7 @@ kick_val
 #> # A tibble: 1 x 2
 #>   splits                 id        
 #>   <list>                 <chr>     
-#> 1 <split [151568/50524]> validation
+#> 1 <split [151571/50522]> validation
 ```
 
 The `split` object contains the information necessary to extract the data we will use for training/analysis and the data we will use for validation/assessment. We can extract these datasets in their raw, unprocessed form from the split using the helper functions `analysis()` and `assessment()`. Then, we can apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
@@ -547,7 +555,7 @@ dim(kick_analysis)
 ```
 
 ```
-#> [1] 151568     30
+#> [1] 151571     30
 ```
 
 ```r
@@ -557,7 +565,7 @@ dim(kick_assess)
 ```
 
 ```
-#> [1] 50524    30
+#> [1] 50522    30
 ```
 
 These are each matrices now appropriate for a deep learning model like the one we trained in the previous section. We will also need the outcome variables for both sets.
@@ -587,7 +595,7 @@ dense_model %>% compile(
 )
 ```
 
-Now we can fit this model with dropout to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
+Now we can fit this model to `kick_analysis` and validate on `kick_assess`. Let's only fit for 10 epochs this time.
 
 
 ```r
@@ -607,10 +615,10 @@ val_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03612
-#>     accuracy: 0.9917
-#>     val_loss: 1.056
-#> val_accuracy: 0.8072
+#>         loss: 0.03504
+#>     accuracy: 0.9919
+#>     val_loss: 1.069
+#> val_accuracy: 0.8051
 ```
 
 Figure \@ref(fig:valhistoryplot) still shows that significant overfitting at 10 epochs.
@@ -657,20 +665,20 @@ val_res
 ```
 
 ```
-#> # A tibble: 50,524 x 3
-#>         .pred_1 .pred_class state
-#>           <dbl> <fct>       <fct>
-#>  1 0.0225       0           0    
-#>  2 0.00753      0           0    
-#>  3 0.0000775    0           0    
-#>  4 0.0000660    0           0    
-#>  5 1.00         1           1    
-#>  6 0.996        1           1    
-#>  7 0.0000000455 0           0    
-#>  8 0.00155      0           0    
-#>  9 0.979        1           1    
-#> 10 1.00         1           1    
-#> # … with 50,514 more rows
+#> # A tibble: 50,522 x 3
+#>      .pred_1 .pred_class state
+#>        <dbl> <fct>       <fct>
+#>  1 0.00101   0           0    
+#>  2 0.000167  0           0    
+#>  3 0.0139    0           0    
+#>  4 0.00725   0           0    
+#>  5 0.0237    0           0    
+#>  6 1.00      1           0    
+#>  7 0.000536  0           0    
+#>  8 0.000308  0           0    
+#>  9 0.000419  0           0    
+#> 10 0.0000417 0           0    
+#> # … with 50,512 more rows
 ```
 
 We can calculate the standard metrics with `metrics()`.
@@ -684,8 +692,8 @@ metrics(val_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.807
-#> 2 kap      binary         0.613
+#> 1 accuracy binary         0.805
+#> 2 kap      binary         0.609
 ```
 
 This matches what we saw when we looked at the output of `val_history`. 
@@ -733,23 +741,23 @@ We start by obtaining pre-trained embeddings. The GloVe embeddings that we used 
 library(textdata)
 
 glove6b <- embedding_glove6b(dimensions = 50) %>% select(1:13)
+glove6b
 ```
-
 
 ```
 #> # A tibble: 400,000 x 13
-#>    token      d1      d2      d3      d4      d5      d6      d7      d8      d9
-#>    <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-#>  1 "the" -0.0382 -0.245   0.728  -0.400   0.0832  0.0440 -0.391   0.334  -0.575 
-#>  2 ","   -0.108   0.111   0.598  -0.544   0.674   0.107   0.0389  0.355   0.0635
-#>  3 "."   -0.340   0.209   0.463  -0.648  -0.384   0.0380  0.171   0.160   0.466 
-#>  4 "of"  -0.153  -0.243   0.898   0.170   0.535   0.488  -0.588  -0.180  -1.36  
-#>  5 "to"  -0.190   0.0500  0.191  -0.0492 -0.0897  0.210  -0.550   0.0984 -0.201 
-#>  6 "and" -0.0720  0.231   0.0237 -0.506   0.339   0.196  -0.329   0.184  -0.181 
-#>  7 "in"   0.0857 -0.222   0.166   0.134   0.382   0.354   0.0129  0.225  -0.438 
-#>  8 "a"   -0.271   0.0440 -0.0203 -0.174   0.644   0.712   0.355   0.471  -0.296 
-#>  9 "\""  -0.305  -0.236   0.176  -0.729  -0.283  -0.256   0.266   0.0253 -0.0748
-#> 10 "'s"   0.589  -0.202   0.735  -0.683  -0.197  -0.180  -0.392   0.342  -0.606 
+#>    token     d1      d2     d3      d4     d5      d6     d7      d8        d9
+#>    <chr>  <dbl>   <dbl>  <dbl>   <dbl>  <dbl>   <dbl>  <dbl>   <dbl>     <dbl>
+#>  1 "the" 0.418   0.250  -0.412  0.122  0.345  -0.0445 -0.497 -0.179  -0.000660
+#>  2 ","   0.0134  0.237  -0.169  0.410  0.638   0.477  -0.429 -0.556  -0.364   
+#>  3 "."   0.152   0.302  -0.168  0.177  0.317   0.340  -0.435 -0.311  -0.450   
+#>  4 "of"  0.709   0.571  -0.472  0.180  0.544   0.726   0.182 -0.524   0.104   
+#>  5 "to"  0.680  -0.0393  0.302 -0.178  0.430   0.0322 -0.414  0.132  -0.298   
+#>  6 "and" 0.268   0.143  -0.279  0.0163 0.114   0.699  -0.513 -0.474  -0.331   
+#>  7 "in"  0.330   0.250  -0.609  0.109  0.0364  0.151  -0.551 -0.0742 -0.0923  
+#>  8 "a"   0.217   0.465  -0.468  0.101  1.01    0.748  -0.531 -0.263   0.168   
+#>  9 "\""  0.258   0.456  -0.770 -0.377  0.593  -0.0635  0.205 -0.574  -0.290   
+#> 10 "'s"  0.237   0.405  -0.205  0.588  0.655   0.329  -0.820 -0.232   0.274   
 #> # … with 399,990 more rows, and 3 more variables: d10 <dbl>, d11 <dbl>,
 #> #   d12 <dbl>
 ```
@@ -765,9 +773,9 @@ tidy(kick_prep)
 #> # A tibble: 3 x 6
 #>   number operation type            trained skip  id                   
 #>    <int> <chr>     <chr>           <lgl>   <lgl> <chr>                
-#> 1      1 step      tokenize        TRUE    FALSE tokenize_nHrhX       
-#> 2      2 step      tokenfilter     TRUE    FALSE tokenfilter_2TrDo    
-#> 3      3 step      sequence_onehot TRUE    FALSE sequence_onehot_H16cB
+#> 1      1 step      tokenize        TRUE    FALSE tokenize_eDrDa       
+#> 2      2 step      tokenfilter     TRUE    FALSE tokenfilter_zDVeF    
+#> 3      3 step      sequence_onehot TRUE    FALSE sequence_onehot_TaBPG
 ```
 
 We see that the third step is the `sequence_onehot` step, so by setting `number = 3` we can extract the embedding vocabulary.
@@ -781,16 +789,16 @@ tidy(kick_prep, number = 3)
 #> # A tibble: 20,000 x 4
 #>    terms vocabulary token id                   
 #>    <chr>      <int> <chr> <chr>                
-#>  1 blurb          1 0     sequence_onehot_H16cB
-#>  2 blurb          2 00    sequence_onehot_H16cB
-#>  3 blurb          3 000   sequence_onehot_H16cB
-#>  4 blurb          4 00pm  sequence_onehot_H16cB
-#>  5 blurb          5 01    sequence_onehot_H16cB
-#>  6 blurb          6 02    sequence_onehot_H16cB
-#>  7 blurb          7 03    sequence_onehot_H16cB
-#>  8 blurb          8 05    sequence_onehot_H16cB
-#>  9 blurb          9 07    sequence_onehot_H16cB
-#> 10 blurb         10 09    sequence_onehot_H16cB
+#>  1 blurb          1 0     sequence_onehot_TaBPG
+#>  2 blurb          2 00    sequence_onehot_TaBPG
+#>  3 blurb          3 000   sequence_onehot_TaBPG
+#>  4 blurb          4 00pm  sequence_onehot_TaBPG
+#>  5 blurb          5 01    sequence_onehot_TaBPG
+#>  6 blurb          6 02    sequence_onehot_TaBPG
+#>  7 blurb          7 03    sequence_onehot_TaBPG
+#>  8 blurb          8 05    sequence_onehot_TaBPG
+#>  9 blurb          9 06    sequence_onehot_TaBPG
+#> 10 blurb         10 07    sequence_onehot_TaBPG
 #> # … with 19,990 more rows
 ```
 
@@ -860,10 +868,10 @@ dense_pte_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.5972
-#>     accuracy: 0.6757
-#>     val_loss: 0.6698
-#> val_accuracy: 0.6113
+#>         loss: 0.5978
+#>     accuracy: 0.675
+#>     val_loss: 0.6723
+#> val_accuracy: 0.6085
 ```
 
 
@@ -879,8 +887,8 @@ metrics(pte_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.611
-#> 2 kap      binary         0.219
+#> 1 accuracy binary         0.608
+#> 2 kap      binary         0.216
 ```
 
 Why is this happening? Part of the training loop for a model like this one typically _adjusts_ the weights in the network. 
@@ -951,8 +959,8 @@ metrics(pte2_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.777
-#> 2 kap      binary         0.553
+#> 1 accuracy binary         0.768
+#> 2 kap      binary         0.534
 ```
 
 This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
@@ -977,11 +985,11 @@ kick_folds
 #> # A tibble: 5 x 2
 #>   splits                 id   
 #>   <list>                 <chr>
-#> 1 <split [161673/40419]> Fold1
-#> 2 <split [161673/40419]> Fold2
-#> 3 <split [161674/40418]> Fold3
-#> 4 <split [161674/40418]> Fold4
-#> 5 <split [161674/40418]> Fold5
+#> 1 <split [161674/40419]> Fold1
+#> 2 <split [161674/40419]> Fold2
+#> 3 <split [161674/40419]> Fold3
+#> 4 <split [161675/40418]> Fold4
+#> 5 <split [161675/40418]> Fold5
 ```
 
 Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures, for more reliability.
@@ -1045,11 +1053,11 @@ cv_fitted
 #> # A tibble: 5 x 3
 #>   splits                 id    validation      
 #>   <list>                 <chr> <list>          
-#> 1 <split [161673/40419]> Fold1 <tibble [4 × 3]>
-#> 2 <split [161673/40419]> Fold2 <tibble [4 × 3]>
-#> 3 <split [161674/40418]> Fold3 <tibble [4 × 3]>
-#> 4 <split [161674/40418]> Fold4 <tibble [4 × 3]>
-#> 5 <split [161674/40418]> Fold5 <tibble [4 × 3]>
+#> 1 <split [161674/40419]> Fold1 <tibble [4 × 3]>
+#> 2 <split [161674/40419]> Fold2 <tibble [4 × 3]>
+#> 3 <split [161674/40419]> Fold3 <tibble [4 × 3]>
+#> 4 <split [161675/40418]> Fold4 <tibble [4 × 3]>
+#> 5 <split [161675/40418]> Fold5 <tibble [4 × 3]>
 ```
 
 Now we can use `unnest()` to find the metrics we computed.
@@ -1064,26 +1072,26 @@ cv_fitted %>%
 #> # A tibble: 20 x 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.821
-#>  2 <split [161673/40419]> Fold1 kap         binary         0.641
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         1.03 
-#>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.856
-#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.819
-#>  6 <split [161673/40419]> Fold2 kap         binary         0.638
-#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         1.04 
-#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.858
-#>  9 <split [161674/40418]> Fold3 accuracy    binary         0.819
-#> 10 <split [161674/40418]> Fold3 kap         binary         0.638
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         1.02 
-#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.856
-#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.817
-#> 14 <split [161674/40418]> Fold4 kap         binary         0.633
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         1.02 
-#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.854
-#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.821
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.642
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.986
-#> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.861
+#>  1 <split [161674/40419]> Fold1 accuracy    binary         0.819
+#>  2 <split [161674/40419]> Fold1 kap         binary         0.638
+#>  3 <split [161674/40419]> Fold1 mn_log_loss binary         1.02 
+#>  4 <split [161674/40419]> Fold1 roc_auc     binary         0.856
+#>  5 <split [161674/40419]> Fold2 accuracy    binary         0.820
+#>  6 <split [161674/40419]> Fold2 kap         binary         0.639
+#>  7 <split [161674/40419]> Fold2 mn_log_loss binary         1.06 
+#>  8 <split [161674/40419]> Fold2 roc_auc     binary         0.860
+#>  9 <split [161674/40419]> Fold3 accuracy    binary         0.820
+#> 10 <split [161674/40419]> Fold3 kap         binary         0.640
+#> 11 <split [161674/40419]> Fold3 mn_log_loss binary         1.01 
+#> 12 <split [161674/40419]> Fold3 roc_auc     binary         0.857
+#> 13 <split [161675/40418]> Fold4 accuracy    binary         0.819
+#> 14 <split [161675/40418]> Fold4 kap         binary         0.636
+#> 15 <split [161675/40418]> Fold4 mn_log_loss binary         1.01 
+#> 16 <split [161675/40418]> Fold4 roc_auc     binary         0.857
+#> 17 <split [161675/40418]> Fold5 accuracy    binary         0.819
+#> 18 <split [161675/40418]> Fold5 kap         binary         0.637
+#> 19 <split [161675/40418]> Fold5 mn_log_loss binary         1.02 
+#> 20 <split [161675/40418]> Fold5 roc_auc     binary         0.854
 ```
 
 We can summarize the unnested results to match what we normally would get from `collect_metrics()`
@@ -1104,10 +1112,10 @@ cv_fitted %>%
 #> # A tibble: 4 x 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.820     5 0.000733
-#> 2 kap         0.638     5 0.00148 
-#> 3 mn_log_loss 1.02      5 0.00909 
-#> 4 roc_auc     0.857     5 0.00123
+#> 1 accuracy    0.819     5 0.000339
+#> 2 kap         0.638     5 0.000717
+#> 3 mn_log_loss 1.02      5 0.00996 
+#> 4 roc_auc     0.857     5 0.000942
 ```
 
 This dataset is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
@@ -1138,12 +1146,12 @@ all_dense_model_res %>%
 #> # A tibble: 6 x 4
 #>   model                    .metric  .estimator .estimate
 #>   <chr>                    <chr>    <chr>          <dbl>
-#> 1 dense                    accuracy binary         0.807
-#> 2 pte (locked weights)     accuracy binary         0.611
-#> 3 pte (not locked weights) accuracy binary         0.777
-#> 4 dense                    kap      binary         0.613
-#> 5 pte (locked weights)     kap      binary         0.219
-#> 6 pte (not locked weights) kap      binary         0.553
+#> 1 dense                    accuracy binary         0.805
+#> 2 pte (locked weights)     accuracy binary         0.608
+#> 3 pte (not locked weights) accuracy binary         0.768
+#> 4 dense                    kap      binary         0.609
+#> 5 pte (locked weights)     kap      binary         0.216
+#> 6 pte (not locked weights) kap      binary         0.534
 ```
 
 We can also do this for ROC curves. Figure \@ref(fig:alldnnroccurve) shows the three different ROC curves together in one chart. As we know, the model using pre-trained word embeddings with locked weights didn't perform very well at all and its ROC curve is the lowest of the three. The other two models perform more similarly but the model using an embedding learned from scratch ends up being the best.
@@ -1186,10 +1194,10 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.807
-#> 2 kap         binary         0.612
-#> 3 mn_log_loss binary         1.06 
-#> 4 roc_auc     binary         0.848
+#> 1 accuracy    binary         0.804
+#> 2 kap         binary         0.608
+#> 3 mn_log_loss binary         1.08 
+#> 4 roc_auc     binary         0.845
 ```
 
 The metrics we see here are about the same as what we achieved in Section \@ref(evaluate-dnn) on the validation data, so we can be confident that we have not overfit during our training or model choosing process.
@@ -1224,8 +1232,3 @@ However, feature engineering is not completely out of our hands as practitioners
 - how to use pre-trained word embeddings in a neural network
 - about resampling strategies for deep learning models
 - about the low interpretability of deep learning models
-
-
-
-
-

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21.6 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.21.7 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-16" />
+<meta name="date" content="2021-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -200,7 +200,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="2.4.1" data-path="tokenization.html"><a href="tokenization.html#tokenize-to-characters-only-keeping-letters"><i class="fa fa-check"></i><b>2.4.1</b> Tokenize to characters, only keeping letters</a></li>
 <li class="chapter" data-level="2.4.2" data-path="tokenization.html"><a href="tokenization.html#allow-for-hyphenated-words"><i class="fa fa-check"></i><b>2.4.2</b> Allow for hyphenated words</a></li>
-<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-into-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it into a function</a></li>
+<li class="chapter" data-level="2.4.3" data-path="tokenization.html"><a href="tokenization.html#wrapping-it-in-a-function"><i class="fa fa-check"></i><b>2.4.3</b> Wrapping it in a function</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="tokenization.html"><a href="tokenization.html#tokenization-for-non-latin-alphabets"><i class="fa fa-check"></i><b>2.5</b> Tokenization for non-Latin alphabets</a></li>
 <li class="chapter" data-level="2.6" data-path="tokenization.html"><a href="tokenization.html#tokenization-benchmark"><i class="fa fa-check"></i><b>2.6</b> Tokenization benchmark</a></li>
@@ -272,7 +272,7 @@ div.csl-indent {
 <li class="chapter" data-level="6.2" data-path="mlregression.html"><a href="mlregression.html#regnull"><i class="fa fa-check"></i><b>6.2</b> Compare to the null model</a></li>
 <li class="chapter" data-level="6.3" data-path="mlregression.html"><a href="mlregression.html#comparerf"><i class="fa fa-check"></i><b>6.3</b> Compare to a random forest model</a></li>
 <li class="chapter" data-level="6.4" data-path="mlregression.html"><a href="mlregression.html#casestudystopwords"><i class="fa fa-check"></i><b>6.4</b> Case study: removing stop words</a></li>
-<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#case-study-varying-n-grams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
+<li class="chapter" data-level="6.5" data-path="mlregression.html"><a href="mlregression.html#casestudyngrams"><i class="fa fa-check"></i><b>6.5</b> Case study: varying n-grams</a></li>
 <li class="chapter" data-level="6.6" data-path="mlregression.html"><a href="mlregression.html#mlregressionlemmatization"><i class="fa fa-check"></i><b>6.6</b> Case study: lemmatization</a></li>
 <li class="chapter" data-level="6.7" data-path="mlregression.html"><a href="mlregression.html#case-study-feature-hashing"><i class="fa fa-check"></i><b>6.7</b> Case study: feature hashing</a>
 <ul>
@@ -421,6 +421,15 @@ div.csl-indent {
 <li class="chapter" data-level="B.2" data-path="appendixdata.html"><a href="appendixdata.html#consumer-financial-protection-bureau-cfpb-complaints"><i class="fa fa-check"></i><b>B.2</b> Consumer Financial Protection Bureau (CFPB) complaints</a></li>
 <li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#opinions-of-the-supreme-court-of-the-united-states"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
 <li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-campaign-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
+</ul></li>
+<li class="chapter" data-level="C" data-path="appendixbaseline.html"><a href="appendixbaseline.html"><i class="fa fa-check"></i><b>C</b> Baseline linear classifier</a>
+<ul>
+<li class="chapter" data-level="C.1" data-path="appendixbaseline.html"><a href="appendixbaseline.html#read-in-the-data"><i class="fa fa-check"></i><b>C.1</b> Read in the data</a></li>
+<li class="chapter" data-level="C.2" data-path="appendixbaseline.html"><a href="appendixbaseline.html#split-into-testtrain-and-create-resampling-folds"><i class="fa fa-check"></i><b>C.2</b> Split into test/train and create resampling folds</a></li>
+<li class="chapter" data-level="C.3" data-path="appendixbaseline.html"><a href="appendixbaseline.html#recipe-for-data-preprocessing"><i class="fa fa-check"></i><b>C.3</b> Recipe for data preprocessing</a></li>
+<li class="chapter" data-level="C.4" data-path="appendixbaseline.html"><a href="appendixbaseline.html#lasso-regularized-classification-model"><i class="fa fa-check"></i><b>C.4</b> Lasso regularized classification model</a></li>
+<li class="chapter" data-level="C.5" data-path="appendixbaseline.html"><a href="appendixbaseline.html#a-model-workflow"><i class="fa fa-check"></i><b>C.5</b> A model workflow</a></li>
+<li class="chapter" data-level="C.6" data-path="appendixbaseline.html"><a href="appendixbaseline.html#tune-the-workflow"><i class="fa fa-check"></i><b>C.6</b> Tune the workflow</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -672,7 +681,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <span id="cb124-12"><a href="embeddings.html#cb124-12" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
 <span id="cb124-13"><a href="embeddings.html#cb124-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
 <span id="cb124-14"><a href="embeddings.html#cb124-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<p>This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and summations to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word and returns a dataframe sorted by similarity.</p>
+<p>This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and sums to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.</p>
 <p>What words are closest to <code>"error"</code> in the data set of CFPB complaints, as determined by our word embeddings?</p>
 <div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="embeddings.html#cb125-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
 <span id="cb125-2"><a href="embeddings.html#cb125-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
@@ -726,9 +735,9 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt;  9 36.00     0.627
 #&gt; 10 28.00     0.624
 #&gt; # … with 7,465 more rows</code></pre>
-<p>We find a lot of dollar amounts which makes sense. Let us filter out the numbers to see what words are similar to <code>"fee'</code></p>
+<p>We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to <code>"fee'</code></p>
 <div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="embeddings.html#cb131-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb131-3"><a href="embeddings.html#cb131-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(item1, <span class="st">&quot;[0-9]*.[0-9]{2}&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,047 x 2
 #&gt;    item1     value
@@ -744,7 +753,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt;  9 assessed  0.538
 #&gt; 10 charges   0.530
 #&gt; # … with 7,037 more rows</code></pre>
-<p>We now find words about interest, charges, and overdrafts. The top two words and “fee” and “fees”; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter <a href="stemming.html#stemming">4</a>) but more reliably and less arbitrarily.</p>
+<p>We now find words about interest, charges, and overdrafts. The top two words are “fee” and “fees”; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter <a href="stemming.html#stemming">4</a>) but more reliably and less arbitrarily.</p>
 <p>Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each <em>original</em> dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.</p>
 <div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="embeddings.html#cb133-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
 <span id="cb133-2"><a href="embeddings.html#cb133-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(dimension <span class="sc">&lt;=</span> <span class="dv">24</span>) <span class="sc">%&gt;%</span></span>
@@ -752,8 +761,8 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <span id="cb133-4"><a href="embeddings.html#cb133-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">12</span>, <span class="fu">abs</span>(value)) <span class="sc">%&gt;%</span></span>
 <span id="cb133-5"><a href="embeddings.html#cb133-5" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
 <span id="cb133-6"><a href="embeddings.html#cb133-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">item1 =</span> <span class="fu">reorder_within</span>(item1, value, dimension)) <span class="sc">%&gt;%</span></span>
-<span id="cb133-7"><a href="embeddings.html#cb133-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> <span class="fu">as.factor</span>(dimension))) <span class="sc">+</span></span>
-<span id="cb133-8"><a href="embeddings.html#cb133-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb133-7"><a href="embeddings.html#cb133-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> dimension)) <span class="sc">+</span></span>
+<span id="cb133-8"><a href="embeddings.html#cb133-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
 <span id="cb133-9"><a href="embeddings.html#cb133-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>dimension, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
 <span id="cb133-10"><a href="embeddings.html#cb133-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_reordered</span>() <span class="sc">+</span></span>
 <span id="cb133-11"><a href="embeddings.html#cb133-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
@@ -846,46 +855,52 @@ How small is too small? It is hard to make definitive statements because being a
 <div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="embeddings.html#cb140-1" aria-hidden="true" tabindex="-1"></a>nearest_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(df, token) {</span>
 <span id="cb140-2"><a href="embeddings.html#cb140-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
 <span id="cb140-3"><a href="embeddings.html#cb140-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">widely</span>(</span>
-<span id="cb140-4"><a href="embeddings.html#cb140-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> . <span class="sc">%*%</span> (.[token, ]),</span>
-<span id="cb140-5"><a href="embeddings.html#cb140-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb140-6"><a href="embeddings.html#cb140-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">maximum_size =</span> <span class="cn">NULL</span></span>
-<span id="cb140-7"><a href="embeddings.html#cb140-7" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
-<span id="cb140-8"><a href="embeddings.html#cb140-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
-<span id="cb140-9"><a href="embeddings.html#cb140-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb140-4"><a href="embeddings.html#cb140-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
+<span id="cb140-5"><a href="embeddings.html#cb140-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
+<span id="cb140-6"><a href="embeddings.html#cb140-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
+<span id="cb140-7"><a href="embeddings.html#cb140-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
+<span id="cb140-8"><a href="embeddings.html#cb140-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-9"><a href="embeddings.html#cb140-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
+<span id="cb140-10"><a href="embeddings.html#cb140-10" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb140-11"><a href="embeddings.html#cb140-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb140-12"><a href="embeddings.html#cb140-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">maximum_size =</span> <span class="cn">NULL</span></span>
+<span id="cb140-13"><a href="embeddings.html#cb140-13" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
+<span id="cb140-14"><a href="embeddings.html#cb140-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
+<span id="cb140-15"><a href="embeddings.html#cb140-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Pre-trained word embeddings are trained on very large, general purpose English language data sets. Commonly used <a href="https://code.google.com/archive/p/word2vec/">word2vec embeddings</a> are based on the Google News data set, and commonly used <a href="https://nlp.stanford.edu/projects/glove/">GloVe embeddings</a> (what we are using here) and <a href="https://fasttext.cc/docs/en/english-vectors.html">FastText embeddings</a> are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to <code>"error"</code> in the GloVe embeddings?</p>
 <div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="embeddings.html#cb141-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
 <span id="cb141-2"><a href="embeddings.html#cb141-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1       value
 #&gt;    &lt;chr&gt;       &lt;dbl&gt;
-#&gt;  1 error        34.6
-#&gt;  2 errors       28.1
-#&gt;  3 data         19.8
-#&gt;  4 inning       19.4
-#&gt;  5 game         19.3
-#&gt;  6 percentage   19.3
-#&gt;  7 probability  19.2
-#&gt;  8 unforced     19.1
-#&gt;  9 fault        19.1
-#&gt; 10 point        19.0
+#&gt;  1 error       1.   
+#&gt;  2 errors      0.792
+#&gt;  3 mistake     0.664
+#&gt;  4 correct     0.621
+#&gt;  5 incorrect   0.613
+#&gt;  6 fault       0.607
+#&gt;  7 difference  0.594
+#&gt;  8 mistakes    0.586
+#&gt;  9 calculation 0.584
+#&gt; 10 probability 0.583
 #&gt; # … with 399,990 more rows</code></pre>
 <p>Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word “error.”</p>
 <p>What is closest to the word <code>"month"</code> in these pre-trained GloVe embeddings?</p>
 <div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="embeddings.html#cb143-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
 <span id="cb143-2"><a href="embeddings.html#cb143-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 2
-#&gt;    item1     value
-#&gt;    &lt;chr&gt;     &lt;dbl&gt;
-#&gt;  1 month      32.4
-#&gt;  2 year       31.2
-#&gt;  3 last       30.6
-#&gt;  4 week       30.5
-#&gt;  5 wednesday  29.6
-#&gt;  6 tuesday    29.5
-#&gt;  7 monday     29.3
-#&gt;  8 thursday   29.1
-#&gt;  9 percent    28.9
-#&gt; 10 friday     28.9
+#&gt;    item1    value
+#&gt;    &lt;chr&gt;    &lt;dbl&gt;
+#&gt;  1 month    1    
+#&gt;  2 week     0.939
+#&gt;  3 last     0.924
+#&gt;  4 months   0.898
+#&gt;  5 year     0.893
+#&gt;  6 weeks    0.865
+#&gt;  7 earlier  0.859
+#&gt;  8 tuesday  0.846
+#&gt;  9 ago      0.844
+#&gt; 10 thursday 0.841
 #&gt; # … with 399,990 more rows</code></pre>
 <p>Instead of words about payments, the GloVe results here focus on different time periods only.</p>
 <p>What words are closest in the GloVe embedding space to <code>"fee"</code>?</p>
@@ -894,16 +909,16 @@ How small is too small? It is hard to make definitive statements because being a
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
-#&gt;  1 fee           39.8
-#&gt;  2 fees          30.7
-#&gt;  3 pay           26.6
-#&gt;  4 $             26.4
-#&gt;  5 salary        25.9
-#&gt;  6 payment       25.9
-#&gt;  7 £             25.4
-#&gt;  8 tax           24.9
-#&gt;  9 payments      23.8
-#&gt; 10 subscription  23.1
+#&gt;  1 fee          1.   
+#&gt;  2 fees         0.832
+#&gt;  3 payment      0.741
+#&gt;  4 pay          0.711
+#&gt;  5 salary       0.700
+#&gt;  6 paid         0.668
+#&gt;  7 payments     0.653
+#&gt;  8 subscription 0.647
+#&gt;  9 paying       0.623
+#&gt; 10 expenses     0.619
 #&gt; # … with 399,990 more rows</code></pre>
 <p>The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.</p>
 <div class="rmdnote">
@@ -1080,7 +1095,7 @@ Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 201
 <div class="footnotes">
 <hr />
 <ol start="8">
-<li id="fn8"><p>Google has since <a href="https://www.blog.google/products/translate/reducing-gender-bias-google-translate/">worked to correct this problem.</a><a href="embeddings.html#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>Google has since <a href="https://www.blog.google/products/translate/reducing-gender-bias-google-translate/">worked to correct this problem.</a> but in 2021 the problem <a href="https://twitter.com/doravargha/status/1373211762108076034">still exists for some languages</a>.<a href="embeddings.html#fnref8" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

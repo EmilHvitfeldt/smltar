@@ -66,6 +66,10 @@ This sample of opinions reflects the distribution over time of available opinion
 
 Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
+<div class="rmdpackage">
+<p><strong>tidymodels</strong> is a collection of packages for modeling and machine learning using tidyverse principles. These packages facilities preprocessing, modeling and evaluation.</p>
+</div>
+
 
 ```r
 library(tidymodels)
@@ -80,6 +84,10 @@ scotus_test <- testing(scotus_split)
 ```
 
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
+
+<div class="rmdpackage">
+<p><strong>textrecipes</strong> extends the <strong>recipes</strong> package by providing steps that turn columns containing text into numeric columns. These steps can perform the actions we explored in the first section of this book.</p>
+</div>
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
@@ -161,9 +169,9 @@ scotus_wf
 
 Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a support vector machine (SVM) model. While they don't see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification [@Joachims1998] and can give good performance [@Vantu2016].
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section \@ref(tktk) for tuning model hyperparameters).</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section \@ref(tunelasso) for tuning model hyperparameters).</div>\EndKnitrBlock{rmdnote}
 
-Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let's use the **LiblineaR** engine [R-LiblineaR].
+Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let's use the **LiblineaR** engine [@R-LiblineaR].
 
 
 ```r
@@ -196,19 +204,19 @@ svm_fit %>%
 #>    term                  estimate
 #>    <chr>                    <dbl>
 #>  1 Bias                   1920.  
-#>  2 tfidf_text_later          1.50
-#>  3 tfidf_text_appeals        1.48
-#>  4 tfidf_text_see            1.39
-#>  5 tfidf_text_noted          1.38
-#>  6 tfidf_text_example        1.27
-#>  7 tfidf_text_petitioner     1.26
-#>  8 tfidf_text_even           1.23
-#>  9 tfidf_text_rather         1.21
-#> 10 tfidf_text_including      1.13
+#>  2 tfidf_text_appeals        1.48
+#>  3 tfidf_text_see            1.45
+#>  4 tfidf_text_later          1.36
+#>  5 tfidf_text_even           1.33
+#>  6 tfidf_text_example        1.30
+#>  7 tfidf_text_noted          1.25
+#>  8 tfidf_text_petitioner     1.25
+#>  9 tfidf_text_based          1.25
+#> 10 tfidf_text_relevant       1.20
 #> # … with 991 more rows
 ```
 
-The term `Bias` here means the same thing as an intercept. We see here, what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
+The term `Bias` here means the same thing as an intercept. We see here what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
 
 What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?
 
@@ -222,18 +230,18 @@ svm_fit %>%
 
 ```
 #> # A tibble: 1,001 x 2
-#>    term                 estimate
-#>    <chr>                   <dbl>
-#>  1 tfidf_text_ought        -2.77
-#>  2 tfidf_text_1st          -1.94
-#>  3 tfidf_text_but          -1.63
-#>  4 tfidf_text_same         -1.62
-#>  5 tfidf_text_the          -1.57
-#>  6 tfidf_text_therefore    -1.54
-#>  7 tfidf_text_it           -1.46
-#>  8 tfidf_text_which        -1.40
-#>  9 tfidf_text_this         -1.39
-#> 10 tfidf_text_be           -1.33
+#>    term             estimate
+#>    <chr>               <dbl>
+#>  1 tfidf_text_1st      -1.79
+#>  2 tfidf_text_but      -1.73
+#>  3 tfidf_text_the      -1.62
+#>  4 tfidf_text_same     -1.55
+#>  5 tfidf_text_it       -1.44
+#>  6 tfidf_text_this     -1.43
+#>  7 tfidf_text_cause    -1.41
+#>  8 tfidf_text_bound    -1.37
+#>  9 tfidf_text_be       -1.36
+#> 10 tfidf_text_been     -1.35
 #> # … with 991 more rows
 ```
 
@@ -255,7 +263,7 @@ Yet another option for evaluating or comparing models is to use a separate valid
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 
 ```r
@@ -327,13 +335,13 @@ collect_metrics(svm_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.6      10 0.216   Preprocessor1_Model1
-#> 2 rsq     standard    0.895    10 0.00244 Preprocessor1_Model1
+#> 1 rmse    standard   15.9      10 0.189   Preprocessor1_Model1
+#> 2 rsq     standard    0.892    10 0.00150 Preprocessor1_Model1
 ```
 
 
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is 15.6 years.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$. RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is 15.9 years.
 
 <div class="rmdnote">
 <p>RSME and <span class="math inline">\(R^2\)</span> are performance metrics used for regression models.</p>
@@ -364,7 +372,7 @@ svm_rs %>%
 <p class="caption">(\#fig:firstregpredict)Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years</p>
 </div>
 
-The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.6 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
+The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.9 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
 
 <div class="rmdwarning">
 <p>Hopefully you are convinced that using resampled data sets for measuring performance is the right choice, but it can be computationally expensive. Instead of fitting once, we must fit the model one time for <em>each</em> resample. The resamples are independent of each other, so this is a great fit for parallel processing. The tidymodels framework is designed to work fluently with parallel processing in R, using multiple cores or multiple machines. The implementation details of parallel processing are operating system specific, so <a href="https://tune.tidymodels.org/articles/extras/optimizations.html">look at tidymodels’ documentation for how to get started</a>.</p>
@@ -422,7 +430,7 @@ collect_metrics(null_rs)
 #> # A tibble: 1 x 6
 #>   .metric .estimator  mean     n std_err .config             
 #>   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard    47.9    10   0.294 Preprocessor1_Model1
+#> 1 rmse    standard    48.0    10   0.512 Preprocessor1_Model1
 ```
 
 The RMSE indicates that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and very little specialized preprocessing) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
@@ -477,8 +485,8 @@ collect_metrics(rf_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
-#> 2 rsq     standard    0.919    10 0.00283 Preprocessor1_Model1
+#> 1 rmse    standard   15.0      10 0.487   Preprocessor1_Model1
+#> 2 rsq     standard    0.919    10 0.00434 Preprocessor1_Model1
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
@@ -621,8 +629,8 @@ collect_metrics(smart_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   17.2      10 0.199   Preprocessor1_Model1
-#> 2 rsq     standard    0.876    10 0.00261 Preprocessor1_Model1
+#> 1 rmse    standard   16.8      10 0.194   Preprocessor1_Model1
+#> 2 rsq     standard    0.880    10 0.00305 Preprocessor1_Model1
 ```
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
@@ -659,11 +667,11 @@ The Snowball lexicon contains the smallest number of words (see Figure \@ref(fig
 <p>This result is not generalizable to all data sets and contexts, but the approach outlined in this section <strong>is</strong> generalizable.</p>
 </div>
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results for smart and stopword-iso are worse than removing no stopwords at all (remember that the RMSE was 15.6 years in Section \@ref(firstregressionevaluation)). This indicates that removing a small stop word list is a good choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.9 years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
 
-This increase in performance isn't huge, but removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
+When removing stop words does appear to help a model, it's good to know that removing stop words isn't computationally slow or difficult so the cost for this improvement is low.
 
-## Case study: varying n-grams 
+## Case study: varying n-grams {#casestudyngrams}
 
 Each model trained so far in this chapter has involved single words or _unigrams_, but using n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words, as well as effects from word order, that can be predictive.
 
@@ -741,11 +749,11 @@ collect_metrics(bigram_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
-#> 2 rsq     standard    0.892    10 0.00240 Preprocessor1_Model1
+#> 1 rmse    standard   16.0      10 0.191   Preprocessor1_Model1
+#> 2 rsq     standard    0.890    10 0.00211 Preprocessor1_Model1
 ```
 
-We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse). Instead of looking at the top 5 best-performing models with `show_best()` as in Figure \@ref(fig:snowballrmse), let's look at all the models we trained and make a dot plot.
+We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse).
 
 
 ```r
@@ -772,9 +780,9 @@ list(`1` = unigram_rs,
 <p class="caption">(\#fig:ngramrmse)Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams</p>
 </div>
 
-Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using bigrams plus unigrams performs best for this corpus of Supreme Court opinions. The performance gain in moving from unigrams to unigrams plus bigrams is significant, but adding in trigrams doesn't change the situation as much. 
+Each of these models was trained with `max_tokens = 1e3`, i.e., including only the top 1000 tokens for each tokenization strategy. Holding the number of tokens constant, using unigrams alone performs best for this corpus of Supreme Court opinions. To be able to incorporate the more complex information in bigrams or trigrams, we would need to increase the number of tokens in the model considerably. 
 
-Keep in mind that adding n-grams is computationally expensive, especially compared to the improvement in model performance gained. We can benchmark the whole model workflow, including preprocessing and modeling. Using bigrams plus unigrams takes more than twice as long to train than only unigrams, and adding in trigrams as well takes almost five times as long as training on unigrams alone.
+Keep in mind that adding n-grams is computationally expensive to start with, especially compared to the typical improvement in model performance gained. We can benchmark the whole model workflow, including preprocessing and modeling. Using bigrams plus unigrams takes more than twice as long to train than only unigrams (number of tokens held constant), and adding in trigrams as well takes almost five times as long as training on unigrams alone.
 
 ## Case study: lemmatization {#mlregressionlemmatization}
 
@@ -889,11 +897,11 @@ collect_metrics(lemma_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
-#> 2 rsq     standard    0.913    10 0.00304 Preprocessor1_Model1
+#> 1 rmse    standard   14.3      10 0.191   Preprocessor1_Model1
+#> 2 rsq     standard    0.913    10 0.00189 Preprocessor1_Model1
 ```
 
-The best value for RMSE at 14.2 shows us that using lemmatization can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
+The best value for RMSE at 14.3 shows us that using lemmatization can have a significant benefit for model performance, compared to 15.9 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.
 
 <div class="rmdnote">
 <p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
@@ -1034,15 +1042,15 @@ scotus_hash %>%
 ```
 #> Rows: 7,500
 #> Columns: 9
-#> $ text_hash001 <dbl> -16, -5, -12, -10, -10, -2, -7, -13, -16, -18, -1, -2, -1…
-#> $ text_hash002 <dbl> -1, 1, 3, -2, 0, 0, 5, -1, 1, 6, 0, 2, 0, 0, 0, -3, 1, 2,…
-#> $ text_hash003 <dbl> -2, 0, 4, -1, -1, 1, -5, -2, -2, 0, 0, -1, 1, 6, 0, 0, -3…
-#> $ text_hash004 <dbl> -2, 0, -1, 0, 0, 0, -14, -14, -4, -2, 0, -10, -1, -2, 0, …
-#> $ text_hash005 <dbl> 0, 0, 0, 0, 0, 0, -2, -1, 2, 1, 0, -1, 0, -1, 0, 0, -1, 0…
-#> $ text_hash006 <dbl> 24, 2, 4, 6, 7, 2, 14, 13, 13, 22, 1, 41, 2, 49, 9, 1, 17…
-#> $ text_hash007 <dbl> 13, 1, 1, -3, 0, -6, -2, -4, -8, -1, 0, 0, -4, -11, 0, 0,…
-#> $ text_hash008 <dbl> -8, 3, 1, 1, 1, 0, -19, 0, 1, 0, 1, -1, 1, 1, -2, 1, -8, …
-#> $ text_hash009 <dbl> -2, 0, -1, 1, 0, 0, 0, -1, -1, -1, 0, -1, -1, -1, 0, 0, -…
+#> $ text_hash001 <dbl> -47, -2, -9, -10, -15, -7, -5, -12, -4, -9, -2, -1, 2, -2…
+#> $ text_hash002 <dbl> 0, -4, -2, 0, 2, -8, 6, 1, 0, 6, -1, 0, 1, 0, 0, 0, -4, -…
+#> $ text_hash003 <dbl> 1, -1, 7, -3, 3, 1, 0, 1, 0, 4, 1, 0, 2, 0, 1, -2, -1, -4…
+#> $ text_hash004 <dbl> -7, 0, 0, -10, -5, 4, 7, -1, 0, -4, 0, 0, 0, 0, -1, 0, -4…
+#> $ text_hash005 <dbl> -1, -4, 1, 0, 2, -2, -1, -17, 0, 0, 0, 0, -1, -1, 0, 0, -…
+#> $ text_hash006 <dbl> 42, 3, 11, 0, 42, 9, 26, 6, 0, 18, 8, -1, 2, 6, 0, 0, 26,…
+#> $ text_hash007 <dbl> -17, -1, -1, 1, -7, 0, 1, -3, 0, -1, 0, 0, 0, 0, 0, 0, -6…
+#> $ text_hash008 <dbl> 15, 1, -2, -1, 3, 5, -1, -2, -1, -1, 5, -2, 1, 1, -1, 4, …
+#> $ text_hash009 <dbl> 6, 0, -4, 0, -30, 0, 0, 0, 0, -3, 0, -1, 0, 0, 0, 0, 0, -…
 ```
 
 By using `step_texthash()` we can quickly generate machine-ready data with a consistent number of variables.
@@ -1184,7 +1192,7 @@ svm_rs %>%
 #> # A tibble: 1 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 mape    standard       0.616
+#> 1 mape    standard       0.623
 ```
 
 We can also compute the mean absolute percent error for each resample.
@@ -1201,16 +1209,16 @@ svm_rs %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 mape    standard       0.603
-#>  2 Fold02 mape    standard       0.660
-#>  3 Fold03 mape    standard       0.596
-#>  4 Fold04 mape    standard       0.639
-#>  5 Fold05 mape    standard       0.618
-#>  6 Fold06 mape    standard       0.611
-#>  7 Fold07 mape    standard       0.618
-#>  8 Fold08 mape    standard       0.602
-#>  9 Fold09 mape    standard       0.604
-#> 10 Fold10 mape    standard       0.605
+#>  1 Fold01 mape    standard       0.620
+#>  2 Fold02 mape    standard       0.613
+#>  3 Fold03 mape    standard       0.646
+#>  4 Fold04 mape    standard       0.607
+#>  5 Fold05 mape    standard       0.609
+#>  6 Fold06 mape    standard       0.631
+#>  7 Fold07 mape    standard       0.619
+#>  8 Fold08 mape    standard       0.616
+#>  9 Fold09 mape    standard       0.632
+#> 10 Fold10 mape    standard       0.640
 ```
 
 Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.
@@ -1227,16 +1235,16 @@ svm_rs %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 mae     standard        11.5
-#>  2 Fold02 mae     standard        12.6
-#>  3 Fold03 mae     standard        11.4
-#>  4 Fold04 mae     standard        12.2
-#>  5 Fold05 mae     standard        11.8
-#>  6 Fold06 mae     standard        11.7
+#>  1 Fold01 mae     standard        11.9
+#>  2 Fold02 mae     standard        11.7
+#>  3 Fold03 mae     standard        12.4
+#>  4 Fold04 mae     standard        11.7
+#>  5 Fold05 mae     standard        11.6
+#>  6 Fold06 mae     standard        12.1
 #>  7 Fold07 mae     standard        11.9
-#>  8 Fold08 mae     standard        11.5
-#>  9 Fold09 mae     standard        11.6
-#> 10 Fold10 mae     standard        11.6
+#>  8 Fold08 mae     standard        11.8
+#>  9 Fold09 mae     standard        12.1
+#> 10 Fold10 mae     standard        12.3
 ```
 
 
@@ -1253,28 +1261,21 @@ In this chapter, we started from the beginning and then explored both different 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - _tune_ the number of tokens used in the model to find a value that fits our needs,
 - include both unigrams and bigrams,
-- remove the Snowball stop word lexicon,
 - choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and
 - finally evaluate on the testing set, which we have not touched at all yet.
+
+We will include a much larger number of tokens than before, which should give us the latitude to include both unigrams and bigrams, despite the result we saw in Section \@ref(casestudyngrams).
 
 ### Preprocess the data
 
 First, let's create the data preprocessing recipe. By setting the tokenization options to `list(n = 2, n_min = 1)`, we will include both unigrams and bigrams in our model. 
-
-<div class="rmdnote">
-<p>We can remove the Snowball lexicon of stop words from the text with the option <code>stopwords = stopwords::stopwords(source = "snowball")</code>; this will remove the stop words before tokenizing so that neither the unigrams or bigrams will include these stop words.</p>
-</div>
 
 When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value. Before we set `max_tokens = 1e3` to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.
 
 
 ```r
 final_rec <- recipe(year ~ text, data = scotus_train) %>%
-  step_tokenize(
-    text, token = "ngrams",
-    options = list(n = 2, n_min = 1,
-                   stopwords = stopwords::stopwords(source = "snowball"))
-  ) %>%
+  step_tokenize(text, token = "ngrams", options = list(n = 2, n_min = 1)) %>%
   step_tokenfilter(text, max_tokens = tune()) %>%
   step_tfidf(text) %>%
   step_normalize(all_predictors())
@@ -1354,7 +1355,7 @@ tune_wf
 Before we tune the model, we need to set up a set of possible parameter values to try. 
 
 <div class="rmdwarning">
-<p>There is <em>one</em> tunable parameters in this model, the maximum number of tokens included in the model.</p>
+<p>There is <em>one</em> tunable parameter in this model, the maximum number of tokens included in the model.</p>
 </div>
 
 Let's include different possible values for this parameter starting from the value we've already tried, for a combination of six models.
@@ -1440,7 +1441,9 @@ final_rs %>%
 <p class="caption">(\#fig:scotusfinaltunevis)Performance improves significantly at about 4000 tokens</p>
 </div>
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. Let's choose by percent loss compared to the best model, with the default 2% loss.
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
+
+Let's choose by percent loss compared to the best model, with the default 2% loss.
 
 
 ```r
@@ -1454,7 +1457,7 @@ chosen_mae
 #> # A tibble: 1 x 9
 #>   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #>        <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>            <dbl> <dbl>
-#> 1       4000 mae     standard    9.43    10   0.112 Preprocessor4_M…  9.28  1.63
+#> 1       4000 mae     standard    10.1    10   0.118 Preprocessor4_M…  10.0 0.438
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -1506,8 +1509,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 x 4
 #>   .metric .estimator .estimate .config             
 #>   <chr>   <chr>          <dbl> <chr>               
-#> 1 rmse    standard      12.9   Preprocessor1_Model1
-#> 2 rsq     standard       0.930 Preprocessor1_Model1
+#> 1 rmse    standard      13.2   Preprocessor1_Model1
+#> 2 rsq     standard       0.926 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -1550,10 +1553,10 @@ scotus_fit %>%
 <p class="caption">(\#fig:scotusvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
 </div>
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "therefore" and "assembly", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "contended" and "therefore", are associated with lower, earlier years for these Supreme Court opinions. 
 
 <div class="rmdnote">
-<p>Some of these features are unigrams and some are bigrams, but notice that none of either include stop words included in the Snowball lexicon because we removed them.</p>
+<p>Some of these features are unigrams and some are bigrams.</p>
 </div>
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
@@ -1591,5 +1594,6 @@ You can use regression modeling to predict a continuous variable from a data set
 - how to compare different model types
 - about measuring the impact of n-gram tokenization on models
 - how to implement lemmatization and stop word removal with text models
+- how feature hashing can be used as a fast alternative to bag-of-words
 - about performance metrics for regression models
 
