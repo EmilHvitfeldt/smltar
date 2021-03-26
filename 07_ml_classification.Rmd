@@ -113,7 +113,7 @@ One of the main advantages of a naive Bayes model is its ability to handle a lar
 Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 ```{block, type = "rmdpackage"}
-**discrim** is an extension package for **parsnip** that contains model definitions for various discriminant analysis models. Naive Bayes being on of them.
+In **tidymodels**, the package for creating model specifications is **parsnip**. The **parsnip** package provides the functions for creating all the models we have used so far, but other extra packages provide more. The **discrim** package is an extension package for **parsnip** that contains model definitions for various discriminant analysis models, including Naive Bayes.
 ```
 
 ```{r nbspec}
@@ -365,8 +365,8 @@ The function `grid_regular()` is from the **dials** package. It chooses sensible
 
 Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
 
-```{block, type = "rmdnote"}
-Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
+```{block, type = "rmdpackage"}
+In **tidymodels**, the package for tuning is called **tune**. Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (`fit_resamples()`) because the two tasks are so similar. The difference is that when you tune, each model that you fit has _different_ parameters and you want to find the best one.
 ```
 
 We add our tunable model specification `tune_spec` to a workflow with the same preprocessing recipe we've been using so far, and then fit it to every possible parameter in `lambda_grid` and every resample in `complaints_folds` with `tune_grid()`.
@@ -472,10 +472,10 @@ Since we are using a linear model, the model coefficients are directly interpret
 
 We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
-To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package hardhat.
+To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package [**hardhat**](https://hardhat.tidymodels.org/).
 
 ```{block, type = "rmdpackage"}
-The [hardhat](https://hardhat.tidymodels.org/) package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
+The **hardhat** package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
 ```
 
 ```{r sparsebp}
@@ -585,7 +585,7 @@ When you have multiple classes in your data, it is possible to formulate the mul
 
 There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
+We will be using the [**themis**](https://themis.tidymodels.org) add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
 
 ```{block, type = "rmdpackage"}
 The **themis** package provides many more algorithms to deal with imbalanced data during data preprocessing.
@@ -662,7 +662,7 @@ In binary classification, there is one right answer and one wrong answer; in thi
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
 
-```{r multiheatmap, fig.width = 9, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal"}
+```{r multiheatmap, fig.width = 10, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -678,7 +678,7 @@ The off-diagonals numbers are all the failures and where we should direct our fo
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
-```{r multiheatmapminusdiag, fig.width = 9, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal"}
+```{r multiheatmapminusdiag, fig.width = 10, fig.asp = 0.8, fig.cap="Confusion matrix for multiclass lasso regularized classifier without diagonal"}
 multi_lasso_rs %>%
   collect_predictions() %>%
   filter(penalty == best_acc$penalty) %>%
@@ -956,7 +956,7 @@ Your domain knowledge allows you to build more predictive features than the naiv
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of knowledge about regular expressions pays off.
 
-```{block2, type = "rmdnote"}
+```{block2, type = "rmdpackage"}
 The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.
 ```
 
@@ -1141,28 +1141,27 @@ For the full set of classification metric options, see the [yardstick documentat
 ## The full game: classification {#mlclassificationfull}
 
 We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
-We started this chapter with a simple naive Bayes model and n-gram token counts.
+We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with n-grams, as well as the non-text features. We will use our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - include text (but not `tags` or date features, since those did not result in better performance),
 - tune the number of tokens used in the model,
-- include bigrams and unigrams,
+- include unigrams only,
 - include custom-engineered features,
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
 
 We start by creating a new preprocessing recipe, using only the text of the complaints for feature engineering. 
-Let's use the same predictors and handle `date_received` and `tags` in the same way.
 
 ```{r complaintrecfinal1, dependson="complaintssplit"}
 complaints_rec_v2 <-
   recipe(product ~ consumer_complaint_narrative, data = complaints_train)
 ```
 
-After exploring this text data more in Section \@ref(customfeatures), we want to add custom features to our final model.
+After exploring this text data more in Section \@ref(customfeatures), we want to add these custom features to our final model.
 To do this, we use `step_textfeature()` to compute custom text features. 
 We create a list of the custom text features and pass this list to `step_textfeature()` via the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
@@ -1177,7 +1176,7 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization will be similar to the other models in this chapter, but this time we'll include bigrams and unigrams in the model.
+The tokenization will be similar to the other models in this chapter.
 In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
 Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
@@ -1188,8 +1187,7 @@ This data set has many more than 50 of even the most common 5000 or more tokens,
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
-  step_tokenize(consumer_complaint_narrative, token = "ngrams",
-                options = list(n = 2, n_min = 1)) %>%
+  step_tokenize(consumer_complaint_narrative, token = "ngrams") %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1217,7 +1215,7 @@ Let's include different possible values for each parameter, for a combination of
 ```{r finalcomplaintsgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(500, 4e3)),
+  max_tokens(range = c(500, 3e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
@@ -1225,7 +1223,7 @@ final_grid
 ```
 
 ```{block, type = "rmdnote"}
-We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`.
+We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`. The **tidymodels** package for creating and handling tuning parameters and parameter grids is **dials**.
 ```
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.
@@ -1314,7 +1312,7 @@ collect_predictions(final_fitted)  %>%
 
 The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:complaintsvip).
 
-```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
+```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
 library(vip)
 
 complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
@@ -1345,13 +1343,11 @@ complaints_imp %>%
   )
 ```
 
-Tokens (unigrams or bigrams) like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
 
 ```{block, type = "rmdnote"}
-Most of these features are unigrams but a few are bigrams, like "subsection a". Notice that this bigram would have been removed if stop words were filtered out.
-```
-
 The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like `percent_censoring` or `max_money` are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.
+```
 
 We can gain some final insight into our model by looking at observations from the test set that it *misclassified*. Let's bind together the predictions on the test set with the original `complaints_test` data. Then let's look at complaints that were labeled as about credit reporting in the original data but that our final model thought had a low probability of being about credit reporting.
 
