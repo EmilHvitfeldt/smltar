@@ -325,7 +325,7 @@ val_res %>% metrics(state, .pred_class, .pred_1)
 
 
 
-A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix \@ref(fig:appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
+A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix \@ref(appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
 
 
 ```r
@@ -986,3 +986,55 @@ LSTMs are a specific kind of recurrent neural network that are capable of learni
 
 
 
+```r
+library(hardhat)
+sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
+
+new_kick_train <- kickstarter_train %>%
+  mutate(state = factor(state))
+
+## baseline lasso model
+set.seed(123)
+kick_folds <- vfold_cv(new_kick_train)
+
+kick_rec <- recipe(state ~ blurb, data = new_kick_train) %>%
+  step_tokenize(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = 5e3) %>%
+  step_tfidf(blurb)
+
+kick_rec
+
+lasso_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
+  set_mode("classification") %>%
+  set_engine("glmnet")
+lasso_spec
+
+lambda_grid <- grid_regular(penalty(), levels = 20)
+lambda_grid
+
+kick_wf <- workflow() %>%
+  add_recipe(kick_rec, blueprint = sparse_bp) %>%
+  add_model(lasso_spec)
+
+kick_wf
+
+doParallel::registerDoParallel()
+set.seed(2020)
+lasso_rs <- tune_grid(
+  kick_wf,
+  kick_folds,
+  grid = lambda_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+
+autoplot(lasso_rs)
+
+show_best(lasso_rs, "accuracy")   ## accuracy ~ 0.684
+show_best(lasso_rs, "roc_auc")    ## ROC ~ 0.752
+
+lasso_rs %>%
+  collect_predictions() %>%
+  inner_join(select_best(lasso_rs, "roc_auc")) %>%
+  roc_curve(state, .pred_0) %>%
+  autoplot()
+```

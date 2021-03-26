@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-24" />
+<meta name="date" content="2021-03-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -395,6 +395,9 @@ div.csl-indent {
 <li class="chapter" data-level="10.9" data-path="dlcnn.html"><a href="dlcnn.html#dlcnnsummary"><i class="fa fa-check"></i><b>10.9</b> Summary</a>
 <ul>
 <li class="chapter" data-level="10.9.1" data-path="dlcnn.html"><a href="dlcnn.html#in-this-chapter-you-learned-9"><i class="fa fa-check"></i><b>10.9.1</b> In this chapter, you learned:</a></li>
+<li class="chapter" data-level="10.9.2" data-path="dlcnn.html"><a href="dlcnn.html#stride"><i class="fa fa-check"></i><b>10.9.2</b> Stride</a></li>
+<li class="chapter" data-level="10.9.3" data-path="dlcnn.html"><a href="dlcnn.html#dilation"><i class="fa fa-check"></i><b>10.9.3</b> Dilation</a></li>
+<li class="chapter" data-level="10.9.4" data-path="dlcnn.html"><a href="dlcnn.html#padding"><i class="fa fa-check"></i><b>10.9.4</b> Padding</a></li>
 </ul></li>
 </ul></li>
 <li class="part"><span><b>IV Conclusion</b></span></li>
@@ -417,10 +420,10 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="B" data-path="appendixdata.html"><a href="appendixdata.html"><i class="fa fa-check"></i><b>B</b> Data</a>
 <ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata.html"><a href="appendixdata.html#h.c.-andersen-fairy-tales"><i class="fa fa-check"></i><b>B.1</b> H.C. Andersen fairy tales</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata.html"><a href="appendixdata.html#consumer-financial-protection-bureau-cfpb-complaints"><i class="fa fa-check"></i><b>B.2</b> Consumer Financial Protection Bureau (CFPB) complaints</a></li>
-<li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#opinions-of-the-supreme-court-of-the-united-states"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
-<li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-campaign-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
+<li class="chapter" data-level="B.1" data-path="appendixdata.html"><a href="appendixdata.html#hcandersen"><i class="fa fa-check"></i><b>B.1</b> H.C. Andersen fairy tales</a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata.html"><a href="appendixdata.html#cfpb-complaints"><i class="fa fa-check"></i><b>B.2</b> Consumer Financial Protection Bureau (CFPB) complaints</a></li>
+<li class="chapter" data-level="B.3" data-path="appendixdata.html"><a href="appendixdata.html#scotus-opinions"><i class="fa fa-check"></i><b>B.3</b> Opinions of the Supreme Court of the United States</a></li>
+<li class="chapter" data-level="B.4" data-path="appendixdata.html"><a href="appendixdata.html#kickstarter-blurbs"><i class="fa fa-check"></i><b>B.4</b> Kickstarter campaign blurbs</a></li>
 </ul></li>
 <li class="chapter" data-level="C" data-path="appendixbaseline.html"><a href="appendixbaseline.html"><i class="fa fa-check"></i><b>C</b> Baseline linear classifier</a>
 <ul>
@@ -517,11 +520,11 @@ Like we discussed in the last chapter, when we <code>prep()</code> a recipe, we 
 <div id="building-an-lstm" class="section level3" number="9.1.1">
 <h3><span class="header-section-number">9.1.1</span> Building an LSTM</h3>
 <p>An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> and memory cells that can learn to “remember” and “forget” information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.</p>
-<p>Figure <a href="dldnn.html#fig:rnndiag">8.1</a> depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, <span class="math inline">\(A\)</span>, operates on some of the input and outputs a value. During this process, some information is held inside <span class="math inline">\(A\)</span> to make the network “remember” this updated network. Network <span class="math inline">\(A\)</span> is then applied to the next input where it predicts new output and its memory is updated.</p>
+<p>Figure <a href="dllstm.html#fig:rnndiag">9.1</a> depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, <span class="math inline">\(A\)</span>, operates on some of the input and outputs a value. During this process, some information is held inside <span class="math inline">\(A\)</span> to make the network “remember” this updated network. Network <span class="math inline">\(A\)</span> is then applied to the next input where it predicts new output and its memory is updated.</p>
 <div class="figure" style="text-align: center"><span id="fig:rnndiag"></span>
 <img src="diagram-files/rnn-architecture.png" alt="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks." width="90%" />
 <p class="caption">
-FIGURE 8.1: High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.
+FIGURE 9.1: High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.
 </p>
 </div>
 <p>The exact shape and function of network <span class="math inline">\(A\)</span> are beyond the reach of this book. For further study, Christopher Olah’s blog post <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">“Understanding LSTM Networks”</a> gives a good technical overview of how LSTM networks work.</p>
@@ -589,12 +592,12 @@ As we noted in Chapter <span class="citation">(<a href="#ref-ref" role="doc-bibl
 #&gt;     accuracy: 0.8776
 #&gt;     val_loss: 0.5831
 #&gt; val_accuracy: 0.7825</code></pre>
-<p>The loss on the training data (called <code>loss</code> here) is much better than the loss on the validation data (<code>val_loss</code>), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:firstlstmhistory">9.1</a>.</p>
+<p>The loss on the training data (called <code>loss</code> here) is much better than the loss on the validation data (<code>val_loss</code>), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:firstlstmhistory">9.2</a>.</p>
 <div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="dllstm.html#cb510-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstlstmhistory"></span>
 <img src="09_dl_lstm_files/figure-html/firstlstmhistory-1.png" alt="Training and validation metrics for LSTM" width="672" />
 <p class="caption">
-FIGURE 9.1: Training and validation metrics for LSTM
+FIGURE 9.2: Training and validation metrics for LSTM
 </p>
 </div>
 <div class="rmdnote">
@@ -662,12 +665,12 @@ When we include some dropout, we temporarily remove some units together with the
 #&gt;     accuracy: 0.8204
 #&gt;     val_loss: 0.5952
 #&gt; val_accuracy: 0.736</code></pre>
-<p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.2</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
+<p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.3</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
 <div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="dllstm.html#cb520-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lstmvalhistory"></span>
 <img src="09_dl_lstm_files/figure-html/lstmvalhistory-1.png" alt="Training and validation metrics for LSTM with dropout" width="672" />
 <p class="caption">
-FIGURE 9.2: Training and validation metrics for LSTM with dropout
+FIGURE 9.3: Training and validation metrics for LSTM with dropout
 </p>
 </div>
 <p>Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.</p>
@@ -680,21 +683,21 @@ FIGURE 9.2: Training and validation metrics for LSTM with dropout
 #&gt; 2 kap         binary         0.471
 #&gt; 3 mn_log_loss binary         0.595
 #&gt; 4 roc_auc     binary         0.805</code></pre>
-<p>A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix <a href="#fig:appendixbaseline"><strong>??</strong></a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.3</a> to evaluate the performance across the range of thresholds.</p>
+<p>A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
 <div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="dllstm.html#cb523-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
 <span id="cb523-2"><a href="dllstm.html#cb523-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
 <span id="cb523-3"><a href="dllstm.html#cb523-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lstmvalroc"></span>
 <img src="09_dl_lstm_files/figure-html/lstmvalroc-1.png" alt="ROC curve for LSTM with dropout predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
-FIGURE 9.3: ROC curve for LSTM with dropout predictions of Kickstarter campaign success
+FIGURE 9.4: ROC curve for LSTM with dropout predictions of Kickstarter campaign success
 </p>
 </div>
 </div>
 </div>
 <div id="compare-to-a-recurrent-neural-network" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Compare to a recurrent neural network</h2>
-<p>An LSTM is actually a specific kind of recurrent neural network (RNN) <span class="citation">(<a href="#ref-ELMAN1990179" role="doc-biblioref">Elman 1990</a>)</span>. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network <span class="math inline">\(A\)</span> in figure <a href="dldnn.html#fig:rnndiag">8.1</a>. RNNs tend to have a very simple structure, typically just a single <code>tanh()</code> layer. This is much simpler than what happens in LSTMs.</p>
+<p>An LSTM is actually a specific kind of recurrent neural network (RNN) <span class="citation">(<a href="#ref-ELMAN1990179" role="doc-biblioref">Elman 1990</a>)</span>. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network <span class="math inline">\(A\)</span> in figure <a href="dllstm.html#fig:rnndiag">9.1</a>. RNNs tend to have a very simple structure, typically just a single <code>tanh()</code> layer. This is much simpler than what happens in LSTMs.</p>
 <div class="rmdwarning">
 <p>
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context.
@@ -730,12 +733,12 @@ Simple RNNs can only connect very recent information and structure in sequences,
 #&gt;     accuracy: 0.766
 #&gt;     val_loss: 0.6025
 #&gt; val_accuracy: 0.7102</code></pre>
-<p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.4</a>.</p>
+<p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.5</a>.</p>
 <div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="dllstm.html#cb526-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:rnnhistory"></span>
 <img src="09_dl_lstm_files/figure-html/rnnhistory-1.png" alt="Training and validation metrics for RNN" width="672" />
 <p class="caption">
-FIGURE 9.4: Training and validation metrics for RNN
+FIGURE 9.5: Training and validation metrics for RNN
 </p>
 </div>
 <p>These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don’t work well compared to simpler deep learning architectures like the dense network introduced in Section <a href="dldnn.html#firstdlclassification">8.2</a> <span class="citation">(<a href="#ref-Minaee2020" role="doc-biblioref">Minaee et al. 2020</a>)</span>, or even other machine learning approaches like regularized linear models with good preprocessing.</p>
@@ -1138,24 +1141,24 @@ The relationship between this hyperparameter and model performance is weak. Noti
 #&gt; 2 kap         binary         0.524
 #&gt; 3 mn_log_loss binary         0.556
 #&gt; 4 roc_auc     binary         0.831</code></pre>
-<p>This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.5</a>.</p>
+<p>This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.6</a>.</p>
 <div class="sourceCode" id="cb560"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb560-1"><a href="dllstm.html#cb560-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb560-2"><a href="dllstm.html#cb560-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
 <span id="cb560-3"><a href="dllstm.html#cb560-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lstmfinalroc"></span>
 <img src="09_dl_lstm_files/figure-html/lstmfinalroc-1.png" alt="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
-FIGURE 9.5: ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success
+FIGURE 9.6: ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success
 </p>
 </div>
-<p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model’s performance using a confusion matrix as well, in Figure <a href="dllstm.html#fig:lstmheatmap">9.6</a>.</p>
+<p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model’s performance using a confusion matrix as well, in Figure <a href="dllstm.html#fig:lstmheatmap">9.7</a>.</p>
 <div class="sourceCode" id="cb561"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb561-1"><a href="dllstm.html#cb561-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb561-2"><a href="dllstm.html#cb561-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb561-3"><a href="dllstm.html#cb561-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lstmheatmap"></span>
 <img src="09_dl_lstm_files/figure-html/lstmheatmap-1.png" alt="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
-FIGURE 9.6: Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success
+FIGURE 9.7: Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success
 </p>
 </div>
 <p>Notice that this final model still does not perform as well as any of the best models of Chapter <a href="dldnn.html#dldnn">8</a>.</p>
@@ -1180,6 +1183,56 @@ For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not tur
 <li>about the importance of centering and scaling regression outcomes for neural networks</li>
 <li>how to evaluate LSTM models for text</li>
 </ul>
+<div class="sourceCode" id="cb562"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb562-1"><a href="dllstm.html#cb562-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
+<span id="cb562-2"><a href="dllstm.html#cb562-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span>
+<span id="cb562-3"><a href="dllstm.html#cb562-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-4"><a href="dllstm.html#cb562-4" aria-hidden="true" tabindex="-1"></a>new_kick_train <span class="ot">&lt;-</span> kickstarter_train <span class="sc">%&gt;%</span></span>
+<span id="cb562-5"><a href="dllstm.html#cb562-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">factor</span>(state))</span>
+<span id="cb562-6"><a href="dllstm.html#cb562-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-7"><a href="dllstm.html#cb562-7" aria-hidden="true" tabindex="-1"></a><span class="do">## baseline lasso model</span></span>
+<span id="cb562-8"><a href="dllstm.html#cb562-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb562-9"><a href="dllstm.html#cb562-9" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(new_kick_train)</span>
+<span id="cb562-10"><a href="dllstm.html#cb562-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-11"><a href="dllstm.html#cb562-11" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> new_kick_train) <span class="sc">%&gt;%</span></span>
+<span id="cb562-12"><a href="dllstm.html#cb562-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb562-13"><a href="dllstm.html#cb562-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb562-14"><a href="dllstm.html#cb562-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
+<span id="cb562-15"><a href="dllstm.html#cb562-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-16"><a href="dllstm.html#cb562-16" aria-hidden="true" tabindex="-1"></a>kick_rec</span>
+<span id="cb562-17"><a href="dllstm.html#cb562-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-18"><a href="dllstm.html#cb562-18" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb562-19"><a href="dllstm.html#cb562-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb562-20"><a href="dllstm.html#cb562-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb562-21"><a href="dllstm.html#cb562-21" aria-hidden="true" tabindex="-1"></a>lasso_spec</span>
+<span id="cb562-22"><a href="dllstm.html#cb562-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-23"><a href="dllstm.html#cb562-23" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(), <span class="at">levels =</span> <span class="dv">20</span>)</span>
+<span id="cb562-24"><a href="dllstm.html#cb562-24" aria-hidden="true" tabindex="-1"></a>lambda_grid</span>
+<span id="cb562-25"><a href="dllstm.html#cb562-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-26"><a href="dllstm.html#cb562-26" aria-hidden="true" tabindex="-1"></a>kick_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb562-27"><a href="dllstm.html#cb562-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kick_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
+<span id="cb562-28"><a href="dllstm.html#cb562-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb562-29"><a href="dllstm.html#cb562-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-30"><a href="dllstm.html#cb562-30" aria-hidden="true" tabindex="-1"></a>kick_wf</span>
+<span id="cb562-31"><a href="dllstm.html#cb562-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-32"><a href="dllstm.html#cb562-32" aria-hidden="true" tabindex="-1"></a>doParallel<span class="sc">::</span><span class="fu">registerDoParallel</span>()</span>
+<span id="cb562-33"><a href="dllstm.html#cb562-33" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
+<span id="cb562-34"><a href="dllstm.html#cb562-34" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb562-35"><a href="dllstm.html#cb562-35" aria-hidden="true" tabindex="-1"></a>  kick_wf,</span>
+<span id="cb562-36"><a href="dllstm.html#cb562-36" aria-hidden="true" tabindex="-1"></a>  kick_folds,</span>
+<span id="cb562-37"><a href="dllstm.html#cb562-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid,</span>
+<span id="cb562-38"><a href="dllstm.html#cb562-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb562-39"><a href="dllstm.html#cb562-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb562-40"><a href="dllstm.html#cb562-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-41"><a href="dllstm.html#cb562-41" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span>
+<span id="cb562-42"><a href="dllstm.html#cb562-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-43"><a href="dllstm.html#cb562-43" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)   <span class="do">## accuracy ~ 0.684</span></span>
+<span id="cb562-44"><a href="dllstm.html#cb562-44" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)    <span class="do">## ROC ~ 0.752</span></span>
+<span id="cb562-45"><a href="dllstm.html#cb562-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-46"><a href="dllstm.html#cb562-46" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="sc">%&gt;%</span></span>
+<span id="cb562-47"><a href="dllstm.html#cb562-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb562-48"><a href="dllstm.html#cb562-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="fu">select_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb562-49"><a href="dllstm.html#cb562-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_0) <span class="sc">%&gt;%</span></span>
+<span id="cb562-50"><a href="dllstm.html#cb562-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 
 </div>
 </div>
