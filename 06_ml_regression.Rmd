@@ -1001,6 +1001,23 @@ final_fitted %>%
   )
 ```
 
+Finally, we can gain more insight into our model and how it is behaving by looking at observations from the test set that have been _mispredicted_. Let's bind together the predictions on the test set with the original Supreme Court opinion test data and filter to observations with a prediction that is more than 25 years wrong.
+
+```{r}
+scotus_bind <- collect_predictions(final_fitted) %>%
+  bind_cols(scotus_test %>% select(-year, -id)) %>%
+  filter(abs(year - .pred) > 25)
+```
+
+There isn't too much training data to start with for the earliest years, so we are unlikely to quickly gain insight from looking at the oldest opinions. However, what do the more recent opinions that were predicted inaccurately look like?
+
+```{r}
+scotus_bind %>%
+  arrange(-year) %>%
+  select(year, .pred, case_name, text)
+```
+
+There are some interesting examples here where we can understand why the model would mispredict, like _New Hampshire v. Maine_, a case about the boundary between the two states that invoked a 1740 decree of King George II, and the cases written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court, a confusing title when he served as a federal judge on the D.C. Circuit Court of Appeals earlier.
 
 ## Summary {#mlregressionsummary}
 
