@@ -758,6 +758,29 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 
 The metrics we see here are about the same as what we achieved in Section \@ref(evaluate-dnn) on the validation data, so we can be confident that we have not overfit during our training or model choosing process.
 
+Just like we did toward the end of both Sections \@ref(regression-final-evaluation) and \@ref(classification-final-evaluation), we can look at some examples of test set observations that our model did a bad job at predicting. Let's bind together the predictions on the test set with the original `kickstarter_test` data. Then let's look at blurbs that were successful but that our final model thought had a low probability of being successful.
+
+```{r}
+kickstarter_bind <- final_res %>%
+  bind_cols(kickstarter_test %>% select(-state))
+
+kickstarter_bind %>%
+  filter(state == 1, .pred_1 < 0.2) %>%
+  select(blurb) %>%
+  slice_sample(n = 10)
+```
+
+What about misclassifications in the other direction, observations in the test set that were *not* successful but that our final model gave a high probability of being successful?
+
+```{r}
+kickstarter_bind %>%
+  filter(state == 0, .pred_1 > 0.8) %>%
+  select(blurb) %>%
+  slice_sample(n = 10)
+```
+
+Notice that although the steps for model fitting are somewhat different now that we are using deep learning, model evaluation is much the same as it was in Chapters \@ref(mlregression) and \@ref(mlclassification).
+
 ## Limitations of deep learning {#dllimitations}
 
 Deep learning models achieve excellent performance on many tasks; the flexibility and potential complexity of their architecture is part of the reason why. One of the main downsides of deep learning models is that the interpretability of the models themselves is poor. 
