@@ -2,12 +2,9 @@
 
 ##----------------------------------------------------------
 
-install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
-pak::local_install_dev_deps(upgrade = TRUE)
+devtools::install_dev_deps()
 
 ##----------------------------------------------------------
-
-pak::pkg_install('rstudio/reticulate')
 
 ## assume Miniconda installed and R environment exists called `r-reticulate`:
 # reticulate::install_miniconda()
