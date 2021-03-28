@@ -186,7 +186,7 @@ One of the main advantages of a naive Bayes model is its ability to handle a lar
 Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 <div class="rmdpackage">
-<p><strong>discrim</strong> is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models. Naive Bayes being on of them.</p>
+<p>In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.</p>
 </div>
 
 
@@ -588,8 +588,8 @@ The function `grid_regular()` is from the **dials** package. It chooses sensible
 
 Now it is time to tune! Let's use `tune_grid()` to fit a model at each of the values for the regularization penalty in our regular grid.
 
-<div class="rmdnote">
-<p>Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (<code>fit_resamples()</code>) because the two tasks are so similar. The difference is that when you tune, each model that you fit has <em>different</em> parameters and you want to find the best one.</p>
+<div class="rmdpackage">
+<p>In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</strong>. Tuning a model uses a similar syntax compared to fitting a model to a set of resampled data sets for the purposes of evaluation (<code>fit_resamples()</code>) because the two tasks are so similar. The difference is that when you tune, each model that you fit has <em>different</em> parameters and you want to find the best one.</p>
 </div>
 
 We add our tunable model specification `tune_spec` to a workflow with the same preprocessing recipe we've been using so far, and then fit it to every possible parameter in `lambda_grid` and every resample in `complaints_folds` with `tune_grid()`.
@@ -813,10 +813,10 @@ fitted_lasso %>%
 
 We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
-To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package hardhat.
+To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package [**hardhat**](https://hardhat.tidymodels.org/).
 
 <div class="rmdpackage">
-<p>The <a href="https://hardhat.tidymodels.org/">hardhat</a> package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don’t use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.</p>
+<p>The <strong>hardhat</strong> package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don’t use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.</p>
 </div>
 
 
@@ -1025,7 +1025,7 @@ When you have multiple classes in your data, it is possible to formulate the mul
 
 There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the [themis](https://themis.tidymodels.org) add-on package for recipes which provides the [step_downsample()](https://themis.tidymodels.org/reference/step_downsample.html) function to perform downsampling.
+We will be using the [**themis**](https://themis.tidymodels.org) add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
 
 <div class="rmdpackage">
 <p>The <strong>themis</strong> package provides many more algorithms to deal with imbalanced data during data preprocessing.</p>
@@ -1183,7 +1183,7 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="864" />
+<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
 <p class="caption">(\#fig:multiheatmap)Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal</p>
 </div>
 
@@ -1206,7 +1206,7 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="864" />
+<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
 <p class="caption">(\#fig:multiheatmapminusdiag)Confusion matrix for multiclass lasso regularized classifier without diagonal</p>
 </div>
 
@@ -1567,7 +1567,7 @@ Your domain knowledge allows you to build more predictive features than the naiv
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of knowledge about regular expressions pays off.
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdpackage}
 
 Your specific domain knowledge may provide specific guidance about feature engineering for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
@@ -1863,21 +1863,20 @@ It is possible with many data sets to achieve high accuracy just by predicting t
 ## The full game: classification {#mlclassificationfull}
 
 We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
-We started this chapter with a simple naive Bayes model and n-gram token counts.
+We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with n-grams, as well as the non-text features. We will use our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 - include text (but not `tags` or date features, since those did not result in better performance),
 - tune the number of tokens used in the model,
-- include bigrams and unigrams,
+- include unigrams only,
 - include custom-engineered features,
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
 
 We start by creating a new preprocessing recipe, using only the text of the complaints for feature engineering. 
-Let's use the same predictors and handle `date_received` and `tags` in the same way.
 
 
 ```r
@@ -1885,7 +1884,7 @@ complaints_rec_v2 <-
   recipe(product ~ consumer_complaint_narrative, data = complaints_train)
 ```
 
-After exploring this text data more in Section \@ref(customfeatures), we want to add custom features to our final model.
+After exploring this text data more in Section \@ref(customfeatures), we want to add these custom features to our final model.
 To do this, we use `step_textfeature()` to compute custom text features. 
 We create a list of the custom text features and pass this list to `step_textfeature()` via the `extract_functions` argument. 
 Note how we have to take a copy of `consumer_complaint_narrative` using `step_mutate()` as `step_textfeature()` consumes the column.
@@ -1901,7 +1900,7 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
   step_textfeature(narrative_copy, extract_functions = extract_funs)
 ```
 
-The tokenization will be similar to the other models in this chapter, but this time we'll include bigrams and unigrams in the model.
+The tokenization will be similar to the other models in this chapter.
 In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
 Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
@@ -1913,8 +1912,7 @@ We want our model to be robust and a token needs to appear enough times before w
 
 ```r
 complaints_rec_v2 <- complaints_rec_v2 %>%
-  step_tokenize(consumer_complaint_narrative, token = "ngrams",
-                options = list(n = 2, n_min = 1)) %>%
+  step_tokenize(consumer_complaint_narrative, token = "ngrams") %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1968,7 +1966,7 @@ Let's include different possible values for each parameter, for a combination of
 ```r
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(500, 4e3)),
+  max_tokens(range = c(500, 3e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
@@ -1993,7 +1991,7 @@ final_grid
 ```
 
 <div class="rmdnote">
-<p>We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>.</p>
+<p>We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong>.</p>
 </div>
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.
@@ -2011,7 +2009,7 @@ tune_rs <- tune_grid(
 
 We have fitted these classification models!
 
-### Evaluate the modeling
+### Evaluate the modeling {#classification-final-evaluation}
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:complaintsfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization. 
 
@@ -2045,7 +2043,7 @@ choose_acc
 #> # A tibble: 1 x 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
-#> 1 0.00483       1375 accuracy binary     0.881    10 9.98e-4 Prepro… 0.899  1.92
+#> 1 0.00113       1750 accuracy binary     0.821    10 0.00135 Prepro… 0.837  1.90
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -2074,7 +2072,7 @@ final_wf
 #> Logistic Regression Model Specification (classification)
 #> 
 #> Main Arguments:
-#>   penalty = 0.00483293023857175
+#>   penalty = 0.00112883789168469
 #>   mixture = 1
 #> 
 #> Computational engine: glmnet
@@ -2101,8 +2099,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 x 4
 #>   .metric  .estimator .estimate .config             
 #>   <chr>    <chr>          <dbl> <chr>               
-#> 1 accuracy binary         0.884 Preprocessor1_Model1
-#> 2 roc_auc  binary         0.949 Preprocessor1_Model1
+#> 1 accuracy binary         0.827 Preprocessor1_Model1
+#> 2 roc_auc  binary         0.904 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -2176,17 +2174,15 @@ complaints_imp %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
-<p class="caption">(\#fig:complaintsvip)Some words or bigrams increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
+<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
+<p class="caption">(\#fig:complaintsvip)Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
 </div>
 
-Tokens (unigrams or bigrams) like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
 
 <div class="rmdnote">
-<p>Most of these features are unigrams but a few are bigrams, like “subsection a”. Notice that this bigram would have been removed if stop words were filtered out.</p>
+<p>The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like <code>percent_censoring</code> or <code>max_money</code> are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.</p>
 </div>
-
-The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like `percent_censoring` or `max_money` are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.
 
 We can gain some final insight into our model by looking at observations from the test set that it *misclassified*. Let's bind together the predictions on the test set with the original `complaints_test` data. Then let's look at complaints that were labeled as about credit reporting in the original data but that our final model thought had a low probability of being about credit reporting.
 
@@ -2205,16 +2201,16 @@ complaints_bind %>%
 #> # A tibble: 10 x 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
-#>  1 "I checked my credit report because I keep getting denied when I try to get …
-#>  2 "CRA continually reports debt not owed by myself after several attempts to r…
-#>  3 "Contacted by Convergent Outsourcing , Inc., XXXX XXXX. XXXX about an old XX…
-#>  4 "I PAID OFF AN AUTO LOAN WITH XXXX XXXX AND ALSO PAID OFF ANOTHER ACCOUNT XX…
-#>  5 "NCB MANAGMENT SERVICES is reporting on my Credit Report that I have a Balan…
-#>  6 "After reconciling my bank account. I noticed a monthly recurring transactio…
-#>  7 "I have had two capital one accounts since XXXX. I have never made any late …
-#>  8 "I went to TJ Maxx with my sister on XX/XX/18 at the XXXX, Alabama locaction…
-#>  9 "I was notified another lender that these are not categorized as 'educationa…
-#> 10 "Back in the late XX/XX/XXXX's early XX/XX/XXXX 's I took out loans in the a…
+#>  1 "XXXX XXXX in XXXX has several negative reviews for billing costumers after …
+#>  2 "Why hasn't First Advantage contacted XXXX yet to report to them that it's f…
+#>  3 "In re XX/XX/2017 equifax breach. \n\nI understand a settlement on behalf of…
+#>  4 "I received a letter that XXXX XXXX reduced my credit limits because I charg…
+#>  5 "I filed section 128.21 in the state of Wisconsin. XXXX XXXX  was notified i…
+#>  6 "In XX/XX/2013 I vacated my tenancy at an apartment complex that had serious…
+#>  7 "My name is XXXX XXXX, I reacently found out about a loan that is not mines …
+#>  8 "Since the beginning of my home loan with Selene Finance every attempt to pa…
+#>  9 "XX/XX/19 : Paid XXXX XXXX what should have been my final bill but still rec…
+#> 10 "I noticed an unauthorized hard inquiry conducted by the below agency : Inst…
 ```
 
 We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.
@@ -2233,16 +2229,16 @@ complaints_bind %>%
 #> # A tibble: 10 x 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
-#>  1 "I am a victim of identity theft. please remove this fraudulent charge from …
-#>  2 "Fed Loan is inaccurately reporting the status of the Student loan payment s…
-#>  3 "I have sent letters and call the all ( 3 ) credit bureaus who handle credit…
-#>  4 "Experian is still reporting a account on my credit report that isnt mine! I…
-#>  5 "FCRA states information reporting has to be 100 % verifiable and 100 % accu…
-#>  6 "There have been multiple times advising the company that the accounts are n…
-#>  7 "These are not my Accounts."                                                 
-#>  8 "According to section XXXX XXXX XXXX XXXX XXXX in amount of {$710.00} must r…
-#>  9 "Here is another account that is reporting incorrect information XXXX XXXX i…
-#> 10 "Fed loan service is reporting a loan twice on my XXXX credit report. \nTher…
+#>  1 "onemain was not Authorize to pull my credit report!"                        
+#>  2 "My client, XXXX XXXX XXXX sent me a {$38000.00} wire transfer into Wells Fa…
+#>  3 "i still have XXXX XXXX still on my XXXX credit report and it has been remov…
+#>  4 "According to the Fair Credit Reporting Act, Section 609 ( a ) ( 1 ) ( A ), …
+#>  5 "Numerous requests for reinvestigation have been sent out to Transunion, XXX…
+#>  6 "According to section XXXX XXXX XXXX XXXX XXXX in amount of {$710.00} must r…
+#>  7 "When i pulled my credit report i noticed LVNV Funding/ XXXX XXXX was on my …
+#>  8 "XXXX XXXX XXXX is reporting a collection on my credit reports for a auto lo…
+#>  9 "I am a victim of identity theft, and I discovered that a previous fraudulen…
+#> 10 "I was going over my credit report and seen FRAUDULENT ACCOUNTS and I seen u…
 ```
 
 Again, these are "mistakes" on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.

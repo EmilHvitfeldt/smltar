@@ -8,7 +8,7 @@ In R, text is typically represented with the **character** data type, similar to
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
 <div class="rmdpackage">
-<p><strong>tidyverse</strong> is a collection of packages for data manipulation, exploration and visualization.</p>
+<p>The <strong>tidyverse</strong> is a collection of packages for data manipulation, exploration, and visualization.</p>
 </div>
 
 
@@ -126,7 +126,7 @@ sample_tibble <- tibble(text = sample_vector)
 ```
 
 <div class="rmdpackage">
-<p><strong>tokenizers</strong> contains functions to split text into tokens of varying kinds. Including tokens such as words, letters, n-grams, lines and paragraphs.</p>
+<p>The <strong>tokenizers</strong> package offers fast, consistent tokenization in R for tokens such as words, letters, n-grams, lines, paragraphs, and more.</p>
 </div>
 
 The tokenization achieved by using `tokenize_words()` on `sample_vector`:
@@ -170,7 +170,7 @@ sample_tibble %>%
 ```
 
 <div class="rmdpackage">
-<p><strong>tidytext</strong> provides functions to allow conversion of text to and from tidy formats. This allows us to work seamlessly with other tidy functions from <strong>tidyverse</strong> for further analysis.</p>
+<p>The <strong>tidytext</strong> package provides functions to transform text to and from tidy formats, allowing us to work seamlessly with other <strong>tidyverse</strong> tools.</p>
 </div>
 
 Arguments used in `tokenize_words()` can be passed through `unnest_tokens()` using the ["the dots"](https://adv-r.hadley.nz/functions.html#fun-dot-dot-dot), `...`.
@@ -827,7 +827,7 @@ segment(words, engine1)
 
 ## Tokenization benchmark
 
-Not all tokenization packages are the same. Most open source tokenizers in R are well-designed but they are designed to serve different purposes. Some have a multitude of arguments to allow you to customize your tokenizer for greater flexibility, but this flexibility comes at a price; they tend to have slower performance. 
+Not all tokenization packages are the same. Most open source tokenizers in R are well-designed but they are designed to serve different purposes. Some have a multitude of arguments to allow you to customize your tokenizer for greater flexibility, but this flexibility comes at a price; they tend to have relatively slower performance. 
 
 While we can't easily quantify flexibility, it is straightforward to benchmark some of the tokenizers available in R so you can pick the one that best suits your needs.
 

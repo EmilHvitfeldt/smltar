@@ -66,10 +66,6 @@ This sample of opinions reflects the distribution over time of available opinion
 
 Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
-<div class="rmdpackage">
-<p><strong>tidymodels</strong> is a collection of packages for modeling and machine learning using tidyverse principles. These packages facilities preprocessing, modeling and evaluation.</p>
-</div>
-
 
 ```r
 library(tidymodels)
@@ -83,11 +79,13 @@ scotus_train <- training(scotus_split)
 scotus_test <- testing(scotus_split)
 ```
 
-Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. What are the steps in creating this recipe?
+Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. 
 
 <div class="rmdpackage">
-<p><strong>textrecipes</strong> extends the <strong>recipes</strong> package by providing steps that turn columns containing text into numeric columns. These steps can perform the actions we explored in the first section of this book.</p>
+<p>The <strong>recipes</strong> package is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.</p>
 </div>
+
+What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
@@ -141,9 +139,11 @@ dim(scotus_bake)
 
 For most modeling tasks, you will not need to `prep()` or `bake()` your recipe directly; instead you can build up a tidymodels `workflow()` to bundle together your modeling components.
 
-Let's create a `workflow()` to bundle together this recipe with any model specifications we may want to create later. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
+<div class="rmdpackage">
+<p>In <strong>tidymodels</strong>, the <strong>workflows</strong> package offers infrastructure for bundling model components. A <em>model workflow</em> is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.</p>
+</div>
 
-First, let's create an empty `workflow()` and then only add the data preprocessor `scotus_rec` to it.
+Let's create a `workflow()` to bundle together our recipe with any model specifications we may want to create later. First, let's create an empty `workflow()` and then only add the data preprocessor `scotus_rec` to it.
 
 
 ```r
@@ -263,7 +263,13 @@ Yet another option for evaluating or comparing models is to use a separate valid
 
 What are we to do, then, if we want to train multiple models and find the best one? Or compute a reliable estimate for how our model has performed without wasting the valuable testing set? We can use **resampling**. When we resample, we create new simulated data sets from the training set for the purpose of, for example, measuring model performance.
 
-Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
+
+<div class="rmdpackage">
+<p>In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong>.</p>
+</div>
+
+Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 
 ```r
@@ -1416,7 +1422,7 @@ final_rs
 
 We trained all these models!
 
-### Evaluate the modeling
+### Evaluate the modeling {#regression-final-evaluation}
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:scotusfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose) and the number of tokens.
 
@@ -1441,7 +1447,7 @@ final_rs %>%
 <p class="caption">(\#fig:scotusfinaltunevis)Performance improves significantly at about 4000 tokens</p>
 </div>
 
-Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be the one with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
+Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be one of the ones with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
 
 Let's choose by percent loss compared to the best model, with the default 2% loss.
 
@@ -1553,10 +1559,10 @@ scotus_fit %>%
 <p class="caption">(\#fig:scotusvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
 </div>
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "scalia" and "century", are associated with higher, later years and those that contribute in the negative direction, like "contended" and "therefore", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years and those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
 
 <div class="rmdnote">
-<p>Some of these features are unigrams and some are bigrams.</p>
+<p>Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.</p>
 </div>
 
 We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.
@@ -1578,10 +1584,46 @@ final_fitted %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.png" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed" width="672" />
-<p class="caption">(\#fig:scotusfinalpredvis)Predicted and true years from a linear SVM regression model with bigrams and unigrams, and stop words removed</p>
+<img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.png" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams" width="672" />
+<p class="caption">(\#fig:scotusfinalpredvis)Predicted and true years from a linear SVM regression model with bigrams and unigrams</p>
 </div>
 
+Finally, we can gain more insight into our model and how it is behaving by looking at observations from the test set that have been _mispredicted_. Let's bind together the predictions on the test set with the original Supreme Court opinion test data and filter to observations with a prediction that is more than 25 years wrong.
+
+
+```r
+scotus_bind <- collect_predictions(final_fitted) %>%
+  bind_cols(scotus_test %>% select(-year, -id)) %>%
+  filter(abs(year - .pred) > 25)
+```
+
+There isn't too much training data to start with for the earliest years, so we are unlikely to quickly gain insight from looking at the oldest opinions. However, what do the more recent opinions that were predicted inaccurately look like?
+
+
+```r
+scotus_bind %>%
+  arrange(-year) %>%
+  select(year, .pred, case_name, text)
+```
+
+```
+#> # A tibble: 137 x 4
+#>     year .pred case_name                       text                             
+#>    <dbl> <dbl> <chr>                           <chr>                            
+#>  1  2008 1982. Sprint Communications Co. v. A… "Supreme Court of United States.…
+#>  2  2004 1978. BedRoc Limited, LLC v. United … "No. 02-1593.\nThe Pittman Under…
+#>  3  2004 1978. Sosa v. Alvarez-Machain         "No. 03-339.\nThe Drug Enforceme…
+#>  4  2002 1954. JPMorgan Chase Bank v. Traffic… "No. 01-651.\nCERTIORARI TO THE …
+#>  5  1996 2021. Bank One Chicago, NA v. Midwes… "No. 94-1175.\n\n        Syllabu…
+#>  6  1995 1959. Johnny Paul Penry v. Texas. No… "Justice SCALIA, Circuit Justice…
+#>  7  1993 1964. Tennessee v. Middlebrooks       "No. 92-989.\nCERTIORARI TO THE …
+#>  8  1992 2021. Martin v. District of Columbia… "Nos. 92-5584, 92-5618.\nReheari…
+#>  9  1992 1966. INS v. Elias-Zacarias           "No. 90-1342.\n\n        Syllabu…
+#> 10  1992 1966. Republic Nat. Bank of Miami v.… "No. 91-767.\nSyllabus*\nThe Gov…
+#> # … with 127 more rows
+```
+
+There are some interesting examples here where we can understand why the model would mispredict, like _New Hampshire v. Maine_, a case about the boundary between the two states that invoked a 1740 decree of King George II, and the cases written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court, a confusing title when he served as a federal judge on the D.C. Circuit Court of Appeals earlier.
 
 ## Summary {#mlregressionsummary}
 

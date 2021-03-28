@@ -8,9 +8,15 @@ It's time to use what we have discussed and learned in the first five chapters o
 - support vector machines (SVM) [@Boser1992], and 
 - regularized linear models such as implemented in [glmnet](https://glmnet.stanford.edu/) [@Friedman2010].
 
-We start in Chapter \@ref(mlregression) with exploring regression models and continue in Chapter \@ref(mlclassification) with classification models. We will use the [tidymodels](https://www.tidymodels.org/) framework for resampling, preprocessing, fitting, and evaluation. As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the foreword for the deep learning chapters.
+We start in Chapter \@ref(mlregression) with exploring regression models and continue in Chapter \@ref(mlclassification) with classification models. We will use the [tidymodels](https://www.tidymodels.org/) framework for resampling, preprocessing, fitting, and evaluation. 
 
-Before we starting fitting these models to real datasets, let's consider how to think about algorithmic bias for predictive modeling.
+<div class="rmdpackage">
+<p>The <strong>tidymodels</strong> framework is a collection of R packages for modeling and machine learning using tidyverse principles. These packages facilitate resampling, preprocessing, modeling, and evaluation. There are core packages that you can load all together via <code>library(tidymodels)</code> and then extra packages for more specific tasks.</p>
+</div>
+
+As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the foreword for the deep learning chapters.
+
+Before we starting fitting these models to real data sets, let's consider how to think about algorithmic bias for predictive modeling.
 Rachel Thomas proposed a checklist at [ODSC West 2019](https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/) for algorithmic basic in machine learning.
 
 ## Should we even be doing this? {-}
@@ -19,15 +25,20 @@ This is always the first step. Machine learning algorithms involve math and data
 
 ## What bias is already in the data? {-}
 
-Chapter \@ref(mlregression) uses a dataset of United States Supreme Court opinions, with an uneven distribution of years. There are many more opinions from more recent decades than from earlier ones. Bias like this is extremely common in datasets and must be considered in modeling. In this case, we show how using regularized linear models results in better predictions across years than other approaches (Section \@ref(comparerf)).
+Chapter \@ref(mlregression) uses a data set of United States Supreme Court opinions, with an uneven distribution of years. There are many more opinions from more recent decades than from earlier ones. Bias like this is extremely common in data sets and must be considered in modeling. In this case, we show how using regularized linear models results in better predictions across years than other approaches (Section \@ref(comparerf)).
 
 ## Can the code and data be audited? {-}
 
-In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the datasets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.
+In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the data sets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.
 
 ## What are the error rates for sub-groups? {-}
 
-In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the [yardstick](https://yardstick.tidymodels.org/) package makes this task well within the reach of data practitioners.
+In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the **yardstick** package makes this task well within the reach of data practitioners.
+
+<div class="rmdpackage">
+<p>In <strong>tidymodels</strong>, the <strong>yardstick</strong> package has functions for model evaluation.</p>
+</div>
+
 
 ## What is the accuracy of a simple rule-based alternative? {-}
 
