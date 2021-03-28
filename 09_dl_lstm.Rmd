@@ -94,6 +94,10 @@ lstm_mod
 Notice the number of parameters in this LSTM model, about twice as many as the dense neural networks in Chapter \@ref(dldnn). It is easier to overfit an LSTM model, and it takes more time and memory to train, because of the large number of parameters.
 ```
 
+```{block2, type = "rmdnote"}
+It is possible to set up an LSTM network that works with sequences of varied length, this can sometimes improve performance but takes more work to set up and is outside the scope of this book.
+```
+
 Because we are training a binary classification model, we use `activation = "sigmoid"` for the last layer; we want to fit and predict to class probabilities.
 
 Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
