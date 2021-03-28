@@ -542,7 +542,11 @@ This simpler model did not turn out to outperform our initial model in this chap
 
 ## Using pre-trained word embeddings
 
-All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings. 
+All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings.
+
+```{block, type = "rmdnote"}
+This section serves to show how to use pre-trained word embeddings. We do not expect to see good results since the data and embeddings we will be trying do not match well. The main takeaway from this section should be that this approach is possible and how it is accomplished. Your task is to figure out if it is appropriate for your data and problem.
+```
 
 We start by obtaining pre-trained embeddings. The GloVe embeddings that we used in Section \@ref(glove) are a good place to start. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models directly.
 
