@@ -1187,7 +1187,7 @@ This data set has many more than 50 of even the most common 5000 or more tokens,
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
-  step_tokenize(consumer_complaint_narrative, token = "ngrams") %>%
+  step_tokenize(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative,
                    max_tokens = tune(), min_times = 250) %>%
   step_tfidf(consumer_complaint_narrative)
@@ -1222,7 +1222,7 @@ final_grid <- grid_regular(
 final_grid
 ```
 
-```{block, type = "rmdnote"}
+```{block, type = "rmdpackage"}
 We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`. The **tidymodels** package for creating and handling tuning parameters and parameter grids is **dials**.
 ```
 
