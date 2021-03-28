@@ -1,6 +1,11 @@
 # Classification {#mlclassification}
 
-In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For example, let's consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Section \@ref(cfpb-complaints)) with `read_csv()`.
+In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome. 
+
+- A **regression model** predicts a numeric or continuous value.
+- A **classification model** predicts a class label or group membership.
+
+For our classification example in this chapter, let's consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Section \@ref(cfpb-complaints)) with `read_csv()`.
 
 ```{r complaints, message=FALSE}
 library(tidyverse)
@@ -15,7 +20,7 @@ glimpse(complaints)
 ```
 
 
-In this chapter, we will build classification models to predict what type of financial `product` the complaints are referring to, i.e., a label or categorical variable. 
+In this chapter, we will build classification models to predict what type of financial `product` the complaints are referring to, i.e., a label or categorical variable. The goal of predictive modeling with text input features and a categorical outcome is to learn and model the relationship between those input features, typically created through steps as outlined in Chapters \@ref(language) through \@ref(embeddings), and the class label or categorical outcome. Most classification models do predict the probability of a class (a numeric output), but the particular characteristics of this output make classification models different enough from regression models that we handle them differently.
 
 ## A first classification model {#classfirstattemptlookatdata}
 
