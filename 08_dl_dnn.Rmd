@@ -463,9 +463,90 @@ val_res %>%
   )
 ```
 
+## Using bag-of-words features
+
+Before we move on with neural networks, and this new way to represent the text sequences. Let us explore what happens if we use the same preprocessing as in Chapters \@ref(mlregression) and \@ref(mlclassification). We will employ a bag-of-words preprocessing and feed in word counts to the neural network. This model will not use any location-based information about the tokens, just the counts. 
+
+For this, we need to create a new recipe to transform the data into counts.
+
+```{block, type = "rmdnote"}
+The objects in this chapter are named using `bow` to indicate that they are using **b**ag **o**f **w**ord data.
+```
+
+```{r}
+kick_bow_rec <- recipe(~blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_stopwords(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = 1e3) %>%
+  step_tf(blurb)
+```
+
+And we will `prep()` and `bake()` this recipe to get out our processed data. It will be quite sparse since the blurbs are quite short and we are counting the most frequent 10000 tokens after removing the snowball stop word list. 
+
+```{r}
+kick_bow_prep <-  prep(kick_bow_rec)
+
+kick_bow_analysis <- bake(kick_bow_prep, 
+                          new_data = analysis(kick_val$splits[[1]]),
+                          composition = "matrix")
+
+kick_bow_assess <- bake(kick_bow_prep, 
+                        new_data = assessment(kick_val$splits[[1]]),
+                        composition = "matrix")
+```
+
+Now that we have the analysis and assessment data sets calculated, we can setup define the neural network architecture. We won't be using an embedding layer, so we are passing the data directly into the first dense layer. This layer is followed by another hidden layer and a final layer with a sigmoid activation to leave us with a value between 0 and 1 which we will treat as the probability.
+
+```{r}
+bow_model <- keras_model_sequential() %>%
+  layer_dense(units = 64, activation = "relu", input_shape = c(1e3)) %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+bow_model %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+In many ways, this model architecture is not that different than the model we used in section \@ref(firstdlclassification). The main difference comes as a reaction to how the preprocessing is handled. The shape and information of the data that results from `kick_bow_prep` are different than what we saw before since the values in the matrix represents counts (something that Keras can handle directly) and not indicators for words. Keras handles the indicators with `layer_embedding()`, by mapping them through an embedding layer.
+
+The fitting procedure remains unchanged.
+
+```{r}
+bow_history <- bow_model %>%
+  fit(
+    x = kick_bow_analysis,
+    y = state_analysis,
+    batch_size = 512,
+    epochs = 10,
+    validation_data = list(kick_bow_assess, state_assess),
+    verbose = FALSE
+  )
+
+bow_history
+```
+
+We use `keras_predict()` again to get predictions, and calculate the standard metrics with `metrics()`.
+
+```{r}
+bow_res <- keras_predict(bow_model, kick_bow_assess, state_assess)
+
+metrics(bow_res, state, .pred_class)
+```
+
+This model does not perform as well as the model we used in section \@ref(firstdlclassification). This could suggest that a model that looks at more than just word counts would be useful. We also see that this model outperformed the baseline model \@ref(appendixbaseline) which achieved an accuracy of 0.684. The baseline was a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.
+
+This simpler model did not turn out to outperform our initial model in this chapter. However, it is important to investigate if a simpler model can rival or beat the model we are working with.
+
 ## Using pre-trained word embeddings
 
-All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings. 
+All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings.
+
+```{block, type = "rmdnote"}
+This section serves to show how to use pre-trained word embeddings. We do not expect to see good results since the data and embeddings we will be trying do not match well. The main takeaway from this section should be that this approach is possible and how it is accomplished. Your task is to figure out if it is appropriate for your data and problem.
+```
 
 We start by obtaining pre-trained embeddings. The GloVe embeddings that we used in Section \@ref(glove) are a good place to start. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models directly.
 
