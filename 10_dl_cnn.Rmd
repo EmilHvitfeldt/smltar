@@ -24,14 +24,14 @@ knitr::include_graphics("diagram-files/cnn-architecture.png")
 ```
 
 This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use sequence one-hot encoding (Section \@ref(onehotsequence)) with a possible word embedding.
-Let's talk about two of the most important CNN concepts, **filters** and **kernel size**.
+Let's talk about two of the most important CNN concepts, **kernels** and **kernel size**.
 
-### Filters
+### Kernel
 
 The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its weights and then sums up the values to get a single value. 
 Sometimes an activation function is applied as well.
 It is these weights that are trained with gradient descent to find the best fit.
-In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer filters at the beginning of your network and then increase them as you go along. 
+In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer `filters` at the beginning of your network and then increase them as you go along. 
 
 ### Kernel size
 
