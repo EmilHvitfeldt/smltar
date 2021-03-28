@@ -32,7 +32,7 @@ tidy_fir_tree %>%
 
 Trees, we see once again, are important in this story; the singular form appears 76 times and the plural form appears twelve times. (We'll come back to how we might handle the apostrophe in `"tree's"` later in this chapter.)
 
-What if we aren't interested in the difference between `"trees"` and `"tree"` and we want to treat both together? That idea is at the heart of **stemming**, the process of identifying the base word (or stem) for a dataset of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, `"trees"` would lose its letter `"s"` while `"tree"` stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem `"tree"` (89, if we also find the stem for `"tree's"`).
+What if we aren't interested in the difference between `"trees"` and `"tree"` and we want to treat both together? That idea is at the heart of **stemming**, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, `"trees"` would lose its letter `"s"` while `"tree"` stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem `"tree"` (89, if we also find the stem for `"tree's"`).
 
 ## How to stem text in R
 
@@ -163,7 +163,7 @@ We have *two* stems! This stemmer works differently; it uses both morphological 
 
 You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.
 
-Why does stemming often help, if you are training a machine learning model for text? Stemming *reduces the feature space* of text data. Let's see this in action, with a dataset of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard dataset of stopwords?
+Why does stemming often help, if you are training a machine learning model for text? Stemming *reduces the feature space* of text data. Let's see this in action, with a data set of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard data set of stopwords?
 
 
 ```r
@@ -194,7 +194,7 @@ tidy_scotus %>%
 #> # … with 167,869 more rows
 ```
 
-There are 167,879 distinct words in this dataset we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [quanteda](https://cran.r-project.org/package=quanteda) package).
+There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [quanteda](https://cran.r-project.org/package=quanteda) package).
 
 
 ```r
@@ -223,7 +223,7 @@ tidy_scotus %>%
 #> Document-feature matrix of: 9,642 documents, 135,570 features (99.5% sparse).
 ```
 
-We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our dataset so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
+We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
 
 There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, @Schofield16 and related work explore how choices around stemming and other preprocessing steps don't help and can actually hurt performance when training topic models for text. From @Schofield16 specifically,
 
@@ -346,7 +346,7 @@ Handling punctuation in this way further reduces sparsity in word features. Whet
 
 ## Compare some stemming options
 
-Let's compare a few simple stemming algorithms and see what results we end with. Let's look at "The Fir-Tree", specifically the tidied dataset from which we have removed stop words. Let's compare three very straightforward stemming approaches.
+Let's compare a few simple stemming algorithms and see what results we end with. Let's look at "The Fir-Tree", specifically the tidied data set from which we have removed stop words. Let's compare three very straightforward stemming approaches.
 
 - **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
 - **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.]
@@ -462,7 +462,11 @@ Lemmatization requires more information than the rule-based stemmers we've discu
 <p>How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.</p>
 </div>
 
-A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. NLP practitioners who work with R can use this library via the [spacyr](http://spacyr.quanteda.io/) package [@Benoit19], the [cleanNLP](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [textrecipes](https://tidymodels.github.io/textrecipes/dev/) package [@textrecipes]. Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
+A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. 
+
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">NLP practitioners who work with R can use this library via the [**spacyr**](http://spacyr.quanteda.io/) package [@Benoit19], the [**cleanNLP**](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [**textrecipes**](https://textrecipes.tidymodels.org/) package [@textrecipes]. </div>\EndKnitrBlock{rmdpackage}
+
+Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
 
 Let's briefly walk through how to use spacyr.
 
@@ -525,7 +529,7 @@ not_stemmed_in(stopwords(source = "snowball"))
 
 Here we see that many of the words that are lost are the contractions.
 
-\BeginKnitrBlock{rmdwarning}<div class="rmdwarning">In Section \@ref(homemadestopwords), we explored whether to include "tree" as a stop word for "The Fir-Tree". Now we can understand that this is more complicated than we first discussed, because there are different versions of the base word ("trees", "tree's") in our dataset. Interactions between preprocessing steps can have a major impact on your analysis.</div>\EndKnitrBlock{rmdwarning}
+\BeginKnitrBlock{rmdwarning}<div class="rmdwarning">In Section \@ref(homemadestopwords), we explored whether to include "tree" as a stop word for "The Fir-Tree". Now we can understand that this is more complicated than we first discussed, because there are different versions of the base word ("trees", "tree's") in our data set. Interactions between preprocessing steps can have a major impact on your analysis.</div>\EndKnitrBlock{rmdwarning}
 
 ## Summary {#stemmingsummary}
 

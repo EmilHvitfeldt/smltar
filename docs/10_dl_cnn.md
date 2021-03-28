@@ -1009,20 +1009,20 @@ runs_results
 ```
 
 ```
-#> # A tibble: 30 x 28
+#> # A tibble: 36 x 28
 #>    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #>    <chr>               <dbl>     <dbl>         <dbl>       <dbl>           <dbl>
-#>  1 _tuning/2021-03-26… 1.00         NA            NA      0.0341           0.992
-#>  2 _tuning/2021-03-26… 1.01         NA            NA      0.0366           0.992
-#>  3 _tuning/2021-03-26… 0.972        NA            NA      0.05             0.987
-#>  4 _tuning/2021-03-26… 0.978        NA            NA      0.0284           0.994
-#>  5 _tuning/2021-03-26… 0.973        NA            NA      0.0351           0.993
-#>  6 _tuning/2021-03-26… 0.944        NA            NA      0.0454           0.989
-#>  7 _tuning/2021-03-25… 0.988        NA            NA      0.0328           0.993
-#>  8 _tuning/2021-03-25… 0.991        NA            NA      0.0351           0.992
-#>  9 _tuning/2021-03-25… 0.953        NA            NA      0.0507           0.987
-#> 10 _tuning/2021-03-25… 0.977        NA            NA      0.0311           0.994
-#> # … with 20 more rows, and 22 more variables: metric_val_loss <dbl>,
+#>  1 _tuning/2021-03-28… 0.988        NA            NA      0.0328           0.993
+#>  2 _tuning/2021-03-28… 0.991        NA            NA      0.0351           0.992
+#>  3 _tuning/2021-03-28… 0.953        NA            NA      0.0507           0.987
+#>  4 _tuning/2021-03-28… 0.977        NA            NA      0.0311           0.994
+#>  5 _tuning/2021-03-28… 0.964        NA            NA      0.0322           0.993
+#>  6 _tuning/2021-03-28… 0.940        NA            NA      0.0443           0.989
+#>  7 _tuning/2021-03-26… 1.00         NA            NA      0.0341           0.992
+#>  8 _tuning/2021-03-26… 1.01         NA            NA      0.0366           0.992
+#>  9 _tuning/2021-03-26… 0.972        NA            NA      0.05             0.987
+#> 10 _tuning/2021-03-26… 0.978        NA            NA      0.0284           0.994
+#> # … with 26 more rows, and 22 more variables: metric_val_loss <dbl>,
 #> #   metric_val_accuracy <dbl>, flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   samples <int>, batch_size <int>, epochs <int>, epochs_completed <int>,
 #> #   metrics <chr>, model <chr>, loss_function <chr>, optimizer <chr>,
@@ -1043,7 +1043,7 @@ best_runs
 ```
 
 ```
-#> # A tibble: 30 x 3
+#> # A tibble: 36 x 3
 #>    metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                  <dbl>             <int>         <int>
 #>  1               0.814                 5             1
@@ -1051,12 +1051,12 @@ best_runs
 #>  3               0.812                 5             1
 #>  4               0.812                 5             1
 #>  5               0.812                 5             1
-#>  6               0.812                 3             1
-#>  7               0.811                 7             1
+#>  6               0.812                 5             1
+#>  7               0.812                 3             1
 #>  8               0.811                 7             1
 #>  9               0.811                 7             1
-#> 10               0.81                  5             1
-#> # … with 20 more rows
+#> 10               0.811                 7             1
+#> # … with 26 more rows
 ```
 
 There isn't a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.
@@ -1354,32 +1354,7 @@ CNNs are a type of neural network that can learn local spatial patterns. They es
 
 
 
-### Stride
 
-The stride is the second big hyperparameter that controls the kernels in a CNN. The stride length determines how much the kernel moves along the sequence between each calculation. A stride length of 1 means that the kernel moves over one place at a time, this way we get maximal overlap.
 
-<div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-stride.png" alt="The stride length affects the size of the vector. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting vector by skipping windows." width="901" />
-<p class="caption">(\#fig:cnn-stride)The stride length affects the size of the vector. When stride = 1 then the window slides along one by one. Increasing the slide length decreases the resulting vector by skipping windows.</p>
-</div>
 
-In figure \@ref(fig:cnn-stride) we see that if the kernel size and stride length are equal then there is no overlap. We can decrease the size of the output vector by increasing the stride length. Be careful not to set the stride length to be larger than the kernel size, otherwise, then you will skip over some of the information.
 
-### Dilation
-
-The dilation controls how the kernel is applied to the input tensor.
-So far we have shown examples where the dilation is equal to 1. This means that each value from the input tensor will be spaced 1 distance apart from each other.
-
-<div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-dilation.png" alt="The dilation affects the size of the resulting tensor. When dilation = 1 then consecutive values are taking from the input. Increasing the dilation leaves gaps between input values and decreases the resulting tensor." width="901" />
-<p class="caption">(\#fig:cnn-dilation)The dilation affects the size of the resulting tensor. When dilation = 1 then consecutive values are taking from the input. Increasing the dilation leaves gaps between input values and decreases the resulting tensor.</p>
-</div>
-
-If we increase the dilation then can see in figure \@ref(fig:cnn-dilation) that there will be spaces or gaps between the input values. This allows the kernel to find large spatial patterns that span many tokens.
-This is a useful trick to be able to extract features and structure from long sequences. Dilated convolutional layers when put in succession will be able to find patterns in very large sequences.
-
-### Padding
-
-The last hyperparameter we will talk about is padding.
-One of the downsides to how the kernels are being used in the previous figures is how it handles the edge of the sequence.
-Padding is the act of putting something before and after the sequence when the convolution is taking place to be able to extract more information from the first and last tokens in the sequence. Padding will lead to larger output tensors since they we let the kernel move more.

@@ -8,9 +8,21 @@ In Chapters \@ref(mlregression) and \@ref(mlclassification), we use algorithms s
 <p>Deep learning models can be effective for text prediction problems because they use these multiple layers to capture complex relationships in language.</p>
 </div>
 
-The layers in a deep learning model are connected in a network and these models are called **neural networks**, although they do not work much like a human brain. The layers can be connected in different configurations called network architectures. Two of the most common architectures used for text data are a convolutional neural network (CNN), and long short-term memory (LSTM)^[In other situations you may do best using a different architecture, for example, when working with dense, tabular data.]. These architectures sometimes incorporate word embeddings, as described in Chapter \@ref(embeddings).
+The layers in a deep learning model are connected in a network and these models are called **neural networks**, although they do not work much like a human brain. The layers can be connected in different configurations called network architectures, which sometimes incorporate word embeddings, as described in Chapter \@ref(embeddings). We will cover three network architectures in the following chapters:
 
-For the following chapters, we will use tidymodels packages along with [Tensorflow](https://www.tensorflow.org/) and the R interface to Keras [@R-keras] for preprocessing, modeling, and evaluation. Table \@ref(tab:comparedlml) presents some key differences between deep learning and what, in this book, we call machine learning methods.
+- Chapter \@ref(dldnn) starts our exploration of deep learning for text with a densely connected neural network. Think of this more straightforward architecture as a bridge between the "shallow" learning approaches of Chapters \@ref(mlregression) and \@ref(mlclassification) that treated text as a bag of words and the more complex architectures to come.
+- Chapter \@ref(dllstm) continues by walking through how to train and evaluate a more advanced architecture, a long short-term memory (LSTM) network. LSTMs are among the most common architectures used for text data because they model text as a long sequence of words or characters.
+- Chapter \@ref(dlcnn) wraps up our treatment of deep learning for text with the convolutional neural network (CNN) architecture. CNNs are another advanced architecture appropriate for text data because they can capture specific local patterns.
+
+Our discussion of network architectures is fairly specific to text data; in other situations you may do best using a different architecture, for example, when working with dense, tabular data.
+
+For the following chapters, we will use tidymodels packages along with [Tensorflow](https://www.tensorflow.org/) and the R interface to Keras [@R-keras] for preprocessing, modeling, and evaluation. 
+
+<div class="rmdpackage">
+<p>The <strong>keras</strong> R package provides an interface for R users to Keras, a high-level API for building neural networks.</p>
+</div>
+
+Table \@ref(tab:comparedlml) presents some key differences between deep learning and what, in this book, we call machine learning methods.
 
 <table>
 <caption>(\#tab:comparedlml)Comparing deep learning with other machine learning methods</caption>

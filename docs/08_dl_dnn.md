@@ -2,12 +2,12 @@
 
 
 
-These chapters on deep learning are broken up by network architecture instead of by outcome as we did in Chapters \@ref(mlclassification) and \@ref(mlregression).
+These chapters on deep learning are broken up by network architecture instead of by outcome as we did in Chapters \@ref(mlregression) and \@ref(mlclassification).
 We'll use Keras [@R-keras] with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
 Keras provides extensive support for creating and training many kinds of deep learning models, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 
 
-<div class="rmdnote">
-<p>The tidymodels framework is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.</p>
+<div class="rmdpackage">
+<p>The <strong>tidymodels</strong> framework of R packages is modular, so we can use it for certain tasks without committing to it entirely, when appropriate.</p>
 </div>
 
 This chapter explores one of the most straightforward configurations for a deep learning model, a **densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. We can also use this type of network architecture as a bridge between the bag-of-words approaches we explored in detail in Chapters \@ref(mlregression) and \@ref(mlclassification) to non-bag-of-words approaches we will use in Chapters \@ref(dllstm) and \@ref(dlcnn). Deep learning allows us to incorporate not just word counts but also word sequences and positions.
@@ -218,6 +218,9 @@ kickstarter_train %>%
 </div>
 
 Given that we don't have many words for this particular dataset to begin with, let's err on the side of longer sequences so we don't lose valuable data. Let's try 30 words for our threshold `max_length`, and let's include 20,000 words in our vocabulary.
+
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">We will use the **recipes** and **textrecipes** packages for data preprocessing and feature engineering for our deep learning models, just like we did for our models in Chapters \@ref(mlregression) and \@ref(mlclassification). To use a recipe, we first specify it with the variables we want to include and the steps we want to use in feature engineering.</div>\EndKnitrBlock{rmdpackage}
+
 
 
 ```r
@@ -468,7 +471,7 @@ We still have a few things left to add to this model before we can fit it to the
 When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network's weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself^[https://keras.io/api/optimizers/]; you can even create custom optimizers if what you need isn't on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.
 
 <div class="rmdnote">
-<p>An optimizer can either be set with the name of the optimizer as a character or by supplying the function <code>optimizer_*()</code> where <code>*</code> is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.</p>
+<p>An optimizer can either be set with the name of the optimizer as a character or by supplying the function <code>optimizer_foo()</code> where <code>foo</code> is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.</p>
 </div>
 
 During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras^[https://keras.io/api/losses/]. These loss function typically has two arguments, the true value and the predicted value, and returns a measure of how close they are. 
@@ -965,9 +968,7 @@ metrics(pte2_res, state, .pred_class)
 
 This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
 
-<div class="rmdnote">
-<p>If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with, both for the reasons laid out there and for the issues highlighted in Section @ref(fairnessembeddings).</p>
-</div>
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with, both for the reasons laid out there and for the issues highlighted in Section \@ref(fairnessembeddings).</div>\EndKnitrBlock{rmdnote}
 
 ## Cross-validation for deep learning models {#dnncross}
 
@@ -1201,6 +1202,63 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 The metrics we see here are about the same as what we achieved in Section \@ref(evaluate-dnn) on the validation data, so we can be confident that we have not overfit during our training or model choosing process.
+
+Just like we did toward the end of both Sections \@ref(regression-final-evaluation) and \@ref(classification-final-evaluation), we can look at some examples of test set observations that our model did a bad job at predicting. Let's bind together the predictions on the test set with the original `kickstarter_test` data. Then let's look at blurbs that were successful but that our final model thought had a low probability of being successful.
+
+
+```r
+kickstarter_bind <- final_res %>%
+  bind_cols(kickstarter_test %>% select(-state))
+
+kickstarter_bind %>%
+  filter(state == 1, .pred_1 < 0.2) %>%
+  select(blurb) %>%
+  slice_sample(n = 10)
+```
+
+```
+#> # A tibble: 10 x 1
+#>    blurb                                                                        
+#>    <chr>                                                                        
+#>  1 The popular YouTube channel Blimey Cow wants to start an audio network and n…
+#>  2 Seventh Night is a Romantic, Comic, Action, Adventure Fantasy novel that sho…
+#>  3 3 guest conductors, 32 singers, and $3,600 to hire professional instrumental…
+#>  4 Electronic music goes beyond electronic music.                               
+#>  5 The clip for your duvet to help you put on the cover easily, keep it in plac…
+#>  6 Lepe Cellars is an artisan winery, operated by Miguel Lepe. The dream is to …
+#>  7 It turns out not everyone loves Vinyl haha , so by request we are going to d…
+#>  8 Have friends in your area deliver food or anything else you need to you in o…
+#>  9 T-shirts and clothing made to show off your favorite car designs!            
+#> 10 A mother's worth is calculated by the deposits of love exchanged between her…
+```
+
+What about misclassifications in the other direction, observations in the test set that were *not* successful but that our final model gave a high probability of being successful?
+
+
+```r
+kickstarter_bind %>%
+  filter(state == 0, .pred_1 > 0.8) %>%
+  select(blurb) %>%
+  slice_sample(n = 10)
+```
+
+```
+#> # A tibble: 10 x 1
+#>    blurb                                                                        
+#>    <chr>                                                                        
+#>  1 "Cobar Community Radio is licensed to go on-air but needs additional funds t…
+#>  2 "I design and produce wooden signs and wall vinyl's customized to the client…
+#>  3 "A volume of short children's stories based on a character inspired by my gr…
+#>  4 "Growing Pains is a short film following the story of an unemployed imaginar…
+#>  5 "This is a retro style Role Playing game designed for mobile devices includi…
+#>  6 "Assemble yourself seamless and without competence of connected objects such…
+#>  7 "Bruce has entered our VOTA House Party tour contest and invited you to join…
+#>  8 "Permettre au sport d'évoluer en facilitant la prise de données lors des mat…
+#>  9 "Beyond Eden's new record funded by you and the band..... not a record compa…
+#> 10 "It's a coming of age story , about a sixteen year who crosses the U.S borde…
+```
+
+Notice that although the steps for model fitting are somewhat different now that we are using deep learning, model evaluation is much the same as it was in Chapters \@ref(mlregression) and \@ref(mlclassification).
 
 ## Limitations of deep learning {#dllimitations}
 

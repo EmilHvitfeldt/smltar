@@ -2,11 +2,11 @@
 
 There are four main text data sets we use throughout this book to demonstrate building features for machine learning and training models. These data sets include texts of different languages, different lengths (short to long), and from very recent time periods to a few hundred years ago. 
 
-These text data sets are not overly difficult to read into memory and prepare for analysis, but in many text modeling projects, the data itself may be in any of a number of formats from an API to literal paper. Practitioners may need to use skills such as web scraping or connecting to databases to even begin their work.
+These text data sets are not overly difficult to read into memory and prepare for analysis; by contrast, in many text modeling projects, the data itself may be in any of a number of formats from an API to literal paper. Practitioners may need to use skills such as web scraping or connecting to databases to even begin their work.
 
-## H.C. Andersen fairy tales {#hcandersen}
+## Hans Christian Andersen fairy tales {#hcandersen}
 
-The **hcandersenr** [@R-hcandersenr] package includes the text of the 157 known fairy tales by the Danish author H.C. Andersen. 
+The **hcandersenr** [@R-hcandersenr] package includes the text of the 157 known fairy tales by the Danish author Hans Christian Andersen (1805 - 1875). 
 There are five different languages available, with:
 
 - 156 fairy tales in English,
@@ -21,10 +21,7 @@ Each data set comes as a dataframe with two columns, `text` and `book` where the
 
 The package also makes available a data set called `EK` which includes information about the publication date, language of origin, and names in the different languages.
 
-## Consumer Financial Protection Bureau (CFPB) complaints {#cfpb-complaints}
-
-Consumers can submit complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/) about financial products and services; the CFPB sends the complaints to companies for response. The data set of consumer complaints used in this book has been filtered to those submitted to the CFPB since 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text). Each observation has a `complaint_id`, various categorical variables, and a text column `consumer_complaint_narrative` containing the written complaints.
-
+This data set is used in Chapters \@ref(tokenization), \@ref(stopwords), and \@ref(stemming).
 
 ## Opinions of the Supreme Court of the United States {#scotus-opinions}
 
@@ -55,7 +52,23 @@ The text has had minimal preprocessing and includes header information in the te
 #> resolution of both issues was correct.
 ```
 
+This data set is used in Chapters \@ref(stemming), \@ref(mlregression), and \@ref(dllstm).
+
+## Consumer Financial Protection Bureau (CFPB) complaints {#cfpb-complaints}
+
+
+
+Consumers can submit complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/) about financial products and services; the CFPB sends the complaints to companies for response. 
+
+The data set of consumer complaints used in this book has been filtered to 117,214 complaints submitted to the CFPB after 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text). Each observation has a `complaint_id`, various categorical variables, and a text column `consumer_complaint_narrative` containing the written complaints, for a total of 18 columns.
+
+This data set is used in Chapters \@ref(embeddings) and \@ref(mlclassification).
+
 ## Kickstarter campaign blurbs {#kickstarter-blurbs}
 
-This data set includes tktk...
+
+
+The crowdfunding site [Kickstarter](https://www.kickstarter.com/) provides people a platform to gather pledges to "back" their projects, such as films, music, comics, journalism, and more. When setting up a campaign, project owners submit a description or "blurb" for their campaign to tell potential backers what it is about. The data set of campaign blurbs used in this book [was scraped from Kickstarter](https://webrobots.io/kickstarter-datasets/); the blurbs used here for modeling are from 2009-04-21 to 2016-03-14, with a total of 269,790 campaigns in the sample. For each campaign, we know its `state`, whether it was successful in meeting its crowdfunding goal or not.
+
+This data set is used in Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn).
 

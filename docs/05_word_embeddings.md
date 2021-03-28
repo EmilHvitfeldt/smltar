@@ -172,7 +172,7 @@ Now that we can find all the skipgram windows, we can calculate how often words 
 
 For this example, let's use a window size of **four**.
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the **furrr** package [@Vaughan2018] to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the **furrr** package [@Vaughan2018] to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.</div>\EndKnitrBlock{rmdpackage}
 
 
 ```r
@@ -248,9 +248,7 @@ tidy_word_vectors
 #> # … with 747,490 more rows
 ```
 
-<div class="rmdnote">
-<p><code>tidy_word_vectors</code> is not drastically smaller than <code>tidy_pmi</code> since the vocabulary only has a size of <code>r nrow(count(tidy_pmi, item1))</code> and <code>tidy_pmi</code> is represented in a sparse format.</p>
-</div>
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">`tidy_word_vectors` is not drastically smaller than `tidy_pmi` since the vocabulary only has a size of `r nrow(count(tidy_pmi, item1))` and `tidy_pmi` is represented in a sparse format.</div>\EndKnitrBlock{rmdnote}
 
 We have now successfully found word embeddings, with clear and understandable code. This is a real benefit of this approach; this approach is based on counting, dividing, and matrix decomposition and is thus easier to understand and implement than options based on deep learning. Training word vectors or embeddings, even with this straightforward method, still requires a large data set (ideally, hundreds of thousands of documents or more) and a not insignificant investment of time and computational power. 
 
@@ -309,7 +307,7 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
-Errors, problems, issues, mistakes -- sounds bad!
+Mistakes, problems, glitches -- sounds bad!
 
 What is closest to the word `"month"`?
 
@@ -336,7 +334,7 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
-We see words about payments, along with other time periods such as days and years. Notice that we did not stem this text data (see Chapter \@ref(stemming)) but the word embeddings learned that singular and plural forms of words belong together.
+We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter \@ref(stemming)) but the word embeddings learned that "month", "months", and "monthly" belong together.
 
 What words are closest in this embedding space to `"fee"`?
 
@@ -363,7 +361,7 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
-We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to `"fee'`
+We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to "fee".
 
 
 ```r
@@ -389,7 +387,7 @@ tidy_word_vectors %>%
 #> # … with 7,037 more rows
 ```
 
-We now find words about interest, charges, and overdrafts. The top two words are "fee" and "fees"; word embeddings can learn that words like these are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
+We now find words about overdrafts and charges. The top two words are "fee" and "fees"; word embeddings can learn that singular and plural forms of words are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
@@ -654,7 +652,7 @@ dim(doc_matrix)
 
 Since these GloVe embeddings had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents which contain only words not included in the GloVe embeddings.
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">The R package **wordsalad** [@R-wordsalad] provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The package **wordsalad** [@R-wordsalad] provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.</div>\EndKnitrBlock{rmdpackage}
 
 ## Fairness and word embeddings {#fairnessembeddings}
 
@@ -670,7 +668,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 - Women's first names are more associated with family and men's first names are more associated with career.
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
-Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem.](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034).] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
+Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). ^[Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034).] @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
 Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of [Wikipedia](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia), but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
