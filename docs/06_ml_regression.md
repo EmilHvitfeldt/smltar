@@ -1,6 +1,6 @@
 # Regression {#mlregression}
 
-In this chapter, we will use machine learning to predict *continuous values* that are associated with documents. For example, let's consider a filtered sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
+In this chapter, we will use machine learning to predict *continuous values* that are associated with text data. Like in all predictive modeling tasks, this chapter demonstrates how to use learning algorithms to find and model relationships between an outcome or target variable and other input features. What is unique about the focus of this book is that our features are created from text data following the techniques laid out in Chapters \@ref(language) through \@ref(embeddings), and what is unique about the focus of this particular chapter is that our outcome is numeric and continuous. For example, let's consider a sample of opinions from the United States Supreme Court, available in the **scotus** [@R-scotus] package.
 
 
 ```r
@@ -38,7 +38,7 @@ This data set contains the entire text of each opinion in the `text` column, alo
 - A **classification model** predicts a class label or group membership.
 - A **regression model** predicts a numeric or continuous value.
 
-In text modeling, we use text data (such as the text of the court opinions), sometimes combined with other structured, non-text data, to predict the continuous value of interest (such as year of the court opinion).
+In text modeling, we use text data (such as the text of the court opinions), sometimes combined with other structured, non-text data, to predict the continuous value of interest (such as year of the court opinion). The goal of predictive modeling with text input features and a continuous outcome is to learn and model the relationship between the input features and the numeric target (outcome).
 
 ## A first regression model {#firstmlregression}
 

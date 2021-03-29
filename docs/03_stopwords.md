@@ -780,7 +780,7 @@ Different languages have different numbers of words in each class of words. An e
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#wiyczeossw .gt_table {
+#nhgzcttbug .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -805,7 +805,7 @@ Different languages have different numbers of words in each class of words. An e
   border-left-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_heading {
+#nhgzcttbug .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -817,7 +817,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_title {
+#nhgzcttbug .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -827,7 +827,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-width: 0;
 }
 
-#wiyczeossw .gt_subtitle {
+#nhgzcttbug .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -837,13 +837,13 @@ Different languages have different numbers of words in each class of words. An e
   border-top-width: 0;
 }
 
-#wiyczeossw .gt_bottom_border {
+#nhgzcttbug .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_col_headings {
+#nhgzcttbug .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -858,7 +858,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_col_heading {
+#nhgzcttbug .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -878,7 +878,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#wiyczeossw .gt_column_spanner_outer {
+#nhgzcttbug .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -890,15 +890,15 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 4px;
 }
 
-#wiyczeossw .gt_column_spanner_outer:first-child {
+#nhgzcttbug .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wiyczeossw .gt_column_spanner_outer:last-child {
+#nhgzcttbug .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wiyczeossw .gt_column_spanner {
+#nhgzcttbug .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -910,7 +910,7 @@ Different languages have different numbers of words in each class of words. An e
   width: 100%;
 }
 
-#wiyczeossw .gt_group_heading {
+#nhgzcttbug .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -932,7 +932,7 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#wiyczeossw .gt_empty_group_heading {
+#nhgzcttbug .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -947,15 +947,15 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#wiyczeossw .gt_from_md > :first-child {
+#nhgzcttbug .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wiyczeossw .gt_from_md > :last-child {
+#nhgzcttbug .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wiyczeossw .gt_row {
+#nhgzcttbug .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -974,7 +974,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#wiyczeossw .gt_stub {
+#nhgzcttbug .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -986,7 +986,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-left: 12px;
 }
 
-#wiyczeossw .gt_summary_row {
+#nhgzcttbug .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -996,7 +996,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#wiyczeossw .gt_first_summary_row {
+#nhgzcttbug .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1006,7 +1006,7 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_grand_summary_row {
+#nhgzcttbug .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1016,7 +1016,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#wiyczeossw .gt_first_grand_summary_row {
+#nhgzcttbug .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1026,11 +1026,11 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_striped {
+#nhgzcttbug .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#wiyczeossw .gt_table_body {
+#nhgzcttbug .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1039,7 +1039,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_footnotes {
+#nhgzcttbug .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1053,13 +1053,13 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_footnote {
+#nhgzcttbug .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#wiyczeossw .gt_sourcenotes {
+#nhgzcttbug .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1073,46 +1073,46 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#wiyczeossw .gt_sourcenote {
+#nhgzcttbug .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#wiyczeossw .gt_left {
+#nhgzcttbug .gt_left {
   text-align: left;
 }
 
-#wiyczeossw .gt_center {
+#nhgzcttbug .gt_center {
   text-align: center;
 }
 
-#wiyczeossw .gt_right {
+#nhgzcttbug .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wiyczeossw .gt_font_normal {
+#nhgzcttbug .gt_font_normal {
   font-weight: normal;
 }
 
-#wiyczeossw .gt_font_bold {
+#nhgzcttbug .gt_font_bold {
   font-weight: bold;
 }
 
-#wiyczeossw .gt_font_italic {
+#nhgzcttbug .gt_font_italic {
   font-style: italic;
 }
 
-#wiyczeossw .gt_super {
+#nhgzcttbug .gt_super {
   font-size: 65%;
 }
 
-#wiyczeossw .gt_footnote_marks {
+#nhgzcttbug .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="wiyczeossw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="nhgzcttbug" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="5" class="gt_heading gt_title gt_font_normal" style>German Definite Articles (the)</th>
@@ -1171,7 +1171,7 @@ Different languages have different numbers of words in each class of words. An e
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#csjajytxzr .gt_table {
+#mphqimyknk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1196,7 +1196,7 @@ Different languages have different numbers of words in each class of words. An e
   border-left-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_heading {
+#mphqimyknk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1208,7 +1208,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_title {
+#mphqimyknk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1218,7 +1218,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-width: 0;
 }
 
-#csjajytxzr .gt_subtitle {
+#mphqimyknk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1228,13 +1228,13 @@ Different languages have different numbers of words in each class of words. An e
   border-top-width: 0;
 }
 
-#csjajytxzr .gt_bottom_border {
+#mphqimyknk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_col_headings {
+#mphqimyknk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1249,7 +1249,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_col_heading {
+#mphqimyknk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1269,7 +1269,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#csjajytxzr .gt_column_spanner_outer {
+#mphqimyknk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1281,15 +1281,15 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 4px;
 }
 
-#csjajytxzr .gt_column_spanner_outer:first-child {
+#mphqimyknk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#csjajytxzr .gt_column_spanner_outer:last-child {
+#mphqimyknk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#csjajytxzr .gt_column_spanner {
+#mphqimyknk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1301,7 +1301,7 @@ Different languages have different numbers of words in each class of words. An e
   width: 100%;
 }
 
-#csjajytxzr .gt_group_heading {
+#mphqimyknk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1323,7 +1323,7 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#csjajytxzr .gt_empty_group_heading {
+#mphqimyknk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1338,15 +1338,15 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#csjajytxzr .gt_from_md > :first-child {
+#mphqimyknk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#csjajytxzr .gt_from_md > :last-child {
+#mphqimyknk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#csjajytxzr .gt_row {
+#mphqimyknk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1365,7 +1365,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#csjajytxzr .gt_stub {
+#mphqimyknk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1377,7 +1377,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-left: 12px;
 }
 
-#csjajytxzr .gt_summary_row {
+#mphqimyknk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1387,7 +1387,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#csjajytxzr .gt_first_summary_row {
+#mphqimyknk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1397,7 +1397,7 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_grand_summary_row {
+#mphqimyknk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1407,7 +1407,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#csjajytxzr .gt_first_grand_summary_row {
+#mphqimyknk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1417,11 +1417,11 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_striped {
+#mphqimyknk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#csjajytxzr .gt_table_body {
+#mphqimyknk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1430,7 +1430,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_footnotes {
+#mphqimyknk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1444,13 +1444,13 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_footnote {
+#mphqimyknk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#csjajytxzr .gt_sourcenotes {
+#mphqimyknk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1464,46 +1464,46 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#csjajytxzr .gt_sourcenote {
+#mphqimyknk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#csjajytxzr .gt_left {
+#mphqimyknk .gt_left {
   text-align: left;
 }
 
-#csjajytxzr .gt_center {
+#mphqimyknk .gt_center {
   text-align: center;
 }
 
-#csjajytxzr .gt_right {
+#mphqimyknk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#csjajytxzr .gt_font_normal {
+#mphqimyknk .gt_font_normal {
   font-weight: normal;
 }
 
-#csjajytxzr .gt_font_bold {
+#mphqimyknk .gt_font_bold {
   font-weight: bold;
 }
 
-#csjajytxzr .gt_font_italic {
+#mphqimyknk .gt_font_italic {
   font-style: italic;
 }
 
-#csjajytxzr .gt_super {
+#mphqimyknk .gt_super {
   font-size: 65%;
 }
 
-#csjajytxzr .gt_footnote_marks {
+#mphqimyknk .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="csjajytxzr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="mphqimyknk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="4" class="gt_heading gt_title gt_font_normal" style>German Indefinite Articles (a/an)</th>
