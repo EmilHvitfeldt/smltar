@@ -22,14 +22,14 @@ A convolutional filter slides along the sequence to produce a new, smaller seque
 </div>
 
 This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use sequence one-hot encoding (Section \@ref(onehotsequence)) with a possible word embedding.
-Let's talk about two of the most important CNN concepts, **filters** and **kernel size**.
+Let's talk about two of the most important CNN concepts, **kernels** and **kernel size**.
 
-### Filters
+### Kernel
 
 The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its weights and then sums up the values to get a single value. 
 Sometimes an activation function is applied as well.
 It is these weights that are trained with gradient descent to find the best fit.
-In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer filters at the beginning of your network and then increase them as you go along. 
+In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer `filters` at the beginning of your network and then increase them as you go along. 
 
 ### Kernel size
 
@@ -45,10 +45,6 @@ Larger kernels will detect larger and less frequent patterns where smaller kerne
 Notice how the choice of token will affect how we think about kernel size. 
 For character tokenization, a kernel size of 5 will (in early layers) find patterns in subwords more often than patterns across words, since five characters will not span multiple words. 
 By contrast, a kernel size of 5 for word tokenization will learn patterns within sentences instead. 
-
-<div class="rmdwarning">
-<p>Kernels must have an odd length.</p>
-</div>
 
 ## A first CNN model {#firstcnn}
 
@@ -1009,20 +1005,20 @@ runs_results
 ```
 
 ```
-#> # A tibble: 36 x 28
+#> # A tibble: 42 x 28
 #>    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #>    <chr>               <dbl>     <dbl>         <dbl>       <dbl>           <dbl>
-#>  1 _tuning/2021-03-28… 0.988        NA            NA      0.0328           0.993
-#>  2 _tuning/2021-03-28… 0.991        NA            NA      0.0351           0.992
-#>  3 _tuning/2021-03-28… 0.953        NA            NA      0.0507           0.987
-#>  4 _tuning/2021-03-28… 0.977        NA            NA      0.0311           0.994
-#>  5 _tuning/2021-03-28… 0.964        NA            NA      0.0322           0.993
-#>  6 _tuning/2021-03-28… 0.940        NA            NA      0.0443           0.989
-#>  7 _tuning/2021-03-26… 1.00         NA            NA      0.0341           0.992
-#>  8 _tuning/2021-03-26… 1.01         NA            NA      0.0366           0.992
-#>  9 _tuning/2021-03-26… 0.972        NA            NA      0.05             0.987
-#> 10 _tuning/2021-03-26… 0.978        NA            NA      0.0284           0.994
-#> # … with 26 more rows, and 22 more variables: metric_val_loss <dbl>,
+#>  1 _tuning/2021-03-29… 0.988        NA            NA      0.0328           0.993
+#>  2 _tuning/2021-03-29… 0.991        NA            NA      0.0351           0.992
+#>  3 _tuning/2021-03-29… 0.953        NA            NA      0.0507           0.987
+#>  4 _tuning/2021-03-29… 0.977        NA            NA      0.0311           0.994
+#>  5 _tuning/2021-03-29… 0.964        NA            NA      0.0322           0.993
+#>  6 _tuning/2021-03-29… 0.940        NA            NA      0.0443           0.989
+#>  7 _tuning/2021-03-28… 0.988        NA            NA      0.0328           0.993
+#>  8 _tuning/2021-03-28… 0.991        NA            NA      0.0351           0.992
+#>  9 _tuning/2021-03-28… 0.953        NA            NA      0.0507           0.987
+#> 10 _tuning/2021-03-28… 0.977        NA            NA      0.0311           0.994
+#> # … with 32 more rows, and 22 more variables: metric_val_loss <dbl>,
 #> #   metric_val_accuracy <dbl>, flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   samples <int>, batch_size <int>, epochs <int>, epochs_completed <int>,
 #> #   metrics <chr>, model <chr>, loss_function <chr>, optimizer <chr>,
@@ -1043,7 +1039,7 @@ best_runs
 ```
 
 ```
-#> # A tibble: 36 x 3
+#> # A tibble: 42 x 3
 #>    metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                  <dbl>             <int>         <int>
 #>  1               0.814                 5             1
@@ -1052,11 +1048,11 @@ best_runs
 #>  4               0.812                 5             1
 #>  5               0.812                 5             1
 #>  6               0.812                 5             1
-#>  7               0.812                 3             1
-#>  8               0.811                 7             1
+#>  7               0.812                 5             1
+#>  8               0.812                 3             1
 #>  9               0.811                 7             1
 #> 10               0.811                 7             1
-#> # … with 26 more rows
+#> # … with 32 more rows
 ```
 
 There isn't a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.
@@ -1351,10 +1347,3 @@ CNNs are a type of neural network that can learn local spatial patterns. They es
 - how byte pair encoding can be used to tokenize for finer detail
 - how to do hyperparameter search in Keras with tfruns
 - how to evaluate CNN models for text
-
-
-
-
-
-
-

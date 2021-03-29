@@ -733,9 +733,112 @@ val_res %>%
 <p class="caption">(\#fig:dnnroccurve)ROC curve for first DNN model predictions of Kickstarter campaign success</p>
 </div>
 
+## Using bag-of-words features
+
+Before we move on with neural networks, and this new way to represent the text sequences. Let us explore what happens if we use the same preprocessing as in Chapters \@ref(mlregression) and \@ref(mlclassification). We will employ a bag-of-words preprocessing and feed in word counts to the neural network. This model will not use any location-based information about the tokens, just the counts. 
+
+For this, we need to create a new recipe to transform the data into counts.
+
+<div class="rmdnote">
+<p>The objects in this chapter are named using <code>bow</code> to indicate that they are using <strong>b</strong>ag <strong>o</strong>f <strong>w</strong>ord data.</p>
+</div>
+
+
+```r
+kick_bow_rec <- recipe(~blurb, data = kickstarter_train) %>%
+  step_tokenize(blurb) %>%
+  step_stopwords(blurb) %>%
+  step_tokenfilter(blurb, max_tokens = 1e3) %>%
+  step_tf(blurb)
+```
+
+And we will `prep()` and `bake()` this recipe to get out our processed data. It will be quite sparse since the blurbs are quite short and we are counting the most frequent 10000 tokens after removing the snowball stop word list. 
+
+
+```r
+kick_bow_prep <-  prep(kick_bow_rec)
+
+kick_bow_analysis <- bake(kick_bow_prep, 
+                          new_data = analysis(kick_val$splits[[1]]),
+                          composition = "matrix")
+
+kick_bow_assess <- bake(kick_bow_prep, 
+                        new_data = assessment(kick_val$splits[[1]]),
+                        composition = "matrix")
+```
+
+Now that we have the analysis and assessment data sets calculated, we can setup define the neural network architecture. We won't be using an embedding layer, so we are passing the data directly into the first dense layer. This layer is followed by another hidden layer and a final layer with a sigmoid activation to leave us with a value between 0 and 1 which we will treat as the probability.
+
+
+```r
+bow_model <- keras_model_sequential() %>%
+  layer_dense(units = 64, activation = "relu", input_shape = c(1e3)) %>%
+  layer_dense(units = 64, activation = "relu") %>%
+  layer_dense(units = 1, activation = "sigmoid")
+
+bow_model %>% compile(
+  optimizer = "adam",
+  loss = "binary_crossentropy",
+  metrics = c("accuracy")
+)
+```
+
+In many ways, this model architecture is not that different than the model we used in section \@ref(firstdlclassification). The main difference comes as a reaction to how the preprocessing is handled. The shape and information of the data that results from `kick_bow_prep` are different than what we saw before since the values in the matrix represents counts (something that Keras can handle directly) and not indicators for words. Keras handles the indicators with `layer_embedding()`, by mapping them through an embedding layer.
+
+The fitting procedure remains unchanged.
+
+
+```r
+bow_history <- bow_model %>%
+  fit(
+    x = kick_bow_analysis,
+    y = state_analysis,
+    batch_size = 512,
+    epochs = 10,
+    validation_data = list(kick_bow_assess, state_assess),
+    verbose = FALSE
+  )
+
+bow_history
+```
+
+```
+#> 
+#> Final epoch (plot to see history):
+#>         loss: 0.3338
+#>     accuracy: 0.855
+#>     val_loss: 0.674
+#> val_accuracy: 0.7208
+```
+
+We use `keras_predict()` again to get predictions, and calculate the standard metrics with `metrics()`.
+
+
+```r
+bow_res <- keras_predict(bow_model, kick_bow_assess, state_assess)
+
+metrics(bow_res, state, .pred_class)
+```
+
+```
+#> # A tibble: 2 x 3
+#>   .metric  .estimator .estimate
+#>   <chr>    <chr>          <dbl>
+#> 1 accuracy binary         0.721
+#> 2 kap      binary         0.441
+```
+
+This model does not perform as well as the model we used in section \@ref(firstdlclassification). This could suggest that a model that looks at more than just word counts would be useful. We also see that this model outperformed the baseline model \@ref(appendixbaseline) which achieved an accuracy of 0.684. The baseline was a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.
+
+This simpler model did not turn out to outperform our initial model in this chapter. However, it is important to investigate if a simpler model can rival or beat the model we are working with.
+
 ## Using pre-trained word embeddings
 
-All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings. 
+All the models in Section \@ref(firstdlclassification) included an embedding layer to make dense vectors from our word sequences that we let the model train, along with the model as a whole. This is not the only way to handle this task. In Chapter \@ref(embeddings), we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let's try to _provide_ the embeddings.
+
+<div class="rmdnote">
+<p>This section serves to show how to use pre-trained word embeddings. We do not expect to see good results since the data and embeddings we will be trying do not match well. The main takeaway from this section should be that this approach is possible and how it is accomplished. Your task is to figure out if it is appropriate for your data and problem.</p>
+</div>
 
 We start by obtaining pre-trained embeddings. The GloVe embeddings that we used in Section \@ref(glove) are a good place to start. Setting `dimensions = 50` and only selecting the first 12 dimensions will make it easier for us to compare models directly.
 
@@ -871,10 +974,10 @@ dense_pte_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.5978
-#>     accuracy: 0.675
-#>     val_loss: 0.6723
-#> val_accuracy: 0.6085
+#>         loss: 0.5996
+#>     accuracy: 0.6739
+#>     val_loss: 0.672
+#> val_accuracy: 0.6086
 ```
 
 
@@ -890,8 +993,8 @@ metrics(pte_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.608
-#> 2 kap      binary         0.216
+#> 1 accuracy binary         0.609
+#> 2 kap      binary         0.214
 ```
 
 Why is this happening? Part of the training loop for a model like this one typically _adjusts_ the weights in the network. 
@@ -962,8 +1065,8 @@ metrics(pte2_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.768
-#> 2 kap      binary         0.534
+#> 1 accuracy binary         0.765
+#> 2 kap      binary         0.528
 ```
 
 This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.
@@ -1073,26 +1176,26 @@ cv_fitted %>%
 #> # A tibble: 20 x 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161674/40419]> Fold1 accuracy    binary         0.819
-#>  2 <split [161674/40419]> Fold1 kap         binary         0.638
-#>  3 <split [161674/40419]> Fold1 mn_log_loss binary         1.02 
+#>  1 <split [161674/40419]> Fold1 accuracy    binary         0.817
+#>  2 <split [161674/40419]> Fold1 kap         binary         0.633
+#>  3 <split [161674/40419]> Fold1 mn_log_loss binary         1.10 
 #>  4 <split [161674/40419]> Fold1 roc_auc     binary         0.856
-#>  5 <split [161674/40419]> Fold2 accuracy    binary         0.820
-#>  6 <split [161674/40419]> Fold2 kap         binary         0.639
-#>  7 <split [161674/40419]> Fold2 mn_log_loss binary         1.06 
-#>  8 <split [161674/40419]> Fold2 roc_auc     binary         0.860
-#>  9 <split [161674/40419]> Fold3 accuracy    binary         0.820
-#> 10 <split [161674/40419]> Fold3 kap         binary         0.640
+#>  5 <split [161674/40419]> Fold2 accuracy    binary         0.819
+#>  6 <split [161674/40419]> Fold2 kap         binary         0.638
+#>  7 <split [161674/40419]> Fold2 mn_log_loss binary         1.01 
+#>  8 <split [161674/40419]> Fold2 roc_auc     binary         0.859
+#>  9 <split [161674/40419]> Fold3 accuracy    binary         0.818
+#> 10 <split [161674/40419]> Fold3 kap         binary         0.635
 #> 11 <split [161674/40419]> Fold3 mn_log_loss binary         1.01 
-#> 12 <split [161674/40419]> Fold3 roc_auc     binary         0.857
-#> 13 <split [161675/40418]> Fold4 accuracy    binary         0.819
-#> 14 <split [161675/40418]> Fold4 kap         binary         0.636
-#> 15 <split [161675/40418]> Fold4 mn_log_loss binary         1.01 
-#> 16 <split [161675/40418]> Fold4 roc_auc     binary         0.857
-#> 17 <split [161675/40418]> Fold5 accuracy    binary         0.819
-#> 18 <split [161675/40418]> Fold5 kap         binary         0.637
-#> 19 <split [161675/40418]> Fold5 mn_log_loss binary         1.02 
-#> 20 <split [161675/40418]> Fold5 roc_auc     binary         0.854
+#> 12 <split [161674/40419]> Fold3 roc_auc     binary         0.856
+#> 13 <split [161675/40418]> Fold4 accuracy    binary         0.817
+#> 14 <split [161675/40418]> Fold4 kap         binary         0.633
+#> 15 <split [161675/40418]> Fold4 mn_log_loss binary         1.03 
+#> 16 <split [161675/40418]> Fold4 roc_auc     binary         0.856
+#> 17 <split [161675/40418]> Fold5 accuracy    binary         0.817
+#> 18 <split [161675/40418]> Fold5 kap         binary         0.633
+#> 19 <split [161675/40418]> Fold5 mn_log_loss binary         1.04 
+#> 20 <split [161675/40418]> Fold5 roc_auc     binary         0.855
 ```
 
 We can summarize the unnested results to match what we normally would get from `collect_metrics()`
@@ -1113,10 +1216,10 @@ cv_fitted %>%
 #> # A tibble: 4 x 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.819     5 0.000339
-#> 2 kap         0.638     5 0.000717
-#> 3 mn_log_loss 1.02      5 0.00996 
-#> 4 roc_auc     0.857     5 0.000942
+#> 1 accuracy    0.818     5 0.000473
+#> 2 kap         0.634     5 0.000988
+#> 3 mn_log_loss 1.04      5 0.0160  
+#> 4 roc_auc     0.856     5 0.000661
 ```
 
 This dataset is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
@@ -1148,11 +1251,11 @@ all_dense_model_res %>%
 #>   model                    .metric  .estimator .estimate
 #>   <chr>                    <chr>    <chr>          <dbl>
 #> 1 dense                    accuracy binary         0.805
-#> 2 pte (locked weights)     accuracy binary         0.608
-#> 3 pte (not locked weights) accuracy binary         0.768
+#> 2 pte (locked weights)     accuracy binary         0.609
+#> 3 pte (not locked weights) accuracy binary         0.765
 #> 4 dense                    kap      binary         0.609
-#> 5 pte (locked weights)     kap      binary         0.216
-#> 6 pte (not locked weights) kap      binary         0.534
+#> 5 pte (locked weights)     kap      binary         0.214
+#> 6 pte (not locked weights) kap      binary         0.528
 ```
 
 We can also do this for ROC curves. Figure \@ref(fig:alldnnroccurve) shows the three different ROC curves together in one chart. As we know, the model using pre-trained word embeddings with locked weights didn't perform very well at all and its ROC curve is the lowest of the three. The other two models perform more similarly but the model using an embedding learned from scratch ends up being the best.

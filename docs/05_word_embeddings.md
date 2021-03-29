@@ -248,7 +248,9 @@ tidy_word_vectors
 #> # … with 747,490 more rows
 ```
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">`tidy_word_vectors` is not drastically smaller than `tidy_pmi` since the vocabulary only has a size of `r nrow(count(tidy_pmi, item1))` and `tidy_pmi` is represented in a sparse format.</div>\EndKnitrBlock{rmdnote}
+<div class="rmdnote">
+<p><code>tidy_word_vectors</code> is not drastically smaller than <code>tidy_pmi</code> since the vocabulary is not enormous and <code>tidy_pmi</code> is represented in a sparse format.</p>
+</div>
 
 We have now successfully found word embeddings, with clear and understandable code. This is a real benefit of this approach; this approach is based on counting, dividing, and matrix decomposition and is thus easier to understand and implement than options based on deep learning. Training word vectors or embeddings, even with this straightforward method, still requires a large data set (ideally, hundreds of thousands of documents or more) and a not insignificant investment of time and computational power. 
 
