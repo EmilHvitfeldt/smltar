@@ -562,14 +562,49 @@ explanation
 
 The output comes in a tibble format where `feature` and `feature_weight` are included, but fortunately lime contains some functions to visualize these weights. Figure \@ref(fig:limeplotfeatures) shows the result of using `plot_features()`, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Blue bars indicate that the weights _support_ the prediction in the direction and red bars indicate _contradictions_. This chart is great for finding the most prominent features in an observation.
 
-```{r limeplotfeatures, fig.cap="Plot of most important features for a CNN model predicting two observations."}
+```{r, eval=FALSE}
 plot_features(explanation)
+```
+
+```{r limeplotfeatures, echo=FALSE, fig.cap="Plot of most important features for a CNN model predicting two observations."}
+suppressMessages(
+plot_features(explanation) +
+  scale_fill_manual(values = discrete_colors[1:2], drop = FALSE)
+)
 ```
 
 Figure \@ref(fig:limeplottextexplanations) shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.
 
-```{r limeplottextexplanations, fig.cap="Feature highlighting of words for two examples explained by a CNN model."}
+```{r, eval=FALSE}
 plot_text_explanations(explanation)
+```
+
+```{r limeplottextexplanations, echo=FALSE, fig.cap="Feature highlighting of words for two examples explained by a CNN model."}
+positive_colors <- prismatic::clr_lighten(
+  rep(discrete_colors[1], 6), 
+  c(-0.1, 0.1, 0.3, 0.5, 0.7, 0.9)
+)
+
+negative_colors <- prismatic::clr_lighten(
+  rep(discrete_colors[2], 6), 
+  c(-0.1, 0.1, 0.3, 0.5, 0.7, 0.9)
+)
+
+all_styles <- paste(collapse = "\n",
+paste0(".match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
+       { border: 1px solid ", positive_colors[1], ";}"),
+paste0(".match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+       { border: 1px solid ", negative_colors[1], ";}"),
+paste0(".plot_text_explanations .", "positive", "_", 1:5, " {
+  background-color: ", positive_colors[-1], ";}"),
+paste0(".plot_text_explanations .", "negative", "_", 1:5, " {
+  background-color: ", negative_colors[-1], ";}")
+)
+
+htmltools::tagList(
+  plot_text_explanations(explanation),
+  htmltools::tags$style(all_styles)
+)
 ```
 
 ```{block, type = "rmdnote"}
@@ -601,8 +636,16 @@ explanation <- explain(
 
 Explanations based on these two sentences are fairly similar as we can see in Figure \@ref(fig:robustlimeplottextexplanations). However, notice how the removal of the word "whole" affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.
 
-```{r robustlimeplottextexplanations, fig.cap="Feature highlighting of words in two examples explained by a CNN model."}
+```{r, eval=FALSE}
 plot_text_explanations(explanation)
+```
+
+
+```{r robustlimeplottextexplanations, echo=FALSE, fig.cap="Feature highlighting of words in two examples explained by a CNN model."}
+htmltools::tagList(
+  plot_text_explanations(explanation),
+  htmltools::tags$style(all_styles)
+)
 ```
 
 It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
