@@ -799,7 +799,7 @@ finalize_workflow(more_vars_wf,
   filter(!str_detect(term, "tfidf"))
 ```
 
-In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms. They are not that important.
+In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 700s of all model terms, with smaller coefficients than many text terms. They are not that important.
 
 ```{block, type = "rmdnote"}
 This whole book focuses on supervised machine learning for text data, but models can combine _both_ text predictors and other kinds of predictors.
@@ -1215,13 +1215,13 @@ Before we tune the model, we need to set up a set of possible parameter values t
 There are _two_ tunable parameters in this model, the regularization parameter and the maximum number of tokens included in the model. 
 ```
 
-Let's include different possible values for each parameter, for a combination of 100 models.
+Let's include different possible values for each parameter, for a combination of 60 models.
 
 ```{r finalcomplaintsgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(1e3, 4e3)),
-  levels = c(penalty = 20, max_tokens = 5)
+  max_tokens(range = c(1e3, 3e3)),
+  levels = c(penalty = 20, max_tokens = 3)
 )
 
 final_grid
@@ -1254,8 +1254,8 @@ autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
     title = "Model performance across regularization penalties and tokens",
-    subtitle = paste("The best model includes a higher number of tokens",
-                     "but also significant regularization")
+    subtitle = paste("The numerically best model includes a higher number",
+                     "of tokens but we can choose a simpler model")
   )
 ```
 
@@ -1348,7 +1348,7 @@ complaints_imp %>%
   )
 ```
 
-Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "reporting", and "report" and  contribute in this model _toward_ classification as about credit reporting.
 
 ```{block, type = "rmdnote"}
 The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like `percent_censoring` or `max_money` are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.

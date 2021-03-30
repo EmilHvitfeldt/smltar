@@ -1048,20 +1048,20 @@ runs_results
 ```
 
 ```
-#> # A tibble: 48 x 28
+#> # A tibble: 60 x 28
 #>    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #>    <chr>               <dbl>     <dbl>         <dbl>       <dbl>           <dbl>
-#>  1 _tuning/2021-03-30… 0.988        NA            NA      0.0328           0.993
-#>  2 _tuning/2021-03-30… 0.991        NA            NA      0.0351           0.992
-#>  3 _tuning/2021-03-30… 0.953        NA            NA      0.0507           0.987
-#>  4 _tuning/2021-03-30… 0.977        NA            NA      0.0311           0.994
-#>  5 _tuning/2021-03-30… 0.964        NA            NA      0.0322           0.993
-#>  6 _tuning/2021-03-30… 0.940        NA            NA      0.0443           0.989
-#>  7 _tuning/2021-03-29… 0.988        NA            NA      0.0328           0.993
-#>  8 _tuning/2021-03-29… 0.991        NA            NA      0.0351           0.992
-#>  9 _tuning/2021-03-29… 0.953        NA            NA      0.0507           0.987
-#> 10 _tuning/2021-03-29… 0.977        NA            NA      0.0311           0.994
-#> # … with 38 more rows, and 22 more variables: metric_val_loss <dbl>,
+#>  1 _tuning/2021-03-30… 1.01         NA            NA      0.0339           0.992
+#>  2 _tuning/2021-03-30… 1.01         NA            NA      0.0375           0.991
+#>  3 _tuning/2021-03-30… 0.973        NA            NA      0.0518           0.986
+#>  4 _tuning/2021-03-30… 0.973        NA            NA      0.0295           0.994
+#>  5 _tuning/2021-03-30… 0.968        NA            NA      0.0313           0.993
+#>  6 _tuning/2021-03-30… 0.931        NA            NA      0.0455           0.988
+#>  7 _tuning/2021-03-30… 1.01         NA            NA      0.034            0.993
+#>  8 _tuning/2021-03-30… 1.02         NA            NA      0.0384           0.991
+#>  9 _tuning/2021-03-30… 0.985        NA            NA      0.0537           0.986
+#> 10 _tuning/2021-03-30… 0.987        NA            NA      0.0318           0.993
+#> # … with 50 more rows, and 22 more variables: metric_val_loss <dbl>,
 #> #   metric_val_accuracy <dbl>, flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   samples <int>, batch_size <int>, epochs <int>, epochs_completed <int>,
 #> #   metrics <chr>, model <chr>, loss_function <chr>, optimizer <chr>,
@@ -1082,7 +1082,7 @@ best_runs
 ```
 
 ```
-#> # A tibble: 48 x 3
+#> # A tibble: 60 x 3
 #>    metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                  <dbl>             <int>         <int>
 #>  1               0.814                 5             1
@@ -1094,8 +1094,8 @@ best_runs
 #>  7               0.812                 5             1
 #>  8               0.812                 5             1
 #>  9               0.812                 3             1
-#> 10               0.811                 7             1
-#> # … with 38 more rows
+#> 10               0.811                 5             1
+#> # … with 50 more rows
 ```
 
 There isn't a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.
