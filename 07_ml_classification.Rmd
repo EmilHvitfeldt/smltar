@@ -95,14 +95,14 @@ complaints_rec <-
 ```
 
 Now we add steps to process the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
-Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
+Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 1000 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
 
 ```{r complaintrec4, dependson="complaintrec1"}
 library(textrecipes)
 
 complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -115,7 +115,7 @@ complaint_wf <- workflow() %>%
 
 Let's start with a naive Bayes model [@kim2006; @Kibriya2005; @Eibe2006], which is available in the tidymodels package **discrim**.
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
-Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
+Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 ```{block, type = "rmdpackage"}
 In **tidymodels**, the package for creating model specifications is **parsnip**. The **parsnip** package provides the functions for creating all the models we have used so far, but other extra packages provide more. The **discrim** package is an extension package for **parsnip** that contains model definitions for various discriminant analysis models, including naive Bayes.
@@ -606,7 +606,7 @@ multicomplaints_rec <-
   recipe(product ~ consumer_complaint_narrative,
          data = multicomplaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative) %>%
   step_downsample(product)
 ```
@@ -754,7 +754,7 @@ Now we add steps to process the text of the complaints, as before.
 ```{r complaintrec8, dependson="complaintrec1"}
 more_vars_rec <- more_vars_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -1182,19 +1182,19 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
 ```
 
 The tokenization will be similar to the other models in this chapter.
-In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
-Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
+In our original model, we only included 1000 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
+Let's also set the `min_times` argument to 100, to throw away tokens that appear less than 100 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
 
 ```{block, type = "rmdnote"}
-This data set has many more than 50 of even the most common 5000 or more tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
+This data set has many more than 100 of even the most common 5000 or more tokens, but it can still be good practice to specify `min_times` to be safe. Your choice for `min_times` should depend on your data and how robust you need your model to be.
 ```
 
 ```{r complaintrecfinal3, dependson="complaintrecfinal2"}
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative,
-                   max_tokens = tune(), min_times = 250) %>%
+                   max_tokens = tune(), min_times = 100) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -1220,7 +1220,7 @@ Let's include different possible values for each parameter, for a combination of
 ```{r finalcomplaintsgrid}
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(500, 3e3)),
+  max_tokens(range = c(1e3, 4e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
