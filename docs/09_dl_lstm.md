@@ -984,7 +984,3 @@ LSTMs are a specific kind of recurrent neural network that are capable of learni
 - that network layers like RNNs and LSTMs can be stacked for greater model capacity
 - about the importance of centering and scaling regression outcomes for neural networks
 - how to evaluate LSTM models for text
-
-
-
-

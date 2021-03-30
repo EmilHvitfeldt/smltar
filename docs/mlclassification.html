@@ -1400,7 +1400,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 #&gt;  9 tags_Servicemember      -0.0176  0.000695       789
 #&gt; 10 date_received_dow_Wed   -0.00257 0.000695       795
 #&gt; # … with 11 more rows</code></pre>
-<p>In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms. They are not that important.</p>
+<p>In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 700s of all model terms, with smaller coefficients than many text terms. They are not that important.</p>
 <div class="rmdnote">
 <p>
 This whole book focuses on supervised machine learning for text data, but models can combine <em>both</em> text predictors and other kinds of predictors.
@@ -1808,15 +1808,15 @@ This data set has many more than 100 of even the most common 5000 or more tokens
 There are <em>two</em> tunable parameters in this model, the regularization parameter and the maximum number of tokens included in the model.
 </p>
 </div>
-<p>Let’s include different possible values for each parameter, for a combination of 100 models.</p>
+<p>Let’s include different possible values for each parameter, for a combination of 60 models.</p>
 <div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="mlclassification.html#cb401-1" aria-hidden="true" tabindex="-1"></a>final_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
 <span id="cb401-2"><a href="mlclassification.html#cb401-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)),</span>
-<span id="cb401-3"><a href="mlclassification.html#cb401-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">4e3</span>)),</span>
-<span id="cb401-4"><a href="mlclassification.html#cb401-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="at">penalty =</span> <span class="dv">20</span>, <span class="at">max_tokens =</span> <span class="dv">5</span>)</span>
+<span id="cb401-3"><a href="mlclassification.html#cb401-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">3e3</span>)),</span>
+<span id="cb401-4"><a href="mlclassification.html#cb401-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="at">penalty =</span> <span class="dv">20</span>, <span class="at">max_tokens =</span> <span class="dv">3</span>)</span>
 <span id="cb401-5"><a href="mlclassification.html#cb401-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb401-6"><a href="mlclassification.html#cb401-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb401-7"><a href="mlclassification.html#cb401-7" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 100 x 2
+<pre><code>#&gt; # A tibble: 60 x 2
 #&gt;     penalty max_tokens
 #&gt;       &lt;dbl&gt;      &lt;int&gt;
 #&gt;  1 0.0001         1000
@@ -1829,7 +1829,7 @@ There are <em>two</em> tunable parameters in this model, the regularization para
 #&gt;  8 0.00298        1000
 #&gt;  9 0.00483        1000
 #&gt; 10 0.00785        1000
-#&gt; # … with 90 more rows</code></pre>
+#&gt; # … with 50 more rows</code></pre>
 <div class="rmdpackage">
 <p>
 We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong>.
@@ -1852,8 +1852,8 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb404-2"><a href="mlclassification.html#cb404-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb404-3"><a href="mlclassification.html#cb404-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
 <span id="cb404-4"><a href="mlclassification.html#cb404-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance across regularization penalties and tokens&quot;</span>,</span>
-<span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;The best model includes a higher number of tokens&quot;</span>,</span>
-<span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;but also significant regularization&quot;</span>)</span>
+<span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;The numerically best model includes a higher number&quot;</span>,</span>
+<span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;of tokens but we can choose a simpler model&quot;</span>)</span>
 <span id="cb404-7"><a href="mlclassification.html#cb404-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintsfinaltunevis"></span>
 <img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model" width="672" />
@@ -1869,7 +1869,7 @@ FIGURE 7.11: Model performance is similar for the higher token options so we can
 <pre><code>#&gt; # A tibble: 1 x 10
 #&gt;   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #&gt;     &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.81</code></pre>
+#&gt; 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.78</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
 <div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="mlclassification.html#cb407-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(sparse_wf_v2, choose_acc)</span>
 <span id="cb407-2"><a href="mlclassification.html#cb407-2" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
@@ -1971,7 +1971,7 @@ FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 FIGURE 7.14: Some words increase a CFPB complaint’s probability of being about credit reporting while some decrease that probability
 </p>
 </div>
-<p>Tokens like “interest,” “bank,” and “escrow” contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, “report,” and “reporting” contribute in this model <em>toward</em> classification as about credit reporting.</p>
+<p>Tokens like “interest,” “bank,” and “escrow” contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, “reporting,” and “report” and contribute in this model <em>toward</em> classification as about credit reporting.</p>
 <div class="rmdnote">
 <p>
 The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like <code>percent_censoring</code> or <code>max_money</code> are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.

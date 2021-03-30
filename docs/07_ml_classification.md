@@ -1382,7 +1382,7 @@ finalize_workflow(more_vars_wf,
 #> # … with 11 more rows
 ```
 
-In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 300s and 400s of all model terms, with smaller coefficients than many text terms. They are not that important.
+In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 700s of all model terms, with smaller coefficients than many text terms. They are not that important.
 
 <div class="rmdnote">
 <p>This whole book focuses on supervised machine learning for text data, but models can combine <em>both</em> text predictors and other kinds of predictors.</p>
@@ -1965,21 +1965,21 @@ Before we tune the model, we need to set up a set of possible parameter values t
 <p>There are <em>two</em> tunable parameters in this model, the regularization parameter and the maximum number of tokens included in the model.</p>
 </div>
 
-Let's include different possible values for each parameter, for a combination of 100 models.
+Let's include different possible values for each parameter, for a combination of 60 models.
 
 
 ```r
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(1e3, 4e3)),
-  levels = c(penalty = 20, max_tokens = 5)
+  max_tokens(range = c(1e3, 3e3)),
+  levels = c(penalty = 20, max_tokens = 3)
 )
 
 final_grid
 ```
 
 ```
-#> # A tibble: 100 x 2
+#> # A tibble: 60 x 2
 #>     penalty max_tokens
 #>       <dbl>      <int>
 #>  1 0.0001         1000
@@ -1992,7 +1992,7 @@ final_grid
 #>  8 0.00298        1000
 #>  9 0.00483        1000
 #> 10 0.00785        1000
-#> # … with 90 more rows
+#> # … with 50 more rows
 ```
 
 <div class="rmdpackage">
@@ -2024,8 +2024,8 @@ autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
     title = "Model performance across regularization penalties and tokens",
-    subtitle = paste("The best model includes a higher number of tokens",
-                     "but also significant regularization")
+    subtitle = paste("The numerically best model includes a higher number",
+                     "of tokens but we can choose a simpler model")
   )
 ```
 
@@ -2048,7 +2048,7 @@ choose_acc
 #> # A tibble: 1 x 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
-#> 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.81
+#> 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.78
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -2183,7 +2183,7 @@ complaints_imp %>%
 <p class="caption">(\#fig:complaintsvip)Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
 </div>
 
-Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "report", and "reporting" contribute in this model _toward_ classification as about credit reporting.
+Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "reporting", and "report" and  contribute in this model _toward_ classification as about credit reporting.
 
 <div class="rmdnote">
 <p>The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like <code>percent_censoring</code> or <code>max_money</code> are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.</p>
