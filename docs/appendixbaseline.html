@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-28" />
+<meta name="date" content="2021-03-30" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -434,11 +434,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>This machine learning analysis is presented with only minimal narrative; see Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> for more explanation and details.</p>
 <div id="read-in-the-data" class="section level2" number="13.1">
 <h2><span class="header-section-number">C.1</span> Read in the data</h2>
-<div class="sourceCode" id="cb693"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb693-1"><a href="appendixbaseline.html#cb693-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb693-2"><a href="appendixbaseline.html#cb693-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb693-3"><a href="appendixbaseline.html#cb693-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
-<span id="cb693-4"><a href="appendixbaseline.html#cb693-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb693-5"><a href="appendixbaseline.html#cb693-5" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
+<div class="sourceCode" id="cb694"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb694-1"><a href="appendixbaseline.html#cb694-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb694-2"><a href="appendixbaseline.html#cb694-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb694-3"><a href="appendixbaseline.html#cb694-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
+<span id="cb694-4"><a href="appendixbaseline.html#cb694-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb694-5"><a href="appendixbaseline.html#cb694-5" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 269,790 x 3
 #&gt;    blurb                                                        state created_at
 #&gt;    &lt;chr&gt;                                                        &lt;fct&gt; &lt;date&gt;    
@@ -456,18 +456,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="split-into-testtrain-and-create-resampling-folds" class="section level2" number="13.2">
 <h2><span class="header-section-number">C.2</span> Split into test/train and create resampling folds</h2>
-<div class="sourceCode" id="cb695"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb695-1"><a href="appendixbaseline.html#cb695-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb695-2"><a href="appendixbaseline.html#cb695-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb695-3"><a href="appendixbaseline.html#cb695-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
-<span id="cb695-4"><a href="appendixbaseline.html#cb695-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb695-5"><a href="appendixbaseline.html#cb695-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
-<span id="cb695-6"><a href="appendixbaseline.html#cb695-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb695-7"><a href="appendixbaseline.html#cb695-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
-<span id="cb695-8"><a href="appendixbaseline.html#cb695-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span>
-<span id="cb695-9"><a href="appendixbaseline.html#cb695-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb695-10"><a href="appendixbaseline.html#cb695-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb695-11"><a href="appendixbaseline.html#cb695-11" aria-hidden="true" tabindex="-1"></a>kickstarter_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train)</span>
-<span id="cb695-12"><a href="appendixbaseline.html#cb695-12" aria-hidden="true" tabindex="-1"></a>kickstarter_folds</span></code></pre></div>
+<div class="sourceCode" id="cb696"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb696-1"><a href="appendixbaseline.html#cb696-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb696-2"><a href="appendixbaseline.html#cb696-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb696-3"><a href="appendixbaseline.html#cb696-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
+<span id="cb696-4"><a href="appendixbaseline.html#cb696-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb696-5"><a href="appendixbaseline.html#cb696-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
+<span id="cb696-6"><a href="appendixbaseline.html#cb696-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb696-7"><a href="appendixbaseline.html#cb696-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
+<span id="cb696-8"><a href="appendixbaseline.html#cb696-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span>
+<span id="cb696-9"><a href="appendixbaseline.html#cb696-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb696-10"><a href="appendixbaseline.html#cb696-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb696-11"><a href="appendixbaseline.html#cb696-11" aria-hidden="true" tabindex="-1"></a>kickstarter_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train)</span>
+<span id="cb696-12"><a href="appendixbaseline.html#cb696-12" aria-hidden="true" tabindex="-1"></a>kickstarter_folds</span></code></pre></div>
 <pre><code>#&gt; #  10-fold cross-validation 
 #&gt; # A tibble: 10 x 2
 #&gt;    splits                 id    
@@ -485,14 +485,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="recipe-for-data-preprocessing" class="section level2" number="13.3">
 <h2><span class="header-section-number">C.3</span> Recipe for data preprocessing</h2>
-<div class="sourceCode" id="cb697"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb697-1"><a href="appendixbaseline.html#cb697-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
-<span id="cb697-2"><a href="appendixbaseline.html#cb697-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb697-3"><a href="appendixbaseline.html#cb697-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb697-4"><a href="appendixbaseline.html#cb697-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb697-5"><a href="appendixbaseline.html#cb697-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb697-6"><a href="appendixbaseline.html#cb697-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
-<span id="cb697-7"><a href="appendixbaseline.html#cb697-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb697-8"><a href="appendixbaseline.html#cb697-8" aria-hidden="true" tabindex="-1"></a>kickstarter_rec</span></code></pre></div>
+<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="appendixbaseline.html#cb698-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb698-2"><a href="appendixbaseline.html#cb698-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-3"><a href="appendixbaseline.html#cb698-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb698-4"><a href="appendixbaseline.html#cb698-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb698-5"><a href="appendixbaseline.html#cb698-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb698-6"><a href="appendixbaseline.html#cb698-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
+<span id="cb698-7"><a href="appendixbaseline.html#cb698-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-8"><a href="appendixbaseline.html#cb698-8" aria-hidden="true" tabindex="-1"></a>kickstarter_rec</span></code></pre></div>
 <pre><code>#&gt; Data Recipe
 #&gt; 
 #&gt; Inputs:
@@ -509,11 +509,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="lasso-regularized-classification-model" class="section level2" number="13.4">
 <h2><span class="header-section-number">C.4</span> Lasso regularized classification model</h2>
-<div class="sourceCode" id="cb699"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb699-1"><a href="appendixbaseline.html#cb699-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb699-2"><a href="appendixbaseline.html#cb699-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb699-3"><a href="appendixbaseline.html#cb699-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
-<span id="cb699-4"><a href="appendixbaseline.html#cb699-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb699-5"><a href="appendixbaseline.html#cb699-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
+<div class="sourceCode" id="cb700"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb700-1"><a href="appendixbaseline.html#cb700-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-2"><a href="appendixbaseline.html#cb700-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-3"><a href="appendixbaseline.html#cb700-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb700-4"><a href="appendixbaseline.html#cb700-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb700-5"><a href="appendixbaseline.html#cb700-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
 <pre><code>#&gt; Logistic Regression Model Specification (classification)
 #&gt; 
 #&gt; Main Arguments:
@@ -525,11 +525,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="a-model-workflow" class="section level2" number="13.5">
 <h2><span class="header-section-number">C.5</span> A model workflow</h2>
 <p>We need a few more components before we can tune our workflow. Let’s use a sparse data encoding (Section <a href="mlclassification.html#casestudysparseencoding">7.5</a>).</p>
-<div class="sourceCode" id="cb701"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb701-1"><a href="appendixbaseline.html#cb701-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
-<span id="cb701-2"><a href="appendixbaseline.html#cb701-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb702"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb702-1"><a href="appendixbaseline.html#cb702-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
+<span id="cb702-2"><a href="appendixbaseline.html#cb702-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
 <p>Let’s create a grid of possible regularization penalties to try.</p>
-<div class="sourceCode" id="cb702"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb702-1"><a href="appendixbaseline.html#cb702-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
-<span id="cb702-2"><a href="appendixbaseline.html#cb702-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
+<div class="sourceCode" id="cb703"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb703-1"><a href="appendixbaseline.html#cb703-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
+<span id="cb703-2"><a href="appendixbaseline.html#cb703-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 20 x 1
 #&gt;      penalty
 #&gt;        &lt;dbl&gt;
@@ -554,11 +554,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 19 0.546    
 #&gt; 20 1</code></pre>
 <p>Now these can be combined in a tuneable <code>workflow()</code>.</p>
-<div class="sourceCode" id="cb704"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb704-1"><a href="appendixbaseline.html#cb704-1" aria-hidden="true" tabindex="-1"></a>kickstarter_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb704-2"><a href="appendixbaseline.html#cb704-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kickstarter_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
-<span id="cb704-3"><a href="appendixbaseline.html#cb704-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
-<span id="cb704-4"><a href="appendixbaseline.html#cb704-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb704-5"><a href="appendixbaseline.html#cb704-5" aria-hidden="true" tabindex="-1"></a>kickstarter_wf</span></code></pre></div>
+<div class="sourceCode" id="cb705"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb705-1"><a href="appendixbaseline.html#cb705-1" aria-hidden="true" tabindex="-1"></a>kickstarter_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb705-2"><a href="appendixbaseline.html#cb705-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kickstarter_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
+<span id="cb705-3"><a href="appendixbaseline.html#cb705-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb705-4"><a href="appendixbaseline.html#cb705-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb705-5"><a href="appendixbaseline.html#cb705-5" aria-hidden="true" tabindex="-1"></a>kickstarter_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: logistic_reg()
@@ -581,14 +581,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="tune-the-workflow" class="section level2" number="13.6">
 <h2><span class="header-section-number">C.6</span> Tune the workflow</h2>
-<div class="sourceCode" id="cb706"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb706-1"><a href="appendixbaseline.html#cb706-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
-<span id="cb706-2"><a href="appendixbaseline.html#cb706-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb706-3"><a href="appendixbaseline.html#cb706-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
-<span id="cb706-4"><a href="appendixbaseline.html#cb706-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_folds,</span>
-<span id="cb706-5"><a href="appendixbaseline.html#cb706-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid</span>
-<span id="cb706-6"><a href="appendixbaseline.html#cb706-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb706-7"><a href="appendixbaseline.html#cb706-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb706-8"><a href="appendixbaseline.html#cb706-8" aria-hidden="true" tabindex="-1"></a>lasso_rs</span></code></pre></div>
+<div class="sourceCode" id="cb707"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb707-1"><a href="appendixbaseline.html#cb707-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
+<span id="cb707-2"><a href="appendixbaseline.html#cb707-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb707-3"><a href="appendixbaseline.html#cb707-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
+<span id="cb707-4"><a href="appendixbaseline.html#cb707-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_folds,</span>
+<span id="cb707-5"><a href="appendixbaseline.html#cb707-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid</span>
+<span id="cb707-6"><a href="appendixbaseline.html#cb707-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb707-7"><a href="appendixbaseline.html#cb707-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb707-8"><a href="appendixbaseline.html#cb707-8" aria-hidden="true" tabindex="-1"></a>lasso_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 4
@@ -605,7 +605,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt;  9 &lt;split [181884/20209]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
 #&gt; 10 &lt;split [181884/20209]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
 <p>What are the best models?</p>
-<div class="sourceCode" id="cb708"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb708-1"><a href="appendixbaseline.html#cb708-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb709"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb709-1"><a href="appendixbaseline.html#cb709-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 x 7
 #&gt;     penalty .metric .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -614,7 +614,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 3 0.000207  roc_auc binary     0.751    10 0.000903 Preprocessor1_Model06
 #&gt; 4 0.000113  roc_auc binary     0.751    10 0.000914 Preprocessor1_Model05
 #&gt; 5 0.0000616 roc_auc binary     0.751    10 0.000920 Preprocessor1_Model04</code></pre>
-<div class="sourceCode" id="cb710"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb710-1"><a href="appendixbaseline.html#cb710-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb711"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb711-1"><a href="appendixbaseline.html#cb711-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 x 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -623,7 +623,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 3 0.000207  accuracy binary     0.684    10 0.000905 Preprocessor1_Model06
 #&gt; 4 0.0000616 accuracy binary     0.684    10 0.000909 Preprocessor1_Model04
 #&gt; 5 0.000113  accuracy binary     0.684    10 0.000879 Preprocessor1_Model05</code></pre>
-<div class="sourceCode" id="cb712"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb712-1"><a href="appendixbaseline.html#cb712-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
+<div class="sourceCode" id="cb713"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb713-1"><a href="appendixbaseline.html#cb713-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
 <p><img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </div>

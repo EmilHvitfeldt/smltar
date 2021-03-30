@@ -166,7 +166,7 @@ complaints_rec <-
 ```
 
 Now we add steps to process the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
-Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 500 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
+Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 1000 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
 
 
 ```r
@@ -174,7 +174,7 @@ library(textrecipes)
 
 complaints_rec <- complaints_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -188,7 +188,7 @@ complaint_wf <- workflow() %>%
 
 Let's start with a naive Bayes model [@kim2006; @Kibriya2005; @Eibe2006], which is available in the tidymodels package **discrim**.
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
-Here we have only kept the 500 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
+Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 <div class="rmdpackage">
 <p>In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.</p>
@@ -317,11 +317,11 @@ nb_rs_metrics
 #> # A tibble: 2 x 6
 #>   .metric  .estimator  mean     n  std_err .config             
 #>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.678    10 0.00635  Preprocessor1_Model1
-#> 2 roc_auc  binary     0.874    10 0.000833 Preprocessor1_Model1
+#> 1 accuracy binary     0.806    10 0.00184  Preprocessor1_Model1
+#> 2 roc_auc  binary     0.878    10 0.000715 Preprocessor1_Model1
 ```
 
-The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 67.8%.
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.6%.
 
 <div class="rmdnote">
 <p>Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.</p>
@@ -495,8 +495,8 @@ lasso_rs_metrics
 #> # A tibble: 2 x 6
 #>   .metric  .estimator  mean     n  std_err .config             
 #>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.863    10 0.000988 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.936    10 0.000817 Preprocessor1_Model1
+#> 1 accuracy binary     0.868    10 0.000977 Preprocessor1_Model1
+#> 2 roc_auc  binary     0.939    10 0.000849 Preprocessor1_Model1
 ```
 
 This looks pretty promising, considering we haven't yet done any tuning on the lasso hyperparameters.
@@ -649,16 +649,16 @@ collect_metrics(tune_rs)
 #> # A tibble: 60 x 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
-#>  1 1.00e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model01
-#>  2 1.00e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model01
-#>  3 2.21e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model02
-#>  4 2.21e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model02
-#>  5 4.89e-10 accuracy binary     0.884    10 0.00109  Preprocessor1_Model03
-#>  6 4.89e-10 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model03
-#>  7 1.08e- 9 accuracy binary     0.884    10 0.00109  Preprocessor1_Model04
-#>  8 1.08e- 9 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model04
-#>  9 2.40e- 9 accuracy binary     0.884    10 0.00109  Preprocessor1_Model05
-#> 10 2.40e- 9 roc_auc  binary     0.947    10 0.000788 Preprocessor1_Model05
+#>  1 1.00e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
+#>  2 1.00e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
+#>  3 2.21e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model02
+#>  4 2.21e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model02
+#>  5 4.89e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model03
+#>  6 4.89e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model03
+#>  7 1.08e- 9 accuracy binary     0.890    10 0.00102  Preprocessor1_Model04
+#>  8 1.08e- 9 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model04
+#>  9 2.40e- 9 accuracy binary     0.890    10 0.00102  Preprocessor1_Model05
+#> 10 2.40e- 9 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model05
 #> # … with 50 more rows
 ```
 
@@ -688,18 +688,18 @@ tune_rs %>%
 
 ```
 #> # A tibble: 5 x 7
-#>    penalty .metric .estimator  mean     n  std_err .config              
-#>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 3.56e- 4 roc_auc binary     0.947    10 0.000779 Preprocessor1_Model20
-#> 2 1.61e- 4 roc_auc binary     0.947    10 0.000783 Preprocessor1_Model19
-#> 3 7.28e- 5 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model18
-#> 4 1.00e-10 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model01
-#> 5 2.21e-10 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model02
+#>        penalty .metric .estimator  mean     n  std_err .config              
+#>          <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
+#> 1 0.000356     roc_auc binary     0.953    10 0.000824 Preprocessor1_Model20
+#> 2 0.000788     roc_auc binary     0.953    10 0.000827 Preprocessor1_Model21
+#> 3 0.000161     roc_auc binary     0.953    10 0.000822 Preprocessor1_Model19
+#> 4 0.0000728    roc_auc binary     0.953    10 0.000821 Preprocessor1_Model18
+#> 5 0.0000000001 roc_auc binary     0.952    10 0.000823 Preprocessor1_Model01
 ```
 
 
 
-The best value for ROC AUC from this tuning run is 0.947. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`, or a simpler model with higher regularization with `select_by_pct_loss()` or `select_by_one_std_err()` Let's choose the model with the best ROC AUC within one standard error of the numerically best model [@Breiman1984].
+The best value for ROC AUC from this tuning run is 0.953. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with `select_best()`, or a simpler model with higher regularization with `select_by_pct_loss()` or `select_by_one_std_err()` Let's choose the model with the best ROC AUC within one standard error of the numerically best model [@Breiman1984].
 
 
 ```r
@@ -713,7 +713,7 @@ chosen_auc
 #> # A tibble: 1 x 9
 #>    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>            <dbl>  <dbl>
-#> 1 0.000788 roc_auc binary     0.947    10 0.000778 Preprocessor1_M… 0.947  0.946
+#> 1 0.000788 roc_auc binary     0.953    10 0.000827 Preprocessor1_M… 0.953  0.952
 ```
 
 Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
@@ -765,20 +765,20 @@ fitted_lasso %>%
 ```
 
 ```
-#> # A tibble: 501 x 3
-#>    term                                        estimate  penalty
-#>    <chr>                                          <dbl>    <dbl>
-#>  1 tfidf_consumer_complaint_narrative_funds        27.0 0.000788
-#>  2 tfidf_consumer_complaint_narrative_debt         21.0 0.000788
-#>  3 tfidf_consumer_complaint_narrative_money        17.9 0.000788
-#>  4 tfidf_consumer_complaint_narrative_escrow       17.0 0.000788
-#>  5 tfidf_consumer_complaint_narrative_interest     15.6 0.000788
-#>  6 tfidf_consumer_complaint_narrative_collect      15.6 0.000788
-#>  7 tfidf_consumer_complaint_narrative_transfer     15.5 0.000788
-#>  8 tfidf_consumer_complaint_narrative_fees         14.3 0.000788
-#>  9 tfidf_consumer_complaint_narrative_deposit      13.9 0.000788
-#> 10 tfidf_consumer_complaint_narrative_sure         13.7 0.000788
-#> # … with 491 more rows
+#> # A tibble: 1,001 x 3
+#>    term                                         estimate  penalty
+#>    <chr>                                           <dbl>    <dbl>
+#>  1 tfidf_consumer_complaint_narrative_funds         26.5 0.000788
+#>  2 tfidf_consumer_complaint_narrative_appraisal     22.1 0.000788
+#>  3 tfidf_consumer_complaint_narrative_bonus         21.4 0.000788
+#>  4 tfidf_consumer_complaint_narrative_debt          19.9 0.000788
+#>  5 tfidf_consumer_complaint_narrative_escrow        17.8 0.000788
+#>  6 tfidf_consumer_complaint_narrative_customers     17.2 0.000788
+#>  7 tfidf_consumer_complaint_narrative_money         16.5 0.000788
+#>  8 tfidf_consumer_complaint_narrative_emailed       15.9 0.000788
+#>  9 tfidf_consumer_complaint_narrative_fees          15.1 0.000788
+#> 10 tfidf_consumer_complaint_narrative_interest      14.5 0.000788
+#> # … with 991 more rows
 ```
 
 We see here, for the penalty we chose, what terms contribute the most to a complaint _not_ being about credit. The words are largely about mortgages and other financial products.
@@ -794,20 +794,20 @@ fitted_lasso %>%
 ```
 
 ```
-#> # A tibble: 501 x 3
+#> # A tibble: 1,001 x 3
 #>    term                                          estimate  penalty
 #>    <chr>                                            <dbl>    <dbl>
-#>  1 tfidf_consumer_complaint_narrative_experian      -61.7 0.000788
-#>  2 tfidf_consumer_complaint_narrative_transunion    -53.7 0.000788
-#>  3 tfidf_consumer_complaint_narrative_equifax       -51.1 0.000788
-#>  4 tfidf_consumer_complaint_narrative_reporting     -22.4 0.000788
-#>  5 tfidf_consumer_complaint_narrative_compliance    -17.8 0.000788
-#>  6 tfidf_consumer_complaint_narrative_report        -16.7 0.000788
-#>  7 tfidf_consumer_complaint_narrative_inquiries     -16.5 0.000788
-#>  8 tfidf_consumer_complaint_narrative_score         -15.8 0.000788
-#>  9 tfidf_consumer_complaint_narrative_credit        -14.1 0.000788
-#> 10 tfidf_consumer_complaint_narrative_inquiry       -13.6 0.000788
-#> # … with 491 more rows
+#>  1 tfidf_consumer_complaint_narrative_reseller      -86.4 0.000788
+#>  2 tfidf_consumer_complaint_narrative_experian      -59.2 0.000788
+#>  3 tfidf_consumer_complaint_narrative_transunion    -51.9 0.000788
+#>  4 tfidf_consumer_complaint_narrative_equifax       -48.0 0.000788
+#>  5 tfidf_consumer_complaint_narrative_compliant     -21.8 0.000788
+#>  6 tfidf_consumer_complaint_narrative_reporting     -21.5 0.000788
+#>  7 tfidf_consumer_complaint_narrative_report        -17.1 0.000788
+#>  8 tfidf_consumer_complaint_narrative_freeze        -17.1 0.000788
+#>  9 tfidf_consumer_complaint_narrative_inquiries     -16.9 0.000788
+#> 10 tfidf_consumer_complaint_narrative_method        -16.0 0.000788
+#> # … with 991 more rows
 ```
 
 <div class="rmdnote">
@@ -941,14 +941,14 @@ sparse_rs %>%
 #> # A tibble: 5 x 7
 #>     penalty .metric .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000379  roc_auc binary     0.947    10 0.000780 Preprocessor1_Model07
-#> 2 0.000207  roc_auc binary     0.947    10 0.000781 Preprocessor1_Model06
-#> 3 0.000113  roc_auc binary     0.947    10 0.000786 Preprocessor1_Model05
-#> 4 0.00001   roc_auc binary     0.947    10 0.000788 Preprocessor1_Model01
-#> 5 0.0000183 roc_auc binary     0.947    10 0.000788 Preprocessor1_Model02
+#> 1 0.000695  roc_auc binary     0.953    10 0.000825 Preprocessor1_Model08
+#> 2 0.000379  roc_auc binary     0.953    10 0.000824 Preprocessor1_Model07
+#> 3 0.000207  roc_auc binary     0.953    10 0.000821 Preprocessor1_Model06
+#> 4 0.000113  roc_auc binary     0.953    10 0.000820 Preprocessor1_Model05
+#> 5 0.0000616 roc_auc binary     0.952    10 0.000822 Preprocessor1_Model04
 ```
 
-The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.947. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 3.6\times 10^{-4}) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
+The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 3.6\times 10^{-4}) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
 
 Importantly, this tuning also took a bit less time to complete. 
 
@@ -1047,7 +1047,7 @@ multicomplaints_rec <-
   recipe(product ~ consumer_complaint_narrative,
          data = multicomplaints_train) %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative) %>%
   step_downsample(product)
 ```
@@ -1136,12 +1136,12 @@ multi_lasso_rs
 #>    <list>             <chr>  <list>          <list>         <list>              
 #>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,840 × …
 #>  2 <split [79120/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  3 <split [79120/879… Fold03 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  3 <split [79120/879… Fold03 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
 #>  4 <split [79120/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  5 <split [79120/879… Fold05 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  6 <split [79120/879… Fold06 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  7 <split [79120/879… Fold07 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  8 <split [79120/879… Fold08 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  5 <split [79120/879… Fold05 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#>  6 <split [79120/879… Fold06 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#>  7 <split [79120/879… Fold07 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#>  8 <split [79120/879… Fold08 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
 #>  9 <split [79120/879… Fold09 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
 #> 10 <split [79120/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
 ```
@@ -1160,14 +1160,14 @@ best_acc
 #> # A tibble: 5 x 7
 #>    penalty .metric  .estimator  mean     n std_err .config              
 #>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1 0.00234  accuracy multiclass 0.733    10 0.00243 Preprocessor1_Model10
-#> 2 0.00127  accuracy multiclass 0.728    10 0.00226 Preprocessor1_Model09
-#> 3 0.00428  accuracy multiclass 0.727    10 0.00211 Preprocessor1_Model11
-#> 4 0.000695 accuracy multiclass 0.721    10 0.00199 Preprocessor1_Model08
-#> 5 0.00785  accuracy multiclass 0.716    10 0.00207 Preprocessor1_Model12
+#> 1 0.00234  accuracy multiclass 0.755    10 0.00220 Preprocessor1_Model10
+#> 2 0.00428  accuracy multiclass 0.751    10 0.00238 Preprocessor1_Model11
+#> 3 0.00127  accuracy multiclass 0.749    10 0.00273 Preprocessor1_Model09
+#> 4 0.00785  accuracy multiclass 0.740    10 0.00219 Preprocessor1_Model12
+#> 5 0.000695 accuracy multiclass 0.740    10 0.00451 Preprocessor1_Model08
 ```
 
-The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 73.3%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
+The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.5%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
 
 <div class="rmdwarning">
 <p>In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.</p>
@@ -1278,7 +1278,7 @@ Now we add steps to process the text of the complaints, as before.
 ```r
 more_vars_rec <- more_vars_rec %>%
   step_tokenize(consumer_complaint_narrative) %>%
-  step_tokenfilter(consumer_complaint_narrative, max_tokens = 500) %>%
+  step_tokenfilter(consumer_complaint_narrative, max_tokens = 1e3) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -1344,14 +1344,14 @@ more_vars_rs %>%
 #> # A tibble: 5 x 7
 #>     penalty .metric .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000379  roc_auc binary     0.947    10 0.000771 Preprocessor1_Model07
-#> 2 0.000207  roc_auc binary     0.947    10 0.000772 Preprocessor1_Model06
-#> 3 0.000113  roc_auc binary     0.947    10 0.000776 Preprocessor1_Model05
-#> 4 0.00001   roc_auc binary     0.947    10 0.000779 Preprocessor1_Model01
-#> 5 0.0000183 roc_auc binary     0.947    10 0.000779 Preprocessor1_Model02
+#> 1 0.000695  roc_auc binary     0.953    10 0.000824 Preprocessor1_Model08
+#> 2 0.000379  roc_auc binary     0.953    10 0.000818 Preprocessor1_Model07
+#> 3 0.000207  roc_auc binary     0.953    10 0.000814 Preprocessor1_Model06
+#> 4 0.000113  roc_auc binary     0.953    10 0.000813 Preprocessor1_Model05
+#> 5 0.0000616 roc_auc binary     0.953    10 0.000812 Preprocessor1_Model04
 ```
 
-We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.947, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 3.8\times 10^{-4} but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 7\times 10^{-4} but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
 
 
 ```r
@@ -1369,16 +1369,16 @@ finalize_workflow(more_vars_wf,
 #> # A tibble: 21 x 4
 #>    term                    estimate  penalty term_rank
 #>    <chr>                      <dbl>    <dbl>     <int>
-#>  1 date_received_month_Dec  -0.380  0.000379       412
-#>  2 (Intercept)               0.211  0.000379       429
-#>  3 date_received_month_Aug  -0.141  0.000379       438
-#>  4 date_received_dow_Mon     0.131  0.000379       440
-#>  5 date_received_month_Jul  -0.0944 0.000379       445
-#>  6 tags_Servicemember       -0.0839 0.000379       448
-#>  7 date_received_month_Apr   0.0767 0.000379       450
-#>  8 tags_unknown             -0.0645 0.000379       453
-#>  9 date_received_month_Feb  -0.0544 0.000379       454
-#> 10 date_received_month_Jun  -0.0444 0.000379       455
+#>  1 date_received_month_Dec -0.319   0.000695       726
+#>  2 (Intercept)              0.256   0.000695       734
+#>  3 date_received_dow_Mon    0.129   0.000695       758
+#>  4 date_received_month_Apr  0.101   0.000695       763
+#>  5 date_received_month_Aug -0.0923  0.000695       768
+#>  6 date_received_dow_Fri    0.0422  0.000695       782
+#>  7 date_received_month_Jul -0.0302  0.000695       785
+#>  8 date_received_month_Feb -0.0270  0.000695       787
+#>  9 tags_Servicemember      -0.0176  0.000695       789
+#> 10 date_received_dow_Wed   -0.00257 0.000695       795
 #> # … with 11 more rows
 ```
 
@@ -1816,7 +1816,7 @@ nb_rs_predictions %>%
 #> # A tibble: 1 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 recall  binary         0.340
+#> 1 recall  binary         0.722
 ```
 
 We can also compute the recall for each resample using `group_by()`.
@@ -1832,16 +1832,16 @@ nb_rs_predictions %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 recall  binary         0.314
-#>  2 Fold02 recall  binary         0.322
-#>  3 Fold03 recall  binary         0.280
-#>  4 Fold04 recall  binary         0.412
-#>  5 Fold05 recall  binary         0.325
-#>  6 Fold06 recall  binary         0.375
-#>  7 Fold07 recall  binary         0.344
-#>  8 Fold08 recall  binary         0.277
-#>  9 Fold09 recall  binary         0.329
-#> 10 Fold10 recall  binary         0.422
+#>  1 Fold01 recall  binary         0.791
+#>  2 Fold02 recall  binary         0.690
+#>  3 Fold03 recall  binary         0.674
+#>  4 Fold04 recall  binary         0.8  
+#>  5 Fold05 recall  binary         0.719
+#>  6 Fold06 recall  binary         0.735
+#>  7 Fold07 recall  binary         0.713
+#>  8 Fold08 recall  binary         0.655
+#>  9 Fold09 recall  binary         0.717
+#> 10 Fold10 recall  binary         0.725
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
@@ -1854,8 +1854,8 @@ conf_mat_resampled(nb_rs)
 
 ```
 #>        Credit  Other
-#> Credit 1417.9 2749.0
-#> Other    81.0 4543.2
+#> Credit 3009.5 1157.4
+#> Other   549.1 4075.1
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
@@ -1906,12 +1906,12 @@ complaints_rec_v2 <- complaints_rec_v2 %>%
 ```
 
 The tokenization will be similar to the other models in this chapter.
-In our original model, we only included 500 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
-Let's also set the `min_times` argument to 50, to throw away tokens that appear less than 50 times in the entire corpus.
+In our original model, we only included 1000 tokens; for our final model, let's treat the number of tokens as a hyperparameter that we vary when we tune the final model.
+Let's also set the `min_times` argument to 100, to throw away tokens that appear less than 100 times in the entire corpus.
 We want our model to be robust and a token needs to appear enough times before we include it.
 
 <div class="rmdnote">
-<p>This data set has many more than 50 of even the most common 5000 or more tokens, but it can still be good practice to specify <code>min_times</code> to be safe. Your choice for <code>min_times</code> should depend on your data and how robust you need your model to be.</p>
+<p>This data set has many more than 100 of even the most common 5000 or more tokens, but it can still be good practice to specify <code>min_times</code> to be safe. Your choice for <code>min_times</code> should depend on your data and how robust you need your model to be.</p>
 </div>
 
 
@@ -1919,7 +1919,7 @@ We want our model to be robust and a token needs to appear enough times before w
 complaints_rec_v2 <- complaints_rec_v2 %>%
   step_tokenize(consumer_complaint_narrative) %>%
   step_tokenfilter(consumer_complaint_narrative,
-                   max_tokens = tune(), min_times = 250) %>%
+                   max_tokens = tune(), min_times = 100) %>%
   step_tfidf(consumer_complaint_narrative)
 ```
 
@@ -1971,7 +1971,7 @@ Let's include different possible values for each parameter, for a combination of
 ```r
 final_grid <- grid_regular(
   penalty(range = c(-4, 0)),
-  max_tokens(range = c(500, 3e3)),
+  max_tokens(range = c(1e3, 4e3)),
   levels = c(penalty = 20, max_tokens = 5)
 )
 
@@ -1982,16 +1982,16 @@ final_grid
 #> # A tibble: 100 x 2
 #>     penalty max_tokens
 #>       <dbl>      <int>
-#>  1 0.0001          500
-#>  2 0.000162        500
-#>  3 0.000264        500
-#>  4 0.000428        500
-#>  5 0.000695        500
-#>  6 0.00113         500
-#>  7 0.00183         500
-#>  8 0.00298         500
-#>  9 0.00483         500
-#> 10 0.00785         500
+#>  1 0.0001         1000
+#>  2 0.000162       1000
+#>  3 0.000264       1000
+#>  4 0.000428       1000
+#>  5 0.000695       1000
+#>  6 0.00113        1000
+#>  7 0.00183        1000
+#>  8 0.00298        1000
+#>  9 0.00483        1000
+#> 10 0.00785        1000
 #> # … with 90 more rows
 ```
 
@@ -2048,7 +2048,7 @@ choose_acc
 #> # A tibble: 1 x 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
-#> 1 0.00183        500 accuracy binary     0.881    10 8.05e-4 Prepro… 0.897  1.75
+#> 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.81
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -2077,7 +2077,7 @@ final_wf
 #> Logistic Regression Model Specification (classification)
 #> 
 #> Main Arguments:
-#>   penalty = 0.00183298071083244
+#>   penalty = 0.00483293023857175
 #>   mixture = 1
 #> 
 #> Computational engine: glmnet
@@ -2104,8 +2104,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 x 4
 #>   .metric  .estimator .estimate .config             
 #>   <chr>    <chr>          <dbl> <chr>               
-#> 1 accuracy binary         0.883 Preprocessor1_Model1
-#> 2 roc_auc  binary         0.947 Preprocessor1_Model1
+#> 1 accuracy binary         0.885 Preprocessor1_Model1
+#> 2 roc_auc  binary         0.949 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -2206,16 +2206,16 @@ complaints_bind %>%
 #> # A tibble: 10 x 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
-#>  1 "I am being charged over 300 $ from something called phnx finan and I would …
-#>  2 "Lend up / XXXX XXXXXXXX Last month I filled out an application for a credit…
-#>  3 "I had a divorce and my husband kept the home because it was in his name.. h…
-#>  4 "A guy XXXX continues to call at my work, from number : ( XXXX ) XXXX-XXXX, …
-#>  5 "On XXXX XXXX, XXXX we were contacted by an attorney, XXXX XXXX with XXXX XX…
-#>  6 "Hi, To who this may concern, On the XXXX of XXXX called and made a payment …
-#>  7 "I agreed to pay this debt off for a lesser amount and the company was suppo…
-#>  8 "I'm filing a complaint against XXXX XXXX XXXX.they shut my phone off and re…
-#>  9 "An attorney that was assigned to be my children 's advocate attorney in XXX…
-#> 10 "XX/XX/XXXX I was checking my bank account, and I noticed an extra account w…
+#>  1 "Spoke with Mr XXXX today at XXXX. Inquired about medical bill and date. Inf…
+#>  2 "I opened a credit card account with GE Financial to finance an air conditio…
+#>  3 "I lost my debit card and had to use my checks until I received my new card.…
+#>  4 "Loan was for {$2500.00} balance is showing {$4200.00} because they included…
+#>  5 "Chase XXXX Reward card was activated in my name without my consent. Card # …
+#>  6 "I have had this service for more the seven years, the more I use them the m…
+#>  7 "Ive had severe issues with the student loan process for at least 10 years. …
+#>  8 "Chase Card Address : XXXX XXXX XXXX City/ State/ Zip : XXXX, DE XXXX Date :…
+#>  9 "I received a notice that stated that I was currently in debt in the amount …
+#> 10 "Hi About 2 months ago ( XXXX ) I received an email from a company represent…
 ```
 
 We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.
@@ -2234,16 +2234,16 @@ complaints_bind %>%
 #> # A tibble: 10 x 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
-#>  1 Collection account is showing up twice on Equifax credit report and the coll…
-#>  2 ACCOUNT RECOVERY SERVICE XXXX {$450.00} I was a victim of fraud and have att…
-#>  3 Company said I was late on a payment but was never late                      
-#>  4 I attempted to check my credit score. My SSN wasnt accepted and so i wasn't …
-#>  5 MACYS/DSNB REVOLVING ACCOUNT # XXXX OPEN DATE XX/XX/2012 IS FRAUDULENT AND N…
-#>  6 CREDENCE RESOURCE MANAGE IS REPORT NEGATIVE AND FALSE INFORMATION ON MY CRED…
-#>  7 transunion will not provide me iwth the opportunity to dispute or correct in…
-#>  8 Have contacted Credit Bureaus on numerous occasions to have incorrect or out…
-#>  9 Experian one of the worse credit bureaus I have ever dealt with. I have cont…
-#> 10 These accounts are not mines
+#>  1 "Paid in full collections to CBE Group amount of {$360.00} paid in XXXX of 2…
+#>  2 "Back in 2013, my purse was stolen containing all of my personal belongings.…
+#>  3 "I Have contacted Credit Bureaus on numerous occasions to have incorrect or …
+#>  4 "I contacted the company, I reported to police department, sent in police re…
+#>  5 "FCRA states information reporting has to be 100 % verifiable and 100 % accu…
+#>  6 "I have attempted on numerous times to dispute an account that has ERRORS. E…
+#>  7 "XXXX  OF XXXX FLORIDA IS TAKING ADVANTAGE OF THEIR ABILITY TO REPORT TO THE…
+#>  8 "Late payment reported ( {$16.00} ) to my credit report that caused my credi…
+#>  9 "MIDLAND FUNDING XXXX as of XX/XX/2019 reporting for identity fraud, was rep…
+#> 10 "I have contacted this company through the credit bureaus multiple times to …
 ```
 
 Again, these are "mistakes" on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.
