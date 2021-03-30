@@ -662,7 +662,7 @@ collect_metrics(tune_rs)
 #> # … with 50 more rows
 ```
 
-Let's visualize these metrics, RMSE and $R^2$, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
+Let's visualize these metrics, accuracy and ROC AUC, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
 
 
 ```r
@@ -783,7 +783,7 @@ fitted_lasso %>%
 
 We see here, for the penalty we chose, what terms contribute the most to a complaint _not_ being about credit. The words are largely about mortgages and other financial products.
 
-What terms contribute to a complaint being about credit, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.
+What terms contribute to a complaint being about credit reporting, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.
 
 
 ```r
