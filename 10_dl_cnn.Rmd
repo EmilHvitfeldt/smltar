@@ -601,10 +601,8 @@ paste0(".plot_text_explanations .", "negative", "_", 1:5, " {
   background-color: ", negative_colors[-1], ";}")
 )
 
-htmltools::tagList(
-  plot_text_explanations(explanation),
-  htmltools::tags$style(all_styles)
-)
+plot_text_explanations(explanation) %>%
+  htmlwidgets::prependContent(htmltools::tags$style(all_styles))
 ```
 
 ```{block, type = "rmdnote"}
@@ -642,10 +640,8 @@ plot_text_explanations(explanation)
 
 
 ```{r robustlimeplottextexplanations, echo=FALSE, fig.cap="Feature highlighting of words in two examples explained by a CNN model."}
-htmltools::tagList(
-  plot_text_explanations(explanation),
-  htmltools::tags$style(all_styles)
-)
+plot_text_explanations(explanation) %>%
+  htmlwidgets::prependContent(htmltools::tags$style(all_styles))
 ```
 
 It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
