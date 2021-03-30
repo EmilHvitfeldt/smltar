@@ -1623,7 +1623,14 @@ scotus_bind %>%
 #> # … with 127 more rows
 ```
 
-There are some interesting examples here where we can understand why the model would mispredict, like _New Hampshire v. Maine_, a case about the boundary between the two states that invoked a 1740 decree of King George II, and the cases written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court, a confusing title when he served as a federal judge on the D.C. Circuit Court of Appeals earlier.
+There are some interesting examples here where we can understand why the model would mispredict: 
+
+- _BedRoc Limited, LLC v. United States_ was a case decided in 2004 regarding the 1919 Pittman Act.
+- The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.
+
+<div class="rmdwarning">
+<p>Looking at examples that your model does not perform well for is well worth your time, for similar reasons that exploratory data analysis is valuable before you begin training your model.</p>
+</div>
 
 ## Summary {#mlregressionsummary}
 
