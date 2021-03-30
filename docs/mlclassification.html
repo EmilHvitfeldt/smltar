@@ -674,7 +674,7 @@ The function <code>conf_mat_resampled()</code> computes a separate confusion mat
 FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias towards predicting ‘Credit’
 </p>
 </div>
-<p>In Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>, the square for “Credit”/“Credit” has a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not for the positive case! However, this first model is struggling somewhat since such a high number of observations from the “Other” class are being mispredicted.</p>
+<p>In Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>, the squares for “Credit”/“Credit” and “Other”/“Other” have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the “Other” class are being mispredicted as “Credit.”</p>
 <div class="rmdwarning">
 <p>
 One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.
@@ -759,7 +759,7 @@ Using regularization helps us choose a simpler model that we expect to generaliz
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 accuracy binary     0.868    10 0.000977 Preprocessor1_Model1
 #&gt; 2 roc_auc  binary     0.939    10 0.000849 Preprocessor1_Model1</code></pre>
-<p>This looks pretty promising, considering we haven’t yet done any tuning on the lasso hyperparameters.
+<p>This looks pretty promising, considering we haven’t yet done any tuning of the lasso hyperparameters.
 Figure <a href="mlclassification.html#fig:lassoroccurve">7.3</a> shows the ROC curves for this regularized model on each of the resampled data sets.</p>
 <div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="mlclassification.html#cb300-1" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb300-2"><a href="mlclassification.html#cb300-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
@@ -777,7 +777,7 @@ FIGURE 7.3: ROC curve for lasso regularized classifier with resamples of US Cons
 </p>
 </div>
 <p>Let’s finish this section by generating a confusion matrix, shown in Figure <a href="mlclassification.html#fig:lassoheatmap">7.4</a>.
-Our lasso model is much better at separating the classes than the naive Bayes model in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, and our results are much more symmetrical than those for the naive Bayes model in Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>.</p>
+Our lasso model is better at separating the classes than the naive Bayes model in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, and our results are more symmetrical than those for the naive Bayes model in Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>.</p>
 <div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="mlclassification.html#cb301-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(lasso_rs) <span class="sc">%&gt;%</span></span>
 <span id="cb301-2"><a href="mlclassification.html#cb301-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lassoheatmap"></span>
@@ -789,7 +789,7 @@ FIGURE 7.4: Confusion matrix for a lasso regularized classifier, with more symme
 </div>
 <div id="tunelasso" class="section level2" number="7.4">
 <h2><span class="header-section-number">7.4</span> Tuning lasso hyperparameters</h2>
-<p>The value <code>penalty = 0.1</code> for regularization in Section <a href="mlclassification.html#comparetolasso">7.3</a> was picked somewhat arbitrarily. How do we know the <em>right</em> or <em>best</em> regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let’s build a new model specification for <strong>model tuning</strong>.</p>
+<p>The value <code>penalty = 0.01</code> for regularization in Section <a href="mlclassification.html#comparetolasso">7.3</a> was picked somewhat arbitrarily. How do we know the <em>right</em> or <em>best</em> regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let’s build a new model specification for <strong>model tuning</strong>.</p>
 <div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="mlclassification.html#cb302-1" aria-hidden="true" tabindex="-1"></a>tune_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb302-2"><a href="mlclassification.html#cb302-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb302-3"><a href="mlclassification.html#cb302-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
@@ -937,7 +937,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 #&gt;   mixture = 1
 #&gt; 
 #&gt; Computational engine: glmnet</code></pre>
-<p>Instead of <code>penalty = tune()</code> like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 7.9^{-4}. This workflow is ready to go! It can now be fit to our training data.</p>
+<p>Instead of <code>penalty = tune()</code> like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 0.00079. This workflow is ready to go! It can now be fit to our training data.</p>
 <div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="mlclassification.html#cb317-1" aria-hidden="true" tabindex="-1"></a>fitted_lasso <span class="ot">&lt;-</span> <span class="fu">fit</span>(final_lasso, complaints_train)</span></code></pre></div>
 <p>What does the result look like? We can access the fit using <code>pull_workflow_fit()</code>, and even <code>tidy()</code> the model coefficient results into a convenient dataframe format.</p>
 <div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="mlclassification.html#cb318-1" aria-hidden="true" tabindex="-1"></a>fitted_lasso <span class="sc">%&gt;%</span></span>
@@ -1081,7 +1081,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 #&gt; 3 0.000207  roc_auc binary     0.953    10 0.000821 Preprocessor1_Model06
 #&gt; 4 0.000113  roc_auc binary     0.953    10 0.000820 Preprocessor1_Model05
 #&gt; 5 0.0000616 roc_auc binary     0.952    10 0.000822 Preprocessor1_Model04</code></pre>
-<p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 3.6^{-4}) but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
+<p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.00036) but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
 <p>Importantly, this tuning also took a bit less time to complete.</p>
 <ul>
 <li>The <em>preprocessing</em> was not much faster, because tokenization and computing tf-idf take a long time.</li>
@@ -1377,7 +1377,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 #&gt; 3 0.000207  roc_auc binary     0.953    10 0.000814 Preprocessor1_Model06
 #&gt; 4 0.000113  roc_auc binary     0.953    10 0.000813 Preprocessor1_Model05
 #&gt; 5 0.0000616 roc_auc binary     0.953    10 0.000812 Preprocessor1_Model04</code></pre>
-<p>We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 7^{-4} but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
+<p>We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
 <div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb355-1"><a href="mlclassification.html#cb355-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
 <span id="cb355-2"><a href="mlclassification.html#cb355-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb355-3"><a href="mlclassification.html#cb355-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(complaints_train) <span class="sc">%&gt;%</span></span>
@@ -1852,9 +1852,8 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb404-2"><a href="mlclassification.html#cb404-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb404-3"><a href="mlclassification.html#cb404-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
 <span id="cb404-4"><a href="mlclassification.html#cb404-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance across regularization penalties and tokens&quot;</span>,</span>
-<span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;The numerically best model includes a higher number&quot;</span>,</span>
-<span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;of tokens but we can choose a simpler model&quot;</span>)</span>
-<span id="cb404-7"><a href="mlclassification.html#cb404-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
+<span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintsfinaltunevis"></span>
 <img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model" width="672" />
 <p class="caption">
