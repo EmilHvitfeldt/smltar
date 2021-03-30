@@ -104,31 +104,37 @@ This version of the book was built with R version 4.0.3 (2020-10-10) and the fol
 |:--------------|:----------|:--------------------------------------|
 |bench          |1.1.1      |CRAN (R 4.0.0)                         |
 |bookdown       |0.21       |CRAN (R 4.0.2)                         |
+|broom          |0.7.5      |CRAN (R 4.0.3)                         |
 |corpus         |0.10.1     |CRAN (R 4.0.0)                         |
+|dials          |0.0.9      |CRAN (R 4.0.2)                         |
 |discrim        |0.1.1      |CRAN (R 4.0.2)                         |
 |doParallel     |1.0.16     |CRAN (R 4.0.2)                         |
 |glmnet         |4.1-1      |CRAN (R 4.0.2)                         |
 |gt             |0.2.2      |CRAN (R 4.0.2)                         |
 |hcandersenr    |0.2.0      |CRAN (R 4.0.2)                         |
 |htmltools      |0.5.1.1    |CRAN (R 4.0.2)                         |
+|htmlwidgets    |1.5.3      |CRAN (R 4.0.2)                         |
 |hunspell       |3.0.1      |CRAN (R 4.0.2)                         |
 |irlba          |2.3.3      |CRAN (R 4.0.0)                         |
 |jiebaR         |0.11       |CRAN (R 4.0.2)                         |
 |jsonlite       |1.7.2      |CRAN (R 4.0.2)                         |
-|keras          |2.3.0.0    |CRAN (R 4.0.0)                         |
+|keras          |2.4.0      |CRAN (R 4.0.3)                         |
 |klaR           |0.6-15     |CRAN (R 4.0.0)                         |
 |LiblineaR      |2.10-12    |CRAN (R 4.0.2)                         |
 |lime           |0.5.2      |CRAN (R 4.0.2)                         |
 |lobstr         |1.1.1      |CRAN (R 4.0.0)                         |
 |naivebayes     |0.9.7      |CRAN (R 4.0.0)                         |
-|parsnip        |0.1.5.9002 |Github (tidymodels/parsnip\@66aa91d)   |
+|parsnip        |0.1.5.9002 |Github (tidymodels/parsnip\@8238826)   |
+|prismatic      |1.0.0      |CRAN (R 4.0.2)                         |
 |quanteda       |2.1.2      |CRAN (R 4.0.2)                         |
 |ranger         |0.12.1     |CRAN (R 4.0.0)                         |
+|recipes        |0.1.15     |CRAN (R 4.0.2)                         |
 |remotes        |2.2.0      |CRAN (R 4.0.2)                         |
 |reticulate     |1.18       |CRAN (R 4.0.2)                         |
+|rsample        |0.0.9      |CRAN (R 4.0.2)                         |
 |rsparse        |0.4.0      |CRAN (R 4.0.1)                         |
 |scico          |1.2.0      |CRAN (R 4.0.0)                         |
-|scotus         |0.0.0.9000 |Github (EmilHvitfeldt/scotus\@8374be1) |
+|scotus         |0.0.0.9001 |Github (EmilHvitfeldt/scotus\@43ca597) |
 |servr          |0.21       |CRAN (R 4.0.2)                         |
 |sessioninfo    |1.1.1      |CRAN (R 4.0.0)                         |
 |slider         |0.2.1      |CRAN (R 4.0.2)                         |
@@ -148,6 +154,9 @@ This version of the book was built with R version 4.0.3 (2020-10-10) and the fol
 |tokenizers     |0.2.1      |CRAN (R 4.0.0)                         |
 |tokenizers.bpe |0.1.0      |CRAN (R 4.0.2)                         |
 |tufte          |0.9        |CRAN (R 4.0.2)                         |
+|tune           |0.1.3      |CRAN (R 4.0.3)                         |
 |UpSetR         |1.4.0      |CRAN (R 4.0.0)                         |
 |vip            |0.3.2      |CRAN (R 4.0.2)                         |
 |widyr          |0.1.3      |CRAN (R 4.0.2)                         |
+|workflows      |0.2.2      |CRAN (R 4.0.2)                         |
+|yardstick      |0.0.8      |CRAN (R 4.0.2)                         |
