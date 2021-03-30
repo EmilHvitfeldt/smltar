@@ -1065,10 +1065,9 @@ Be sure that the preprocess function <em>matches</em> the preprocessing that was
 FIGURE 10.8: Plot of most important features for a CNN model predicting two observations.
 </p>
 </div>
-<p>Figure <a href="#fig:limeplottextexplanations"><strong>??</strong></a> shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.</p>
+<p>Figure <a href="dlcnn.html#fig:limeplottextexplanations">10.9</a> shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.</p>
 <div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="dlcnn.html#cb621-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
-<div id="htmlwidget-72c99cf26d794b2c72aa" style="width:960px;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-72c99cf26d794b2c72aa">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Exploring<\/span> <span class='negative_1'>paint<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>its<\/span> <span class='positive_2'>place<\/span> <span class='positive_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_1'>digital<\/span> <span class='positive_1'>world<\/span>. <\/br> <sub>Label predicted: 1 (98.98%)<br/>Explainer fit: 0.22<\/sub> <\/p><br/><p> <span class='negative_1'>Mike<\/span> Fassio <span class='positive_1'>wants<\/span> <span class='negative_1'>a<\/span> side-by-side <span class='positive_1'>photo<\/span> of <span class='positive_1'>me<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>Hazel<\/span> <span class='negative_1'>eating<\/span> <span class='positive_2'>cake<\/span> with our <span class='positive_1'>bare<\/span> <span class='negative_1'>hands<\/span>.  Let's <span class='positive_1'>make<\/span> this <span class='negative_1'>a<\/span> reality! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.49<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<div class="figure" style="text-align: center"><span id="fig:limeplottextexplanations"></span>
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
        { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
        { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
@@ -1094,6 +1093,12 @@ FIGURE 10.8: Plot of most important features for a CNN model predicting two obse
        { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
   background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
   background-color: #FFFFB2FF;}</style>
+<div id="htmlwidget-72c99cf26d794b2c72aa" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-72c99cf26d794b2c72aa">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Exploring<\/span> <span class='negative_1'>paint<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>its<\/span> <span class='positive_2'>place<\/span> <span class='positive_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_1'>digital<\/span> <span class='positive_1'>world<\/span>. <\/br> <sub>Label predicted: 1 (98.98%)<br/>Explainer fit: 0.22<\/sub> <\/p><br/><p> <span class='negative_1'>Mike<\/span> Fassio <span class='positive_1'>wants<\/span> <span class='negative_1'>a<\/span> side-by-side <span class='positive_1'>photo<\/span> of <span class='positive_1'>me<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>Hazel<\/span> <span class='negative_1'>eating<\/span> <span class='positive_2'>cake<\/span> with our <span class='positive_1'>bare<\/span> <span class='negative_1'>hands<\/span>.  Let's <span class='positive_1'>make<\/span> this <span class='negative_1'>a<\/span> reality! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.49<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+FIGURE 10.9: Feature highlighting of words for two examples explained by a CNN model.
+</p>
+</div>
 <div class="rmdnote">
 <p>
 The <code>interactive_text_explanations()</code> function can be used to launch an interactive Shiny app where you can explore the model weights.
@@ -1118,10 +1123,9 @@ The following example shows this effect. We have created two very similar senten
 <span id="cb622-15"><a href="dlcnn.html#cb622-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
 <span id="cb622-16"><a href="dlcnn.html#cb622-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
 <span id="cb622-17"><a href="dlcnn.html#cb622-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>Explanations based on these two sentences are fairly similar as we can see in Figure <a href="#fig:robustlimeplottextexplanations"><strong>??</strong></a>. However, notice how the removal of the word “whole” affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.</p>
+<p>Explanations based on these two sentences are fairly similar as we can see in Figure <a href="dlcnn.html#fig:robustlimeplottextexplanations">10.10</a>. However, notice how the removal of the word “whole” affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.</p>
 <div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="dlcnn.html#cb623-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
-<div id="htmlwidget-edc6d7175589f8998c64" style="width:960px;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-edc6d7175589f8998c64">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (100%)<br/>Explainer fit: 0.81<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<div class="figure" style="text-align: center"><span id="fig:robustlimeplottextexplanations"></span>
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
        { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
        { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
@@ -1147,6 +1151,12 @@ The following example shows this effect. We have created two very similar senten
        { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
   background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
   background-color: #FFFFB2FF;}</style>
+<div id="htmlwidget-edc6d7175589f8998c64" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-edc6d7175589f8998c64">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (100%)<br/>Explainer fit: 0.81<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+FIGURE 10.10: Feature highlighting of words in two examples explained by a CNN model.
+</p>
+</div>
 <p>It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.</p>
 <div class="rmdnote">
 <p>
@@ -1226,20 +1236,20 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <p>You don’t have to, but we have manually specified the <code>runs_dir</code> argument, which is where the results of the tuning will be saved.</p>
 <p>A summary of all the runs in the folder can be retrieved with <code>ls_runs()</code>; here we use <code>as_tibble()</code> to get the results as a tibble.</p>
 <div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 60 x 28
+<pre><code>#&gt; # A tibble: 66 x 28
 #&gt;    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #&gt;    &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;
-#&gt;  1 _tuning/2021-03-30… 1.01         NA            NA      0.0339           0.992
-#&gt;  2 _tuning/2021-03-30… 1.01         NA            NA      0.0375           0.991
-#&gt;  3 _tuning/2021-03-30… 0.973        NA            NA      0.0518           0.986
-#&gt;  4 _tuning/2021-03-30… 0.973        NA            NA      0.0295           0.994
-#&gt;  5 _tuning/2021-03-30… 0.968        NA            NA      0.0313           0.993
-#&gt;  6 _tuning/2021-03-30… 0.931        NA            NA      0.0455           0.988
-#&gt;  7 _tuning/2021-03-30… 1.01         NA            NA      0.034            0.993
-#&gt;  8 _tuning/2021-03-30… 1.02         NA            NA      0.0384           0.991
-#&gt;  9 _tuning/2021-03-30… 0.985        NA            NA      0.0537           0.986
-#&gt; 10 _tuning/2021-03-30… 0.987        NA            NA      0.0318           0.993
-#&gt; # … with 50 more rows, and 22 more variables: metric_val_loss &lt;dbl&gt;,
+#&gt;  1 _tuning/2021-03-30… 1.03         NA            NA      0.0339           0.992
+#&gt;  2 _tuning/2021-03-30… 0.994        NA            NA      0.0374           0.992
+#&gt;  3 _tuning/2021-03-30… 0.996        NA            NA      0.0477           0.987
+#&gt;  4 _tuning/2021-03-30… 0.954        NA            NA      0.0311           0.994
+#&gt;  5 _tuning/2021-03-30… 0.956        NA            NA      0.03             0.994
+#&gt;  6 _tuning/2021-03-30… 0.929        NA            NA      0.0461           0.988
+#&gt;  7 _tuning/2021-03-30… 1.01         NA            NA      0.0339           0.992
+#&gt;  8 _tuning/2021-03-30… 1.01         NA            NA      0.0375           0.991
+#&gt;  9 _tuning/2021-03-30… 0.973        NA            NA      0.0518           0.986
+#&gt; 10 _tuning/2021-03-30… 0.973        NA            NA      0.0295           0.994
+#&gt; # … with 56 more rows, and 22 more variables: metric_val_loss &lt;dbl&gt;,
 #&gt; #   metric_val_accuracy &lt;dbl&gt;, flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   samples &lt;int&gt;, batch_size &lt;int&gt;, epochs &lt;int&gt;, epochs_completed &lt;int&gt;,
 #&gt; #   metrics &lt;chr&gt;, model &lt;chr&gt;, loss_function &lt;chr&gt;, optimizer &lt;chr&gt;,
@@ -1252,7 +1262,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb631-3"><a href="dlcnn.html#cb631-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
 <span id="cb631-4"><a href="dlcnn.html#cb631-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb631-5"><a href="dlcnn.html#cb631-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 60 x 3
+<pre><code>#&gt; # A tibble: 66 x 3
 #&gt;    metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                  &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
 #&gt;  1               0.814                 5             1
@@ -1264,8 +1274,8 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt;  7               0.812                 5             1
 #&gt;  8               0.812                 5             1
 #&gt;  9               0.812                 3             1
-#&gt; 10               0.811                 5             1
-#&gt; # … with 50 more rows</code></pre>
+#&gt; 10               0.812                 7             1
+#&gt; # … with 56 more rows</code></pre>
 <p>There isn’t a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
@@ -1450,24 +1460,24 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt; 2 kap         binary         0.702
 #&gt; 3 mn_log_loss binary         0.778
 #&gt; 4 roc_auc     binary         0.894</code></pre>
-<p>This is our best performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dlcnn.html#fig:cnnfinalroc">10.9</a>.</p>
+<p>This is our best performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dlcnn.html#fig:cnnfinalroc">10.11</a>.</p>
 <div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="dlcnn.html#cb648-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb648-2"><a href="dlcnn.html#cb648-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
 <span id="cb648-3"><a href="dlcnn.html#cb648-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnfinalroc"></span>
 <img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.png" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
-FIGURE 10.9: ROC curve for final CNN model predictions on testing set of Kickstarter campaign success
+FIGURE 10.11: ROC curve for final CNN model predictions on testing set of Kickstarter campaign success
 </p>
 </div>
-<p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model’s performance using a confusion matrix as well, in Figure <a href="dlcnn.html#fig:cnnheatmapfinal">10.10</a>.</p>
+<p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model’s performance using a confusion matrix as well, in Figure <a href="dlcnn.html#fig:cnnheatmapfinal">10.12</a>.</p>
 <div class="sourceCode" id="cb649"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb649-1"><a href="dlcnn.html#cb649-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb649-2"><a href="dlcnn.html#cb649-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb649-3"><a href="dlcnn.html#cb649-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnheatmapfinal"></span>
 <img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.png" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
-FIGURE 10.10: Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success
+FIGURE 10.12: Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success
 </p>
 </div>
 <p>Notice that this final model performs better then any of the models we have tried so far in this chapter, Chapter <a href="dldnn.html#dldnn">8</a>, and Chapter <a href="dllstm.html#dllstm">9</a>.</p>

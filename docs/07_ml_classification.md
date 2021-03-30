@@ -365,7 +365,7 @@ conf_mat_resampled(nb_rs) %>%
 <p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'</p>
 </div>
 
-In Figure \@ref(fig:firstheatmap), the square for "Credit"/"Credit" has a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not for the positive case! However, this first model is struggling somewhat since such a high number of observations from the "Other" class are being mispredicted.
+In Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Other" class are being mispredicted as "Credit".
 
 <div class="rmdwarning">
 <p>One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.</p>
@@ -499,7 +499,7 @@ lasso_rs_metrics
 #> 2 roc_auc  binary     0.939    10 0.000849 Preprocessor1_Model1
 ```
 
-This looks pretty promising, considering we haven't yet done any tuning on the lasso hyperparameters.
+This looks pretty promising, considering we haven't yet done any tuning of the lasso hyperparameters.
 Figure \@ref(fig:lassoroccurve) shows the ROC curves for this regularized model on each of the resampled data sets.
 
 
@@ -521,7 +521,7 @@ lasso_rs_predictions %>%
 </div>
 
 Let's finish this section by generating a confusion matrix, shown in Figure \@ref(fig:lassoheatmap).
-Our lasso model is much better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are much more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
+Our lasso model is better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
 
 
 ```r
@@ -537,7 +537,7 @@ conf_mat_resampled(lasso_rs) %>%
 
 ## Tuning lasso hyperparameters {#tunelasso}
 
-The value `penalty = 0.1` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
+The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
 
 ```r
@@ -747,7 +747,7 @@ final_lasso
 #> Computational engine: glmnet
 ```
 
-Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 7.9\times 10^{-4}. This workflow is ready to go! It can now be fit to our training data.
+Instead of `penalty = tune()` like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 0.00079. This workflow is ready to go! It can now be fit to our training data.
 
 
 ```r
@@ -948,7 +948,7 @@ sparse_rs %>%
 #> 5 0.0000616 roc_auc binary     0.952    10 0.000822 Preprocessor1_Model04
 ```
 
-The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 3.6\times 10^{-4}) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
+The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 0.00036) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
 
 Importantly, this tuning also took a bit less time to complete. 
 
@@ -1351,7 +1351,7 @@ more_vars_rs %>%
 #> 5 0.0000616 roc_auc binary     0.953    10 0.000812 Preprocessor1_Model04
 ```
 
-We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 7\times 10^{-4} but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
 
 
 ```r
@@ -2024,8 +2024,7 @@ autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
     title = "Model performance across regularization penalties and tokens",
-    subtitle = paste("The numerically best model includes a higher number",
-                     "of tokens but we can choose a simpler model")
+    subtitle = paste("We can choose a simpler model with higher regularization")
   )
 ```
 
