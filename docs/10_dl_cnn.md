@@ -2,9 +2,9 @@
 
 
 
-The first neural networks we built in Chapter \@ref(dldnn) did not learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within a dataset.
+The first neural networks we built in Chapter \@ref(dldnn) did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within data.
 
-CNNs can be well-suited for modeling text data text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN takes data (like text) as input and then hopefully produces output that represents specific structures in the data.
+CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.
 
 <div class="rmdnote">
 <p>Let’s take more time with CNNs in this chapter to explore their construction, different features, and the hyperparameters we can tune.</p>
@@ -21,39 +21,39 @@ A convolutional filter slides along the sequence to produce a new, smaller seque
 <p class="caption">(\#fig:cnn-architecture)A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value.</p>
 </div>
 
-This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use sequence one-hot encoding (Section \@ref(onehotsequence)) with a possible word embedding.
+This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use one-hot sequence encoding (Section \@ref(onehotsequence)) with a possible word embedding.
 Let's talk about two of the most important CNN concepts, **kernels** and **kernel size**.
 
 ### Kernel
 
-The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its weights and then sums up the values to get a single value. 
+The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its own weights, and then sums up the values to get a single value. 
 Sometimes an activation function is applied as well.
-It is these weights that are trained with gradient descent to find the best fit.
+It is these weights that are trained via gradient descent to find the best fit.
 In Keras, the `filters` represent how many different kernels are trained in each layer. You typically start with fewer `filters` at the beginning of your network and then increase them as you go along. 
 
 ### Kernel size
 
 The most prominent hyperparameter is the kernel size. 
-The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels will similarly capture local information about how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as we see in Figure \@ref(fig:cnn-kernel-size).
+The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have five weights. These kernels can capture local information similarly to how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as shown in Figure \@ref(fig:cnn-kernel-size).
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to calculate one value." width="100%" />
-<p class="caption">(\#fig:cnn-kernel-size)The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to calculate one value.</p>
+<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to compute one value." width="100%" />
+<p class="caption">(\#fig:cnn-kernel-size)The kernel size affects the size of the output. A kernel size of 3 uses the information from three values to compute one value.</p>
 </div>
 
-Larger kernels will detect larger and less frequent patterns where smaller kernels will find fine-grained features. 
-Notice how the choice of token will affect how we think about kernel size. 
-For character tokenization, a kernel size of 5 will (in early layers) find patterns in subwords more often than patterns across words, since five characters will not span multiple words. 
-By contrast, a kernel size of 5 for word tokenization will learn patterns within sentences instead. 
+Larger kernels learn larger and less frequent patterns, while smaller kernels will find fine-grained features. 
+Notice how the choice of token affects how we think about kernel size. 
+For character tokenization, a kernel size of 5 will (in early layers) find patterns in subwords more often than patterns across words, since five characters will typically not span multiple words. 
+By contrast, a kernel size of 5 with word tokenization will learn patterns within sentences instead. 
 
 ## A first CNN model {#firstcnn}
 
-We will be using the same data which we examine in Section \@ref(kickstarter) and use in Chapters \@ref(dldnn) and \@ref(dllstm). This dataset contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections \@ref(dnnrecipe) and \@ref(firstlstm).
+We will be using the same data which we examine in Sections \@ref(kickstarter) and \@ref(kickstarter-blurbs), and use throughout Chapters \@ref(dldnn) and \@ref(dllstm). This data set contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections \@ref(dnnrecipe) and \@ref(firstlstm).
 
 
 
-Our first start CNN will look a lot like what is shown in Figure \@ref(fig:cnn-architecture).
-We start with an embedding layer, followed by a single one-dimensional convolution layer `layer_conv_1d()`, then a global max pooling layer `layer_global_max_pooling_1d()`, a densely connected layer, and ending with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.
+Our first CNN will look a lot like what is shown in Figure \@ref(fig:cnn-architecture).
+We start with an embedding layer, followed by a single one-dimensional convolution layer `layer_conv_1d()`, then a global max pooling layer `layer_global_max_pooling_1d()`, a densely connected layer, and end with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.
 
 
 ```r
@@ -96,7 +96,7 @@ We are using the same embedding layer with the same `max_length` as in the previ
 The `layer_global_max_pooling_1d()` layer collapses the remaining CNN output into one dimension so we can finish it off with a densely connected layer and the sigmoid activation function.
 
 This might not end up being the best CNN configuration, but it is a good starting point.
-One of the challenges when working with CNNs is to ensure that we manage the dimensionality correctly. The length of the sequence decreases by `(kernel_size - 1)` for each layer. For this input, we have a sequence of length `max_length = 30`, which is decreased by `(5 - 1) = 4` resulting in a sequence of 26, as show in the printed output of `simple_cnn_model`. We could create seven layers with `kernel_size = 5`, since we would end with `30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2` elements in the resulting sequence. However, we would not be able to do a network with 3 layers of 
+One of the challenges when working with CNNs is to ensure that we manage the dimensionality correctly. The length of the sequence decreases by `(kernel_size - 1)` for each layer. For this input, we have a sequence of length `max_length = 30`, which is decreased by `(5 - 1) = 4` resulting in a sequence of 26, as shown in the printed output of `simple_cnn_model`. We could create seven layers with `kernel_size = 5`, since we would end with `30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2` elements in the resulting sequence. However, we would not be able to do a network with 3 layers of 
 `kernel_size = 7` followed by 3 layers of `kernel_size = 5` since the resulting sequence would be `30 - 6 - 6 - 6 - 4 - 4 - 4 = 0` and we must have a positive length for our sequence.
 Remember that `kernel_size` is not the only argument that will change the length of the resulting sequence. 
 
@@ -171,9 +171,9 @@ metrics(val_res, state, .pred_class, .pred_1)
 #> 4 roc_auc     binary         0.862
 ```
 
-We see some improvement over the densely connected network from Chapter \@ref(dldnn), our best performing model on the Kickstarter data so far.
+We already see improvement over the densely connected network from Chapter \@ref(dldnn), our best performing model on the Kickstarter data so far.
 
-The heatmap in Figure \@ref(fig:cnnheatmap) shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model.
+The heatmap in Figure \@ref(fig:cnnheatmap) shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model!
 
 
 ```r
@@ -209,19 +209,19 @@ val_res %>%
 Now that we know how our basic CNN performs, we can see what happens when we apply some common modifications to it.
 This case study will examine: 
 
-- how we can add additional convolutional layers to our base model and 
-- how additional dense layers can be added.
+- how we can add additional _convolutional_ layers to our base model and 
+- how additional _dense_ layers can be added.
 
 Let's start by adding another fully connected layer. We take the architecture we used in `simple_cnn_model` and add another `layer_dense()` after the first `layer_dense()` in the model.
 Increasing the depth of the model via the fully connected layers allows the model to find more complex patterns.
-There is, however, a trade-off. Adding more layers adds more weights to the model, making it more complex and harder to train. If you don't have enough data or the patterns you are trying to classify aren't that complex, then model performance will suffer since the model will start overfitting as it starts picking up on patterns in the data that aren't there.
+There is, however, a trade-off. Adding more layers adds more weights to the model, making it more complex and harder to train. If you don't have enough data or the patterns you are trying to classify aren't that complex, then model performance will suffer since the model will start overfitting as it starts memorizing patterns in the training data that don't generalize to new data.
 
 
 <div class="rmdwarning">
 <p>When working with CNNs, the different layers perform different tasks. A convolutional layer extracts local patterns as it slides along the sequences, while a fully connected layer finds global patterns.</p>
 </div>
 
-We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers gives richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
+We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers creates richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
 
 
 ```r
@@ -353,9 +353,9 @@ cnn_double_conv
 There are a lot of different ways we can extend the network by adding convolutional layers with `layer_conv_1d()`. We must consider the individual characteristics of each layer, with respect to kernel size, as well as other CNN parameters we have not discussed in detail yet like stride, padding, and dilation rate. We also have to consider the progression of these layers within the network itself. 
 The model is using an increasing number of filters in each layer, doubling the number of filters for each layer. This is to ensure that there are more filters later on to capture enough of the global information.
 
-This model is using kernel size 5 twice. There aren't any hard rules about how you structure kernel sizes, but the sizes you choose will change what features the model can detect.  
+This model is using kernel size of 5 twice. There aren't any hard rules about how you structure kernel sizes, but the sizes you choose will change what features the model can detect.  
 
-<div class="rmdwarning">
+<div class="rmdnote">
 <p>The early layers extract general or low-level features while the later layers learn finer detail or high-level features in the data. The choice of kernel size determines the size of these features.</p>
 </div>
 
@@ -481,25 +481,31 @@ all_cnn_model_predictions %>%
 </div>
 
 The curves are _very_ close in this chart, indicating that we don't have much to gain by adding more layers and that they don't improve performance substantively.
-This doesn't mean that we are done with CNNs! There are still many things we can explore, like different tokenization approahces and hyperparameters that can be trained.
+This doesn't mean that we are done with CNNs! There are still many things we can explore, like different tokenization approaches and hyperparameters that can be trained.
 
 ## Case study: byte pair encoding
 
-In our models in this chapter so far we have used words as the token of interest. We saw in Chapters \@ref(mlregression) and \@ref(mlclassification) how n-grams could be used in modeling as well.
-One of the reasons why the Kickstarter dataset is hard to work with is because the text is quite short so we don't get that many individual tokens to work with.
-Another choice of token is _subwords_, where we split the text into smaller units than words and especially some longer words will be broken into multiple subword units. One way to tokenize text into subword units is byte pair encoding proposed by @Gage1994ANA.
+In our models in this chapter so far we have used words as the token of interest. We saw in Section \@ref(casestudyngrams) how n-grams can be used in modeling as well.
+One of the reasons why the Kickstarter data set is hard to work with is because the text is quite short so we don't have that many individual tokens to work with in a given blurb.
+Another choice of token is _subwords_, where we split the text into smaller units than words; longer words especially will be broken into multiple subword units. One way to tokenize text into subword units is _byte pair encoding_ [@Gage1994ANA].
 This algorithm has been repurposed to work on text by iteratively merging frequently occurring subword pairs.
-Using subwords in text is used in methods such as [BERT](https://github.com/google-research/bert) and [GPT-2](https://openai.com/blog/better-language-models/) with great success.
+Methods such as [BERT](https://github.com/google-research/bert) and [GPT-2](https://openai.com/blog/better-language-models/) use subword units for text with great success.
 The byte pair encoding algorithm has a hyperparameter controlling the size of the vocabulary. Setting it to higher values allows the models to find more rarely used character sequences in the text.
 
-Byte pair encoding offers a good trade-off between character level and word level information, and can also encode unknown words. For example, suppose that the model is aware of the word "woman". A simple tokenizer such as those we used before would have to put a word such as "womanhood" into an unknown bucket or ignore it completely, whereas the byte pair encoding should be able to pick up on the subwords "woman" and "hood" (or "woman", "h", and "ood", depending on if the model found "hood" as a common enough subword).
+Byte pair encoding offers a good trade-off between character level and word level information, and can also encode unknown words. For example, suppose that the model is aware of the word "woman". A simple tokenizer would have to put a word such as "womanhood" into an unknown bucket or ignore it completely, whereas byte pair encoding should be able to pick up on the subwords "woman" and "hood" (or "woman", "h", and "ood", depending on whether the model found "hood" as a common enough subword).
 Using a subword tokenizer such as byte pair encoding should let us see the text with more granularity since we will have more and smaller tokens for each observation.
 
 \BeginKnitrBlock{rmdnote}<div class="rmdnote">Character level CNNs have also proven successful in some contexts. They have been explored by @Zhang2015 and work quite well on some shorter texts such as headlines and tweets [@Vosoughi2016].</div>\EndKnitrBlock{rmdnote}
 
-We need to remind ourselves that these models don't contain any linguistic knowledge at all, they only "learn" the morphological patterns of sequences of characters (Section \@ref(morphology)) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.
+We need to remind ourselves that these models don't contain any linguistic knowledge at all; they only "learn" the morphological patterns of sequences of characters (Section \@ref(morphology)) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.
 
-Since we are using a completely different preprocessing approach, we need to specify a new feature engineering recipe. The textrecipes package has a tokenization engine to perform byte pair encoding, but we need to determine the vocabulary size and the appropriate sequence length. This function takes a character vector and a vocabulary size and returns a dataframe with the number of tokens in each observation.
+Since we are using a completely different preprocessing approach, we need to specify a new feature engineering recipe. 
+
+<div class="rmdpackage">
+<p>The <strong>textrecipes</strong> package has a tokenization engine to perform byte pair encoding, but we need to determine the vocabulary size and the appropriate sequence length.</p>
+</div>
+
+Let's write a function that takes a character vector and a vocabulary size and returns a dataframe with the number of tokens in each observation.
 
 
 ```r
@@ -518,7 +524,7 @@ get_bpe_token_dist <- function(vocab_size, x) {
 }
 ```
 
-We can use `map()` to try a handful of different vocabulary sizes
+We can use `map()` to try a handful of different vocabulary sizes.
 
 
 ```r
@@ -655,7 +661,7 @@ bpe_history
 
 The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher detail tokenizer.
 
-The confusion matrix in \@ref(fig:bpeheatmap) also gives us clear information that there isn't much bias between the two classes with this new tokenizer.
+The confusion matrix in Figure \@ref(fig:bpeheatmap) also clearly shows that there isn't much bias between the two classes with this new tokenizer.
 
 
 ```r
@@ -690,7 +696,7 @@ bpe_rec %>%
 #> [37] "hood"  "hop"   "hor"   "hous"  "house" "how"   "hr"    "hs"    "hu"
 ```
 
-Notice how some of these subword tokens are full words and some are part of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
+Notice how some of these subword tokens are full words and some are parts of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
 We can also look at common long words.
 
 
@@ -724,17 +730,17 @@ These twenty-five words were common enough to get their own subword token, and h
 
 ## Case study: explainability with LIME {#lime}
 
-We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box" one, is using the *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. 
+We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box" one, is using an algorithm for observation-level variable importance like *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. 
 
 <div class="rmdnote">
 <p>As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.</p>
 </div>
 
 <div class="rmdpackage">
-<p>The <strong>lime</strong> package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that has driven the outcome of the prediction.</p>
+<p>The <strong>lime</strong> package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction.</p>
 </div>
 
-To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
+To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go there.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
 
 
 ```r
@@ -786,7 +792,7 @@ explainer <- lime(
 )
 ```
 
-This `explainer` object can now be used with `explain()` to generate explanations for the sentences. We set `n_labels = 1` to only get explanations for the first label, since we are working with a binary classification model^[The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.]. We set `n_features = 12` so we can look at the 12 most important features. If we were dealing with longer text you might want to change `n_features` to capture the effect of as many features you want.
+This `explainer` object can now be used with `explain()` to generate explanations for the sentences. We set `n_labels = 1` to only get explanations for the first label, since we are working with a binary classification model^[The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.]. We set `n_features = 12` to return the twelve most important features. If we were dealing with longer text, we might want to change `n_features` to return more features (tokens).
 
 
 ```r
@@ -819,7 +825,7 @@ explanation
 #> #   prediction <list>
 ```
 
-The output comes in a tibble format where `feature` and `feature_weight` are included, but fortunately lime contains some functions to visualize these weights. Figure \@ref(fig:limeplotfeatures) shows the result of using `plot_features()`, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Blue bars indicate that the weights _support_ the prediction in the direction and red bars indicate _contradictions_. This chart is great for finding the most prominent features in an observation.
+The output comes in a tibble format where `feature` and `feature_weight` are included, but fortunately lime contains some functions to visualize these weights. Figure \@ref(fig:limeplotfeatures) shows the result of using `plot_features()`, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Bars in the positive direction (darker) indicate that the weights _support_ the prediction and bars in the negative direction (lighter) indicate _contradictions_. This chart is great for finding the most prominent features in an observation.
 
 
 ```r
@@ -950,11 +956,11 @@ It is these kinds of correlated patterns that can make deep learning models hard
 <p>The LIME algorithm and <strong>lime</strong> R package are not limited to explaining CNNs. This approach can be used with any of the models we have used in this book, even the ones trained with <strong>parsnip</strong>.</p>
 </div>
 
-## Case study: hyperparameter search
+## Case study: hyperparameter search {#keras-hyperparameter}
 
-So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Chapters \@ref(mlclassificationfull) and \@ref(mlregressionfull) using the tune package. We can use the [tfruns](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple Keras models and compare the results.
+So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Sections \@ref(mlregressionfull) and \@ref(mlclassificationfull) using the **tune** package. We can use the [**tfruns**](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple Keras models and compare the results.
 
-This workflow will be a little different than what we have seen in the book so far since we will have to create a .R file that contain the necessary modeling steps and then we use that file to run multiple models. A file named `cnn-spec.R` is created and you can see the raw file [here](https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R). The first thing we need to do is specify what hyperparameters we want to change. By convention, we name this object `FLAGS` and it is created using the `flags()` function. For each parameter we want to tune, we add a corresponding `flag_*()` function, which can be `flag_integer()`, `flag_boolean()`, `flag_numeric()`, or `flag_string()` depending on what we need to tune.
+This workflow will be a little different than what we have seen in the book so far since we will have to create a `.R` file that contains the necessary modeling steps and then use that file to fit multiple models. Such an example file named `cnn-spec.R` used for the following models is available [on GitHub](https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R). The first thing we need to do is specify what hyperparameters we want to vary. By convention, this object is named `FLAGS` and it is created using the `flags()` function. For each parameter we want to tune, we add a corresponding `flag_*()` function, which can be `flag_integer()`, `flag_boolean()`, `flag_numeric()`, or `flag_string()` depending on what we need to tune.
 
 <div class="rmdwarning">
 <p>Be sure you are using the right type for each of these flags; Keras is quite picky! If Keras is expecting an integer and gets a numeric then you will get an error.</p>
@@ -968,7 +974,7 @@ FLAGS <- flags(
 )
 ```
 
-Notice how we are giving each flag a name and a possible value. The value doesn't actually do anything, as it is not used once we start running multiple models, but it needs to be the right type for the model we are using.
+Notice how we are giving each flag a name and a possible value. The value itself isn't important, as it is not used once we start running multiple models, but it needs to be the right type for the model we are using.
 
 Next, we specify the Keras model we want to run.
 
@@ -992,9 +998,9 @@ model %>% compile(
 )
 ```
 
-We specify the hyperparameters we want to change by marking them as `FLAGS$name`. So in this model, we are trying different values of `kernel_size` and `strides`, which are denoted by the `kernel_size1` and `strides1` flag respectively.
+We target the hyperparameters we want to change by marking them as `FLAGS$name`. So in this model, we are tuning different values of `kernel_size` and `strides`, which are denoted by the `kernel_size1` and `strides1` flag respectively.
 
-Lastly, we have to specify how is trained and evaluated.
+Lastly, we must specify how the model is trained and evaluated.
 
 
 ```r
@@ -1016,9 +1022,9 @@ score <- model %>% evaluate(
 cat("Test accuracy:", score["accuracy"], "\n")
 ```
 
-This is mostly the same as what we have seen before. When we are running these different models the scripts will be run in the environment they are initialized from, so the models will have access to objects like `prepped_training` and `kickstarter_train` and we don't have to create them inside the file.
+This is mostly the same as what we have seen before. When we are running these different models, the scripts will be run in the environment they are initialized from, so the models will have access to objects like `prepped_training` and `kickstarter_train` and we don't have to create them inside the file.
 
-Now that we have the file set up we need to specify the different hyperparameters we want to look at. Three different values for the kernel size and 2 different values for the stride length give us `3 * 2 = 6` different runs.
+Now that we have the file set up we need to specify the different hyperparameters we want to try. Three different values for the kernel size and two different values for the stride length give us `3 * 2 = 6` different runs.
 
 
 ```r
@@ -1032,7 +1038,7 @@ hyperparams <- list(
 <p>This is a small selection of hyperparameters and ranges. There is much more room for experimentation.</p>
 </div>
 
-Now we have everything we need to do some hyperparameter searching. Load up tfruns and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
+Now we have everything we need for hyperparameter searching. Load up **tfruns** and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
 
 
 ```r
@@ -1056,20 +1062,20 @@ runs_results
 ```
 
 ```
-#> # A tibble: 78 x 28
+#> # A tibble: 102 x 28
 #>    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #>    <chr>               <dbl>     <dbl>         <dbl>       <dbl>           <dbl>
-#>  1 _tuning/2021-03-30… 1.02         NA            NA      0.0372           0.991
-#>  2 _tuning/2021-03-30… 1.03         NA            NA      0.0417           0.990
-#>  3 _tuning/2021-03-30… 0.948        NA            NA      0.0526           0.986
-#>  4 _tuning/2021-03-30… 0.967        NA            NA      0.0324           0.993
-#>  5 _tuning/2021-03-30… 0.942        NA            NA      0.0313           0.994
-#>  6 _tuning/2021-03-30… 0.953        NA            NA      0.045            0.988
-#>  7 _tuning/2021-03-30… 1.01         NA            NA      0.0336           0.993
-#>  8 _tuning/2021-03-30… 1.00         NA            NA      0.0376           0.992
-#>  9 _tuning/2021-03-30… 0.991        NA            NA      0.0466           0.988
-#> 10 _tuning/2021-03-30… 0.971        NA            NA      0.0288           0.995
-#> # … with 68 more rows, and 22 more variables: metric_val_loss <dbl>,
+#>  1 _tuning/2021-03-31… 0.988        NA            NA      0.0328           0.993
+#>  2 _tuning/2021-03-31… 0.991        NA            NA      0.0351           0.992
+#>  3 _tuning/2021-03-31… 0.953        NA            NA      0.0507           0.987
+#>  4 _tuning/2021-03-31… 0.977        NA            NA      0.0311           0.994
+#>  5 _tuning/2021-03-31… 0.964        NA            NA      0.0322           0.993
+#>  6 _tuning/2021-03-31… 0.940        NA            NA      0.0443           0.989
+#>  7 _tuning/2021-03-31… 1.05         NA            NA      0.0343           0.992
+#>  8 _tuning/2021-03-31… 1.03         NA            NA      0.0349           0.992
+#>  9 _tuning/2021-03-31… 1.01         NA            NA      0.0484           0.987
+#> 10 _tuning/2021-03-31… 0.956        NA            NA      0.0297           0.994
+#> # … with 92 more rows, and 22 more variables: metric_val_loss <dbl>,
 #> #   metric_val_accuracy <dbl>, flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   samples <int>, batch_size <int>, epochs <int>, epochs_completed <int>,
 #> #   metrics <chr>, model <chr>, loss_function <chr>, optimizer <chr>,
@@ -1090,27 +1096,27 @@ best_runs
 ```
 
 ```
-#> # A tibble: 78 x 3
+#> # A tibble: 102 x 3
 #>    metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                  <dbl>             <int>         <int>
 #>  1               0.814                 5             1
 #>  2               0.813                 7             1
 #>  3               0.812                 5             1
 #>  4               0.812                 5             1
-#>  5               0.812                 5             1
+#>  5               0.812                 7             1
 #>  6               0.812                 5             1
 #>  7               0.812                 5             1
 #>  8               0.812                 5             1
 #>  9               0.812                 5             1
-#> 10               0.812                 3             1
-#> # … with 68 more rows
+#> 10               0.812                 5             1
+#> # … with 92 more rows
 ```
 
-There isn't a lot of performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came on top.
+There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 
-In Section \@ref(dnncross), we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter dataset we are using is big enough that we have enough data to use a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. However, it is important to understand how to implement other resampling strategies for situations when your data budget may not be as plentiful or when your needs to computing performance metrics are more precise.
+In Section \@ref(dnncross), we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter data set we are using is big enough that we have ample data for a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. However, it is important to understand how to implement other resampling strategies for situations when your data budget may not be as plentiful or when you need to compute performance metrics that are more precise.
 
 
 ```r
@@ -1131,7 +1137,7 @@ kick_folds
 #> 5 <split [161675/40418]> Fold5
 ```
 
-Each of these folds has an analysis/training set and an assessment/validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures, for more reliability.
+Each of these folds has an analysis or training set and an assessment or validation set. Instead of training our model one time and getting one measure of performance, we can train our model `v` times and get `v` measures (five, in this case), for more reliability.
 
 Last time we saw how to create a custom function to handle preprocessing, fitting, and evaluation. We will use the same approach of creating the function, but this time use the model specification from Section \@ref(firstcnn).
 
@@ -1258,15 +1264,20 @@ cv_fitted %>%
 #> 4 roc_auc     0.873     5 0.000465
 ```
 
-The metrics have little variance just like they did last time, which is reassuring that our model is robust with respect to the evaluation metrics. 
+The metrics have little variance just like they did last time, which is reassuring; our model is robust with respect to the evaluation metrics. 
 
 ## The full game: CNN {#cnnfull}
 
 We've come a long way in this chapter, and looked at the many different modifications to the simple CNN model we started with. Most of the alterations didn't add much so this final model is not going to be much different than what we have seen so far.
 
+<div class="rmdwarning">
+<p>There are an incredible number of ways to change a deep learning network architecture, but in most realistic situations, the benefit in model performance from such changes is modest.</p>
+</div>
+
+
 ### Preprocess the data {#cnnfullpreprocess}
 
-For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
+For this final model, we are not going to use our separate validation data again, so we only need to preprocess the training data.
 
 
 ```r
@@ -1383,7 +1394,7 @@ final_res %>%
 Notice that this final model performs better then any of the models we have tried so far in this chapter, Chapter \@ref(dldnn), and Chapter \@ref(dllstm). 
 
 <div class="rmdnote">
-<p>For this particular dataset of short text blurbs, a CNN model able to learn local features performed the best, better than either a densely connected neural network or an LSTM.</p>
+<p>For this particular data set of short text blurbs, a CNN model able to learn local features performed the best, better than either a densely connected neural network or an LSTM.</p>
 </div>
 
 ## Summary {#dlcnnsummary}
@@ -1396,5 +1407,5 @@ CNNs are a type of neural network that can learn local spatial patterns. They es
 - about CNN network architectures
 - how CNN layers can be stacked to extract patterns of varying detail
 - how byte pair encoding can be used to tokenize for finer detail
-- how to do hyperparameter search in Keras with tfruns
+- how to do hyperparameter search in Keras with **tfruns**
 - how to evaluate CNN models for text

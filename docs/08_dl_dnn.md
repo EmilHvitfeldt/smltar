@@ -1228,6 +1228,11 @@ cv_fitted %>%
 
 This data set is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
 
+<div class="rmdnote">
+<p>Training deep learning models typically takes more time than other kinds of machine learning, so resampling may be an unfeasible choice. There is special hardware available that speeds up deep learning because it is particularly well-suited to fitting such models. GPUs (graphics processing units) are used for displaying graphics (as indicated in their name) and gaming, but also for deep learning because of their highly parallel computational ability. GPUs can make solving deep learning problems faster, or even tractable to start with. Be aware, though, that you might not need a GPU for even real-world deep learning modeling. All the models in this book were trained on a CPU only.</p>
+</div>
+
+
 ## Compare and evaluate DNN models
 
 Let's return to the results we evaluated on a single validation set. We can combine all the predictions on these last three models to more easily compare the results between them.
