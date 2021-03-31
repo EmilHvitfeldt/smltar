@@ -5,11 +5,11 @@ library(keras)
 tensorflow::tf$random$set_seed(1234)
 ``` 
 
-In Chapter \@ref(dldnn), we trained our first deep learning models, with "simple" dense network architectures. These architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlclassification) and \@ref(mlregression), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs) [@Hochreiter1997].
+In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs) [@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
 
-We will be using the same data from the previous chapter, described in Section \@ref(kickstarter). This data contains short text blurbs for prospective crowdfunding campaigns and if they were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let's start by splitting our training and testing sets.
+We will be using the same data from the previous chapter, described in Sections \@ref(kickstarter) and \@ref(kickstarter-blurbs). This data contains short text blurbs for prospective crowdfunding campaigns and whether those campaigns were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let's start by splitting our data into training and testing sets.
 
 ```{r}
 library(tidyverse)
@@ -28,7 +28,7 @@ kickstarter_train <- training(kickstarter_split)
 kickstarter_test <- testing(kickstarter_split)
 ```
 
-Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlclassification) and \@ref(mlregression). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter how many words we'll keep in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this dataset.
+Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlregression) and \@ref(mlclassification). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter to keep only how many words we'll include in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this data set.
 
 ```{r}
 library(textrecipes)
@@ -42,19 +42,19 @@ kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_sequence_onehot(blurb, sequence_length = max_length)
 ```
 
-After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words with integers representing each token in the vocabulary of `r scales::comma(max_words)` words, as described in detail in Section \@ref(onehotsequence). This is different than the representations we used in Chapters \@ref(mlclassification) and \@ref(mlregression), mainly because all the information about word sequence is encoded in this representation.
+After tokenizing, the preprocessing is different. We use `step_sequence_onehot()` to encode the sequences of words as integers representing each token in the vocabulary of `r scales::comma(max_words)` words, as described in detail in Section \@ref(onehotsequence). This is different than the representations we used in Chapters \@ref(mlregression) and \@ref(mlclassification), mainly because information about word sequence is encoded in this representation.
 
-```{block, type = "rmdwarning"}
+```{block2, type = "rmdnote"}
 Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).
 ```
 
 There are `r scales::comma(nrow(kickstarter_train))` blurbs in the training set and `r scales::comma(nrow(kickstarter_test))` in the testing set.
 
-```{block, type = "rmdwarning"}
-Like we discussed in the last chapter, when we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a dataset, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a dataset like a tibble or a matrix.
+```{block, type = "rmdpackage"}
+Like we discussed in the last chapter, we are using **recipes** and **textrecipes** for preprocessing before modeling. When we `prep()` a recipe, we compute or estimate statistics from the training set; the output of `prep()` is a recipe. When we `bake()` a recipe, we apply the preprocessing to a data set, either the training set that we started with or another set like the testing data or new data. The output of `bake()` is a data set like a tibble or a matrix.
 ```
 
-We could have applied these functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
+We could have applied these `prep()` and `bake()` functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
 
 ```{r}
 kick_prep <- prep(kick_rec)
@@ -75,9 +75,13 @@ Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a
 knitr::include_graphics("diagram-files/rnn-architecture.png")
 ```
 
-The exact shape and function of network $A$ are beyond the reach of this book. For further study, Christopher Olah's blog post ["Understanding LSTM Networks"](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) gives a good technical overview of how LSTM networks work.
+The exact shape and function of network $A$ are beyond the reach of this book. For further study, Christopher Olah's blog post ["Understanding LSTM Networks"](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) gives a more technical overview of how LSTM networks work.
 
 The Keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
+
+```{block, type = "rmdnote"}
+It is possible to set up an LSTM network that works with sequences of varied length, this can sometimes improve performance but takes more work to set up and is outside the scope of this book.
+```
 
 ```{r}
 library(keras)
@@ -92,10 +96,6 @@ lstm_mod
 
 ```{block2, type = "rmdwarning"}
 Notice the number of parameters in this LSTM model, about twice as many as the dense neural networks in Chapter \@ref(dldnn). It is easier to overfit an LSTM model, and it takes more time and memory to train, because of the large number of parameters.
-```
-
-```{block2, type = "rmdnote"}
-It is possible to set up an LSTM network that works with sequences of varied length, this can sometimes improve performance but takes more work to set up and is outside the scope of this book.
 ```
 
 Because we are training a binary classification model, we use `activation = "sigmoid"` for the last layer; we want to fit and predict to class probabilities.
@@ -115,7 +115,7 @@ lstm_mod %>%
   )
 ```
 
-```{block, type = "rmdwarning"}
+```{block2, type = "rmdwarning"}
 As we noted in Chapter \@ref(dldnn), the neural network model is modified **in place**; the object `lstm_mod` is different after we compile it, even though we didn't assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
 ```
 
@@ -145,7 +145,7 @@ plot(lstm_history)
 Remember that lower loss indicates a better fitting model, and higher accuracy (closer to 1) indicates a better model.
 ```
 
-This model continues to improve epoch after epoch on the training data, but performs much worse on the validation set after the first epoch or so, demonstrating how extremely it is overfitting to the training data. This is very common for powerful deep learning models, including LSTMs.
+This model continues to improve epoch after epoch on the training data, but performs worse on the validation set than the training set after the first few epochs and eventually starts to exhibit _worsening_ performance on the validation set as epochs pass, demonstrating how extremely it is overfitting to the training data. This is very common for powerful deep learning models, including LSTMs.
 
 ### Evaluation {#lstmevaluation}
 
@@ -157,7 +157,7 @@ kick_val <- validation_split(kickstarter_train, strata = state)
 kick_val
 ```
 
-We can access the two datasets specified by this `split` via the functions `analysis()` (the analog to training) and `assessment()` (the analog to testing). We need to apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
+We can access the two data sets specified by this `split` via the functions `analysis()` (the analog to training) and `assessment()` (the analog to testing). We need to apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
 
 ```{r}
 kick_analysis <- bake(kick_prep, new_data = analysis(kick_val$splits[[1]]),
@@ -233,7 +233,7 @@ lstm_auc <- val_res %>%
   round(3)
 ```
 
-A regularized linear model trained on this dataset achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix \@ref(appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
+A regularized linear model trained on this data set achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix \@ref(appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
 
 ```{r lstmvalroc, opts.label = "fig.square", fig.cap="ROC curve for LSTM with dropout predictions of Kickstarter campaign success"}
 val_res %>%
@@ -632,7 +632,7 @@ dim(kick_matrix)
 
 ### Specify the model {#lstmfullmodel}
 
-We've learned a lot about how to model this dataset over the course of this chapter.
+We've learned a lot about how to model this data set over the course of this chapter.
 
 - We can use `dropout` to reduce overfitting.
 - Let's stack several layers together, and in fact increase the number of LSTM layers to three.
@@ -704,7 +704,7 @@ final_res %>%
 Notice that this final model still does not perform as well as any of the best models of Chapter \@ref(dldnn).
 
 ```{block, type = "rmdnote"}
-For this dataset of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give a great result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
+For this data set of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give a great result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
 ```
 
 For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
