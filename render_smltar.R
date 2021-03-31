@@ -22,6 +22,8 @@ sessioninfo::package_info(pkgs, dependencies = FALSE)
 
 ##----------------------------------------------------------
 
+# DELETE _tuning dir THEN
+
 bookdown::render_book("index.Rmd", quiet = FALSE)
 
 ##----------------------------------------------------------
