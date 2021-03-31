@@ -1242,20 +1242,20 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <p>You don’t have to, but we have manually specified the <code>runs_dir</code> argument, which is where the results of the tuning will be saved.</p>
 <p>A summary of all the runs in the folder can be retrieved with <code>ls_runs()</code>; here we use <code>as_tibble()</code> to get the results as a tibble.</p>
 <div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 102 x 28
+<pre><code>#&gt; # A tibble: 108 x 28
 #&gt;    run_dir             eval_ eval_loss eval_accuracy metric_loss metric_accuracy
 #&gt;    &lt;chr&gt;               &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;
-#&gt;  1 _tuning/2021-03-31… 0.988        NA            NA      0.0328           0.993
-#&gt;  2 _tuning/2021-03-31… 0.991        NA            NA      0.0351           0.992
-#&gt;  3 _tuning/2021-03-31… 0.953        NA            NA      0.0507           0.987
-#&gt;  4 _tuning/2021-03-31… 0.977        NA            NA      0.0311           0.994
-#&gt;  5 _tuning/2021-03-31… 0.964        NA            NA      0.0322           0.993
-#&gt;  6 _tuning/2021-03-31… 0.940        NA            NA      0.0443           0.989
-#&gt;  7 _tuning/2021-03-31… 1.05         NA            NA      0.0343           0.992
-#&gt;  8 _tuning/2021-03-31… 1.03         NA            NA      0.0349           0.992
-#&gt;  9 _tuning/2021-03-31… 1.01         NA            NA      0.0484           0.987
-#&gt; 10 _tuning/2021-03-31… 0.956        NA            NA      0.0297           0.994
-#&gt; # … with 92 more rows, and 22 more variables: metric_val_loss &lt;dbl&gt;,
+#&gt;  1 _tuning/2021-03-31… 1.04         NA            NA      0.0353           0.992
+#&gt;  2 _tuning/2021-03-31… 0.999        NA            NA      0.0346           0.993
+#&gt;  3 _tuning/2021-03-31… 0.963        NA            NA      0.0547           0.985
+#&gt;  4 _tuning/2021-03-31… 0.990        NA            NA      0.0301           0.994
+#&gt;  5 _tuning/2021-03-31… 0.932        NA            NA      0.0371           0.992
+#&gt;  6 _tuning/2021-03-31… 0.939        NA            NA      0.0421           0.990
+#&gt;  7 _tuning/2021-03-31… 0.988        NA            NA      0.0328           0.993
+#&gt;  8 _tuning/2021-03-31… 0.991        NA            NA      0.0351           0.992
+#&gt;  9 _tuning/2021-03-31… 0.953        NA            NA      0.0507           0.987
+#&gt; 10 _tuning/2021-03-31… 0.977        NA            NA      0.0311           0.994
+#&gt; # … with 98 more rows, and 22 more variables: metric_val_loss &lt;dbl&gt;,
 #&gt; #   metric_val_accuracy &lt;dbl&gt;, flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   samples &lt;int&gt;, batch_size &lt;int&gt;, epochs &lt;int&gt;, epochs_completed &lt;int&gt;,
 #&gt; #   metrics &lt;chr&gt;, model &lt;chr&gt;, loss_function &lt;chr&gt;, optimizer &lt;chr&gt;,
@@ -1268,7 +1268,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb631-3"><a href="dlcnn.html#cb631-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
 <span id="cb631-4"><a href="dlcnn.html#cb631-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb631-5"><a href="dlcnn.html#cb631-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 102 x 3
+<pre><code>#&gt; # A tibble: 108 x 3
 #&gt;    metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                  &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
 #&gt;  1               0.814                 5             1
@@ -1281,7 +1281,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt;  8               0.812                 5             1
 #&gt;  9               0.812                 5             1
 #&gt; 10               0.812                 5             1
-#&gt; # … with 92 more rows</code></pre>
+#&gt; # … with 98 more rows</code></pre>
 <p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
