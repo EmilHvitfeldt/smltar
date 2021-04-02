@@ -1,5 +1,20 @@
 # Classification {#mlclassification}
 
+```{r, include=FALSE}
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+
+
 In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome. 
 
 - A **regression model** predicts a numeric or continuous value.
@@ -18,7 +33,6 @@ how and when it was filed, and the response from the bureau.
 ```{r, dependson="complaints"}
 glimpse(complaints)
 ```
-
 
 In this chapter, we will build classification models to predict what type of financial `product` the complaints are referring to, i.e., a label or categorical variable. The goal of predictive modeling with text input features and a categorical outcome is to learn and model the relationship between those input features, typically created through steps as outlined in Chapters \@ref(language) through \@ref(embeddings), and the class label or categorical outcome. Most classification models do predict the probability of a class (a numeric output), but the particular characteristics of this output make classification models different enough from regression models that we handle them differently.
 
