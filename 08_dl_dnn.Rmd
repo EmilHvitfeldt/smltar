@@ -1,9 +1,22 @@
 # Dense neural networks {#dldnn}
 
-```{r include = FALSE}
+```{r include=FALSE}
 library(keras)
 tensorflow::tf$random$set_seed(1234)
+
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
 ```
+
 
 Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by network architecture, rathern than by outcome type as we did in Chapters \@ref(mlregression) and \@ref(mlclassification).
 We'll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
