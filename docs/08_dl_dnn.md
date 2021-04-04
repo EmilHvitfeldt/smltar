@@ -2,6 +2,7 @@
 
 
 
+
 Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by network architecture, rathern than by outcome type as we did in Chapters \@ref(mlregression) and \@ref(mlclassification).
 We'll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate [@R-reticulate], R.
 Keras provides an extensive, high-level API for creating and training many kinds of neural networks, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 

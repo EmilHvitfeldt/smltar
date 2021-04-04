@@ -1,5 +1,8 @@
 # Classification {#mlclassification}
 
+
+
+
 In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome. 
 
 - A **regression model** predicts a numeric or continuous value.
@@ -44,7 +47,6 @@ glimpse(complaints)
 #> $ complaint_id                 <dbl> 3384392, 3417821, 3433198, 3366475, 33853…
 ```
 
-
 In this chapter, we will build classification models to predict what type of financial `product` the complaints are referring to, i.e., a label or categorical variable. The goal of predictive modeling with text input features and a categorical outcome is to learn and model the relationship between those input features, typically created through steps as outlined in Chapters \@ref(language) through \@ref(embeddings), and the class label or categorical outcome. Most classification models do predict the probability of a class (a numeric output), but the particular characteristics of this output make classification models different enough from regression models that we handle them differently.
 
 ## A first classification model {#classfirstattemptlookatdata}
@@ -65,12 +67,43 @@ head(complaints$consumer_complaint_narrative)
 ```
 
 ```
-#> [1] "transworld systems inc. \nis trying to collect a debt that is not mine, not owed and is inaccurate."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-#> [2] "I would like to request the suppression of the following items from my credit report, which are the result of my falling victim to identity theft. This information does not relate to [ transactions that I have made/accounts that I have opened ], as the attached supporting documentation can attest. As such, it should be blocked from appearing on my credit report pursuant to section 605B of the Fair Credit Reporting Act."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-#> [3] "Over the past 2 weeks, I have been receiving excessive amounts of telephone calls from the company listed in this complaint. The calls occur between XXXX XXXX and XXXX XXXX to my cell and at my job. The company does not have the right to harass me at work and I want this to stop. It is extremely distracting to be told 5 times a day that I have a call from this collection agency while at work."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-#> [4] "I was sold access to an event digitally, of which I have all the screenshots to detail the transactions, transferred the money and was provided with only a fake of a ticket. I have reported this to paypal and it was for the amount of {$21.00} including a {$1.00} fee from paypal. \n\nThis occured on XX/XX/2019, by paypal user who gave two accounts : 1 ) XXXX 2 ) XXXX XXXX"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-#> [5] "While checking my credit report I noticed three collections by a company called ARS that i was unfamiliar with. I disputed these collections with XXXX, and XXXX and they both replied that they contacted the creditor and the creditor verified the debt so I asked for proof which both bureaus replied that they are not required to prove anything. I then mailed a certified letter to ARS requesting proof of the debts n the form of an original aggrement, or a proof of a right to the debt, or even so much as the process as to how the bill was calculated, to which I was simply replied a letter for each collection claim that listed my name an account number and an amount with no other information to verify the debts after I sent a clear notice to provide me evidence. Afterwards I recontacted both XXXX, and XXXX, to redispute on the premise that it is not my debt if evidence can not be drawn up, I feel as if I am being personally victimized by ARS on my credit report for debts that are not owed to them or any party for that matter, and I feel discouraged that the credit bureaus who control many aspects of my personal finances are so negligent about my information."
-#> [6] "I would like the credit bureau to correct my XXXX XXXX XXXX XXXX balance. My correct balance is XXXX"
+#> [1] "transworld systems inc. \nis trying to collect a debt that is not mine,
+not owed and is inaccurate."
+#> [2] "I would like to request the suppression of the following items from my
+credit report, which are the result of my falling victim to identity theft.
+This information does not relate to [ transactions that I have made/accounts
+that I have opened ], as the attached supporting documentation can attest. As
+such, it should be blocked from appearing on my credit report pursuant to
+section 605B of the Fair Credit Reporting Act."
+#> [3] "Over the past 2 weeks, I have been receiving excessive amounts of
+telephone calls from the company listed in this complaint. The calls occur
+between XXXX XXXX and XXXX XXXX to my cell and at my job. The company does not
+have the right to harass me at work and I want this to stop. It is extremely
+distracting to be told 5 times a day that I have a call from this collection
+agency while at work."
+#> [4] "I was sold access to an event digitally, of which I have all the
+screenshots to detail the transactions, transferred the money and was provided
+with only a fake of a ticket. I have reported this to paypal and it was for the
+amount of {$21.00} including a {$1.00} fee from paypal. \n\nThis occured on
+XX/XX/2019, by paypal user who gave two accounts : 1 ) XXXX 2 ) XXXX XXXX"
+#> [5] "While checking my credit report I noticed three collections by a
+company called ARS that i was unfamiliar with. I disputed these collections
+with XXXX, and XXXX and they both replied that they contacted the creditor and
+the creditor verified the debt so I asked for proof which both bureaus replied
+that they are not required to prove anything. I then mailed a certified letter
+to ARS requesting proof of the debts n the form of an original aggrement, or a
+proof of a right to the debt, or even so much as the process as to how the bill
+was calculated, to which I was simply replied a letter for each collection
+claim that listed my name an account number and an amount with no other
+information to verify the debts after I sent a clear notice to provide me
+evidence. Afterwards I recontacted both XXXX, and XXXX, to redispute on the
+premise that it is not my debt if evidence can not be drawn up, I feel as if I
+am being personally victimized by ARS on my credit report for debts that are
+not owed to them or any party for that matter, and I feel discouraged that the
+credit bureaus who control many aspects of my personal finances are so
+negligent about my information."
+#> [6] "I would like the credit bureau to correct my XXXX XXXX XXXX XXXX
+balance. My correct balance is XXXX"
 ```
 
 The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publicly available data set. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 

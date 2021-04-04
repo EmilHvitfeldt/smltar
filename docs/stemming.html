@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -548,7 +548,7 @@ FIGURE 4.1: Porter stemming results in five languages
 <div id="should-you-use-stemming-at-all" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Should you use stemming at all?</h2>
 <p>You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.</p>
-<p>Why does stemming often help, if you are training a machine learning model for text? Stemming <em>reduces the feature space</em> of text data. Let’s see this in action, with a data set of United States Supreme Court opinions available in the <a href="https://github.com/EmilHvitfeldt/scotus"><strong>scotus</strong></a> package. How many words are there, after removing a standard data set of stopwords?</p>
+<p>Why does stemming often help, if you are training a machine learning model for text? Stemming <em>reduces the feature space</em> of text data. Let’s see this in action, with a data set of United States Supreme Court opinions available in the <strong>scotus</strong> package, discussed in more detail in Section <a href="appendixdata.html#scotus-opinions">B.2</a>. How many words are there, after removing a standard data set of stopwords?</p>
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="stemming.html#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
 <span id="cb91-2"><a href="stemming.html#cb91-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb91-3"><a href="stemming.html#cb91-3" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="ot">&lt;-</span> scotus_filtered <span class="sc">%&gt;%</span></span>
@@ -571,7 +571,7 @@ FIGURE 4.1: Porter stemming results in five languages
 #&gt;  9 upon   105069
 #&gt; 10 united 103267
 #&gt; # … with 167,869 more rows</code></pre>
-<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix (technically, a document-feature matrix object from the <a href="https://cran.r-project.org/package=quanteda">quanteda</a> package).</p>
+<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix (technically, a document-feature matrix object from the <a href="https://cran.r-project.org/package=quanteda"><strong>quanteda</strong></a> package).</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="stemming.html#cb93-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span></span>
 <span id="cb93-2"><a href="stemming.html#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, word) <span class="sc">%&gt;%</span></span>
 <span id="cb93-3"><a href="stemming.html#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, word, n)</span></code></pre></div>
@@ -766,7 +766,7 @@ How does lemmatization work in languages other than English? Lookup dictionaries
 <p>A modern, efficient implementation for lemmatization is available in the excellent <a href="https://spacy.io/">spaCy</a> library <span class="citation">(<a href="references.html#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span>, which is written in Python.</p>
 
 <div class="rmdpackage">
-NLP practitioners who work with R can use this library via the <a href="http://spacyr.quanteda.io/"><strong>spacyr</strong></a> package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="references.html#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="references.html#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
+NLP practitioners who work with R can use this library via the <strong>spacyr</strong> package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="references.html#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="references.html#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
 </div>
 <p>Section <a href="mlregression.html#mlregressionlemmatization">6.6</a> demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown <a href="https://rstudio.github.io/reticulate/articles/r_markdown.html">via its Python engine</a>.</p>
 <p>Let’s briefly walk through how to use spacyr.</p>

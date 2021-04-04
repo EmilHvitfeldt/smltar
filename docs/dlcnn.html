@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1038,7 +1038,7 @@ Be sure that the preprocess function <em>matches</em> the preprocessing that was
 <span id="cb617-5"><a href="dlcnn.html#cb617-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
 <span id="cb617-6"><a href="dlcnn.html#cb617-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
 <span id="cb617-7"><a href="dlcnn.html#cb617-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
+<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
 <div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
 <span id="cb618-2"><a href="dlcnn.html#cb618-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
 <span id="cb618-3"><a href="dlcnn.html#cb618-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
@@ -1075,30 +1075,30 @@ FIGURE 10.8: Plot of most important features for a CNN model predicting two obse
 <div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="dlcnn.html#cb621-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:limeplottextexplanations"></span>
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
-  background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
-  background-color: #DADA8CFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
+    background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
+    background-color: #DADA8CFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
-  background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
-  background-color: #E3E395FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
+    background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
+    background-color: #E3E395FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
-  background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
-  background-color: #ECEC9FFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
+    background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
+    background-color: #ECEC9FFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
-  background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
-  background-color: #F5F5A9FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
+    background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
+    background-color: #F5F5A9FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
-  background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
-  background-color: #FFFFB2FF;}</style>
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
+    background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
+    background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-72c99cf26d794b2c72aa" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-72c99cf26d794b2c72aa">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Exploring<\/span> <span class='negative_1'>paint<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>its<\/span> <span class='positive_2'>place<\/span> <span class='positive_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_1'>digital<\/span> <span class='positive_1'>world<\/span>. <\/br> <sub>Label predicted: 1 (98.98%)<br/>Explainer fit: 0.22<\/sub> <\/p><br/><p> <span class='negative_1'>Mike<\/span> Fassio <span class='positive_1'>wants<\/span> <span class='negative_1'>a<\/span> side-by-side <span class='positive_1'>photo<\/span> of <span class='positive_1'>me<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>Hazel<\/span> <span class='negative_1'>eating<\/span> <span class='positive_2'>cake<\/span> with our <span class='positive_1'>bare<\/span> <span class='negative_1'>hands<\/span>.  Let's <span class='positive_1'>make<\/span> this <span class='negative_1'>a<\/span> reality! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.49<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
@@ -1133,30 +1133,30 @@ The following example shows this effect. We have created two very similar senten
 <div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="dlcnn.html#cb623-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:robustlimeplottextexplanations"></span>
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
-  background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
-  background-color: #DADA8CFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
+    background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
+    background-color: #DADA8CFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
-  background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
-  background-color: #E3E395FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
+    background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
+    background-color: #E3E395FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
-  background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
-  background-color: #ECEC9FFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
+    background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
+    background-color: #ECEC9FFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
-  background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
-  background-color: #F5F5A9FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
+    background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
+    background-color: #F5F5A9FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
-  background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
-  background-color: #FFFFB2FF;}</style>
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
+    background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
+    background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-edc6d7175589f8998c64" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-edc6d7175589f8998c64">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (100%)<br/>Explainer fit: 0.81<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
@@ -1245,12 +1245,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
-#&gt; 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
-#&gt; 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
-#&gt; 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
-#&gt; 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
-#&gt; 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
+#&gt; 1 _tuning/20… 1.01       0.0315           0.993           1.01             0.808
+#&gt; 2 _tuning/20… 0.986      0.0407           0.990           0.986            0.804
+#&gt; 3 _tuning/20… 0.975      0.0467           0.988           0.975            0.801
+#&gt; 4 _tuning/20… 0.994      0.0307           0.994           0.994            0.813
+#&gt; 5 _tuning/20… 0.955      0.0372           0.992           0.955            0.808
+#&gt; 6 _tuning/20… 0.933      0.0462           0.988           0.933            0.809
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1265,13 +1265,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.812                 5             1
-#&gt; 2               0.811                 7             1
-#&gt; 3               0.809                 7             2
-#&gt; 4               0.808                 5             2
-#&gt; 5               0.807                 3             1
-#&gt; 6               0.803                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.813                 7             1
+#&gt; 2               0.809                 3             1
+#&gt; 3               0.808                 5             1
+#&gt; 4               0.808                 7             2
+#&gt; 5               0.804                 5             2
+#&gt; 6               0.801                 3             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1510,8 +1510,8 @@ For this particular data set of short text blurbs, a CNN model able to learn loc
 
 <div class="footnotes">
 <hr />
-<ol start="17">
-<li id="fn17"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref17" class="footnote-back">↩︎</a></p></li>
+<ol start="16">
+<li id="fn16"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref16" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

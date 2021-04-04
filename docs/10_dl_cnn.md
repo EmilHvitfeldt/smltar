@@ -2,6 +2,7 @@
 
 
 
+
 The first neural networks we built in Chapter \@ref(dldnn) did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within data.
 
 CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.
@@ -848,30 +849,30 @@ plot_text_explanations(explanation)
 
 ```{=html}
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
-  background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
-  background-color: #DADA8CFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
+    background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
+    background-color: #DADA8CFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
-  background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
-  background-color: #E3E395FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
+    background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
+    background-color: #E3E395FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
-  background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
-  background-color: #ECEC9FFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
+    background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
+    background-color: #ECEC9FFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
-  background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
-  background-color: #F5F5A9FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
+    background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
+    background-color: #F5F5A9FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
-  background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
-  background-color: #FFFFB2FF;}</style>
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
+    background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
+    background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-72c99cf26d794b2c72aa" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-72c99cf26d794b2c72aa">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Exploring<\/span> <span class='negative_1'>paint<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>its<\/span> <span class='positive_2'>place<\/span> <span class='positive_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_1'>digital<\/span> <span class='positive_1'>world<\/span>. <\/br> <sub>Label predicted: 1 (98.98%)<br/>Explainer fit: 0.22<\/sub> <\/p><br/><p> <span class='negative_1'>Mike<\/span> Fassio <span class='positive_1'>wants<\/span> <span class='negative_1'>a<\/span> side-by-side <span class='positive_1'>photo<\/span> of <span class='positive_1'>me<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>Hazel<\/span> <span class='negative_1'>eating<\/span> <span class='positive_2'>cake<\/span> with our <span class='positive_1'>bare<\/span> <span class='negative_1'>hands<\/span>.  Let's <span class='positive_1'>make<\/span> this <span class='negative_1'>a<\/span> reality! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.49<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
@@ -919,30 +920,30 @@ plot_text_explanations(explanation)
 
 ```{=html}
 <style>.match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
-  background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
-  background-color: #DADA8CFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_1 {
+    background-color: #65C4B4FF;} .plot_text_explanations .negative_1 {
+    background-color: #DADA8CFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
-  background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
-  background-color: #E3E395FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_2 {
+    background-color: #78D4C4FF;} .plot_text_explanations .negative_2 {
+    background-color: #E3E395FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
-  background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
-  background-color: #ECEC9FFF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_3 {
+    background-color: #8AE5D5FF;} .plot_text_explanations .negative_3 {
+    background-color: #ECEC9FFF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
-  background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
-  background-color: #F5F5A9FF;}
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_4 {
+    background-color: #9CF6E6FF;} .plot_text_explanations .negative_4 {
+    background-color: #F5F5A9FF;}
 .match_positive, .positive_1, .positive_2, .positive_3, .positive_4, .positive_5
-       { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
-       { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
-  background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
-  background-color: #FFFFB2FF;}</style>
+         { border: 1px solid #42A999FF;} .match_negative, .negative_1, .negative_2, .negative_3, .negative_4, .negative_5
+         { border: 1px solid #BEBE6EFF;} .plot_text_explanations .positive_5 {
+    background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
+    background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-edc6d7175589f8998c64" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-edc6d7175589f8998c64">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (100%)<br/>Explainer fit: 0.81<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
@@ -1065,12 +1066,12 @@ runs_results
 #> # A tibble: 6 x 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
-#> 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
-#> 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
-#> 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
-#> 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
-#> 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
+#> 1 _tuning/20… 1.01       0.0315           0.993           1.01             0.808
+#> 2 _tuning/20… 0.986      0.0407           0.990           0.986            0.804
+#> 3 _tuning/20… 0.975      0.0467           0.988           0.975            0.801
+#> 4 _tuning/20… 0.994      0.0307           0.994           0.994            0.813
+#> 5 _tuning/20… 0.955      0.0372           0.992           0.955            0.808
+#> 6 _tuning/20… 0.933      0.0462           0.988           0.933            0.809
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1093,15 +1094,15 @@ best_runs
 #> # A tibble: 6 x 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
-#> 1               0.812                 5             1
-#> 2               0.811                 7             1
-#> 3               0.809                 7             2
-#> 4               0.808                 5             2
-#> 5               0.807                 3             1
-#> 6               0.803                 3             2
+#> 1               0.813                 7             1
+#> 2               0.809                 3             1
+#> 3               0.808                 5             1
+#> 4               0.808                 7             2
+#> 5               0.804                 5             2
+#> 6               0.801                 3             2
 ```
 
-There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
+There isn't much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 
