@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-03-30"
+date: "2021-04-04"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
@@ -57,7 +57,7 @@ The book is divided into three sections. We make a (perhaps arbitrary) distincti
 
 Some of the topics in the second and third sections overlap as they provide different approaches to the same tasks.
 
-Throughout the book, we will demonstrate with examples and build models using a selection of text datasets. A description of these datasets can be found in Appendix \@ref(appendixdata).
+Throughout the book, we will demonstrate with examples and build models using a selection of text data sets. A description of these data sets can be found in Appendix \@ref(appendixdata).
 
 ## Topics this book will not cover {-}
 

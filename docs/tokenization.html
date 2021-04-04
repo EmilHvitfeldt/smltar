@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -450,14 +450,22 @@ The <strong>tidyverse</strong> is a collection of packages for data manipulation
 <span id="cb1-8"><a href="tokenization.html#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(text)</span>
 <span id="cb1-9"><a href="tokenization.html#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="tokenization.html#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(the_fir_tree, <span class="dv">9</span>)</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;Far down in the forest, where the warm sun and the fresh air made a sweet&quot;    
-#&gt; [2] &quot;resting-place, grew a pretty little fir-tree; and yet it was not happy, it&quot;   
-#&gt; [3] &quot;wished so much to be tall like its companions– the pines and firs which grew&quot; 
-#&gt; [4] &quot;around it. The sun shone, and the soft air fluttered its leaves, and the&quot;     
-#&gt; [5] &quot;little peasant children passed by, prattling merrily, but the fir-tree heeded&quot;
-#&gt; [6] &quot;them not. Sometimes the children would bring a large basket of raspberries or&quot;
-#&gt; [7] &quot;strawberries, wreathed on a straw, and seat themselves near the fir-tree, and&quot;
-#&gt; [8] &quot;say, \&quot;Is it not a pretty little tree?\&quot; which made it feel more unhappy than&quot;
+<pre><code>#&gt; [1] &quot;Far down in the forest, where the warm sun and the fresh air made a
+sweet&quot;
+#&gt; [2] &quot;resting-place, grew a pretty little fir-tree; and yet it was not happy,
+it&quot;
+#&gt; [3] &quot;wished so much to be tall like its companions– the pines and firs which
+grew&quot;
+#&gt; [4] &quot;around it. The sun shone, and the soft air fluttered its leaves, and
+the&quot;
+#&gt; [5] &quot;little peasant children passed by, prattling merrily, but the fir-tree
+heeded&quot;
+#&gt; [6] &quot;them not. Sometimes the children would bring a large basket of
+raspberries or&quot;
+#&gt; [7] &quot;strawberries, wreathed on a straw, and seat themselves near the
+fir-tree, and&quot;
+#&gt; [8] &quot;say, \&quot;Is it not a pretty little tree?\&quot; which made it feel more
+unhappy than&quot;
 #&gt; [9] &quot;before.&quot;</code></pre>
 <p>The first nine lines stores the first paragraph of the story, each line consisting of a series of character symbols.
 These elements don’t contain any metadata or information to tell us which characters are words and which aren’t. Identifying these kinds of boundaries between words is where the process of tokenization comes in.</p>
@@ -698,7 +706,7 @@ We use Latin prefixes so that a 1-gram is called a unigram, a 2-gram is called a
 #&gt;  [9] &quot;sun and the&quot;      &quot;and the fresh&quot;    &quot;the fresh air&quot;    &quot;fresh air made&quot;  
 #&gt; [13] &quot;air made a&quot;       &quot;made a sweet&quot;</code></pre>
 <p>Notice how the words in the trigrams overlap so that the word “down” appears in the middle of the first trigram and beginning of the second trigram. N-gram tokenization slides along the text to create overlapping sets of tokens.</p>
-<p>It is important to choose the right value for <code>n</code> when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don’t capture information about word order. Using a higher value for <code>n</code> keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don’t have a large vocabulary in your dataset, consider starting at two instead of three and experimenting from there. Figure <a href="tokenization.html#fig:ngramtokens">2.2</a> demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams.</p>
+<p>It is important to choose the right value for <code>n</code> when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don’t capture information about word order. Using a higher value for <code>n</code> keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don’t have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure <a href="tokenization.html#fig:ngramtokens">2.2</a> demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams.</p>
 <div class="figure" style="text-align: center"><span id="fig:ngramtokens"></span>
 <img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts" width="672" />
 <p class="caption">
@@ -758,13 +766,22 @@ FIGURE 2.2: Using longer n-grams results in a higher number of unique tokens wit
 <span id="cb36-4"><a href="tokenization.html#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-5"><a href="tokenization.html#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb36-6"><a href="tokenization.html#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(the_fir_tree_sentences[[<span class="dv">1</span>]])</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;Far down in the forest, where the warm sun and the fresh air made a sweet resting-place, grew a pretty little fir-tree; and yet it was not happy, it wished so much to be tall like its companions– the pines and firs which grew around it.&quot;
-#&gt; [2] &quot;The sun shone, and the soft air fluttered its leaves, and the little peasant children passed by, prattling merrily, but the fir-tree heeded them not.&quot;                                                                                       
-#&gt; [3] &quot;Sometimes the children would bring a large basket of raspberries or strawberries, wreathed on a straw, and seat themselves near the fir-tree, and say, \&quot;Is it not a pretty little tree?\&quot;&quot;                                                  
-#&gt; [4] &quot;which made it feel more unhappy than before.&quot;                                                                                                                                                                                                
-#&gt; [5] &quot;And yet all this while the tree grew a notch or joint taller every year; for by the number of joints in the stem of a fir-tree we can discover its age.&quot;                                                                                     
+<pre><code>#&gt; [1] &quot;Far down in the forest, where the warm sun and the fresh air made a
+sweet resting-place, grew a pretty little fir-tree; and yet it was not happy,
+it wished so much to be tall like its companions– the pines and firs which grew
+around it.&quot;
+#&gt; [2] &quot;The sun shone, and the soft air fluttered its leaves, and the little
+peasant children passed by, prattling merrily, but the fir-tree heeded them
+not.&quot;
+#&gt; [3] &quot;Sometimes the children would bring a large basket of raspberries or
+strawberries, wreathed on a straw, and seat themselves near the fir-tree, and
+say, \&quot;Is it not a pretty little tree?\&quot;&quot;
+#&gt; [4] &quot;which made it feel more unhappy than before.&quot;
+#&gt; [5] &quot;And yet all this while the tree grew a notch or joint taller every
+year; for by the number of joints in the stem of a fir-tree we can discover its
+age.&quot;
 #&gt; [6] &quot;Still, as it grew, it complained.&quot;</code></pre>
-<p>If you have lines from different categories as we have in the <code>hcandersen_en</code> dataframe, which contains all the lines of the fairy tales in English, then we would like to be able to turn these lines into sentences while preserving the <code>book</code> column in the dataset.
+<p>If you have lines from different categories as we have in the <code>hcandersen_en</code> dataframe, which contains all the lines of the fairy tales in English, then we would like to be able to turn these lines into sentences while preserving the <code>book</code> column in the data set.
 To do this we use <code>nest()</code> and <code>map_chr()</code> to create a dataframe where each fairy tale is its own element and then we use the <code>unnest_sentences()</code> function from the tidytext package to split the text into sentences.</p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="tokenization.html#cb38-1" aria-hidden="true" tabindex="-1"></a>hcandersen_sentences <span class="ot">&lt;-</span> hcandersen_en <span class="sc">%&gt;%</span></span>
 <span id="cb38-2"><a href="tokenization.html#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>(<span class="at">data =</span> <span class="fu">c</span>(text)) <span class="sc">%&gt;%</span></span>
@@ -982,11 +999,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 x 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       75.8ms   81.9ms     12.3     4.57MB    0    
-#&gt; 2 tokenizers   88.6ms   89.9ms     11.0     1.01MB    1.22 
-#&gt; 3 text2vec     78.5ms   79.9ms     12.4    19.21MB    0    
-#&gt; 4 quanteda    143.8ms  146.4ms      6.81     8.7MB    1.70 
-#&gt; 5 base R      308.3ms  311.4ms      3.18   10.51MB    0.795</code></pre>
+#&gt; 1 corpus       76.2ms   79.4ms     12.2     4.57MB    1.36 
+#&gt; 2 tokenizers   91.4ms   95.2ms     10.5     1.01MB    1.16 
+#&gt; 3 text2vec       79ms   82.1ms     12.2    19.41MB    1.35 
+#&gt; 4 quanteda    149.5ms  155.1ms      6.46     8.7MB    0.718
+#&gt; 5 base R      309.8ms  310.7ms      3.20   10.51MB    2.14</code></pre>
 <p>The corpus package <span class="citation">(<a href="references.html#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">

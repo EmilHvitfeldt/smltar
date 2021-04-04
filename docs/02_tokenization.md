@@ -1,5 +1,7 @@
 # Tokenization {#tokenization}
 
+
+
 To build features for supervised machine learning from natural language, we need some way of representing raw text as numbers so we can perform computation on them. Typically, one of the first steps in this transformation from natural language to feature, or any of kind of text analysis, is *tokenization*. Knowing what tokenization and tokens are, along with the related concept of an n-gram, is important for almost any natural language processing task.
 
 ## What is a token?
@@ -26,14 +28,22 @@ head(the_fir_tree, 9)
 ```
 
 ```
-#> [1] "Far down in the forest, where the warm sun and the fresh air made a sweet"    
-#> [2] "resting-place, grew a pretty little fir-tree; and yet it was not happy, it"   
-#> [3] "wished so much to be tall like its companions– the pines and firs which grew" 
-#> [4] "around it. The sun shone, and the soft air fluttered its leaves, and the"     
-#> [5] "little peasant children passed by, prattling merrily, but the fir-tree heeded"
-#> [6] "them not. Sometimes the children would bring a large basket of raspberries or"
-#> [7] "strawberries, wreathed on a straw, and seat themselves near the fir-tree, and"
-#> [8] "say, \"Is it not a pretty little tree?\" which made it feel more unhappy than"
+#> [1] "Far down in the forest, where the warm sun and the fresh air made a
+sweet"
+#> [2] "resting-place, grew a pretty little fir-tree; and yet it was not happy,
+it"
+#> [3] "wished so much to be tall like its companions– the pines and firs which
+grew"
+#> [4] "around it. The sun shone, and the soft air fluttered its leaves, and
+the"
+#> [5] "little peasant children passed by, prattling merrily, but the fir-tree
+heeded"
+#> [6] "them not. Sometimes the children would bring a large basket of
+raspberries or"
+#> [7] "strawberries, wreathed on a straw, and seat themselves near the
+fir-tree, and"
+#> [8] "say, \"Is it not a pretty little tree?\" which made it feel more
+unhappy than"
 #> [9] "before."
 ```
 
@@ -401,7 +411,7 @@ tft_token_ngram[[1]]
 
 Notice how the words in the trigrams overlap so that the word "down" appears in the middle of the first trigram and beginning of the second trigram. N-gram tokenization slides along the text to create overlapping sets of tokens.
 
-It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your dataset, consider starting at two instead of three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams. 
+It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams. 
 
 <div class="figure" style="text-align: center">
 <img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts" width="672" />
@@ -492,15 +502,24 @@ head(the_fir_tree_sentences[[1]])
 ```
 
 ```
-#> [1] "Far down in the forest, where the warm sun and the fresh air made a sweet resting-place, grew a pretty little fir-tree; and yet it was not happy, it wished so much to be tall like its companions– the pines and firs which grew around it."
-#> [2] "The sun shone, and the soft air fluttered its leaves, and the little peasant children passed by, prattling merrily, but the fir-tree heeded them not."                                                                                       
-#> [3] "Sometimes the children would bring a large basket of raspberries or strawberries, wreathed on a straw, and seat themselves near the fir-tree, and say, \"Is it not a pretty little tree?\""                                                  
-#> [4] "which made it feel more unhappy than before."                                                                                                                                                                                                
-#> [5] "And yet all this while the tree grew a notch or joint taller every year; for by the number of joints in the stem of a fir-tree we can discover its age."                                                                                     
+#> [1] "Far down in the forest, where the warm sun and the fresh air made a
+sweet resting-place, grew a pretty little fir-tree; and yet it was not happy,
+it wished so much to be tall like its companions– the pines and firs which grew
+around it."
+#> [2] "The sun shone, and the soft air fluttered its leaves, and the little
+peasant children passed by, prattling merrily, but the fir-tree heeded them
+not."
+#> [3] "Sometimes the children would bring a large basket of raspberries or
+strawberries, wreathed on a straw, and seat themselves near the fir-tree, and
+say, \"Is it not a pretty little tree?\""
+#> [4] "which made it feel more unhappy than before."
+#> [5] "And yet all this while the tree grew a notch or joint taller every
+year; for by the number of joints in the stem of a fir-tree we can discover its
+age."
 #> [6] "Still, as it grew, it complained."
 ```
 
-If you have lines from different categories as we have in the `hcandersen_en` dataframe, which contains all the lines of the fairy tales in English, then we would like to be able to turn these lines into sentences while preserving the `book` column in the dataset.
+If you have lines from different categories as we have in the `hcandersen_en` dataframe, which contains all the lines of the fairy tales in English, then we would like to be able to turn these lines into sentences while preserving the `book` column in the data set.
 To do this we use `nest()` and `map_chr()` to create a dataframe where each fairy tale is its own element and then we use the `unnest_sentences()` function from the tidytext package to split the text into sentences.
 
 
@@ -846,11 +865,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       75.8ms   81.9ms     12.3     4.57MB    0    
-#> 2 tokenizers   88.6ms   89.9ms     11.0     1.01MB    1.22 
-#> 3 text2vec     78.5ms   79.9ms     12.4    19.21MB    0    
-#> 4 quanteda    143.8ms  146.4ms      6.81     8.7MB    1.70 
-#> 5 base R      308.3ms  311.4ms      3.18   10.51MB    0.795
+#> 1 corpus       76.2ms   79.4ms     12.2     4.57MB    1.36 
+#> 2 tokenizers   91.4ms   95.2ms     10.5     1.01MB    1.16 
+#> 3 text2vec       79ms   82.1ms     12.2    19.41MB    1.35 
+#> 4 quanteda    149.5ms  155.1ms      6.46     8.7MB    0.718
+#> 5 base R      309.8ms  310.7ms      3.20   10.51MB    2.14
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.

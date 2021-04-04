@@ -163,7 +163,7 @@ We have *two* stems! This stemmer works differently; it uses both morphological 
 
 You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.
 
-Why does stemming often help, if you are training a machine learning model for text? Stemming *reduces the feature space* of text data. Let's see this in action, with a data set of United States Supreme Court opinions available in the [**scotus**](https://github.com/EmilHvitfeldt/scotus) package. How many words are there, after removing a standard data set of stopwords?
+Why does stemming often help, if you are training a machine learning model for text? Stemming *reduces the feature space* of text data. Let's see this in action, with a data set of United States Supreme Court opinions available in the **scotus** package, discussed in more detail in Section \@ref(scotus-opinions). How many words are there, after removing a standard data set of stopwords?
 
 
 ```r
@@ -194,7 +194,7 @@ tidy_scotus %>%
 #> # … with 167,869 more rows
 ```
 
-There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [quanteda](https://cran.r-project.org/package=quanteda) package).
+There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [**quanteda**](https://cran.r-project.org/package=quanteda) package).
 
 
 ```r
@@ -464,7 +464,7 @@ Lemmatization requires more information than the rule-based stemmers we've discu
 
 A modern, efficient implementation for lemmatization is available in the excellent [spaCy](https://spacy.io/) library [@spacy2], which is written in Python. 
 
-\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">NLP practitioners who work with R can use this library via the [**spacyr**](http://spacyr.quanteda.io/) package [@Benoit19], the [**cleanNLP**](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [**textrecipes**](https://textrecipes.tidymodels.org/) package [@textrecipes]. </div>\EndKnitrBlock{rmdpackage}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">NLP practitioners who work with R can use this library via the **spacyr** package [@Benoit19], the [**cleanNLP**](https://statsmaths.github.io/cleanNLP/) package [@Arnold17], or as an "engine" in the [**textrecipes**](https://textrecipes.tidymodels.org/) package [@textrecipes]. </div>\EndKnitrBlock{rmdpackage}
 
 Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown [via its Python engine](https://rstudio.github.io/reticulate/articles/r_markdown.html). 
 

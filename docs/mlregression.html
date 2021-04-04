@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -480,7 +480,7 @@ FIGURE 6.1: Supreme Court opinions per decade in sample
 <p>This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.</p>
 <div id="firstregression" class="section level3" number="6.1.1">
 <h3><span class="header-section-number">6.1.1</span> Building our first regression model</h3>
-<p>Our first step in building a model is to split our data into training and testing sets. We use functions from <strong>tidymodels</strong> for this; we use <code>initial_split()</code> to set up <em>how</em> to split the data, and then we use the functions <code>training()</code> and <code>testing()</code> to create the data sets we need. Let’s also convert the year to a numeric value since it was originally stored as a character, and remove the <code>'</code> character because of its effect on one of the models<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> we want to try out.</p>
+<p>Our first step in building a model is to split our data into training and testing sets. We use functions from <strong>tidymodels</strong> for this; we use <code>initial_split()</code> to set up <em>how</em> to split the data, and then we use the functions <code>training()</code> and <code>testing()</code> to create the data sets we need. Let’s also convert the year to a numeric value since it was originally stored as a character, and remove the <code>'</code> character because of its effect on one of the models<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> we want to try out.</p>
 <div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="mlregression.html#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb152-2"><a href="mlregression.html#cb152-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb152-3"><a href="mlregression.html#cb152-3" aria-hidden="true" tabindex="-1"></a>scotus_split <span class="ot">&lt;-</span> scotus_filtered <span class="sc">%&gt;%</span></span>
@@ -722,7 +722,7 @@ Hopefully you are convinced that using resampled data sets for measuring perform
 <p>One way to assess a model like this one is to compare its performance to a “null model.”</p>
 
 <div class="rmdnote">
-A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.
+A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.
 </div>
 <p>We can use the same function <code>fit_resamples()</code> and the same preprocessing recipe as before, switching out our SVM model specification for the <code>null_model()</code> specification.</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="mlregression.html#cb172-1" aria-hidden="true" tabindex="-1"></a>null_regression <span class="ot">&lt;-</span> <span class="fu">null_model</span>() <span class="sc">%&gt;%</span></span>
@@ -1006,7 +1006,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 </div>
 <div id="mlregressionlemmatization" class="section level2" number="6.6">
 <h2><span class="header-section-number">6.6</span> Case study: lemmatization</h2>
-<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the spacyr R package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>.</p>
+<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the <strong>spacyr</strong> R package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>.</p>
 <table>
 <caption><span id="tab:lemmatb">TABLE 6.1: </span>Lemmatization of one sentence from a Supreme Court opinion</caption>
 <thead>
@@ -1719,9 +1719,9 @@ Looking at examples that your model does not perform well for is well worth your
 </div>
 <div class="footnotes">
 <hr />
-<ol start="9">
-<li id="fn9"><p>The random forest implementation in the ranger package, demonstrated in Section <a href="mlregression.html#comparerf">6.3</a>, does not handle special characters in columns names well.<a href="mlregression.html#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>This is sometimes called a “baseline model.”<a href="mlregression.html#fnref10" class="footnote-back">↩︎</a></p></li>
+<ol start="8">
+<li id="fn8"><p>The random forest implementation in the ranger package, demonstrated in Section <a href="mlregression.html#comparerf">6.3</a>, does not handle special characters in columns names well.<a href="mlregression.html#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>This is sometimes called a “baseline model.”<a href="mlregression.html#fnref9" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

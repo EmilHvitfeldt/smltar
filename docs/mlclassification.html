@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-03-30" />
+<meta name="date" content="2021-04-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -473,12 +473,43 @@ This kind of “yes or no” binary classification model is both common and usef
 <p>The outcome variable <code>product</code> contains more categories than this, so we need to transform this variable to only contains the values “Credit reporting, credit repair services, or other personal consumer reports” and “Other.”</p>
 <p>It is always a good idea to look at your data! Here are the first six complaints:</p>
 <div class="sourceCode" id="cb264"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb264-1"><a href="mlclassification.html#cb264-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(complaints<span class="sc">$</span>consumer_complaint_narrative)</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;transworld systems inc. \nis trying to collect a debt that is not mine, not owed and is inaccurate.&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-#&gt; [2] &quot;I would like to request the suppression of the following items from my credit report, which are the result of my falling victim to identity theft. This information does not relate to [ transactions that I have made/accounts that I have opened ], as the attached supporting documentation can attest. As such, it should be blocked from appearing on my credit report pursuant to section 605B of the Fair Credit Reporting Act.&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-#&gt; [3] &quot;Over the past 2 weeks, I have been receiving excessive amounts of telephone calls from the company listed in this complaint. The calls occur between XXXX XXXX and XXXX XXXX to my cell and at my job. The company does not have the right to harass me at work and I want this to stop. It is extremely distracting to be told 5 times a day that I have a call from this collection agency while at work.&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-#&gt; [4] &quot;I was sold access to an event digitally, of which I have all the screenshots to detail the transactions, transferred the money and was provided with only a fake of a ticket. I have reported this to paypal and it was for the amount of {$21.00} including a {$1.00} fee from paypal. \n\nThis occured on XX/XX/2019, by paypal user who gave two accounts : 1 ) XXXX 2 ) XXXX XXXX&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-#&gt; [5] &quot;While checking my credit report I noticed three collections by a company called ARS that i was unfamiliar with. I disputed these collections with XXXX, and XXXX and they both replied that they contacted the creditor and the creditor verified the debt so I asked for proof which both bureaus replied that they are not required to prove anything. I then mailed a certified letter to ARS requesting proof of the debts n the form of an original aggrement, or a proof of a right to the debt, or even so much as the process as to how the bill was calculated, to which I was simply replied a letter for each collection claim that listed my name an account number and an amount with no other information to verify the debts after I sent a clear notice to provide me evidence. Afterwards I recontacted both XXXX, and XXXX, to redispute on the premise that it is not my debt if evidence can not be drawn up, I feel as if I am being personally victimized by ARS on my credit report for debts that are not owed to them or any party for that matter, and I feel discouraged that the credit bureaus who control many aspects of my personal finances are so negligent about my information.&quot;
-#&gt; [6] &quot;I would like the credit bureau to correct my XXXX XXXX XXXX XXXX balance. My correct balance is XXXX&quot;</code></pre>
+<pre><code>#&gt; [1] &quot;transworld systems inc. \nis trying to collect a debt that is not mine,
+not owed and is inaccurate.&quot;
+#&gt; [2] &quot;I would like to request the suppression of the following items from my
+credit report, which are the result of my falling victim to identity theft.
+This information does not relate to [ transactions that I have made/accounts
+that I have opened ], as the attached supporting documentation can attest. As
+such, it should be blocked from appearing on my credit report pursuant to
+section 605B of the Fair Credit Reporting Act.&quot;
+#&gt; [3] &quot;Over the past 2 weeks, I have been receiving excessive amounts of
+telephone calls from the company listed in this complaint. The calls occur
+between XXXX XXXX and XXXX XXXX to my cell and at my job. The company does not
+have the right to harass me at work and I want this to stop. It is extremely
+distracting to be told 5 times a day that I have a call from this collection
+agency while at work.&quot;
+#&gt; [4] &quot;I was sold access to an event digitally, of which I have all the
+screenshots to detail the transactions, transferred the money and was provided
+with only a fake of a ticket. I have reported this to paypal and it was for the
+amount of {$21.00} including a {$1.00} fee from paypal. \n\nThis occured on
+XX/XX/2019, by paypal user who gave two accounts : 1 ) XXXX 2 ) XXXX XXXX&quot;
+#&gt; [5] &quot;While checking my credit report I noticed three collections by a
+company called ARS that i was unfamiliar with. I disputed these collections
+with XXXX, and XXXX and they both replied that they contacted the creditor and
+the creditor verified the debt so I asked for proof which both bureaus replied
+that they are not required to prove anything. I then mailed a certified letter
+to ARS requesting proof of the debts n the form of an original aggrement, or a
+proof of a right to the debt, or even so much as the process as to how the bill
+was calculated, to which I was simply replied a letter for each collection
+claim that listed my name an account number and an amount with no other
+information to verify the debts after I sent a clear notice to provide me
+evidence. Afterwards I recontacted both XXXX, and XXXX, to redispute on the
+premise that it is not my debt if evidence can not be drawn up, I feel as if I
+am being personally victimized by ARS on my credit report for debts that are
+not owed to them or any party for that matter, and I feel discouraged that the
+credit bureaus who control many aspects of my personal finances are so
+negligent about my information.&quot;
+#&gt; [6] &quot;I would like the credit bureau to correct my XXXX XXXX XXXX XXXX
+balance. My correct balance is XXXX&quot;</code></pre>
 <p>The complaint narratives contain many series of capital <code>"X"</code>’s. These strings (like “XX/XX” or “XXXX XXXX XXXX XXXX”) are used to to protect personally identifiable information (PII) in this publicly available data set. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify.</p>
 <p>We also see that monetary amounts are surrounded by curly brackets (like <code>"{$21.00}"</code>); this is another text preprocessing step that has been taken care of for us. We could craft a regular expression to extract all the dollar amounts.</p>
 <div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="mlclassification.html#cb266-1" aria-hidden="true" tabindex="-1"></a>complaints<span class="sc">$</span>consumer_complaint_narrative <span class="sc">%&gt;%</span></span>
@@ -1464,7 +1495,7 @@ FIGURE 7.9: Many of the most frequent trigrams feature censored words, but there
 </div>
 <p>There is a difference in these proportions across classes. Tokens like “on xx xx” and “of xx xx” are used when referencing a date, e.g., “we had a problem on 06/25/2018.”
 Remember that the current tokenization engine strips punctuation before tokenizing.
-This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
+This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.</p>
 <p>To crudely simulate what the data might look like before it was censored, we can replace all cases of “XX” and “XXXX” with random integers.
 This isn’t quite right since dates will be given values between <code>00</code> and <code>99</code> and we don’t know for sure that only numerals have been censored, but it gives us a place to start.
 Below is a simple function <code>uncensor_vec()</code> that locates all instances of <code>"XX"</code> and replaces them with a number between 11 and 99.
@@ -2045,8 +2076,8 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 
 <div class="footnotes">
 <hr />
-<ol start="11">
-<li id="fn11"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref11" class="footnote-back">↩︎</a></p></li>
+<ol start="10">
+<li id="fn10"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref10" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
