@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-04" />
+<meta name="date" content="2021-04-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="dllstm.html"/>
 <link rel="next" href="text-models-in-the-real-world.html"/>
-<script src="libs/header-attrs-2.7.4/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.8/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -375,7 +375,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="part"><span><b>IV Conclusion</b></span></li>
 <li class="chapter" data-level="" data-path="text-models-in-the-real-world.html"><a href="text-models-in-the-real-world.html"><i class="fa fa-check"></i>Text models in the real world</a></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
+<li class="appendix"><span><b>Appendices</b></span></li>
 <li class="chapter" data-level="A" data-path="regexp.html"><a href="regexp.html"><i class="fa fa-check"></i><b>A</b> Regular expressions</a>
 <ul>
 <li class="chapter" data-level="A.1" data-path="regexp.html"><a href="regexp.html#literal-characters"><i class="fa fa-check"></i><b>A.1</b> Literal characters</a>
@@ -1023,8 +1023,9 @@ Since the function needs to be able to work with just the <code>x</code> paramet
 <span id="cb615-3"><a href="dlcnn.html#cb615-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span>
 <span id="cb615-4"><a href="dlcnn.html#cb615-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb615-5"><a href="dlcnn.html#cb615-5" aria-hidden="true" tabindex="-1"></a>sentence_to_explain</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;Exploring paint and its place in a digital world.&quot;                                                                  
-#&gt; [2] &quot;Mike Fassio wants a side-by-side photo of me and Hazel eating cake with our bare hands.  Let&#39;s make this a reality!&quot;</code></pre>
+<pre><code>#&gt; [1] &quot;Exploring paint and its place in a digital world.&quot;
+#&gt; [2] &quot;Mike Fassio wants a side-by-side photo of me and Hazel eating cake with
+our bare hands.  Let&#39;s make this a reality!&quot;</code></pre>
 <p>We now load the lime package and pass observations into <code>lime()</code> along with the model we are trying to explain and the preprocess function.</p>
 <div class="rmdwarning">
 <p>
@@ -1245,12 +1246,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.01       0.0315           0.993           1.01             0.808
-#&gt; 2 _tuning/20… 0.986      0.0407           0.990           0.986            0.804
-#&gt; 3 _tuning/20… 0.975      0.0467           0.988           0.975            0.801
-#&gt; 4 _tuning/20… 0.994      0.0307           0.994           0.994            0.813
-#&gt; 5 _tuning/20… 0.955      0.0372           0.992           0.955            0.808
-#&gt; 6 _tuning/20… 0.933      0.0462           0.988           0.933            0.809
+#&gt; 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
+#&gt; 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
+#&gt; 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
+#&gt; 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
+#&gt; 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
+#&gt; 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1265,13 +1266,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.813                 7             1
-#&gt; 2               0.809                 3             1
-#&gt; 3               0.808                 5             1
-#&gt; 4               0.808                 7             2
-#&gt; 5               0.804                 5             2
-#&gt; 6               0.801                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.812                 5             1
+#&gt; 2               0.811                 7             1
+#&gt; 3               0.809                 7             2
+#&gt; 4               0.808                 5             2
+#&gt; 5               0.807                 3             1
+#&gt; 6               0.803                 3             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1336,13 +1337,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb636-4"><a href="dlcnn.html#cb636-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
 #&gt; # A tibble: 5 x 3
-#&gt;   splits                 id    validation      
-#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;          
-#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble [4 × 3]&gt;
-#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble [4 × 3]&gt;
-#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble [4 × 3]&gt;
-#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble [4 × 3]&gt;
-#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble [4 × 3]&gt;</code></pre>
+#&gt;   splits                 id    validation          
+#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;              
+#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble[,3] [4 × 3]&gt;</code></pre>
 <p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
 <div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="dlcnn.html#cb638-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
 <span id="cb638-2"><a href="dlcnn.html#cb638-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>
