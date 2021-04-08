@@ -1,6 +1,6 @@
 \cleardoublepage 
 
-# (APPENDIX) Appendix {-}
+# (APPENDIX) Appendices {-}
 
 # Regular expressions {#regexp}
 
