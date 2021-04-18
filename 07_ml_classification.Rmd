@@ -418,7 +418,7 @@ collect_metrics(tune_rs)
 
 Let's visualize these metrics, accuracy and ROC AUC, in Figure \@ref(fig:complaintstunevis) to see what the best model is.
 
-```{r complaintstunevis, dependson="complaintstuners", opts.label = "fig.square", fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC"}
+```{r complaintstunevis, dependson="complaintstuners", opts.label = "fig.square", fig.cap="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty."}
 autoplot(tune_rs) +
   labs(
     title = "Lasso model performance across regularization penalties",
@@ -1263,7 +1263,7 @@ We have fitted these classification models!
 
 Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure \@ref(fig:complaintsfinaltunevis) shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization. 
 
-```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.asp=1, fig.cap="Model performance is similar for the higher token options so we can choose a simpler model"}
+```{r complaintsfinaltunevis, dependson="complaintsfinaltuners", fig.asp=1, fig.cap="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty."}
 autoplot(tune_rs) +
   labs(
     color = "Number of tokens",
