@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-08" />
+<meta name="date" content="2021-04-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="language.html"/>
 <link rel="next" href="stopwords.html"/>
-<script src="libs/header-attrs-2.7.8/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -708,9 +708,9 @@ We use Latin prefixes so that a 1-gram is called a unigram, a 2-gram is called a
 <p>Notice how the words in the trigrams overlap so that the word “down” appears in the middle of the first trigram and beginning of the second trigram. N-gram tokenization slides along the text to create overlapping sets of tokens.</p>
 <p>It is important to choose the right value for <code>n</code> when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don’t capture information about word order. Using a higher value for <code>n</code> keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don’t have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure <a href="tokenization.html#fig:ngramtokens">2.2</a> demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams.</p>
 <div class="figure" style="text-align: center"><span id="fig:ngramtokens"></span>
-<img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts" width="672" />
+<img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale." width="672" />
 <p class="caption">
-FIGURE 2.2: Using longer n-grams results in a higher number of unique tokens with fewer counts
+FIGURE 2.2: Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale.
 </p>
 </div>
 <p>We are not limited to use only one degree of n-grams. We can, for example, combine unigrams and bigrams in an analysis or model. Getting multiple degrees of n-grams is a little different depending on what package you are using; using <code>tokenize_ngrams()</code> you can specify <code>n</code> and <code>n_min</code>.</p>

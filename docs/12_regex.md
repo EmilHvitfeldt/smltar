@@ -205,24 +205,24 @@ Certain character classes are so commonly used that they have been predefined wi
 
 Table: (\#tab:characterclasses)All character classes
 
-|Class              |Description                                                   |
-|:------------------|:-------------------------------------------------------------|
-|[:digit:] or \\\\d |Digits; [0-9]                                                 |
-|[:alpha:]          |Alphabetic characters, uppercase and lowercase [A-z]          |
-|[:alnum:]          |Alphanumeric characters, letters, and digits [A-z0-9]         |
-|[:graph:]          |Graphical characters [[:alnum:][:punct:]]                     |
-|[:print:]          |Printable characters [[:alnum:][:punct:][:space:]]            |
-|[:lower:]          |Lowercase letters [a-z]                                       |
-|[:upper:]          |Uppercase letters [A-Z]                                       |
-|[:cntrl:]          |Control characters such as newline, carriage return, etc.     |
-|[:punct:]          |Punctuation characters: !"#$%&’()*+,-./:;<=>?@[]^_`{&#124;}~  |
-|[:blank:]          |Space and tab                                                 |
-|[:space:] or \\\\s |Space, tab, vertical tab, newline, form feed, carriage return |
-|[:xdigit:]         |Hexadecimal digits [0-9A-Fa-f]                                |
-|\\\\S              |Not space [^[:space:]]                                        |
-|\\\\w              |Word characters:  letters, digits, and underscores [A-z0-9_]  |
-|\\\\W              |Non-word characters [^A-z0-9_]                                |
-|\\\\D              |Non-digits [^0-9]                                             |
+|Description                                                   |Class              |
+|:-------------------------------------------------------------|:------------------|
+|Digits; [0-9]                                                 |[:digit:] or \\\\d |
+|Alphabetic characters, uppercase and lowercase [A-z]          |[:alpha:]          |
+|Alphanumeric characters, letters, and digits [A-z0-9]         |[:alnum:]          |
+|Graphical characters [[:alnum:][:punct:]]                     |[:graph:]          |
+|Printable characters [[:alnum:][:punct:][:space:]]            |[:print:]          |
+|Lowercase letters [a-z]                                       |[:lower:]          |
+|Uppercase letters [A-Z]                                       |[:upper:]          |
+|Control characters such as newline, carriage return, etc.     |[:cntrl:]          |
+|Punctuation characters: !"#$%&’()*+,-./:;<=>?@[]^_`{&#124;}~  |[:punct:]          |
+|Space and tab                                                 |[:blank:]          |
+|Space, tab, vertical tab, newline, form feed, carriage return |[:space:] or \\\\s |
+|Hexadecimal digits [0-9A-Fa-f]                                |[:xdigit:]         |
+|Not space [^[:space:]]                                        |\\\\S              |
+|Word characters:  letters, digits, and underscores [A-z0-9_]  |\\\\w              |
+|Non-word characters [^A-z0-9_]                                |\\\\W              |
+|Non-digits [^0-9]                                             |\\\\D              |
 
 Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
 

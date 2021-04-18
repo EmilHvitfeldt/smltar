@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-04-08"
+date: "2021-04-18"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
@@ -85,7 +85,7 @@ We don't assume an extensive background in text analysis, but [*Text Mining with
 
 We are so thankful for the contributions, help, and perspectives of people who have supported us in this project. There are several we would like to thank in particular.
 
-We would like to thank Max Kuhn and Davis Vaughan for their investment in the tidymodels packages, David Robinson for his collaboration on the tidytext package, the anonymous technical reviewers for their substantive and insightful feedback, and Desirée De Leon for the site design for this online work.
+We would like to thank Max Kuhn and Davis Vaughan for their investment in the tidymodels packages, David Robinson for his collaboration on the tidytext package, Yihui Xie for his work on knitr, R Markdown, and bookdown, and Desirée De Leon for the site design for this online work. We would also like to thank Carol Haney, Kasia Kulma, David Mimno, Kanishka Misra, and an additional anonymous technical reviewer for their detailed, insightful feedback that substantively improved this book, as well as our editor John Kimmel for his perspective and guidance during the process of writing and publishing.
 
 
 
