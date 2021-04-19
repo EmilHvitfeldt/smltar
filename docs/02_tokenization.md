@@ -414,8 +414,8 @@ Notice how the words in the trigrams overlap so that the word "down" appears in 
 It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams. 
 
 <div class="figure" style="text-align: center">
-<img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts" width="672" />
-<p class="caption">(\#fig:ngramtokens)Using longer n-grams results in a higher number of unique tokens with fewer counts</p>
+<img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale." width="672" />
+<p class="caption">(\#fig:ngramtokens)Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale.</p>
 </div>
 
 We are not limited to use only one degree of n-grams. We can, for example, combine unigrams and bigrams in an analysis or model. Getting multiple degrees of n-grams is a little different depending on what package you are using; using `tokenize_ngrams()` you can specify `n` and `n_min`.
