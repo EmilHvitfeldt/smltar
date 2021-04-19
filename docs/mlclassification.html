@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-08" />
+<meta name="date" content="2021-04-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="mlregression.html"/>
 <link rel="next" href="dlforeword.html"/>
-<script src="libs/header-attrs-2.7.8/header-attrs.js"></script>
+<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -920,9 +920,9 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <span id="cb310-4"><a href="mlclassification.html#cb310-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance metrics can be used to identity the best penalty&quot;</span></span>
 <span id="cb310-5"><a href="mlclassification.html#cb310-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintstunevis"></span>
-<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC" width="672" />
+<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
 <p class="caption">
-FIGURE 7.5: We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC
+FIGURE 7.5: We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty.
 </p>
 </div>
 <p>We can view the best results with <code>show_best()</code> and a choice for the metric, such as ROC AUC.</p>
@@ -1886,9 +1886,9 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
 <span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintsfinaltunevis"></span>
-<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model" width="672" />
+<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
 <p class="caption">
-FIGURE 7.11: Model performance is similar for the higher token options so we can choose a simpler model
+FIGURE 7.11: Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty.
 </p>
 </div>
 <p>Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let’s choose a simpler model within some limit around that numerically best result, with more regularization that gives close-to-best performance. Let’s choose by percent loss compared to the best model (the default choice is 2% loss), and let’s say we care most about overall accuracy (rather than sensitivity or specificity).</p>

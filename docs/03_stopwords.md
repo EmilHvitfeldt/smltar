@@ -441,7 +441,7 @@ Easy examples are to include the complements to the words in the list if they ar
 Figure \@ref(fig:genderrank) shows how the words associated with men have a higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.
 
 <div class="figure" style="text-align: center">
-<img src="03_stopwords_files/figure-html/genderrank-1.png" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="672" />
+<img src="03_stopwords_files/figure-html/genderrank-1.png" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="768" />
 <p class="caption">(\#fig:genderrank)Tokens ranked according to total occurrences, with rank 1 having the most occurrences</p>
 </div>
 

@@ -707,8 +707,8 @@ autoplot(tune_rs) +
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC" width="672" />
-<p class="caption">(\#fig:complaintstunevis)We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC</p>
+<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
+<p class="caption">(\#fig:complaintstunevis)We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty.</p>
 </div>
 
 We can view the best results with `show_best()` and a choice for the metric, such as ROC AUC.
@@ -2062,8 +2062,8 @@ autoplot(tune_rs) +
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model" width="672" />
-<p class="caption">(\#fig:complaintsfinaltunevis)Model performance is similar for the higher token options so we can choose a simpler model</p>
+<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
+<p class="caption">(\#fig:complaintsfinaltunevis)Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty.</p>
 </div>
 
 Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let's choose a simpler model within some limit around that numerically best result, with more regularization that gives close-to-best performance. Let's choose by percent loss compared to the best model (the default choice is 2% loss), and let's say we care most about overall accuracy (rather than sensitivity or specificity).

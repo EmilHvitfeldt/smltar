@@ -265,7 +265,7 @@ Notice how the words in the trigrams overlap so that the word "down" appears in 
 
 It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams. 
 
-```{r ngramtokens, echo=FALSE, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts"}
+```{r ngramtokens, echo=FALSE, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale."}
 length_and_max <- function(x) {
   tab <- table(x)
   paste(length(tab), max(tab), sep = "-")
@@ -293,7 +293,7 @@ plotting_data <- hcandersen_en %>%
 plotting_data  %>%
   ggplot(aes(length, ngrams, color = max)) +
   geom_jitter(width = 0, alpha = 0.8, height = 0.35) +
-  scale_color_viridis_c(trans = "log", labels = scales::comma) +
+  scale_color_viridis_c(trans = "log", breaks = c(1, 10, 100, 1000)) +
   labs(x = "Number of unique n-grams",
        y = NULL,
        color = "Count of\nmost frequent\nngram",
