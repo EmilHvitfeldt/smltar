@@ -140,14 +140,6 @@ cm_heat <- function(x) {
 }
 
 
-tidy.LiblineaR <- function(x, ...) {
-  
-  ret <- tibble(colnames(x$W), x$W[1,])
-  colnames(ret) <- c("term", "estimate")
-  
-  ret
-}
-
 conf_mat_resampled <- function(x) {
   tune::conf_mat_resampled(x, tidy = FALSE) %>%
     as.table() %>%
