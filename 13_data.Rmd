@@ -10,9 +10,13 @@ The **hcandersenr** [@R-hcandersenr] package includes the text of the 157 known 
 There are five different languages available, with:
 
 - 156 fairy tales in English,
+
 - 154 in Spanish,
+
 - 150 in German,
+
 - 138 in Danish, and
+
 - 58 in French.
 
 The package contains a data set for each language with the naming convention `hcandersen_**`,
