@@ -18,6 +18,7 @@ knit_hooks$set(output = function(x, options) {
 In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome. 
 
 - A **regression model** predicts a numeric or continuous value.
+
 - A **classification model** predicts a class label or group membership.
 
 For our classification example in this chapter, let's consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Section \@ref(cfpb-complaints)) with `read_csv()`.
@@ -544,6 +545,7 @@ The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned 
 Importantly, this tuning also took a bit less time to complete. 
 
 - The _preprocessing_ was not much faster, because tokenization and computing tf-idf take a long time. 
+
 - The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
 
 Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
@@ -559,13 +561,21 @@ However, it is not always possible to limit a modeling question to two classes. 
 The CFPB complaints data set in this chapter has nine different `product` classes. In decreasing frequency, they are:
 
 - Credit reporting, credit repair services, or other personal consumer reports
+
 - Debt collection
+
 - Credit card or prepaid card
+
 - Mortgage
+
 - Checking or savings account
+
 - Student loan
+
 - Vehicle loan or lease
+
 - Money transfer, virtual currency, or money service
+
 - Payday loan, title loan, or personal loan
 
 We assume that there is a reason why these product classes have been created in this fashion by this government agency.
@@ -597,7 +607,9 @@ This kind of imbalance is a common problem with multiclass classification, with 
 Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:
 
 - Many machine learning algorithms do not handle imbalanced data well and are likely to have a hard time predicting minority classes.
+
 - Not all machine learning algorithms are built for multiclass classification at all.
+
 - Many evaluation metrics need to be reformulated to describe multiclass predictions.
 
 When you have multiple classes in your data, it is possible to formulate the multiclass problem in two ways. With one approach, any given observation can belong to multiple classes. With the other approach, an observation can belong to one and only one class. We will be sticking to the second, "one class per observation" model formulation in this section.
@@ -723,13 +735,21 @@ Otherwise we we will be very disappointed once our model is used to predict on n
 The variables we identify as available for use as predictors are:
 
 - `date_received`
+
 - `issue`
+
 - `sub_issue`
+
 - `consumer_complaint_narrative`
+
 - `company`
+
 - `state`
+
 - `zip_code`
+
 - `tags`
+
 - `submitted_via`
 
 Let's try including `date_received` in our modeling, along with the text variable we have already used `consumer_complaint_narrative` and a new variable `tags`.
@@ -986,7 +1006,9 @@ They can also be more engineered such as the percentage of capitalization, wheth
 For our CFPB complaints data, certain patterns may not have adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section \@ref(classfirstattemptlookatdata). Let's walk through how to create data preprocessing functions to build the features to:
 
 - detect credit cards,
+
 - calculate percentage censoring, and
+
 - detect monetary amounts.
 
 ### Detect credit cards
@@ -1165,10 +1187,15 @@ Since then have we looked at different models, preprocessing techniques, and dom
 For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
+
 - include text (but not `tags` or date features, since those did not result in better performance),
+
 - tune the number of tokens used in the model,
+
 - include unigrams only,
+
 - include custom-engineered features,
+
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
@@ -1403,8 +1430,13 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 ### In this chapter, you learned:
 
 - how text data can be used in a classification model
+
 - to tune hyperparameters of a model
+
 - how to compare different model types
+
 - that models can combine both text and non-text predictors
+
 - about engineering custom features for machine learning
+
 - about performance metrics for classification models
