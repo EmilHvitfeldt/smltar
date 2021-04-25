@@ -481,7 +481,7 @@ div.csl-indent {
 <p>What if we aren’t interested in the difference between <code>"trees"</code> and <code>"tree"</code> and we want to treat both together? That idea is at the heart of <strong>stemming</strong>, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, <code>"trees"</code> would lose its letter <code>"s"</code> while <code>"tree"</code> stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem <code>"tree"</code> (89, if we also find the stem for <code>"tree's"</code>).</p>
 <div id="how-to-stem-text-in-r" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> How to stem text in R</h2>
-<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <a href="https://cran.r-project.org/package=SnowballC">SnowballC</a> package. (It has been extended to languages other than English as well.)</p>
+<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <strong>SnowballC</strong> package <span class="citation">(<a href="#ref-R-SnowballC" role="doc-biblioref">Bouchet-Valat 2020</a>)</span>. (It has been extended to languages other than English as well.)</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="stemming.html#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
 <span id="cb83-2"><a href="stemming.html#cb83-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb83-3"><a href="stemming.html#cb83-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -543,7 +543,7 @@ FIGURE 4.1: Porter stemming results in five languages
 </p>
 </div>
 <p>Figure <a href="stemming.html#fig:porterlanguages">4.1</a> demonstrates some of the challenges in working with languages other English; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.</p>
-<p>The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that’s not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the <a href="http://hunspell.github.io/">Hunspell</a> library. The “Hun” in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the <a href="https://cran.r-project.org/package=hunspell">hunspell</a> package.</p>
+<p>The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that’s not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the <a href="http://hunspell.github.io/">Hunspell</a> library. The “Hun” in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the <strong>hunspell</strong> [R-hunspell] package.</p>
 <div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="stemming.html#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hunspell)</span>
 <span id="cb87-2"><a href="stemming.html#cb87-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb87-3"><a href="stemming.html#cb87-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -596,7 +596,7 @@ FIGURE 4.1: Porter stemming results in five languages
 #&gt;  9 upon   105069
 #&gt; 10 united 103267
 #&gt; # … with 167,869 more rows</code></pre>
-<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix (technically, a document-feature matrix object from the <a href="https://cran.r-project.org/package=quanteda"><strong>quanteda</strong></a> package).</p>
+<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix (technically, a document-feature matrix object from the <strong>quanteda</strong> <span class="citation">(<a href="#ref-R-quanteda" role="doc-biblioref">Benoit et al. 2020</a>)</span> package).</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="stemming.html#cb93-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span></span>
 <span id="cb93-2"><a href="stemming.html#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, word) <span class="sc">%&gt;%</span></span>
 <span id="cb93-3"><a href="stemming.html#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, word, n)</span></code></pre></div>
@@ -616,9 +616,9 @@ FIGURE 4.1: Porter stemming results in five languages
 <p>Topic modeling is an example of unsupervised machine learning for text and is not the same as the predictive modeling approaches we’ll be focusing on in this book, but the lesson remains that stemming may or may not be beneficial for any specific context. As we work through the rest of this chapter and learn more about stemming, consider what information we lose when we stem text in exchange for reducing the number of word features. Stemming can be helpful in some contexts, but typical stemming algorithms are somewhat aggressive and have been built to favor sensitivity (or recall, or the true positive rate) at the expense of specificity (or precision, or the true negative rate).</p>
 <p>Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:</p>
 <ul>
-<li>meaning and mean</li>
-<li>likely, like, liking</li>
-<li>university and universe</li>
+<li><p>meaning and mean</p></li>
+<li><p>likely, like, liking</p></li>
+<li><p>university and universe</p></li>
 </ul>
 <p>In a supervised machine learning context, this affects a model’s positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter <a href="mlclassification.html#mlclassification">7</a>, we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model’s ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints <em>not</em> about mortgages, correctly.</p>
 </div>
@@ -633,11 +633,11 @@ where <span class="math inline">\(m\)</span> is called the “measure” of the 
 <p><span class="math display">\[VCVCVC\]</span>
 and it is an <code>m = 3</code> word.</p>
 <ul>
-<li>The first step of the Porter stemmer is (perhaps this seems like cheating) actually made of three substeps working with plural and past participle word endings. In the first substep (1a), “sses” is replaced with “ss,” “ies” is replaced with “i,” and final single “s” letters are removed. The second substep (1b) depends on the measure of the word <code>m</code> but works with endings like “eed,” “ed,” “ing,” adding “e” back on to make endings like “ate,” “ble,” and “ize” when appropriate. The third substep (1c) replaces “y” with “i” for words of a certain <code>m</code>.</li>
-<li>The second step of the Porter stemmer takes the output of the first step and regularizes a set of 20 endings. In this step, “ization” goes to “ize,” “alism” goes to “al,” “aliti” goes to “al” (notice that the ending “i” there came from the first step), and so on for the other 17 endings.</li>
-<li>The third step again processes the output, using a list of seven endings. Here, “ical” and “iciti” both go to “ic,” “ful” and “ness” are both removed, and so forth for the three other endings in this step.</li>
-<li>The fourth step involves a longer list of endings to deal with again (19), and they are all removed. Endings like “ent,” “ism,” “ment,” and more are removed in this step.</li>
-<li>The fifth and final step has two substeps, both which depend on the measure <code>m</code> of the word. In this step, depending on <code>m</code>, final “e” letters are sometimes removed and final double letters are sometimes removed.</li>
+<li><p>The first step of the Porter stemmer is (perhaps this seems like cheating) actually made of three substeps working with plural and past participle word endings. In the first substep (1a), “sses” is replaced with “ss,” “ies” is replaced with “i,” and final single “s” letters are removed. The second substep (1b) depends on the measure of the word <code>m</code> but works with endings like “eed,” “ed,” “ing,” adding “e” back on to make endings like “ate,” “ble,” and “ize” when appropriate. The third substep (1c) replaces “y” with “i” for words of a certain <code>m</code>.</p></li>
+<li><p>The second step of the Porter stemmer takes the output of the first step and regularizes a set of 20 endings. In this step, “ization” goes to “ize,” “alism” goes to “al,” “aliti” goes to “al” (notice that the ending “i” there came from the first step), and so on for the other 17 endings.</p></li>
+<li><p>The third step again processes the output, using a list of seven endings. Here, “ical” and “iciti” both go to “ic,” “ful” and “ness” are both removed, and so forth for the three other endings in this step.</p></li>
+<li><p>The fourth step involves a longer list of endings to deal with again (19), and they are all removed. Endings like “ent,” “ism,” “ment,” and more are removed in this step.</p></li>
+<li><p>The fifth and final step has two substeps, both which depend on the measure <code>m</code> of the word. In this step, depending on <code>m</code>, final “e” letters are sometimes removed and final double letters are sometimes removed.</p></li>
 </ul>
 <div class="rmdnote">
 <p>
@@ -699,9 +699,9 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <h2><span class="header-section-number">4.5</span> Compare some stemming options</h2>
 <p>Let’s compare a few simple stemming algorithms and see what results we end with. Let’s look at “The Fir-Tree,” specifically the tidied data set from which we have removed stop words. Let’s compare three very straightforward stemming approaches.</p>
 <ul>
-<li><strong>Only remove final instances of the letter “s.”</strong> This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let’s see what the impact is.</li>
-<li><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></li>
-<li><strong>Implement actual Porter stemming.</strong> We can now compare to the most commonly used stemming algorithm in English.</li>
+<li><p><strong>Only remove final instances of the letter “s.”</strong> This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let’s see what the impact is.</p></li>
+<li><p><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p></li>
+<li><p><strong>Implement actual Porter stemming.</strong> We can now compare to the most commonly used stemming algorithm in English.</p></li>
 </ul>
 <div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="stemming.html#cb103-1" aria-hidden="true" tabindex="-1"></a>stemming <span class="ot">&lt;-</span> tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb103-2"><a href="stemming.html#cb103-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>book, <span class="sc">-</span>language) <span class="sc">%&gt;%</span></span>
@@ -791,7 +791,7 @@ How does lemmatization work in languages other than English? Lookup dictionaries
 <p>A modern, efficient implementation for lemmatization is available in the excellent <a href="https://spacy.io/">spaCy</a> library <span class="citation">(<a href="#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span>, which is written in Python.</p>
 
 <div class="rmdpackage">
-NLP practitioners who work with R can use this library via the <strong>spacyr</strong> package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
+NLP practitioners who work with R can use this library via the <strong>spacyr</strong> package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2020</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
 </div>
 <p>Section <a href="mlregression.html#mlregressionlemmatization">6.6</a> demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown <a href="https://rstudio.github.io/reticulate/articles/r_markdown.html">via its Python engine</a>.</p>
 <p>Let’s briefly walk through how to use spacyr.</p>
@@ -852,10 +852,10 @@ In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored wheth
 <div id="in-this-chapter-you-learned-3" class="section level3" number="4.8.1">
 <h3><span class="header-section-number">4.8.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>about the most broadly used stemming algorithms</li>
-<li>how to implement stemming</li>
-<li>that stemming changes the sparsity or feature space of text data</li>
-<li>the differences between stemming and lemmatization</li>
+<li><p>about the most broadly used stemming algorithms</p></li>
+<li><p>how to implement stemming</p></li>
+<li><p>that stemming changes the sparsity or feature space of text data</p></li>
+<li><p>the differences between stemming and lemmatization</p></li>
 </ul>
 
 </div>
@@ -867,7 +867,13 @@ In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored wheth
 Arnold, Taylor. 2017. <span>“A Tidy Data Model for Natural Language Processing Using cleanNLP.”</span> <em>The R Journal</em> 9 (2): 1–20. <a href="https://journal.r-project.org/archive/2017/RJ-2017-035/index.html">https://journal.r-project.org/archive/2017/RJ-2017-035/index.html</a>.
 </div>
 <div id="ref-Benoit19" class="csl-entry">
-Benoit, Kenneth, and Akitaka Matsuo. 2019. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+Benoit, Kenneth, and Akitaka Matsuo. 2020. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+</div>
+<div id="ref-R-quanteda" class="csl-entry">
+Benoit, Kenneth, Kohei Watanabe, Haiyan Wang, Paul Nulty, Adam Obeng, Stefan Müller, Akitaka Matsuo, Jiong Wei Lua, Jouni Kuha, and William Lowe. 2020. <em>Quanteda: Quantitative Analysis of Textual Data</em>. <a href="https://quanteda.io">https://quanteda.io</a>.
+</div>
+<div id="ref-R-SnowballC" class="csl-entry">
+Bouchet-Valat, Milan. 2020. <em>SnowballC: Snowball Stemmers Based on the c ’Libstemmer’ UTF-8 Library</em>. <a href="https://CRAN.R-project.org/package=SnowballC">https://CRAN.R-project.org/package=SnowballC</a>.
 </div>
 <div id="ref-Harman91" class="csl-entry">
 Harman, Donna. 1991. <span>“How Effective Is Suffixing?”</span> <em>Journal of the American Society for Information Science</em> 42 (1): 7–15.

@@ -4,7 +4,7 @@
 
 # Text models in the real world {-}
 
-Models affect real people in real ways. As the school year of 2020 began with many schools in the United States operating online only because of the novel coronavirus pandemic, a parent of a junior high student [reported](https://twitter.com/DanaJSimmons/status/1300639757165191170) that her son was deeply upset and filled with doubt because of the way the algorithm of an ed tech company automatically scored his text answers. The parent and child [discovered](https://www.theverge.com/2020/9/2/21419012/edgenuity-online-class-ai-grading-keyword-mashing-students-school-cheating-algorithm-glitch) how to "game" the ed tech system's scoring.
+Models affect real people in real ways. As the school year of 2020 began with many schools in the United States operating online only because of the novel coronavirus pandemic, a parent of a junior high student [reported](https://twitter.com/DanaJSimmons/status/1300639757165191170) that her son was deeply upset and filled with doubt because of the way the algorithm of an ed tech company automatically scored his text answers. The parent and child discovered [@Verge2020] how to "game" the ed tech system's scoring.
 
 > Algorithm update. He cracked it: Two full sentences, followed by a word salad of all possibly applicable keywords. 100% on every assignment. Students on \@EdgenuityInc, there's your ticket. He went from an F to an A+ without learning a thing.
 
@@ -17,6 +17,7 @@ The particular ed tech company in this example does claim that these scores are 
 This situation is more urgent and important than only a single example from the pandemic-stressed United States educational system, because:
 
 - these types of harms exacerbate existing inequalities, and
+
 - these systems are becoming more and more widely used.
 
 @Ramineni2018 report how GRE essays by African-American students receive lower scores from automatic grading algorithms than from expert human graders, and explore statistical differences in the two grading approaches. This is a stark reminder that machine learning systems learn patterns from training data and amplify those patterns. @Feathers2019 reports that the kind of automatic essay grading described here is used in at least 21 states, and essay grading is not the only kind of predictive text model that has real impact on real individuals' lives^[For more, see this discussion from Rachel Thomas: https://youtu.be/bqCEUQq0z4o]. 

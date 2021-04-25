@@ -619,8 +619,8 @@ FIGURE 10.4: ROC curve for first CNN model predictions of Kickstarter campaign s
 <p>Now that we know how our basic CNN performs, we can see what happens when we apply some common modifications to it.
 This case study will examine:</p>
 <ul>
-<li>how we can add additional <em>convolutional</em> layers to our base model and</li>
-<li>how additional <em>dense</em> layers can be added.</li>
+<li><p>how we can add additional <em>convolutional</em> layers to our base model and</p></li>
+<li><p>how additional <em>dense</em> layers can be added.</p></li>
 </ul>
 <p>Let’s start by adding another fully connected layer. We take the architecture we used in <code>simple_cnn_model</code> and add another <code>layer_dense()</code> after the first <code>layer_dense()</code> in the model.
 Increasing the depth of the model via the fully connected layers allows the model to find more complex patterns.
@@ -1024,7 +1024,7 @@ As indicated by its name, LIME is an approach to compute local feature importanc
 </div>
 <div class="rmdpackage">
 <p>
-The <strong>lime</strong> package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction.
+The <strong>lime</strong> package in R <span class="citation"><span class="citation">(<a href="#ref-R-lime" role="doc-biblioref">Pedersen and Benesty 2021</a>)</span></span> implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction.
 </p>
 </div>
 <p>To use this package we need to write a helper function to get the data in the format we want. The <code>lime()</code> function takes two mandatory arguments, <code>x</code> and <code>model</code>. The <code>model</code> argument is the trained model we are trying to explain. The <code>lime()</code> function works out of the box with Keras models so we should be good to go there. The <code>x</code> argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting <code>x</code> to be a character vector so we’ll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.</p>
@@ -1271,12 +1271,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.01       0.0329           0.993           1.01             0.807
-#&gt; 2 _tuning/20… 1.00       0.0353           0.992           1.00             0.806
-#&gt; 3 _tuning/20… 1.00       0.0456           0.988           1.00             0.805
-#&gt; 4 _tuning/20… 0.972      0.0305           0.994           0.972            0.810
-#&gt; 5 _tuning/20… 0.960      0.033            0.993           0.960            0.81 
-#&gt; 6 _tuning/20… 0.930      0.0493           0.987           0.930            0.810
+#&gt; 1 _tuning/20… 0.990      0.0308           0.994           0.990            0.806
+#&gt; 2 _tuning/20… 0.990      0.0383           0.991           0.990            0.802
+#&gt; 3 _tuning/20… 0.978      0.047            0.988           0.978            0.804
+#&gt; 4 _tuning/20… 0.952      0.0291           0.995           0.952            0.811
+#&gt; 5 _tuning/20… 0.970      0.0325           0.993           0.970            0.812
+#&gt; 6 _tuning/20… 0.945      0.0448           0.989           0.945            0.808
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1291,13 +1291,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.810                 7             1
-#&gt; 2               0.81                  5             1
-#&gt; 3               0.810                 3             1
-#&gt; 4               0.807                 7             2
-#&gt; 5               0.806                 5             2
-#&gt; 6               0.805                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.812                 5             1
+#&gt; 2               0.811                 7             1
+#&gt; 3               0.808                 3             1
+#&gt; 4               0.806                 7             2
+#&gt; 5               0.804                 3             2
+#&gt; 6               0.802                 5             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1520,12 +1520,12 @@ For this particular data set of short text blurbs, a CNN model able to learn loc
 <div id="in-this-chapter-you-learned-9" class="section level3" number="10.9.1">
 <h3><span class="header-section-number">10.9.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>how to preprocess text data for CNN models</li>
-<li>about CNN network architectures</li>
-<li>how CNN layers can be stacked to extract patterns of varying detail</li>
-<li>how byte pair encoding can be used to tokenize for finer detail</li>
-<li>how to do hyperparameter search in Keras with <strong>tfruns</strong></li>
-<li>how to evaluate CNN models for text</li>
+<li><p>how to preprocess text data for CNN models</p></li>
+<li><p>about CNN network architectures</p></li>
+<li><p>how CNN layers can be stacked to extract patterns of varying detail</p></li>
+<li><p>how byte pair encoding can be used to tokenize for finer detail</p></li>
+<li><p>how to do hyperparameter search in Keras with <strong>tfruns</strong></p></li>
+<li><p>how to evaluate CNN models for text</p></li>
 </ul>
 
 </div>
@@ -1541,6 +1541,9 @@ Gage, P. 1994. <span>“A New Algorithm for Data Compression.”</span> <em>The 
 </div>
 <div id="ref-kim2014" class="csl-entry">
 Kim, Yoon. 2014. <span>“Convolutional Neural Networks for Sentence Classification.”</span> In <em>Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (<span>EMNLP</span>)</em>, 1746–51. Doha, Qatar: Association for Computational Linguistics. <a href="https://doi.org/10.3115/v1/D14-1181">https://doi.org/10.3115/v1/D14-1181</a>.
+</div>
+<div id="ref-R-lime" class="csl-entry">
+Pedersen, Thomas Lin, and Michaël Benesty. 2021. <em>Lime: Local Interpretable Model-Agnostic Explanations</em>. <a href="https://CRAN.R-project.org/package=lime">https://CRAN.R-project.org/package=lime</a>.
 </div>
 <div id="ref-ribeiro2016why" class="csl-entry">
 Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> <a href="http://arxiv.org/abs/1602.04938">http://arxiv.org/abs/1602.04938</a>.

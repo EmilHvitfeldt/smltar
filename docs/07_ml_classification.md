@@ -6,6 +6,7 @@
 In Chapter \@ref(mlregression), we focused on modeling to predict *continuous values* for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict *labels* on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome. 
 
 - A **regression model** predicts a numeric or continuous value.
+
 - A **classification model** predicts a class label or group membership.
 
 For our classification example in this chapter, let's consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let's read in the complaint data (Section \@ref(cfpb-complaints)) with `read_csv()`.
@@ -224,7 +225,7 @@ One of the main advantages of a naive Bayes model is its ability to handle a lar
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 <div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.</p>
+<p>In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong> <span class="citation">[@R-parsnip]</span>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.</p>
 </div>
 
 
@@ -256,7 +257,7 @@ We have trained our first classification model!
 
 ### Evaluation
 
-Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use **resampling** methods to evaluate our model.
+Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use *resampling* methods to evaluate our model.
 
 Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
@@ -851,7 +852,7 @@ fitted_lasso %>%
 
 We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
-To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package [**hardhat**](https://hardhat.tidymodels.org/).
+To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package **hardhat** [@R-hardhat].
 
 <div class="rmdpackage">
 <p>The <strong>hardhat</strong> package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don’t use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.</p>
@@ -986,6 +987,7 @@ The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned 
 Importantly, this tuning also took a bit less time to complete. 
 
 - The _preprocessing_ was not much faster, because tokenization and computing tf-idf take a long time. 
+
 - The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
 
 Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
@@ -1001,13 +1003,21 @@ However, it is not always possible to limit a modeling question to two classes. 
 The CFPB complaints data set in this chapter has nine different `product` classes. In decreasing frequency, they are:
 
 - Credit reporting, credit repair services, or other personal consumer reports
+
 - Debt collection
+
 - Credit card or prepaid card
+
 - Mortgage
+
 - Checking or savings account
+
 - Student loan
+
 - Vehicle loan or lease
+
 - Money transfer, virtual currency, or money service
+
 - Payday loan, title loan, or personal loan
 
 We assume that there is a reason why these product classes have been created in this fashion by this government agency.
@@ -1056,14 +1066,16 @@ This kind of imbalance is a common problem with multiclass classification, with 
 Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:
 
 - Many machine learning algorithms do not handle imbalanced data well and are likely to have a hard time predicting minority classes.
+
 - Not all machine learning algorithms are built for multiclass classification at all.
+
 - Many evaluation metrics need to be reformulated to describe multiclass predictions.
 
 When you have multiple classes in your data, it is possible to formulate the multiclass problem in two ways. With one approach, any given observation can belong to multiple classes. With the other approach, an observation can belong to one and only one class. We will be sticking to the second, "one class per observation" model formulation in this section.
 
 There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the [**themis**](https://themis.tidymodels.org) add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
+We will be using the **themis** [@R-themis] add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
 
 <div class="rmdpackage">
 <p>The <strong>themis</strong> package provides many more algorithms to deal with imbalanced data during data preprocessing.</p>
@@ -1262,13 +1274,21 @@ Otherwise we we will be very disappointed once our model is used to predict on n
 The variables we identify as available for use as predictors are:
 
 - `date_received`
+
 - `issue`
+
 - `sub_issue`
+
 - `consumer_complaint_narrative`
+
 - `company`
+
 - `state`
+
 - `zip_code`
+
 - `tags`
+
 - `submitted_via`
 
 Let's try including `date_received` in our modeling, along with the text variable we have already used `consumer_complaint_narrative` and a new variable `tags`.
@@ -1614,7 +1634,9 @@ They can also be more engineered such as the percentage of capitalization, wheth
 For our CFPB complaints data, certain patterns may not have adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section \@ref(classfirstattemptlookatdata). Let's walk through how to create data preprocessing functions to build the features to:
 
 - detect credit cards,
+
 - calculate percentage censoring, and
+
 - detect monetary amounts.
 
 ### Detect credit cards
@@ -1906,10 +1928,15 @@ Since then have we looked at different models, preprocessing techniques, and dom
 For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
+
 - include text (but not `tags` or date features, since those did not result in better performance),
+
 - tune the number of tokens used in the model,
+
 - include unigrams only,
+
 - include custom-engineered features,
+
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 ### Feature selection
@@ -2028,9 +2055,7 @@ final_grid
 #> # … with 50 more rows
 ```
 
-<div class="rmdpackage">
-<p>We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong>.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`. The **tidymodels** package for creating and handling tuning parameters and parameter grids is **dials** [@R-dials].</div>\EndKnitrBlock{rmdpackage}
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.
 
@@ -2291,8 +2316,13 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 ### In this chapter, you learned:
 
 - how text data can be used in a classification model
+
 - to tune hyperparameters of a model
+
 - how to compare different model types
+
 - that models can combine both text and non-text predictors
+
 - about engineering custom features for machine learning
+
 - about performance metrics for classification models

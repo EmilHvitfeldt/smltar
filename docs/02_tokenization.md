@@ -6,7 +6,7 @@ To build features for supervised machine learning from natural language, we need
 
 ## What is a token?
 
-In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the [**hcandersenr**](https://cran.r-project.org/package=hcandersenr) package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
 <div class="rmdpackage">
@@ -99,18 +99,31 @@ tokenize_words(the_fir_tree[1:2])
 We see sensible single-word results here; the `tokenize_words()` function uses the **stringi** package [@Gagolewski19] and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm [@ICUWordBoundary] work? It can be outlined as follows:
 
 - Break at the start and end of text, unless the text is empty.
+
 - Do not break within CRLF (new line characters).
+
 - Otherwise, break before and after new lines (including CR and LF).
+
 - Do not break within emoji zwj sequences.
+
 - Keep horizontal whitespace together.
+
 - Ignore Format and Extend characters, except after sot, CR, LF, and new line.
+
 - Do not break between most letters.
+
 - Do not break letters across certain punctuation.
+
 - Do not break within sequences of digits, or digits adjacent to letters ("3a", or "A3").
+
 - Do not break within sequences, such as "3.2" or "3,456.789".
+
 - Do not break between Katakana.
+
 - Do not break from extenders.
+
 - Do not break within emoji flag sequences. 
+
 - Otherwise, break everywhere (including around ideographs).
 
 While we might not understand what each and every step in this algorithm is doing, we can appreciate that it is many times more sophisticated than our initial approach of splitting on non-alphanumeric characters. In most of this book, we will use the **tokenizers** package as a baseline tokenizer for reference. Your choice of tokenizer will influence your results, so don't be afraid to experiment with different tokenizers or, if necessary, to write your own to fit your problem.
@@ -120,10 +133,15 @@ While we might not understand what each and every step in this algorithm is doin
 Thinking of a token as a word is a useful way to start understanding tokenization, even if it is hard to implement concretely in software. We can generalize the idea of a token beyond only a single word to other units of text. We can tokenize text at a variety of units including:
 
 - characters,
+
 - words,
+
 - sentences,
+
 - lines,
+
 - paragraphs, and
+
 - n-grams.
 
 In the following sections, we will explore how to tokenize text using the **tokenizers** package. These functions take a character vector as the input and return lists of character vectors as output. This same tokenization can also be done using the **tidytext** [@Silge16] package, for workflows using tidy data principles where the input and output are both in a dataframe.
@@ -375,7 +393,9 @@ An n-gram (sometimes written "ngram") is a term in linguistics for a contiguous 
 Some example n-grams are:
 
 - **unigram:** "Hello", "day", "my", "little"
+
 - **bigram:** "fir tree", "fresh air", "to be", "Robin Hood"
+
 - **trigram:** "You and I", "please let go", "no time like", "the little mermaid"
 
 The benefit of using n-grams compared to words is that n-grams capture word order which would otherwise be lost. Similarly, when we use character n-grams, we can model the beginning and end of words, because a space will be located at the end of an n-gram for the end of a word and at the beginning of an n-gram of the beginning of a word.
@@ -676,8 +696,11 @@ str_split("This isn't a sentence with hyphenated-words.", "[:space:]") %>%
 This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. 
 
 - The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). 
+
 - The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). 
+
 - These will alternate (`|`) so that we get matches from both sides of the words. 
+
 - The reason we use the quantifier `+` is that there are cases where a word is followed by multiple characters we don't want, such as `"okay..."` and `"Really?!!!"`. 
 
 We are using `map()` since `str_split()` returns a list, and we want `str_remove_all()` to be applied to each element in the list. (The example here only has one element.) 
@@ -881,6 +904,9 @@ To build a predictive model, text data needs to be split into meaningful units, 
 ### In this chapter, you learned:
 
 - that tokens are meaningful units of text, such as words or n-grams
+
 - to implement different kinds of tokenization, the process of splitting text into tokens
+
 - how different kinds of tokenization affect the distribution of tokens
+
 - how to build your own tokenizer when the fast, consistent tokenizers that are available are not flexible enough

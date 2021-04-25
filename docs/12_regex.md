@@ -7,9 +7,9 @@
 > Some people, when confronted with a problem, think: "I know, I'll use regular expressions." Now they have two problems.  
 > <footer>--- [Jamie Zawinski](https://en.wikiquote.org/wiki/Jamie_Zawinski)</footer>
 
-This section will give a brief overview on how to write and use a [regular expression](https://en.wikipedia.org/wiki/Regular_expression), often abbreviated *regex*. Regular expressions are a way to specify or search for patterns of strings using a sequence of characters. By combining a selection of simple patterns, we can capture quite complicated strings.
+This section will give a brief overview on how to write and use a regular expression), often abbreviated *regex*. Regular expressions are a way to specify or search for patterns of strings using a sequence of characters. By combining a selection of simple patterns, we can capture quite complicated strings.
 
-Many functions in R take advantage of regular expressions. Some examples from base R include `grep`, `grepl`, `regexpr`, `gregexpr`, `sub`, `gsub`, and `strsplit`, as well as `ls` and `list.files`. The [**stringr**](https://github.com/tidyverse/stringr) package [@Wickham19] uses regular expressions extensively; the regular expressions are passed as the `pattern =` argument. Regular expressions can be used to detect, locate, or extract parts of a string.
+Many functions in R take advantage of regular expressions. Some examples from base R include `grep`, `grepl`, `regexpr`, `gregexpr`, `sub`, `gsub`, and `strsplit`, as well as `ls` and `list.files`. The **stringr** package [@Wickham19] uses regular expressions extensively; the regular expressions are passed as the `pattern =` argument. Regular expressions can be used to detect, locate, or extract parts of a string.
 
 ## Literal characters
 
@@ -98,7 +98,7 @@ str_detect(math, "\\+")
 
 If we tried to use the plus sign without escaping it, like `"+"`, we would get an error and this line of code would not run.
 
-The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@theopengroup2018][@boost_c_libraries].
+The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@theopengroup2018][@levithan2012regular].
 
 
 Table: (\#tab:metacharacters)All meta characters
@@ -228,7 +228,7 @@ Notice that these short-hands are locale specific. This means that the danish ch
 
 ## Quantifiers
 
-We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@javascriptinforegexpquantifiers].
+We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@levithan2012regular].
 
 
 Table: (\#tab:greedyquantifiers)Regular expression quantifiers
@@ -366,8 +366,12 @@ str_detect(folder_names, "^data$")
 This appendix covered some of the basics of getting started with (or refreshed about) regular expressions. If you want to learn more:
 
 - RStudio maintains [an excellent collection of cheat sheets](https://www.rstudio.com/resources/cheatsheets/), some of which are related to regular expressions.
+
 - www.rexegg.com has many pages of valuable information, including [this "quick start" page with helpful tables](https://www.rexegg.com/regex-quickstart.html).
+
 - https://www.regular-expressions.info/ is another great general regular expression site.
-- The [strings chapter](https://r4ds.had.co.nz/strings.html) in *R for Data Science* delves into examples written in R.
+
+- The [strings chapter](https://r4ds.had.co.nz/strings.html) in *R for Data Science* [@Wickham2017] delves into examples written in R.
+
 - Lastly if you want to go down to the metal, check out [*Mastering Regular Expressions*](http://shop.oreilly.com/product/9780596528126.do).
 

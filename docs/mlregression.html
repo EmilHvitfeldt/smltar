@@ -482,8 +482,8 @@ If we want to build a model to predict which court opinions were written in whic
 </p>
 </div>
 <ul>
-<li>A <strong>classification model</strong> predicts a class label or group membership.</li>
-<li>A <strong>regression model</strong> predicts a numeric or continuous value.</li>
+<li><p>A <strong>classification model</strong> predicts a class label or group membership.</p></li>
+<li><p>A <strong>regression model</strong> predicts a numeric or continuous value.</p></li>
 </ul>
 <p>In text modeling, we use text data (such as the text of the court opinions), sometimes combined with other structured, non-text data, to predict the continuous value of interest (such as year of the court opinion). The goal of predictive modeling with text input features and a continuous outcome is to learn and model the relationship between the input features and the numeric target (outcome).</p>
 <div id="firstmlregression" class="section level2" number="6.1">
@@ -516,18 +516,17 @@ FIGURE 6.1: Supreme Court opinions per decade in sample
 <span id="cb152-8"><a href="mlregression.html#cb152-8" aria-hidden="true" tabindex="-1"></a>scotus_train <span class="ot">&lt;-</span> <span class="fu">training</span>(scotus_split)</span>
 <span id="cb152-9"><a href="mlregression.html#cb152-9" aria-hidden="true" tabindex="-1"></a>scotus_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(scotus_split)</span></code></pre></div>
 <p>Next, let’s preprocess our data to get it ready for modeling using a recipe. We’ll use both general preprocessing functions from <strong>tidymodels</strong> and specialized functions just for text from <strong>textrecipes</strong> in this preprocessing.</p>
+
 <div class="rmdpackage">
-<p>
-The <strong>recipes</strong> package is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
-</p>
+The <strong>recipes</strong> package <span class="citation">(<a href="#ref-R-recipes" role="doc-biblioref">Kuhn and Wickham 2020a</a>)</span> is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span> extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
 </div>
 <p>What are the steps in creating this recipe?</p>
 <ul>
-<li>First, we must specify in our initial <code>recipe()</code> statement the form of our model (with the formula <code>year ~ text</code>, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.</li>
-<li>Then, we tokenize (Chapter <a href="tokenization.html#tokenization">2</a>) the text of the court opinions.</li>
-<li>Next, we filter to only keep the top 1000 tokens by term frequency. We filter out those less frequent words because we expect them to be too rare to be reliable, at least for our first attempt. (We are <em>not</em> removing stop words yet; we’ll explore removing them in Section <a href="mlregression.html#casestudystopwords">6.4</a>.)</li>
-<li>The recipe step <code>step_tfidf()</code>, used with defaults here, weights each token frequency by the inverse document frequency.</li>
-<li>As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is needed because we’re going to use a support vector machine model.</li>
+<li><p>First, we must specify in our initial <code>recipe()</code> statement the form of our model (with the formula <code>year ~ text</code>, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.</p></li>
+<li><p>Then, we tokenize (Chapter <a href="tokenization.html#tokenization">2</a>) the text of the court opinions.</p></li>
+<li><p>Next, we filter to only keep the top 1000 tokens by term frequency. We filter out those less frequent words because we expect them to be too rare to be reliable, at least for our first attempt. (We are <em>not</em> removing stop words yet; we’ll explore removing them in Section <a href="mlregression.html#casestudystopwords">6.4</a>.)</p></li>
+<li><p>The recipe step <code>step_tfidf()</code>, used with defaults here, weights each token frequency by the inverse document frequency.</p></li>
+<li><p>As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is needed because we’re going to use a support vector machine model.</p></li>
 </ul>
 <div class="sourceCode" id="cb153"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb153-1"><a href="mlregression.html#cb153-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
 <span id="cb153-2"><a href="mlregression.html#cb153-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -559,10 +558,9 @@ The <strong>recipes</strong> package is part of <strong>tidymodels</strong> and 
 <span id="cb155-4"><a href="mlregression.html#cb155-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_bake)</span></code></pre></div>
 <pre><code>#&gt; [1] 7500 1001</code></pre>
 <p>For most modeling tasks, you will not need to <code>prep()</code> or <code>bake()</code> your recipe directly; instead you can build up a tidymodels <code>workflow()</code> to bundle together your modeling components.</p>
+
 <div class="rmdpackage">
-<p>
-In <strong>tidymodels</strong>, the <strong>workflows</strong> package offers infrastructure for bundling model components. A <em>model workflow</em> is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
-</p>
+In <strong>tidymodels</strong>, the <strong>workflows</strong> package <span class="citation">(<a href="#ref-R-workflows" role="doc-biblioref">Vaughan 2021b</a>)</span> offers infrastructure for bundling model components. A <em>model workflow</em> is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
 </div>
 <p>Let’s create a <code>workflow()</code> to bundle together our recipe with any model specifications we may want to create later. First, let’s create an empty <code>workflow()</code> and then only add the data preprocessor <code>scotus_rec</code> to it.</p>
 <div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb157-1"><a href="mlregression.html#cb157-1" aria-hidden="true" tabindex="-1"></a>scotus_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
@@ -585,7 +583,7 @@ In <strong>tidymodels</strong>, the <strong>workflows</strong> package offers in
 <div class="rmdnote">
 An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section <a href="mlclassification.html#tunelasso">7.4</a> for tuning model hyperparameters).
 </div>
-<p>Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let’s use the <strong>LiblineaR</strong> engine <span class="citation">(<a href="#ref-R-LiblineaR" role="doc-biblioref">Helleputte 2017</a>)</span>.</p>
+<p>Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let’s use the <strong>LiblineaR</strong> engine <span class="citation">(<a href="#ref-R-LiblineaR" role="doc-biblioref">Helleputte 2021</a>)</span>.</p>
 <div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="mlregression.html#cb159-1" aria-hidden="true" tabindex="-1"></a>svm_spec <span class="ot">&lt;-</span> <span class="fu">svm_linear</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb159-2"><a href="mlregression.html#cb159-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb159-3"><a href="mlregression.html#cb159-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;LiblineaR&quot;</span>)</span></code></pre></div>
@@ -649,7 +647,7 @@ The testing set is extremely valuable data, however, and in real world situation
 <p>Let’s estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set.</p>
 <div class="rmdpackage">
 <p>
-In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong>.
+In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong> <span class="citation"><span class="citation">(<a href="#ref-R-rsample" role="doc-biblioref">Silge et al. 2021</a>)</span></span>.
 </p>
 </div>
 <p>Let’s create 10-fold cross-validation sets, and use these resampled sets for performance estimates.</p>
@@ -801,9 +799,9 @@ A null model is a simple, non-informative model that always predicts the largest
 #&gt; Computational engine: ranger</code></pre>
 <p>Now we can fit this random forest model. Let’s use <code>fit_resamples()</code> again, so we can evaluate the model performance. We will use three arguments to this function:</p>
 <ul>
-<li>Our modeling <code>workflow()</code>, with the same preprocessing recipe we have been using so far in this chapter plus our new random forest model specification</li>
-<li>Our cross-validation resamples of the Supreme Court opinions</li>
-<li>A <code>control</code> argument to specify that we want to keep the predictions, to explore after fitting</li>
+<li><p>Our modeling <code>workflow()</code>, with the same preprocessing recipe we have been using so far in this chapter plus our new random forest model specification</p></li>
+<li><p>Our cross-validation resamples of the Supreme Court opinions</p></li>
+<li><p>A <code>control</code> argument to specify that we want to keep the predictions, to explore after fitting</p></li>
 </ul>
 <div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="mlregression.html#cb178-1" aria-hidden="true" tabindex="-1"></a>rf_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
 <span id="cb178-2"><a href="mlregression.html#cb178-2" aria-hidden="true" tabindex="-1"></a>  scotus_wf <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(rf_spec),</span>
@@ -891,8 +889,8 @@ Models that work best with text tend to be models designed for or otherwise appr
 <p>Notice that for this workflow, there is no preprocessor yet: <code>Preprocessor: None</code>. This workflow uses the same linear SVM specification that we used in Section <a href="mlregression.html#firstmlregression">6.1</a> but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.</p>
 <p>Now we can put this all together and fit these models which include stop word removal. We could create a little helper function for fitting like we did for the recipe, but we have printed out all three calls to <code>fit_resamples()</code> for extra clarity. Notice for each one that there are two arguments:</p>
 <ul>
-<li>A workflow, which consists of the linear SVM model specification and a data preprocessing recipe with stop word removal</li>
-<li>The same cross-validation folds we created earlier</li>
+<li><p>A workflow, which consists of the linear SVM model specification and a data preprocessing recipe with stop word removal</p></li>
+<li><p>The same cross-validation folds we created earlier</p></li>
 </ul>
 <div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="mlregression.html#cb187-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb187-2"><a href="mlregression.html#cb187-2" aria-hidden="true" tabindex="-1"></a>snowball_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
@@ -984,9 +982,9 @@ We could have created this type of small function for trying out different stop 
 </div>
 <p>With this helper function, let’s try out predicting the year of Supreme Court opinions using:</p>
 <ul>
-<li>only unigrams</li>
-<li>bigrams and unigrams</li>
-<li>trigrams, bigrams, and unigrams</li>
+<li><p>only unigrams</p></li>
+<li><p>bigrams and unigrams</p></li>
+<li><p>trigrams, bigrams, and unigrams</p></li>
 </ul>
 <div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="mlregression.html#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb195-2"><a href="mlregression.html#cb195-2" aria-hidden="true" tabindex="-1"></a>unigram_rs <span class="ot">&lt;-</span> <span class="fu">fit_ngram</span>(<span class="fu">list</span>(<span class="at">n =</span> <span class="dv">1</span>))</span>
@@ -1031,7 +1029,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 </div>
 <div id="mlregressionlemmatization" class="section level2" number="6.6">
 <h2><span class="header-section-number">6.6</span> Case study: lemmatization</h2>
-<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the <strong>spacyr</strong> R package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>.</p>
+<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the <strong>spacyr</strong> R package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2020</a>)</span>.</p>
 <table>
 <caption><span id="tab:lemmatb">TABLE 6.1: </span>Lemmatization of one sentence from a Supreme Court opinion</caption>
 <thead>
@@ -1181,9 +1179,9 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 </table>
 <p>Notice several things about lemmatization that are different from the kind of default tokenization (Chapter <a href="tokenization.html#tokenization">2</a>) you may be more familiar with.</p>
 <ul>
-<li>Words are converted to lower case except for proper nouns.</li>
-<li>The lemma for pronouns is <code>-PRON-</code>.</li>
-<li>Irregular verbs are converted to their canonical form (“did” to “do”).</li>
+<li><p>Words are converted to lower case except for proper nouns.</p></li>
+<li><p>The lemma for pronouns is <code>-PRON-</code>.</p></li>
+<li><p>Irregular verbs are converted to their canonical form (“did” to “do”).</p></li>
 </ul>
 <p>Using lemmatization instead of a more straightforward tokenization strategy is slower because of the increased complexity involved, but it can be worth it. Let’s explore how to train a model using <em>lemmas</em> instead of <em>words</em>.</p>
 <p>Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use <code>engine = "spacyr"</code> for tokenization (instead of the default) and add <code>step_lemma()</code> to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.</p>
@@ -1298,8 +1296,8 @@ Another step that is taken to avoid the negative effects of hash collisions is t
 </div>
 <p>There are downsides to using feature hashing. Feature hashing:</p>
 <ul>
-<li>still has one tuning parameter, and</li>
-<li>cannot be reversed.</li>
+<li><p>still has one tuning parameter, and</p></li>
+<li><p>cannot be reversed.</p></li>
 </ul>
 <p>The number of buckets you have correlates with computation speed and collision rate which in turn affects performance.
 It is your job to find the output that best suits your needs.
@@ -1446,11 +1444,11 @@ For the full set of regression metric options, see the <a href="https://yardstic
 <h2><span class="header-section-number">6.9</span> The full game: regression</h2>
 <p>In this chapter, we started from the beginning and then explored both different types of models and different data preprocessing steps. Let’s take a step back and build one final model, using everything we’ve learned. For our final model, let’s again use a linear SVM regression model, since it performed better than the other options we looked at. We will:</p>
 <ul>
-<li>train on the same set of cross-validation resamples used throughout this chapter,</li>
-<li><em>tune</em> the number of tokens used in the model to find a value that fits our needs,</li>
-<li>include both unigrams and bigrams,</li>
-<li>choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and</li>
-<li>finally evaluate on the testing set, which we have not touched at all yet.</li>
+<li><p>train on the same set of cross-validation resamples used throughout this chapter,</p></li>
+<li><p><em>tune</em> the number of tokens used in the model to find a value that fits our needs,</p></li>
+<li><p>include both unigrams and bigrams,</p></li>
+<li><p>choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and</p></li>
+<li><p>finally evaluate on the testing set, which we have not touched at all yet.</p></li>
 </ul>
 <p>We will include a much larger number of tokens than before, which should give us the latitude to include both unigrams and bigrams, despite the result we saw in Section <a href="mlregression.html#casestudyngrams">6.5</a>.</p>
 <div id="preprocess-the-data" class="section level3" number="6.9.1">
@@ -1714,8 +1712,8 @@ FIGURE 6.8: Predicted and true years from a linear SVM regression model with big
 #&gt; # … with 127 more rows</code></pre>
 <p>There are some interesting examples here where we can understand why the model would mispredict:</p>
 <ul>
-<li><em>BedRoc Limited, LLC v. United States</em> was a case decided in 2004 regarding the 1919 Pittman Act.</li>
-<li>The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.</li>
+<li><p><em>BedRoc Limited, LLC v. United States</em> was a case decided in 2004 regarding the 1919 Pittman Act.</p></li>
+<li><p>The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.</p></li>
 </ul>
 <div class="rmdwarning">
 <p>
@@ -1730,13 +1728,13 @@ Looking at examples that your model does not perform well for is well worth your
 <div id="in-this-chapter-you-learned-5" class="section level3" number="6.10.1">
 <h3><span class="header-section-number">6.10.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>what kind of quantities can be modeled using regression</li>
-<li>to evaluate a model using resampled data</li>
-<li>how to compare different model types</li>
-<li>about measuring the impact of n-gram tokenization on models</li>
-<li>how to implement lemmatization and stop word removal with text models</li>
-<li>how feature hashing can be used as a fast alternative to bag-of-words</li>
-<li>about performance metrics for regression models</li>
+<li><p>what kind of quantities can be modeled using regression</p></li>
+<li><p>to evaluate a model using resampled data</p></li>
+<li><p>how to compare different model types</p></li>
+<li><p>about measuring the impact of n-gram tokenization on models</p></li>
+<li><p>how to implement lemmatization and stop word removal with text models</p></li>
+<li><p>how feature hashing can be used as a fast alternative to bag-of-words</p></li>
+<li><p>about performance metrics for regression models</p></li>
 </ul>
 
 </div>
@@ -1745,10 +1743,10 @@ Looking at examples that your model does not perform well for is well worth your
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-appleby2008" class="csl-entry">
-Appleby, Austin. 2008. <span>“MurmurHash.”</span> <a href="https://sites.google.com/site/murmurhash">https://sites.google.com/site/murmurhash</a>.
+Appleby, Austin. 2008. <span>“MurmurHash.”</span> https://sites.google.com/site/murmurhash/. <a href="https://sites.google.com/site/murmurhash">https://sites.google.com/site/murmurhash</a>.
 </div>
 <div id="ref-Benoit19" class="csl-entry">
-Benoit, Kenneth, and Akitaka Matsuo. 2019. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+Benoit, Kenneth, and Akitaka Matsuo. 2020. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
 </div>
 <div id="ref-Caruana2008" class="csl-entry">
 Caruana, Rich, Nikos Karampatziakis, and Ainur Yessenalina. 2008. <span>“An Empirical Evaluation of Supervised Learning in High Dimensions.”</span> In <em>Proceedings of the 25th International Conference on Machine Learning</em>, 96–103.
@@ -1757,22 +1755,34 @@ Caruana, Rich, Nikos Karampatziakis, and Ainur Yessenalina. 2008. <span>“An Em
 Forman, George, and Evan Kirshenbaum. 2008. <span>“Extremely Fast Text Feature Extraction for Classification and Indexing.”</span> In <em>Proceedings of the 17th ACM Conference on Information and Knowledge Management</em>, 1221–30. CIKM ’08. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1458082.1458243">https://doi.org/10.1145/1458082.1458243</a>.
 </div>
 <div id="ref-R-LiblineaR" class="csl-entry">
-Helleputte, Thibault. 2017. <em>LiblineaR: Linear Predictive Models Based on the LIBLINEAR c/c++ Library</em>.
+Helleputte, Thibault. 2021. <em>LiblineaR: Linear Predictive Models Based on the LIBLINEAR c/c++ Library</em>.
 </div>
 <div id="ref-R-scotus" class="csl-entry">
 ———. 2019b. <em>Scotus: Collection of Supreme Court of the United States’ Opinions</em>. <a href="https://github.com/EmilHvitfeldt/scotus">https://github.com/EmilHvitfeldt/scotus</a>.
 </div>
+<div id="ref-textrecipes" class="csl-entry">
+———. 2020b. <em>Textrecipes: Extra ’Recipes’ for Text Processing</em>. <a href="https://CRAN.R-project.org/package=textrecipes">https://CRAN.R-project.org/package=textrecipes</a>.
+</div>
 <div id="ref-Joachims1998" class="csl-entry">
 Joachims, Thorsten. 1998. <span>“Text Categorization with Support Vector Machines: Learning with Many Relevant Features.”</span> In <em>Proceedings of the 10th European Conference on Machine Learning</em>, 137–42. ECML’98. Berlin, Heidelberg: Springer-Verlag. <a href="https://doi.org/10.1007/BFb0026683">https://doi.org/10.1007/BFb0026683</a>.
 </div>
+<div id="ref-R-recipes" class="csl-entry">
+Kuhn, Max, and Hadley Wickham. 2020a. <em>Recipes: Preprocessing Tools to Create Design Matrices</em>. <a href="https://CRAN.R-project.org/package=recipes">https://CRAN.R-project.org/package=recipes</a>.
+</div>
 <div id="ref-Olson2017" class="csl-entry">
 Olson, Randal S., William La Cava, Zairah Mustahsan, Akshay Varik, and Jason H. Moore. 2017. <span>“Data-Driven Advice for Applying Machine Learning to Bioinformatics Problems.”</span> <a href="http://arxiv.org/abs/1708.05070">http://arxiv.org/abs/1708.05070</a>.
+</div>
+<div id="ref-R-rsample" class="csl-entry">
+Silge, Julia, Fanny Chow, Max Kuhn, and Hadley Wickham. 2021. <em>Rsample: General Resampling Infrastructure</em>. <a href="https://CRAN.R-project.org/package=rsample">https://CRAN.R-project.org/package=rsample</a>.
 </div>
 <div id="ref-Tang2018" class="csl-entry">
 Tang, Cheng, Damien Garreau, and Ulrike von Luxburg. 2018. <span>“When Do Random Forests Fail?”</span> In <em>Advances in Neural Information Processing Systems</em>, 2983–93.
 </div>
 <div id="ref-Vantu2016" class="csl-entry">
 Van-Tu, Nguyen, and Le Anh-Cuong. 2016. <span>“Improving Question Classification by Feature Extraction and Selection.”</span> <em>Indian Journal of Science and Technology</em> 9 (May). <a href="https://doi.org/10.17485/ijst/2016/v9i17/93160">https://doi.org/10.17485/ijst/2016/v9i17/93160</a>.
+</div>
+<div id="ref-R-workflows" class="csl-entry">
+———. 2021b. <em>Workflows: Modeling Workflows</em>. <a href="https://CRAN.R-project.org/package=workflows">https://CRAN.R-project.org/package=workflows</a>.
 </div>
 <div id="ref-Weinberger2009" class="csl-entry">
 Weinberger, Kilian, Anirban Dasgupta, John Langford, Alex Smola, and Josh Attenberg. 2009. <span>“Feature Hashing for Large Scale Multitask Learning.”</span> In <em>Proceedings of the 26th Annual International Conference on Machine Learning</em>, 1113–20. ICML ’09. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1553374.1553516">https://doi.org/10.1145/1553374.1553516</a>.

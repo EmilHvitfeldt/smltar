@@ -5,20 +5,22 @@
 It's time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context, to make predictions from text data. In the next two chapters, we will focus putting into practice such machine learning algorithms as:
 
 - naive Bayes, 
+
 - support vector machines (SVM) [@Boser1992], and 
+
 - regularized linear models such as implemented in [glmnet](https://glmnet.stanford.edu/) [@Friedman2010].
 
 We start in Chapter \@ref(mlregression) with exploring regression models and continue in Chapter \@ref(mlclassification) with classification models. These are different types of prediction problems, but in both, we can use the tools of supervised machine learning to connect our _input_, which may exist entirely or partly as text data, with our _outcome_ of interest. Most supervised models for text data are built with one of three purposes in mind:
 
 - The main goal of a **predictive model** is to generate the most accurate predictions possible.
+
 - An **inferential model** is created to test a hypothesis or draw conclusions about a population.
+
 - The main purpose of a **descriptive model** is to describe the properties of the observed data.
 
 Many learning algorithms can be used for multiple of these purposes. Concerns about a model's predictive capacity may be as important for an inferential or descriptive model as for a model designed purely for prediction, and model interpretability and explainability may be important for a solely predictive or descriptive model as well as for an inferential model. We will use the [tidymodels](https://www.tidymodels.org/) framework to address all of these issues, with its consistent approach to resampling, preprocessing, fitting, and evaluation. 
 
-<div class="rmdpackage">
-<p>The <strong>tidymodels</strong> framework is a collection of R packages for modeling and machine learning using tidyverse principles. These packages facilitate resampling, preprocessing, modeling, and evaluation. There are core packages that you can load all together via <code>library(tidymodels)</code> and then extra packages for more specific tasks.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **tidymodels** framework [@R-tidymodels] is a collection of R packages for modeling and machine learning using tidyverse principles [@Wickham2019]. These packages facilitate resampling, preprocessing, modeling, and evaluation. There are core packages that you can load all together via `library(tidymodels)` and then extra packages for more specific tasks.</div>\EndKnitrBlock{rmdpackage}
 
 As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the foreword for the deep learning chapters.
 
@@ -42,7 +44,7 @@ In the case of this book, the code and data are all publicly available. You as a
 In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the **yardstick** package makes this task well within the reach of data practitioners.
 
 <div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the <strong>yardstick</strong> package has functions for model evaluation.</p>
+<p>In <strong>tidymodels</strong>, the <strong>yardstick</strong> package <span class="citation">[@R-yardstick]</span> has functions for model evaluation.</p>
 </div>
 
 

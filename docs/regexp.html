@@ -462,8 +462,8 @@ Some people, when confronted with a problem, think: “I know, I’ll use regula
 — <a href="https://en.wikiquote.org/wiki/Jamie_Zawinski">Jamie Zawinski</a>
 </footer>
 </blockquote>
-<p>This section will give a brief overview on how to write and use a <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a>, often abbreviated <em>regex</em>. Regular expressions are a way to specify or search for patterns of strings using a sequence of characters. By combining a selection of simple patterns, we can capture quite complicated strings.</p>
-<p>Many functions in R take advantage of regular expressions. Some examples from base R include <code>grep</code>, <code>grepl</code>, <code>regexpr</code>, <code>gregexpr</code>, <code>sub</code>, <code>gsub</code>, and <code>strsplit</code>, as well as <code>ls</code> and <code>list.files</code>. The <a href="https://github.com/tidyverse/stringr"><strong>stringr</strong></a> package <span class="citation">(<a href="#ref-Wickham19" role="doc-biblioref">Wickham 2019</a>)</span> uses regular expressions extensively; the regular expressions are passed as the <code>pattern =</code> argument. Regular expressions can be used to detect, locate, or extract parts of a string.</p>
+<p>This section will give a brief overview on how to write and use a regular expression), often abbreviated <em>regex</em>. Regular expressions are a way to specify or search for patterns of strings using a sequence of characters. By combining a selection of simple patterns, we can capture quite complicated strings.</p>
+<p>Many functions in R take advantage of regular expressions. Some examples from base R include <code>grep</code>, <code>grepl</code>, <code>regexpr</code>, <code>gregexpr</code>, <code>sub</code>, <code>gsub</code>, and <code>strsplit</code>, as well as <code>ls</code> and <code>list.files</code>. The <strong>stringr</strong> package <span class="citation">(<a href="#ref-Wickham19" role="doc-biblioref">Wickham 2019</a>)</span> uses regular expressions extensively; the regular expressions are passed as the <code>pattern =</code> argument. Regular expressions can be used to detect, locate, or extract parts of a string.</p>
 <div id="literal-characters" class="section level2" number="11.1">
 <h2><span class="header-section-number">A.1</span> Literal characters</h2>
 <p>The most basic regular expression consists of only a single character. Here let’s detect if each of the following strings in the character vector <code>animals</code> contains the letter “j.”</p>
@@ -502,7 +502,7 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 <span id="cb660-2"><a href="regexp.html#cb660-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(math, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE</code></pre>
 <p>If we tried to use the plus sign without escaping it, like <code>"+"</code>, we would get an error and this line of code would not run.</p>
-<p>The complete list of meta characters is displayed in Table <a href="regexp.html#tab:metacharacters">A.1</a> <span class="citation">(<a href="#ref-theopengroup2018" role="doc-biblioref">Group 2018</a>)</span><span class="citation">(<a href="#ref-boost_c_libraries" role="doc-biblioref">2007</a>)</span>.</p>
+<p>The complete list of meta characters is displayed in Table <a href="regexp.html#tab:metacharacters">A.1</a> <span class="citation">(<a href="#ref-theopengroup2018" role="doc-biblioref">Group 2018</a>)</span><span class="citation">(<a href="#ref-levithan2012regular" role="doc-biblioref">Levithan 2012</a>)</span>.</p>
 <table>
 <caption><span id="tab:metacharacters">TABLE A.1: </span>All meta characters</caption>
 <thead>
@@ -695,7 +695,7 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 </div>
 <div id="quantifiers" class="section level2" number="11.4">
 <h2><span class="header-section-number">A.4</span> Quantifiers</h2>
-<p>We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don’t have to write <code>[:digit:][:digit:][:digit:][:digit:]</code>. Table <a href="regexp.html#tab:greedyquantifiers">A.3</a> shows how to specify repetitions. Notice that <code>?</code> is shorthand for <code>{0,1}</code>, <code>*</code> is shorthand for <code>{0,}</code> and <code>+</code> is shorthand for <code>{1,}</code> <span class="citation">(<a href="#ref-javascriptinforegexpquantifiers" role="doc-biblioref"><span>“Quantifiers <span>, *, ?</span> And <span class="nocase">n</span>”</span> 2019</a>)</span>.</p>
+<p>We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don’t have to write <code>[:digit:][:digit:][:digit:][:digit:]</code>. Table <a href="regexp.html#tab:greedyquantifiers">A.3</a> shows how to specify repetitions. Notice that <code>?</code> is shorthand for <code>{0,1}</code>, <code>*</code> is shorthand for <code>{0,}</code> and <code>+</code> is shorthand for <code>{1,}</code> <span class="citation">(<a href="#ref-levithan2012regular" role="doc-biblioref">Levithan 2012</a>)</span>.</p>
 <table>
 <caption><span id="tab:greedyquantifiers">TABLE A.3: </span>Regular expression quantifiers</caption>
 <thead>
@@ -814,28 +814,28 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <h2><span class="header-section-number">A.6</span> Additional resources</h2>
 <p>This appendix covered some of the basics of getting started with (or refreshed about) regular expressions. If you want to learn more:</p>
 <ul>
-<li>RStudio maintains <a href="https://www.rstudio.com/resources/cheatsheets/">an excellent collection of cheat sheets</a>, some of which are related to regular expressions.</li>
-<li>www.rexegg.com has many pages of valuable information, including <a href="https://www.rexegg.com/regex-quickstart.html">this “quick start” page with helpful tables</a>.</li>
-<li><a href="https://www.regular-expressions.info/" class="uri">https://www.regular-expressions.info/</a> is another great general regular expression site.</li>
-<li>The <a href="https://r4ds.had.co.nz/strings.html">strings chapter</a> in <em>R for Data Science</em> delves into examples written in R.</li>
-<li>Lastly if you want to go down to the metal, check out <a href="http://shop.oreilly.com/product/9780596528126.do"><em>Mastering Regular Expressions</em></a>.</li>
+<li><p>RStudio maintains <a href="https://www.rstudio.com/resources/cheatsheets/">an excellent collection of cheat sheets</a>, some of which are related to regular expressions.</p></li>
+<li><p>www.rexegg.com has many pages of valuable information, including <a href="https://www.rexegg.com/regex-quickstart.html">this “quick start” page with helpful tables</a>.</p></li>
+<li><p><a href="https://www.regular-expressions.info/" class="uri">https://www.regular-expressions.info/</a> is another great general regular expression site.</p></li>
+<li><p>The <a href="https://r4ds.had.co.nz/strings.html">strings chapter</a> in <em>R for Data Science</em> <span class="citation">(<a href="#ref-Wickham2017" role="doc-biblioref">Wickham and Grolemund 2017</a>)</span> delves into examples written in R.</p></li>
+<li><p>Lastly if you want to go down to the metal, check out <a href="http://shop.oreilly.com/product/9780596528126.do"><em>Mastering Regular Expressions</em></a>.</p></li>
 </ul>
 
 </div>
 </div>
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-boost_c_libraries" class="csl-entry">
-2007. <em>Boost C Libraries</em>. <a href="https://www.boost.org/doc/libs/1_44_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html">https://www.boost.org/doc/libs/1_44_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html</a>.
-</div>
 <div id="ref-theopengroup2018" class="csl-entry">
 Group, The Open. 2018. <span>“The Open Group Base Specifications Issue 7, 2018 Edition.”</span> <a href="https://pubs.opengroup.org/onlinepubs/9699919799/">https://pubs.opengroup.org/onlinepubs/9699919799/</a>.
 </div>
-<div id="ref-javascriptinforegexpquantifiers" class="csl-entry">
-<span>“Quantifiers <span>, *, ?</span> And <span class="nocase">n</span>.”</span> 2019. <em>The Modern Javascript Tutorial</em>. <a href="https://javascript.info/regexp-quantifiers">https://javascript.info/regexp-quantifiers</a>.
+<div id="ref-levithan2012regular" class="csl-entry">
+Levithan, J. G. S. 2012. <em>Regular Expressions Cookbook, 2nd Edition</em>. O’Reilly Media, Incorporated. <a href="https://books.google.com/books?id=V7uBAQAACAAJ">https://books.google.com/books?id=V7uBAQAACAAJ</a>.
 </div>
 <div id="ref-Wickham19" class="csl-entry">
 Wickham, Hadley. 2019. <em>Stringr: Simple<span>,</span> Consistent Wrappers for Common String Operations</em>. <a href="https://CRAN.R-project.org/package=stringr">https://CRAN.R-project.org/package=stringr</a>.
+</div>
+<div id="ref-Wickham2017" class="csl-entry">
+Wickham, Hadley, and Garrett Grolemund. 2017. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. 1st ed. O’Reilly Media, Inc.
 </div>
 </div>
             </section>

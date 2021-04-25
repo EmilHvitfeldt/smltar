@@ -36,6 +36,7 @@ This data set contains the entire text of each opinion in the `text` column, alo
 
 
 - A **classification model** predicts a class label or group membership.
+
 - A **regression model** predicts a numeric or continuous value.
 
 In text modeling, we use text data (such as the text of the court opinions), sometimes combined with other structured, non-text data, to predict the continuous value of interest (such as year of the court opinion). The goal of predictive modeling with text input features and a continuous outcome is to learn and model the relationship between the input features and the numeric target (outcome).
@@ -81,16 +82,18 @@ scotus_test <- testing(scotus_split)
 
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. 
 
-<div class="rmdpackage">
-<p>The <strong>recipes</strong> package is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **recipes** package [@R-recipes] is part of **tidymodels** and provides functions for data preprocessing and feature engineering. The **textrecipes** package [@textrecipes] extends **recipes** by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.</div>\EndKnitrBlock{rmdpackage}
 
 What are the steps in creating this recipe?
 
 - First, we must specify in our initial `recipe()` statement the form of our model (with the formula `year ~ text`, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.
+
 - Then, we tokenize (Chapter \@ref(tokenization)) the text of the court opinions. 
+
 - Next, we filter to only keep the top 1000 tokens by term frequency. We filter out those less frequent words because we expect them to be too rare to be reliable, at least for our first attempt. (We are _not_ removing stop words yet; we'll explore removing them in Section \@ref(casestudystopwords).)
+
 - The recipe step `step_tfidf()`, used with defaults here, weights each token frequency by the inverse document frequency.
+
 - As a last step, we normalize (center and scale) these tf-idf values. This centering and scaling is needed because we're going to use a support vector machine model.
 
 
@@ -139,9 +142,7 @@ dim(scotus_bake)
 
 For most modeling tasks, you will not need to `prep()` or `bake()` your recipe directly; instead you can build up a tidymodels `workflow()` to bundle together your modeling components.
 
-<div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the <strong>workflows</strong> package offers infrastructure for bundling model components. A <em>model workflow</em> is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the **workflows** package [@R-workflows] offers infrastructure for bundling model components. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.</div>\EndKnitrBlock{rmdpackage}
 
 Let's create a `workflow()` to bundle together our recipe with any model specifications we may want to create later. First, let's create an empty `workflow()` and then only add the data preprocessor `scotus_rec` to it.
 
@@ -266,7 +267,7 @@ What are we to do, then, if we want to train multiple models and find the best o
 Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
 
 <div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong>.</p>
+<p>In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong> <span class="citation">[@R-rsample]</span>.</p>
 </div>
 
 Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
@@ -468,7 +469,9 @@ rf_spec
 Now we can fit this random forest model. Let's use `fit_resamples()` again, so we can evaluate the model performance. We will use three arguments to this function:
 
 - Our modeling `workflow()`, with the same preprocessing recipe we have been using so far in this chapter plus our new random forest model specification
+
 - Our cross-validation resamples of the Supreme Court opinions
+
 - A `control` argument to specify that we want to keep the predictions, to explore after fitting
 
 
@@ -599,6 +602,7 @@ Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None
 Now we can put this all together and fit these models which include stop word removal. We could create a little helper function for fitting like we did for the recipe, but we have printed out all three calls to `fit_resamples()` for extra clarity. Notice for each one that there are two arguments:
 
 - A workflow, which consists of the linear SVM model specification and a data preprocessing recipe with stop word removal
+
 - The same cross-validation folds we created earlier
 
 
@@ -729,7 +733,9 @@ fit_ngram <- function(ngram_options) {
 With this helper function, let's try out predicting the year of Supreme Court opinions using:
 
 - only unigrams
+
 - bigrams and unigrams
+
 - trigrams, bigrams, and unigrams
 
 
@@ -837,7 +843,9 @@ Table: (\#tab:lemmatb)Lemmatization of one sentence from a Supreme Court opinion
 Notice several things about lemmatization that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
 
 - Words are converted to lower case except for proper nouns.
+
 - The lemma for pronouns is `-PRON-`.
+
 - Irregular verbs are converted to their canonical form ("did" to "do").
 
 Using lemmatization instead of a more straightforward tokenization strategy is slower because of the increased complexity involved, but it can be worth it. Let's explore how to train a model using _lemmas_ instead of _words_.
@@ -1005,6 +1013,7 @@ However, research finds that using feature hashing has roughly the same accuracy
 There are downsides to using feature hashing. Feature hashing:
 
 - still has one tuning parameter, and
+
 - cannot be reversed.
 
 The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
@@ -1265,9 +1274,13 @@ svm_rs %>%
 In this chapter, we started from the beginning and then explored both different types of models and different data preprocessing steps. Let's take a step back and build one final model, using everything we've learned. For our final model, let's again use a linear SVM regression model, since it performed better than the other options we looked at. We will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
+
 - _tune_ the number of tokens used in the model to find a value that fits our needs,
+
 - include both unigrams and bigrams,
+
 - choose not to use lemmatization, to demonstrate what is possible for situations when training time makes lemmatization an impractical choice, and
+
 - finally evaluate on the testing set, which we have not touched at all yet.
 
 We will include a much larger number of tokens than before, which should give us the latitude to include both unigrams and bigrams, despite the result we saw in Section \@ref(casestudyngrams).
@@ -1626,6 +1639,7 @@ scotus_bind %>%
 There are some interesting examples here where we can understand why the model would mispredict: 
 
 - _BedRoc Limited, LLC v. United States_ was a case decided in 2004 regarding the 1919 Pittman Act.
+
 - The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.
 
 <div class="rmdwarning">
@@ -1639,10 +1653,16 @@ You can use regression modeling to predict a continuous variable from a data set
 ### In this chapter, you learned:
 
 - what kind of quantities can be modeled using regression
+
 - to evaluate a model using resampled data
+
 - how to compare different model types
+
 - about measuring the impact of n-gram tokenization on models
+
 - how to implement lemmatization and stop word removal with text models
+
 - how feature hashing can be used as a fast alternative to bag-of-words
+
 - about performance metrics for regression models
 
