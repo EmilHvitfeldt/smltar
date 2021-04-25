@@ -496,7 +496,7 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 <span id="cb114-6"><a href="embeddings.html#cb114-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(stem, complaint_id, n) <span class="sc">%&gt;%</span></span>
 <span id="cb114-7"><a href="embeddings.html#cb114-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, tf_idf)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).</code></pre>
-<p>Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in <strong>glmnet</strong> <span class="citation">(<a href="#ref-R-glmnet" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010a</a>)</span>. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don’t always solve all the problems that come along with big text data sets.</p>
+<p>Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in <strong>glmnet</strong> <span class="citation">(<a href="#ref-Friedman2010" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010</a>)</span>. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don’t always solve all the problems that come along with big text data sets.</p>
 <p>As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure <a href="embeddings.html#fig:sparsityram">5.1</a> shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.</p>
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="embeddings.html#cb116-1" aria-hidden="true" tabindex="-1"></a>get_dfm <span class="ot">&lt;-</span> <span class="cf">function</span>(frac) {</span>
 <span id="cb116-2"><a href="embeddings.html#cb116-2" aria-hidden="true" tabindex="-1"></a>  complaints <span class="sc">%&gt;%</span></span>
@@ -810,7 +810,7 @@ These hundred features are the word embeddings we learned from the text data its
 How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of <em>how</em> words are used in any given data set. However, it may be unreasonable to expect good results with data sets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 </p>
 </div>
-<p>In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to <em>pre-trained</em> word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the <strong>textdata</strong> package <span class="citation">(<a href="#ref-Hvitfeldt2020" role="doc-biblioref">Hvitfeldt 2020a</a>)</span>. Let’s use <code>dimensions = 100</code>, since we trained 100-dimensional word embeddings in the previous section.</p>
+<p>In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to <em>pre-trained</em> word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the <strong>textdata</strong> package <span class="citation">(<a href="#ref-Hvitfeldt2020" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>. Let’s use <code>dimensions = 100</code>, since we trained 100-dimensional word embeddings in the previous section.</p>
 <div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="embeddings.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textdata)</span>
 <span id="cb136-2"><a href="embeddings.html#cb136-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb136-3"><a href="embeddings.html#cb136-3" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">embedding_glove6b</span>(<span class="at">dimensions =</span> <span class="dv">100</span>)</span>
@@ -950,7 +950,7 @@ These examples highlight how pre-trained word embeddings can be useful because o
 <p>Since these GloVe embeddings had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents which contain only words not included in the GloVe embeddings.</p>
 
 <div class="rmdpackage">
-The package <strong>wordsalad</strong> <span class="citation">(<a href="#ref-R-wordsalad" role="doc-biblioref">Hvitfeldt 2020d</a>)</span> provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.
+The package <strong>wordsalad</strong> <span class="citation">(<a href="#ref-R-wordsalad" role="doc-biblioref">Hvitfeldt 2020c</a>)</span> provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.
 </div>
 </div>
 <div id="fairnessembeddings" class="section level2" number="5.5">
@@ -1021,7 +1021,7 @@ You can use the same approaches discussed in this chapter to check any new embed
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender2021" class="csl-entry">
-Bender, Emily M., Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. 2021. <span>“On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜.”</span> In <em>Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency</em>, 610–23. FAccT ’21. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a>.
+Bender, Emily M., Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. 2021. <span>“On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜.”</span> In <em>Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency</em>, 610–623. FAccT ’21. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/3442188.3445922">10.1145/3442188.3445922</a>.
 </div>
 <div id="ref-Bojanowski2016" class="csl-entry">
 Bojanowski, Piotr, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2016. <span>“Enriching Word Vectors with Subword Information.”</span> <em>CoRR</em> abs/1607.04606. <a href="http://arxiv.org/abs/1607.04606">http://arxiv.org/abs/1607.04606</a>.
@@ -1030,16 +1030,16 @@ Bojanowski, Piotr, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2016. <span>
 Bolukbasi, Tolga, Kai-Wei Chang, James Y. Zou, Venkatesh Saligrama, and Adam Tauman Kalai. 2016. <span>“Quantifying and Reducing Stereotypes in Word Embeddings.”</span> <em>CoRR</em> abs/1606.06121. <a href="http://arxiv.org/abs/1606.06121">http://arxiv.org/abs/1606.06121</a>.
 </div>
 <div id="ref-Ethayarajh2019" class="csl-entry">
-Ethayarajh, Kawin, David Duvenaud, and Graeme Hirst. 2019. <span>“Understanding Undesirable Word Embedding Associations.”</span> In <em>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</em>, 1696–1705. Florence, Italy: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/P19-1166">https://doi.org/10.18653/v1/P19-1166</a>.
+Ethayarajh, Kawin, David Duvenaud, and Graeme Hirst. 2019. <span>“Understanding Undesirable Word Embedding Associations.”</span> In <em>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</em>, 1696–1705. Florence, Italy: Association for Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/P19-1166">10.18653/v1/P19-1166</a>.
 </div>
-<div id="ref-R-glmnet" class="csl-entry">
-———. 2010a. <span>“Regularization Paths for Generalized Linear Models via Coordinate Descent.”</span> <em>Journal of Statistical Software</em> 33 (1): 1–22. <a href="https://www.jstatsoft.org/v33/i01/">https://www.jstatsoft.org/v33/i01/</a>.
+<div id="ref-Friedman2010" class="csl-entry">
+Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2010. <span>“Regularization Paths for Generalized Linear Models via Coordinate Descent.”</span> <em>Journal of Statistical Software</em> 33 (1): 1–22. <a href="http://www.jstatsoft.org/v33/i01/">http://www.jstatsoft.org/v33/i01/</a>.
 </div>
 <div id="ref-Garg2018" class="csl-entry">
-Garg, Nikhil, Londa Schiebinger, Dan Jurafsky, and James Zou. 2018. <span>“Word Embeddings Quantify 100 Years of Gender and Ethnic Stereotypes.”</span> <em>Proceedings of the National Academy of Sciences</em> 115 (16): E3635–44. <a href="https://doi.org/10.1073/pnas.1720347115">https://doi.org/10.1073/pnas.1720347115</a>.
+Garg, Nikhil, Londa Schiebinger, Dan Jurafsky, and James Zou. 2018. <span>“Word Embeddings Quantify 100 Years of Gender and Ethnic Stereotypes.”</span> <em>Proceedings of the National Academy of Sciences</em> 115 (16). National Academy of Sciences: E3635–E3644. doi:<a href="https://doi.org/10.1073/pnas.1720347115">10.1073/pnas.1720347115</a>.
 </div>
 <div id="ref-Golub1970" class="csl-entry">
-Golub, G. H., and C. Reinsch. 1970. <span>“Singular Value Decomposition and Least Squares Solutions.”</span> <em>Numer. Math.</em> 14 (5): 403–20. <a href="https://doi.org/10.1007/BF02163027">https://doi.org/10.1007/BF02163027</a>.
+Golub, G. H., and C. Reinsch. 1970. <span>“Singular Value Decomposition and Least Squares Solutions.”</span> <em>Numer. Math.</em> 14 (5). Berlin, Heidelberg: Springer-Verlag: 403–420. doi:<a href="https://doi.org/10.1007/BF02163027">10.1007/BF02163027</a>.
 </div>
 <div id="ref-Gonen2019" class="csl-entry">
 Gonen, Hila, and Yoav Goldberg. 2019. <span>“Lipstick on a Pig: Debiasing Methods Cover up Systematic Gender Biases in Word Embeddings but Do Not Remove Them.”</span> <em>CoRR</em> abs/1903.03862. <a href="http://arxiv.org/abs/1903.03862">http://arxiv.org/abs/1903.03862</a>.
@@ -1048,10 +1048,10 @@ Gonen, Hila, and Yoav Goldberg. 2019. <span>“Lipstick on a Pig: Debiasing Meth
 Howard, Jeremy, and Sebastian Ruder. 2018. <span>“Fine-Tuned Language Models for Text Classification.”</span> <em>CoRR</em> abs/1801.06146. <a href="http://arxiv.org/abs/1801.06146">http://arxiv.org/abs/1801.06146</a>.
 </div>
 <div id="ref-Hvitfeldt2020" class="csl-entry">
-———. 2020a. <em>Textdata: Download and Load Various Text Datasets</em>. <a href="https://CRAN.R-project.org/package=textdata">https://CRAN.R-project.org/package=textdata</a>.
+Hvitfeldt, Emil. 2020b. <em>Textdata: Download and Load Various Text Datasets</em>. <a href="https://CRAN.R-project.org/package=textdata">https://CRAN.R-project.org/package=textdata</a>.
 </div>
 <div id="ref-R-wordsalad" class="csl-entry">
-———. 2020d. <em>Wordsalad: Provide Tools to Extract and Analyze Word Vectors</em>. <a href="https://CRAN.R-project.org/package=wordsalad">https://CRAN.R-project.org/package=wordsalad</a>.
+Hvitfeldt, Emil. 2020c. <em>Wordsalad: Provide Tools to Extract and Analyze Word Vectors</em>. <a href="https://CRAN.R-project.org/package=wordsalad">https://CRAN.R-project.org/package=wordsalad</a>.
 </div>
 <div id="ref-Caliskan2016" class="csl-entry">
 Islam, Aylin Caliskan, Joanna J. Bryson, and Arvind Narayanan. 2016. <span>“Semantics Derived Automatically from Language Corpora Necessarily Contain Human Biases.”</span> <em>CoRR</em> abs/1608.07187. <a href="http://arxiv.org/abs/1608.07187">http://arxiv.org/abs/1608.07187</a>.
@@ -1060,7 +1060,7 @@ Islam, Aylin Caliskan, Joanna J. Bryson, and Arvind Narayanan. 2016. <span>“Se
 Le, Quoc V., and Tomas Mikolov. 2014. <span>“Distributed Representations of Sentences and Documents.”</span> <em>CoRR</em> abs/1405.4053. <a href="http://arxiv.org/abs/1405.4053">http://arxiv.org/abs/1405.4053</a>.
 </div>
 <div id="ref-Levy2014" class="csl-entry">
-Levy, Omer, and Yoav Goldberg. 2014. <span>“Dependency-Based Word Embeddings.”</span> In <em>Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)</em>, 302–8. Baltimore, Maryland: Association for Computational Linguistics. <a href="https://doi.org/10.3115/v1/P14-2050">https://doi.org/10.3115/v1/P14-2050</a>.
+Levy, Omer, and Yoav Goldberg. 2014. <span>“Dependency-Based Word Embeddings.”</span> In <em>Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)</em>, 302–308. Baltimore, Maryland: Association for Computational Linguistics. doi:<a href="https://doi.org/10.3115/v1/P14-2050">10.3115/v1/P14-2050</a>.
 </div>
 <div id="ref-Lu2018" class="csl-entry">
 Lu, Kaiji, Piotr Mardziel, Fangjing Wu, Preetam Amancharla, and Anupam Datta. 2018. <span>“Gender Bias in Neural Natural Language Processing.”</span> <em>CoRR</em> abs/1807.11714. <a href="http://arxiv.org/abs/1807.11714">http://arxiv.org/abs/1807.11714</a>.
@@ -1072,7 +1072,7 @@ Mikolov, Tomas, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. <span>“Efficie
 Moody, Chris. 2017. <span>“Stop Using Word2vec.”</span> <em>Multithreaded</em>. StitchFix. <a href="https://multithreaded.stitchfix.com/blog/2017/10/18/stop-using-word2vec/">https://multithreaded.stitchfix.com/blog/2017/10/18/stop-using-word2vec/</a>.
 </div>
 <div id="ref-Pennington2014" class="csl-entry">
-Pennington, Jeffrey, Richard Socher, and Christopher D. Manning. 2014. <span>“GloVe: Global Vectors for Word Representation.”</span> In <em>Empirical Methods in Natural Language Processing (EMNLP)</em>, 1532–43. <a href="http://www.aclweb.org/anthology/D14-1162">http://www.aclweb.org/anthology/D14-1162</a>.
+Pennington, Jeffrey, Richard Socher, and Christopher D. Manning. 2014. <span>“GloVe: Global Vectors for Word Representation.”</span> In <em>Empirical Methods in Natural Language Processing (EMNLP)</em>, 1532–1543. <a href="http://www.aclweb.org/anthology/D14-1162">http://www.aclweb.org/anthology/D14-1162</a>.
 </div>
 <div id="ref-Peters2018" class="csl-entry">
 Peters, Matthew E., Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, and Luke Zettlemoyer. 2018. <span>“Deep Contextualized Word Representations.”</span> <em>CoRR</em> abs/1802.05365. <a href="http://arxiv.org/abs/1802.05365">http://arxiv.org/abs/1802.05365</a>.
@@ -1096,7 +1096,7 @@ Vaughan, Davis. 2021a. <em>Slider: Sliding Window Functions</em>. <a href="https
 Vaughan, Davis, and Matt Dancho. 2021. <em>Furrr: Apply Mapping Functions in Parallel Using Futures</em>. <a href="https://CRAN.R-project.org/package=furrr">https://CRAN.R-project.org/package=furrr</a>.
 </div>
 <div id="ref-Wagner2016" class="csl-entry">
-Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 2016. <span>“Women Through the Glass Ceiling: Gender Asymmetries in Wikipedia.”</span> <em>EPJ Data Science</em> 5 (1): 5.
+Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 2016. <span>“Women Through the Glass Ceiling: Gender Asymmetries in Wikipedia.”</span> <em>EPJ Data Science</em> 5 (1). SpringerOpen: 5.
 </div>
 </div>
             </section>
