@@ -458,7 +458,7 @@ div.csl-indent {
 <p>To build features for supervised machine learning from natural language, we need some way of representing raw text as numbers so we can perform computation on them. Typically, one of the first steps in this transformation from natural language to feature, or any of kind of text analysis, is <em>tokenization</em>. Knowing what tokenization and tokens are, along with the related concept of an n-gram, is important for almost any natural language processing task.</p>
 <div id="what-is-a-token" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> What is a token?</h2>
-<p>In R, text is typically represented with the <strong>character</strong> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <a href="https://cran.r-project.org/package=hcandersenr"><strong>hcandersenr</strong></a> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+<p>In R, text is typically represented with the <strong>character</strong> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <strong>hcandersenr</strong> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled “The Fir Tree,” we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.</p>
 <div class="rmdpackage">
 <p>
@@ -523,22 +523,22 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 #&gt;  [1] &quot;resting&quot; &quot;place&quot;   &quot;grew&quot;    &quot;a&quot;       &quot;pretty&quot;  &quot;little&quot;  &quot;fir&quot;    
 #&gt;  [8] &quot;tree&quot;    &quot;and&quot;     &quot;yet&quot;     &quot;it&quot;      &quot;was&quot;     &quot;not&quot;     &quot;happy&quot;  
 #&gt; [15] &quot;it&quot;</code></pre>
-<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2019</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm <span class="citation">(<a href="#ref-ICUWordBoundary" role="doc-biblioref"><span>“Unicode Text Segmentation”</span> 2019</a>)</span> work? It can be outlined as follows:</p>
+<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2020</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm <span class="citation">(<a href="#ref-ICUWordBoundary" role="doc-biblioref">https://www.unicode.org/ 2019</a>)</span> work? It can be outlined as follows:</p>
 <ul>
-<li>Break at the start and end of text, unless the text is empty.</li>
-<li>Do not break within CRLF (new line characters).</li>
-<li>Otherwise, break before and after new lines (including CR and LF).</li>
-<li>Do not break within emoji zwj sequences.</li>
-<li>Keep horizontal whitespace together.</li>
-<li>Ignore Format and Extend characters, except after sot, CR, LF, and new line.</li>
-<li>Do not break between most letters.</li>
-<li>Do not break letters across certain punctuation.</li>
-<li>Do not break within sequences of digits, or digits adjacent to letters (“3a,” or “A3”).</li>
-<li>Do not break within sequences, such as “3.2” or “3,456.789.”</li>
-<li>Do not break between Katakana.</li>
-<li>Do not break from extenders.</li>
-<li>Do not break within emoji flag sequences.</li>
-<li>Otherwise, break everywhere (including around ideographs).</li>
+<li><p>Break at the start and end of text, unless the text is empty.</p></li>
+<li><p>Do not break within CRLF (new line characters).</p></li>
+<li><p>Otherwise, break before and after new lines (including CR and LF).</p></li>
+<li><p>Do not break within emoji zwj sequences.</p></li>
+<li><p>Keep horizontal whitespace together.</p></li>
+<li><p>Ignore Format and Extend characters, except after sot, CR, LF, and new line.</p></li>
+<li><p>Do not break between most letters.</p></li>
+<li><p>Do not break letters across certain punctuation.</p></li>
+<li><p>Do not break within sequences of digits, or digits adjacent to letters (“3a,” or “A3”).</p></li>
+<li><p>Do not break within sequences, such as “3.2” or “3,456.789.”</p></li>
+<li><p>Do not break between Katakana.</p></li>
+<li><p>Do not break from extenders.</p></li>
+<li><p>Do not break within emoji flag sequences.</p></li>
+<li><p>Otherwise, break everywhere (including around ideographs).</p></li>
 </ul>
 <p>While we might not understand what each and every step in this algorithm is doing, we can appreciate that it is many times more sophisticated than our initial approach of splitting on non-alphanumeric characters. In most of this book, we will use the <strong>tokenizers</strong> package as a baseline tokenizer for reference. Your choice of tokenizer will influence your results, so don’t be afraid to experiment with different tokenizers or, if necessary, to write your own to fit your problem.</p>
 </div>
@@ -546,12 +546,12 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 <h2><span class="header-section-number">2.2</span> Types of tokens</h2>
 <p>Thinking of a token as a word is a useful way to start understanding tokenization, even if it is hard to implement concretely in software. We can generalize the idea of a token beyond only a single word to other units of text. We can tokenize text at a variety of units including:</p>
 <ul>
-<li>characters,</li>
-<li>words,</li>
-<li>sentences,</li>
-<li>lines,</li>
-<li>paragraphs, and</li>
-<li>n-grams.</li>
+<li><p>characters,</p></li>
+<li><p>words,</p></li>
+<li><p>sentences,</p></li>
+<li><p>lines,</p></li>
+<li><p>paragraphs, and</p></li>
+<li><p>n-grams.</p></li>
 </ul>
 <p>In the following sections, we will explore how to tokenize text using the <strong>tokenizers</strong> package. These functions take a character vector as the input and return lists of character vectors as output. This same tokenization can also be done using the <strong>tidytext</strong> <span class="citation">(<a href="#ref-Silge16" role="doc-biblioref">Silge and Robinson 2016</a>)</span> package, for workflows using tidy data principles where the input and output are both in a dataframe.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="tokenization.html#cb7-1" aria-hidden="true" tabindex="-1"></a>sample_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Far down in the forest&quot;</span>,</span>
@@ -710,9 +710,9 @@ We use Latin prefixes so that a 1-gram is called a unigram, a 2-gram is called a
 </div>
 <p>Some example n-grams are:</p>
 <ul>
-<li><strong>unigram:</strong> “Hello,” “day,” “my,” “little”</li>
-<li><strong>bigram:</strong> “fir tree,” “fresh air,” “to be,” “Robin Hood”</li>
-<li><strong>trigram:</strong> “You and I,” “please let go,” “no time like,” “the little mermaid”</li>
+<li><p><strong>unigram:</strong> “Hello,” “day,” “my,” “little”</p></li>
+<li><p><strong>bigram:</strong> “fir tree,” “fresh air,” “to be,” “Robin Hood”</p></li>
+<li><p><strong>trigram:</strong> “You and I,” “please let go,” “no time like,” “the little mermaid”</p></li>
 </ul>
 <p>The benefit of using n-grams compared to words is that n-grams capture word order which would otherwise be lost. Similarly, when we use character n-grams, we can model the beginning and end of words, because a space will be located at the end of an n-gram for the end of a word and at the beginning of an n-gram of the beginning of a word.</p>
 <p>To split text into word n-grams, we can use the function <code>tokenize_ngrams()</code>. It has a few more arguments, so let’s go over them one by one.</p>
@@ -900,10 +900,10 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 #&gt; [5] &quot;with&quot;             &quot;hyphenated-words&quot;</code></pre>
 <p>This regex used to remove the punctuation is a little complicated so let’s discuss it, piece by piece.</p>
 <ul>
-<li>The regex <code>^[:punct:]+</code> will look at the beginning of the string (<code>^</code>) to match any punctuation characters (<code>[:punct:]</code>) where it will select one or more (<code>+</code>).</li>
-<li>The other regex <code>[:punct:]+$</code> will look for punctuation characters (<code>[:punct:]</code>) that appear one or more times (<code>+</code>) at the end of the string (<code>$</code>).</li>
-<li>These will alternate (<code>|</code>) so that we get matches from both sides of the words.</li>
-<li>The reason we use the quantifier <code>+</code> is that there are cases where a word is followed by multiple characters we don’t want, such as <code>"okay..."</code> and <code>"Really?!!!"</code>.</li>
+<li><p>The regex <code>^[:punct:]+</code> will look at the beginning of the string (<code>^</code>) to match any punctuation characters (<code>[:punct:]</code>) where it will select one or more (<code>+</code>).</p></li>
+<li><p>The other regex <code>[:punct:]+$</code> will look for punctuation characters (<code>[:punct:]</code>) that appear one or more times (<code>+</code>) at the end of the string (<code>$</code>).</p></li>
+<li><p>These will alternate (<code>|</code>) so that we get matches from both sides of the words.</p></li>
+<li><p>The reason we use the quantifier <code>+</code> is that there are cases where a word is followed by multiple characters we don’t want, such as <code>"okay..."</code> and <code>"Really?!!!"</code>.</p></li>
 </ul>
 <p>We are using <code>map()</code> since <code>str_split()</code> returns a list, and we want <code>str_remove_all()</code> to be applied to each element in the list. (The example here only has one element.)</p>
 <p>Now let’s see if we can get the same result using extraction. We will start by constructing a regular expression that will capture hyphenated words; our definition here is a word with one hyphen located inside it. Since we want the hyphen to be inside the word, we will need to have a non-zero number of characters on either side of the hyphen.</p>
@@ -1037,10 +1037,10 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <div id="in-this-chapter-you-learned-1" class="section level3" number="2.7.1">
 <h3><span class="header-section-number">2.7.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>that tokens are meaningful units of text, such as words or n-grams</li>
-<li>to implement different kinds of tokenization, the process of splitting text into tokens</li>
-<li>how different kinds of tokenization affect the distribution of tokens</li>
-<li>how to build your own tokenizer when the fast, consistent tokenizers that are available are not flexible enough</li>
+<li><p>that tokens are meaningful units of text, such as words or n-grams</p></li>
+<li><p>to implement different kinds of tokenization, the process of splitting text into tokens</p></li>
+<li><p>how different kinds of tokenization affect the distribution of tokens</p></li>
+<li><p>how to build your own tokenizer when the fast, consistent tokenizers that are available are not flexible enough</p></li>
 </ul>
 
 </div>
@@ -1052,10 +1052,13 @@ Splitting Chinese text into words is called “word segmentation” and is still
 ———. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3): 1–184.
 </div>
 <div id="ref-Gagolewski19" class="csl-entry">
-Gagolewski, Marek. 2019. <em>R Package Stringi: Character String Processing Facilities</em>. <a href="http://www.gagolewski.com/software/stringi/">http://www.gagolewski.com/software/stringi/</a>.
+Gagolewski, Marek. 2020. <em>R Package Stringi: Character String Processing Facilities</em>. <a href="http://www.gagolewski.com/software/stringi/">http://www.gagolewski.com/software/stringi/</a>.
 </div>
 <div id="ref-spacy2" class="csl-entry">
 Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2</span>: Natural Language Understanding with <span>B</span>loom Embeddings, Convolutional Neural Networks and Incremental Parsing.”</span>
+</div>
+<div id="ref-ICUWordBoundary" class="csl-entry">
+https://www.unicode.org/. 2019. <span>“Unicode Text Segmentation.”</span> <a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a>.
 </div>
 <div id="ref-Huang2019" class="csl-entry">
 Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2019. <span>“Toward Fast and Accurate Neural Chinese Word Segmentation with Multi-Criteria Learning.”</span>
@@ -1077,9 +1080,6 @@ Perry, Patrick O. 2020. <em>Corpus: Text Corpus Analysis</em>. <a href="https://
 </div>
 <div id="ref-Silge16" class="csl-entry">
 Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in r.”</span> <em>JOSS</em> 1 (3). <a href="https://doi.org/10.21105/joss.00037">https://doi.org/10.21105/joss.00037</a>.
-</div>
-<div id="ref-ICUWordBoundary" class="csl-entry">
-<span>“Unicode Text Segmentation.”</span> 2019. <a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a>.
 </div>
 </div>
 <div class="footnotes">

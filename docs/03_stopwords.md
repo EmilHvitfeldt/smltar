@@ -1566,6 +1566,9 @@ In many standard NLP workflows, the removal of stop words is presented as a defa
 ### In this chapter, you learned:
 
 - what a stop word is and how to remove stop words from text data
+
 - how different stop word lists can vary
+
 - that the impact of stop word removal is different for different kinds of texts
+
 - about the bias built in to stop word lists and strategies for building such lists

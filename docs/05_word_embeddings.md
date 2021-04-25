@@ -39,7 +39,7 @@ Another way to represent our text data is to create a sparse matrix where the el
 
 $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$
 
-These two quantities can be combined to calculate a term's [tf-idf](https://www.tidytextmining.com/tfidf.html) (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
+These two quantities can be combined to calculate a term's tf-idf (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
 
 
 ```r
@@ -56,7 +56,7 @@ complaints %>%
 #> Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).
 ```
 
-Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet**. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
+Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet** [@R-glmnet]. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
 
 As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure \@ref(fig:sparsityram) shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.
 
@@ -218,7 +218,7 @@ We can next determine the word vectors from the PMI values using singular value 
 SVD is a method for dimensionality reduction via matrix factorization [@Golub1970] which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.
 
 In our application, we will use SVD to factor the PMI matrix into a set of smaller matrices containing the word embeddings with a size we get to choose. The embedding size is typically chosen to be in the low hundreds. Thus we get a matrix of dimension (`n_vocabulary * n_dim`) instead of dimension (`n_vocabulary * n_vocabulary`), which can be a vast reduction in size for large vocabularies.
-Let's use the `widely_svd()` function in **widyr**, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.
+Let's use the `widely_svd()` function in **widyr** [@R-widyr], creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.
 
 
 ```r
@@ -422,7 +422,7 @@ tidy_word_vectors %>%
 
 It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like `"regarding"`, `"contacted"`, and `"called"`, while component 9 highlights the use of *different* common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.
 
-We created word embeddings and can explore them to understand our text data set, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into **document embeddings**, either using a mean or sum. This approach loses information about word order but is straightforward to implement. Let's `count()` to find the sum here in our example.
+We created word embeddings and can explore them to understand our text data set, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into *document embeddings*, either using a mean or sum. This approach loses information about word order but is straightforward to implement. Let's `count()` to find the sum here in our example.
 
 
 ```r
@@ -450,7 +450,7 @@ We have a new matrix here that we can use as the input for modeling. Notice that
 
 If our word embeddings are of high quality, this translation of the high-dimensional space of words to the lower-dimensional space of the word embeddings allows our modeling based on such an input matrix to take advantage of the semantic meaning captured in the embeddings.
 
-This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the [**text2vec**](http://text2vec.org/) package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [@Bojanowski2016]. 
+This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe [@Pennington2014], implemented in R in the **text2vec** package [@Selivanov2018], word2vec [@Mikolov2013], and FastText [@Bojanowski2016]. 
 
 ## Use pre-trained word embeddings {#glove}
 
@@ -460,7 +460,7 @@ If your data set is too small, you typically cannot train reliable word embeddin
 <p>How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of <em>how</em> words are used in any given data set. However, it may be unreasonable to expect good results with data sets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)</p>
 </div>
 
-In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to *pre-trained* word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the [**textdata**](https://cran.r-project.org/package=textdata) package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
+In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to *pre-trained* word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the **textdata** package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
 
 
 ```r
@@ -667,7 +667,9 @@ Perhaps more than any of the other preprocessing steps this book has covered so 
 This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
 
 - Typically Black first names are associated with more unpleasant feelings than typically white first names.
+
 - Women's first names are more associated with family and men's first names are more associated with career.
+
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
 Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034). @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
@@ -711,9 +713,15 @@ Mapping words (or other tokens) to an embedding in a special vector space is a p
 ### In this chapter, you learned:
 
 - what a word embedding is and why we use them
+
 - how to determine word embeddings from a text data set
+
 - how the vector space of word embeddings encodes word similarity
+
 - about a simple strategy to find document similarity
+
 - how to handle pre-trained word embeddings
+
 - why word embeddings carry historic and systemic bias
+
 - about approaches for debiasing word embeddings

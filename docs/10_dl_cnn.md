@@ -210,7 +210,8 @@ val_res %>%
 Now that we know how our basic CNN performs, we can see what happens when we apply some common modifications to it.
 This case study will examine: 
 
-- how we can add additional _convolutional_ layers to our base model and 
+- how we can add additional _convolutional_ layers to our base model and
+
 - how additional _dense_ layers can be added.
 
 Let's start by adding another fully connected layer. We take the architecture we used in `simple_cnn_model` and add another `layer_dense()` after the first `layer_dense()` in the model.
@@ -738,7 +739,7 @@ We noted in Section \@ref(dllimitations) that one of the significant limitations
 </div>
 
 <div class="rmdpackage">
-<p>The <strong>lime</strong> package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction.</p>
+<p>The <strong>lime</strong> package in R <span class="citation">[@R-lime]</span> implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction.</p>
 </div>
 
 To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go there.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
@@ -1067,12 +1068,12 @@ runs_results
 #> # A tibble: 6 x 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.01       0.0329           0.993           1.01             0.807
-#> 2 _tuning/20… 1.00       0.0353           0.992           1.00             0.806
-#> 3 _tuning/20… 1.00       0.0456           0.988           1.00             0.805
-#> 4 _tuning/20… 0.972      0.0305           0.994           0.972            0.810
-#> 5 _tuning/20… 0.960      0.033            0.993           0.960            0.81 
-#> 6 _tuning/20… 0.930      0.0493           0.987           0.930            0.810
+#> 1 _tuning/20… 0.990      0.0308           0.994           0.990            0.806
+#> 2 _tuning/20… 0.990      0.0383           0.991           0.990            0.802
+#> 3 _tuning/20… 0.978      0.047            0.988           0.978            0.804
+#> 4 _tuning/20… 0.952      0.0291           0.995           0.952            0.811
+#> 5 _tuning/20… 0.970      0.0325           0.993           0.970            0.812
+#> 6 _tuning/20… 0.945      0.0448           0.989           0.945            0.808
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1095,15 +1096,15 @@ best_runs
 #> # A tibble: 6 x 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
-#> 1               0.810                 7             1
-#> 2               0.81                  5             1
-#> 3               0.810                 3             1
-#> 4               0.807                 7             2
-#> 5               0.806                 5             2
-#> 6               0.805                 3             2
+#> 1               0.812                 5             1
+#> 2               0.811                 7             1
+#> 3               0.808                 3             1
+#> 4               0.806                 7             2
+#> 5               0.804                 3             2
+#> 6               0.802                 5             2
 ```
 
-There isn't much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.
+There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 
@@ -1395,8 +1396,13 @@ CNNs are a type of neural network that can learn local spatial patterns. They es
 ### In this chapter, you learned:
 
 - how to preprocess text data for CNN models
+
 - about CNN network architectures
+
 - how CNN layers can be stacked to extract patterns of varying detail
+
 - how byte pair encoding can be used to tokenize for finer detail
+
 - how to do hyperparameter search in Keras with **tfruns**
+
 - how to evaluate CNN models for text

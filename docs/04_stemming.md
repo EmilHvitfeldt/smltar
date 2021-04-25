@@ -36,7 +36,7 @@ What if we aren't interested in the difference between `"trees"` and `"tree"` an
 
 ## How to stem text in R
 
-There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework [Snowball](https://snowballstem.org/) with an open-source license; you can use it from R via the [SnowballC](https://cran.r-project.org/package=SnowballC) package. (It has been extended to languages other than English as well.)
+There have been many algorithms built for stemming words over the past half century or so; we'll focus on two approaches. The first is the stemming algorithm of @Porter80, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework [Snowball](https://snowballstem.org/) with an open-source license; you can use it from R via the **SnowballC** package [@R-SnowballC]. (It has been extended to languages other than English as well.)
 
 
 ```r
@@ -116,7 +116,7 @@ tidy_by_lang %>%
 
 Figure \@ref(fig:porterlanguages) demonstrates some of the challenges in working with languages other English; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.
 
-The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the [hunspell](https://cran.r-project.org/package=hunspell) package.
+The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the **hunspell** [R-hunspell] package.
 
 
 ```r
@@ -194,7 +194,7 @@ tidy_scotus %>%
 #> # … with 167,869 more rows
 ```
 
-There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the [**quanteda**](https://cran.r-project.org/package=quanteda) package).
+There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the **quanteda** [@R-quanteda] package).
 
 
 ```r
@@ -234,7 +234,9 @@ Topic modeling is an example of unsupervised machine learning for text and is no
 Most common stemming algorithms you are likely to encounter will successfully reduce words to stems (i.e., not leave extraneous word endings on the words) but at the expense of collapsing some words with dramatic differences in meaning, semantics, use, etc. to the same stems. Examples of the latter are numerous, but some include:
 
 - meaning and mean
+
 - likely, like, liking
+
 - university and universe
 
 In a supervised machine learning context, this affects a model's positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter \@ref(mlclassification), we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model's ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints _not_ about mortgages, correctly.
@@ -257,9 +259,13 @@ $$VCVCVC$$
 and it is an `m = 3` word.
 
 - The first step of the Porter stemmer is (perhaps this seems like cheating) actually made of three substeps working with plural and past participle word endings. In the first substep (1a), "sses" is replaced with "ss", "ies" is replaced with "i", and final single "s" letters are removed. The second substep (1b) depends on the measure of the word `m` but works with endings like "eed", "ed", "ing", adding "e" back on to make endings like "ate", "ble", and "ize" when appropriate. The third substep (1c) replaces "y" with "i" for words of a certain `m`.
+
 - The second step of the Porter stemmer takes the output of the first step and regularizes a set of 20 endings. In this step, "ization" goes to "ize", "alism" goes to "al", "aliti" goes to "al" (notice that the ending "i" there came from the first step), and so on for the other 17 endings.
+
 - The third step again processes the output, using a list of seven endings. Here, "ical" and "iciti" both go to "ic", "ful" and "ness" are both removed, and so forth for the three other endings in this step.
+
 - The fourth step involves a longer list of endings to deal with again (19), and they are all removed. Endings like "ent", "ism", "ment", and more are removed in this step.
+
 - The fifth and final step has two substeps, both which depend on the measure `m` of the word. In this step, depending on `m`, final "e" letters are sometimes removed and final double letters are sometimes removed.
 
 
@@ -349,7 +355,9 @@ Handling punctuation in this way further reduces sparsity in word features. Whet
 Let's compare a few simple stemming algorithms and see what results we end with. Let's look at "The Fir-Tree", specifically the tidied data set from which we have removed stop words. Let's compare three very straightforward stemming approaches.
 
 - **Only remove final instances of the letter "s".** This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let's see what the impact is.
+
 - **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.]
+
 - **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.
 
 
@@ -538,7 +546,10 @@ In this chapter, we explored stemming, the practice of identifying and extractin
 ### In this chapter, you learned:
 
 - about the most broadly used stemming algorithms
+
 - how to implement stemming
+
 - that stemming changes the sparsity or feature space of text data
+
 - the differences between stemming and lemmatization
 

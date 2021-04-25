@@ -456,7 +456,7 @@ div.csl-indent {
 <div id="dldnn" class="section level1" number="8">
 <h1><span class="header-section-number">Chapter 8</span> Dense neural networks</h1>
 <p>Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by network architecture, rathern than by outcome type as we did in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.
-We’ll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate <span class="citation">(<a href="#ref-R-reticulate" role="doc-biblioref">Ushey, Allaire, and Tang 2020</a>)</span>, R.
+We’ll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate <span class="citation">(<a href="#ref-R-reticulate" role="doc-biblioref">Ushey, Allaire, and Tang 2021</a>)</span>, R.
 Keras provides an extensive, high-level API for creating and training many kinds of neural networks, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks.</p>
 <div class="rmdpackage">
 <p>
@@ -591,8 +591,8 @@ It is very easy to overfit deep learning models, so an unbiased estimate of futu
 <h3><span class="header-section-number">8.2.1</span> Preprocessing for deep learning</h3>
 <p>Preprocessing for deep learning models is different than preprocessing for most other text models. These neural networks model <em>sequences</em>, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away) and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model and we need to select this value such that we don’t:</p>
 <ul>
-<li>overshoot and introduce a lot of padded zeroes which would make the model hard to train, or</li>
-<li>undershoot and cut off too much informative text from our documents.</li>
+<li><p>overshoot and introduce a lot of padded zeroes which would make the model hard to train, or</p></li>
+<li><p>undershoot and cut off too much informative text from our documents.</p></li>
 </ul>
 <p>We can use the <code>count_words()</code> function from the tokenizers package to calculate the number of words and generate a histogram in Figure <a href="dldnn.html#fig:kickstarterwordlength">8.4</a>. Notice how we are only using the training data set to avoid data leakage when selecting this value.</p>
 <div class="sourceCode" id="cb431"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb431-1"><a href="dldnn.html#cb431-1" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="sc">%&gt;%</span></span>
@@ -785,10 +785,10 @@ When we <code>bake()</code> a prepped recipe, we apply the preprocessing to a da
 #&gt; ________________________________________________________________________________</code></pre>
 <p>Let us step through this model specification one layer at a time.</p>
 <ul>
-<li>We initiate the Keras model by using <code>keras_model_sequential()</code> to indicate that we want to compose a linear stack of layers.</li>
-<li>Our first <code>layer_embedding()</code> is equipped to handle the preprocessed data we have in <code>kick_train</code>. It will take each observation/row in <code>kick_train</code> and make dense vectors from our word sequences. This turns each observation into an <code>embedding_dim</code> <span class="math inline">\(\times\)</span> <code>sequence_length</code> matrix, 12 <span class="math inline">\(\times\)</span> 30 matrix in our case. In total, we will create a <code>number_of_observations</code> <span class="math inline">\(\times\)</span> <code>embedding_dim</code> <span class="math inline">\(\times\)</span> <code>sequence_length</code> data cube.</li>
-<li>The next <code>layer_flatten()</code> layer takes the matrix for each observation and flattens them down into one dimension. This will create a <code>30 * 12 = 360</code> long vector for each observation.</li>
-<li>Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.</li>
+<li><p>We initiate the Keras model by using <code>keras_model_sequential()</code> to indicate that we want to compose a linear stack of layers.</p></li>
+<li><p>Our first <code>layer_embedding()</code> is equipped to handle the preprocessed data we have in <code>kick_train</code>. It will take each observation/row in <code>kick_train</code> and make dense vectors from our word sequences. This turns each observation into an <code>embedding_dim</code> <span class="math inline">\(\times\)</span> <code>sequence_length</code> matrix, 12 <span class="math inline">\(\times\)</span> 30 matrix in our case. In total, we will create a <code>number_of_observations</code> <span class="math inline">\(\times\)</span> <code>embedding_dim</code> <span class="math inline">\(\times\)</span> <code>sequence_length</code> data cube.</p></li>
+<li><p>The next <code>layer_flatten()</code> layer takes the matrix for each observation and flattens them down into one dimension. This will create a <code>30 * 12 = 360</code> long vector for each observation.</p></li>
+<li><p>Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.</p></li>
 </ul>
 <p>We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an <em>optimizer</em> and a <em>loss function</em> to be able to compile.</p>
 <p>When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network’s weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>; you can even create custom optimizers if what you need isn’t on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.</p>
@@ -1362,9 +1362,9 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 </div>
 <p>We compared these three model options using the validation set we created. Let’s return to the testing set now that we know which model we expect to perform best and obtain a final estimate for how we expect it to perform on new data. For this final evaluation, we will:</p>
 <ul>
-<li>preprocess the test data using the feature engineering recipe <code>kick_prep</code> so it is in the correct format for our deep learning model,</li>
-<li>find the predictions for the processed testing data, and</li>
-<li>compute metrics for these results.</li>
+<li><p>preprocess the test data using the feature engineering recipe <code>kick_prep</code> so it is in the correct format for our deep learning model,</p></li>
+<li><p>find the predictions for the processed testing data, and</p></li>
+<li><p>compute metrics for these results.</p></li>
 </ul>
 <div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="dldnn.html#cb507-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
 <span id="cb507-2"><a href="dldnn.html#cb507-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
@@ -1446,13 +1446,13 @@ However, feature engineering is not completely out of our hands as practitioners
 <div id="in-this-chapter-you-learned-7" class="section level3" number="8.8.1">
 <h3><span class="header-section-number">8.8.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>that you can tokenize and preprocess text to retain the order of the tokens</li>
-<li>how to build and train a dense neural network with Keras</li>
-<li>that you can evaluate deep learning models with the same approaches used for other types of models</li>
-<li>how to train word embeddings alongside your model</li>
-<li>how to use pre-trained word embeddings in a neural network</li>
-<li>about resampling strategies for deep learning models</li>
-<li>about the low interpretability of deep learning models</li>
+<li><p>that you can tokenize and preprocess text to retain the order of the tokens</p></li>
+<li><p>how to build and train a dense neural network with Keras</p></li>
+<li><p>that you can evaluate deep learning models with the same approaches used for other types of models</p></li>
+<li><p>how to train word embeddings alongside your model</p></li>
+<li><p>how to use pre-trained word embeddings in a neural network</p></li>
+<li><p>about resampling strategies for deep learning models</p></li>
+<li><p>about the low interpretability of deep learning models</p></li>
 </ul>
 
 </div>
@@ -1476,7 +1476,7 @@ Shrikumar, Avanti, Peyton Greenside, and Anshul Kundaje. 2019. <span>“Learning
 Shwartz-Ziv, Ravid, and Naftali Tishby. 2017. <span>“Opening the Black Box of Deep Neural Networks via Information.”</span> <a href="http://arxiv.org/abs/1703.00810">http://arxiv.org/abs/1703.00810</a>.
 </div>
 <div id="ref-R-reticulate" class="csl-entry">
-Ushey, Kevin, JJ Allaire, and Yuan Tang. 2020. <em>Reticulate: Interface to ’Python’</em>. <a href="https://github.com/rstudio/reticulate">https://github.com/rstudio/reticulate</a>.
+Ushey, Kevin, JJ Allaire, and Yuan Tang. 2021. <em>Reticulate: Interface to ’Python’</em>. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.
 </div>
 </div>
 <div class="footnotes">

@@ -457,8 +457,8 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 7</span> Classification</h1>
 <p>In Chapter <a href="mlregression.html#mlregression">6</a>, we focused on modeling to predict <em>continuous values</em> for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict <em>labels</em> on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome.</p>
 <ul>
-<li>A <strong>regression model</strong> predicts a numeric or continuous value.</li>
-<li>A <strong>classification model</strong> predicts a class label or group membership.</li>
+<li><p>A <strong>regression model</strong> predicts a numeric or continuous value.</p></li>
+<li><p>A <strong>classification model</strong> predicts a class label or group membership.</p></li>
 </ul>
 <p>For our classification example in this chapter, let’s consider the data set of consumer complaints submitted to the US Consumer Finance Protection Bureau. Let’s read in the complaint data (Section <a href="appendixdata.html#cfpb-complaints">B.3</a>) with <code>read_csv()</code>.</p>
 <div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb261-1"><a href="mlclassification.html#cb261-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -608,7 +608,7 @@ One of the main advantages of a naive Bayes model is its ability to handle a lar
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.</p>
 <div class="rmdpackage">
 <p>
-In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.
+In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong> <span class="citation"><span class="citation">(<a href="#ref-R-parsnip" role="doc-biblioref">Kuhn and Vaughan 2021a</a>)</span></span>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.
 </p>
 </div>
 <div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="mlclassification.html#cb276-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(discrim)</span>
@@ -628,7 +628,7 @@ In <strong>tidymodels</strong>, the package for creating model specifications is
 </div>
 <div id="evaluation" class="section level3" number="7.1.2">
 <h3><span class="header-section-number">7.1.2</span> Evaluation</h3>
-<p>Like we discussed in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>, we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use <strong>resampling</strong> methods to evaluate our model.</p>
+<p>Like we discussed in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>, we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use <em>resampling</em> methods to evaluate our model.</p>
 <p>Let’s use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let’s create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.</p>
 <div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="mlclassification.html#cb279-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
 <span id="cb279-2"><a href="mlclassification.html#cb279-2" aria-hidden="true" tabindex="-1"></a>complaints_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(complaints_train)</span>
@@ -1043,7 +1043,7 @@ Since we are using a linear model, the model coefficients are directly interpret
 <div id="casestudysparseencoding" class="section level2" number="7.5">
 <h2><span class="header-section-number">7.5</span> Case study: sparse encoding</h2>
 <p>We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used <code>set_engine("glmnet")</code>; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section <a href="embeddings.html#motivatingsparse">5.1</a>), rather than a dense data frame or tibble representation.</p>
-<p>To keep our text data sparse throughout modeling and use the sparse capabilities of <code>set_engine("glmnet")</code>, we need to explicitly set a non-default preprocessing blueprint, using the package <a href="https://hardhat.tidymodels.org/"><strong>hardhat</strong></a>.</p>
+<p>To keep our text data sparse throughout modeling and use the sparse capabilities of <code>set_engine("glmnet")</code>, we need to explicitly set a non-default preprocessing blueprint, using the package <strong>hardhat</strong> <span class="citation">(<a href="#ref-R-hardhat" role="doc-biblioref">Vaughan and Kuhn 2020</a>)</span>.</p>
 <div class="rmdpackage">
 <p>
 The <strong>hardhat</strong> package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don’t use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
@@ -1051,7 +1051,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 </div>
 <div class="sourceCode" id="cb322"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb322-1"><a href="mlclassification.html#cb322-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
 <span id="cb322-2"><a href="mlclassification.html#cb322-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
-<p>This “blueprint” lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition <code>"dgCMatrix"</code> is the most common sparse matrix type, from the Matrix package <span class="citation">(<a href="#ref-R-Matrix" role="doc-biblioref">Bates and Maechler 2019</a>)</span>, used in R for modeling. We can use this <code>blueprint</code> argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.</p>
+<p>This “blueprint” lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition <code>"dgCMatrix"</code> is the most common sparse matrix type, from the Matrix package <span class="citation">(<a href="#ref-R-Matrix" role="doc-biblioref">Bates and Maechler 2021</a>)</span>, used in R for modeling. We can use this <code>blueprint</code> argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.</p>
 <div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="mlclassification.html#cb323-1" aria-hidden="true" tabindex="-1"></a>sparse_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb323-2"><a href="mlclassification.html#cb323-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(complaints_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
 <span id="cb323-3"><a href="mlclassification.html#cb323-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tune_spec)</span>
@@ -1140,8 +1140,8 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 <p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.00036) but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
 <p>Importantly, this tuning also took a bit less time to complete.</p>
 <ul>
-<li>The <em>preprocessing</em> was not much faster, because tokenization and computing tf-idf take a long time.</li>
-<li>The <em>model fitting</em> was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input.</li>
+<li><p>The <em>preprocessing</em> was not much faster, because tokenization and computing tf-idf take a long time.</p></li>
+<li><p>The <em>model fitting</em> was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input.</p></li>
 </ul>
 <p>Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.</p>
 <div class="rmdnote">
@@ -1156,15 +1156,15 @@ Since our model performance is about the same and we see gains in training time,
 However, it is not always possible to limit a modeling question to two classes. Let’s explore how to deal with situations where we have more than two classes.
 The CFPB complaints data set in this chapter has nine different <code>product</code> classes. In decreasing frequency, they are:</p>
 <ul>
-<li>Credit reporting, credit repair services, or other personal consumer reports</li>
-<li>Debt collection</li>
-<li>Credit card or prepaid card</li>
-<li>Mortgage</li>
-<li>Checking or savings account</li>
-<li>Student loan</li>
-<li>Vehicle loan or lease</li>
-<li>Money transfer, virtual currency, or money service</li>
-<li>Payday loan, title loan, or personal loan</li>
+<li><p>Credit reporting, credit repair services, or other personal consumer reports</p></li>
+<li><p>Debt collection</p></li>
+<li><p>Credit card or prepaid card</p></li>
+<li><p>Mortgage</p></li>
+<li><p>Checking or savings account</p></li>
+<li><p>Student loan</p></li>
+<li><p>Vehicle loan or lease</p></li>
+<li><p>Money transfer, virtual currency, or money service</p></li>
+<li><p>Payday loan, title loan, or personal loan</p></li>
 </ul>
 <p>We assume that there is a reason why these product classes have been created in this fashion by this government agency.
 Perhaps complaints from different classes are handled by different people or organizations.
@@ -1196,14 +1196,14 @@ Whatever the reason, in this section we would like to build a multiclass classif
 This kind of imbalance is a common problem with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.</p>
 <p>Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:</p>
 <ul>
-<li>Many machine learning algorithms do not handle imbalanced data well and are likely to have a hard time predicting minority classes.</li>
-<li>Not all machine learning algorithms are built for multiclass classification at all.</li>
-<li>Many evaluation metrics need to be reformulated to describe multiclass predictions.</li>
+<li><p>Many machine learning algorithms do not handle imbalanced data well and are likely to have a hard time predicting minority classes.</p></li>
+<li><p>Not all machine learning algorithms are built for multiclass classification at all.</p></li>
+<li><p>Many evaluation metrics need to be reformulated to describe multiclass predictions.</p></li>
 </ul>
 <p>When you have multiple classes in your data, it is possible to formulate the multiclass problem in two ways. With one approach, any given observation can belong to multiple classes. With the other approach, an observation can belong to one and only one class. We will be sticking to the second, “one class per observation” model formulation in this section.</p>
 <p>There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the <a href="https://themis.tidymodels.org"><strong>themis</strong></a> add-on package for recipes which provides the <code>step_downsample()</code> function to perform downsampling.</p>
+We will be using the <strong>themis</strong> <span class="citation">(<a href="#ref-R-themis" role="doc-biblioref">Hvitfeldt 2020c</a>)</span> add-on package for recipes which provides the <code>step_downsample()</code> function to perform downsampling.</p>
 <div class="rmdpackage">
 <p>
 The <strong>themis</strong> package provides many more algorithms to deal with imbalanced data during data preprocessing.
@@ -1350,15 +1350,15 @@ We can look at different models or model engines that might be able to more easi
 Otherwise we we will be very disappointed once our model is used to predict on new data!
 The variables we identify as available for use as predictors are:</p>
 <ul>
-<li><code>date_received</code></li>
-<li><code>issue</code></li>
-<li><code>sub_issue</code></li>
-<li><code>consumer_complaint_narrative</code></li>
-<li><code>company</code></li>
-<li><code>state</code></li>
-<li><code>zip_code</code></li>
-<li><code>tags</code></li>
-<li><code>submitted_via</code></li>
+<li><p><code>date_received</code></p></li>
+<li><p><code>issue</code></p></li>
+<li><p><code>sub_issue</code></p></li>
+<li><p><code>consumer_complaint_narrative</code></p></li>
+<li><p><code>company</code></p></li>
+<li><p><code>state</code></p></li>
+<li><p><code>zip_code</code></p></li>
+<li><p><code>tags</code></p></li>
+<li><p><code>submitted_via</code></p></li>
 </ul>
 <p>Let’s try including <code>date_received</code> in our modeling, along with the text variable we have already used <code>consumer_complaint_narrative</code> and a new variable <code>tags</code>.
 The <code>submitted_via</code> variable could have been a viable candidate, but all the entries are “web.”
@@ -1620,9 +1620,9 @@ Such custom features can be simple such as the number of URLs or the number of p
 They can also be more engineered such as the percentage of capitalization, whether the text ends with a hashtag, or whether two people’s names are both mentioned in a document.</p>
 <p>For our CFPB complaints data, certain patterns may not have adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section <a href="mlclassification.html#classfirstattemptlookatdata">7.1</a>. Let’s walk through how to create data preprocessing functions to build the features to:</p>
 <ul>
-<li>detect credit cards,</li>
-<li>calculate percentage censoring, and</li>
-<li>detect monetary amounts.</li>
+<li><p>detect credit cards,</p></li>
+<li><p>calculate percentage censoring, and</p></li>
+<li><p>detect monetary amounts.</p></li>
 </ul>
 <div id="detect-credit-cards" class="section level3" number="7.9.1">
 <h3><span class="header-section-number">7.9.1</span> Detect credit cards</h3>
@@ -1792,12 +1792,12 @@ We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
 For our final model, let’s use some of the domain-specific features we developed in Section <a href="mlclassification.html#customfeatures">7.9</a> along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:</p>
 <ul>
-<li>train on the same set of cross-validation resamples used throughout this chapter,</li>
-<li>include text (but not <code>tags</code> or date features, since those did not result in better performance),</li>
-<li>tune the number of tokens used in the model,</li>
-<li>include unigrams only,</li>
-<li>include custom-engineered features,</li>
-<li>finally evaluate on the testing set, which we have not touched at all yet.</li>
+<li><p>train on the same set of cross-validation resamples used throughout this chapter,</p></li>
+<li><p>include text (but not <code>tags</code> or date features, since those did not result in better performance),</p></li>
+<li><p>tune the number of tokens used in the model,</p></li>
+<li><p>include unigrams only,</p></li>
+<li><p>include custom-engineered features,</p></li>
+<li><p>finally evaluate on the testing set, which we have not touched at all yet.</p></li>
 </ul>
 <div id="feature-selection" class="section level3" number="7.11.1">
 <h3><span class="header-section-number">7.11.1</span> Feature selection</h3>
@@ -1886,10 +1886,9 @@ There are <em>two</em> tunable parameters in this model, the regularization para
 #&gt;  9 0.00483        1000
 #&gt; 10 0.00785        1000
 #&gt; # … with 50 more rows</code></pre>
+
 <div class="rmdpackage">
-<p>
-We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong>.
-</p>
+We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong> <span class="citation">(<a href="#ref-R-dials" role="doc-biblioref">Kuhn 2020</a>)</span>.
 </div>
 <p>Now it’s time to set up our tuning grid. Let’s save the predictions so we can explore them in more detail, and let’s also set custom metrics instead of using the defaults. Let’s compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.</p>
 <div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="mlclassification.html#cb403-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
@@ -2085,12 +2084,12 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 <div id="in-this-chapter-you-learned-6" class="section level3" number="7.12.1">
 <h3><span class="header-section-number">7.12.1</span> In this chapter, you learned:</h3>
 <ul>
-<li>how text data can be used in a classification model</li>
-<li>to tune hyperparameters of a model</li>
-<li>how to compare different model types</li>
-<li>that models can combine both text and non-text predictors</li>
-<li>about engineering custom features for machine learning</li>
-<li>about performance metrics for classification models</li>
+<li><p>how text data can be used in a classification model</p></li>
+<li><p>to tune hyperparameters of a model</p></li>
+<li><p>how to compare different model types</p></li>
+<li><p>that models can combine both text and non-text predictors</p></li>
+<li><p>about engineering custom features for machine learning</p></li>
+<li><p>about performance metrics for classification models</p></li>
 </ul>
 
 </div>
@@ -2102,7 +2101,7 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-R-Matrix" class="csl-entry">
-Bates, Douglas, and Martin Maechler. 2019. <em>Matrix: Sparse and Dense Matrix Classes and Methods</em>. <a href="https://CRAN.R-project.org/package=Matrix">https://CRAN.R-project.org/package=Matrix</a>.
+Bates, Douglas, and Martin Maechler. 2021. <em>Matrix: Sparse and Dense Matrix Classes and Methods</em>. <a href="https://CRAN.R-project.org/package=Matrix">https://CRAN.R-project.org/package=Matrix</a>.
 </div>
 <div id="ref-Breiman1984" class="csl-entry">
 Breiman, Leo, Jerome Friedman, Charles J Stone, and Richard A Olshen. 1984. <em>Classification and Regression Trees</em>. CRC press.
@@ -2119,11 +2118,20 @@ Fredrikson, Matthew, Eric Lantz, Somesh Jha, Simon Lin, David Page, and Thomas R
 <div id="ref-Fredrikson2015" class="csl-entry">
 Fredrikson, Matt, Somesh Jha, and Thomas Ristenpart. 2015. <span>“Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures.”</span> In, 1322–33. <a href="https://doi.org/10.1145/2810103.2813677">https://doi.org/10.1145/2810103.2813677</a>.
 </div>
+<div id="ref-R-themis" class="csl-entry">
+———. 2020c. <em>Themis: Extra Recipes Steps for Dealing with Unbalanced Data</em>. <a href="https://CRAN.R-project.org/package=themis">https://CRAN.R-project.org/package=themis</a>.
+</div>
 <div id="ref-R-textfeatures" class="csl-entry">
 Kearney, Michael W. 2019. <em>Textfeatures: Extracts Features from Text</em>. <a href="https://CRAN.R-project.org/package=textfeatures">https://CRAN.R-project.org/package=textfeatures</a>.
 </div>
 <div id="ref-Kibriya2005" class="csl-entry">
 Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. <span>“Multinomial Naive Bayes for Text Categorization Revisited.”</span> In <em>AI 2004: Advances in Artificial Intelligence</em>, edited by Geoffrey I. Webb and Xinghuo Yu, 488–99. Berlin, Heidelberg: Springer Berlin Heidelberg.
+</div>
+<div id="ref-R-dials" class="csl-entry">
+Kuhn, Max. 2020. <em>Dials: Tools for Creating Tuning Parameter Values</em>. <a href="https://CRAN.R-project.org/package=dials">https://CRAN.R-project.org/package=dials</a>.
+</div>
+<div id="ref-R-parsnip" class="csl-entry">
+Kuhn, Max, and Davis Vaughan. 2021a. <em>Parsnip: A Common API to Modeling and Analysis Functions</em>.
 </div>
 <div id="ref-kim2006" class="csl-entry">
 Sang-Bum Kim, Kyoung-Soo Han, Hae-Chang Rim, and Sung Hyon Myaeng. 2006. <span>“Some Effective Techniques for Naive Bayes Text Classification.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 18 (11): 1457–66.
@@ -2133,6 +2141,9 @@ Sweeney, Latanya. 2000. <span>“Simple Demographics Often Identify People Uniqu
 </div>
 <div id="ref-Tibshirani1996" class="csl-entry">
 Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 58 (1): 267–88.
+</div>
+<div id="ref-R-hardhat" class="csl-entry">
+Vaughan, Davis, and Max Kuhn. 2020. <em>Hardhat: Construct Modeling Packages</em>. <a href="https://CRAN.R-project.org/package=hardhat">https://CRAN.R-project.org/package=hardhat</a>.
 </div>
 </div>
 <div class="footnotes">
