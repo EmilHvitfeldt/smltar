@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -430,7 +455,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="dlcnn" class="section level1" number="10">
 <h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks</h1>
-<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="references.html#ref-kim2014" role="doc-biblioref">Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
+<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
 <p>CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.</p>
 <div class="rmdnote">
 <p>
@@ -808,7 +833,7 @@ This doesn’t mean that we are done with CNNs! There are still many things we c
 <h2><span class="header-section-number">10.4</span> Case study: byte pair encoding</h2>
 <p>In our models in this chapter so far we have used words as the token of interest. We saw in Section <a href="mlregression.html#casestudyngrams">6.5</a> how n-grams can be used in modeling as well.
 One of the reasons why the Kickstarter data set is hard to work with is because the text is quite short so we don’t have that many individual tokens to work with in a given blurb.
-Another choice of token is <em>subwords</em>, where we split the text into smaller units than words; longer words especially will be broken into multiple subword units. One way to tokenize text into subword units is <em>byte pair encoding</em> <span class="citation">(<a href="references.html#ref-Gage1994ANA" role="doc-biblioref">Gage 1994</a>)</span>.
+Another choice of token is <em>subwords</em>, where we split the text into smaller units than words; longer words especially will be broken into multiple subword units. One way to tokenize text into subword units is <em>byte pair encoding</em> <span class="citation">(<a href="#ref-Gage1994ANA" role="doc-biblioref">Gage 1994</a>)</span>.
 This algorithm has been repurposed to work on text by iteratively merging frequently occurring subword pairs.
 Methods such as <a href="https://github.com/google-research/bert">BERT</a> and <a href="https://openai.com/blog/better-language-models/">GPT-2</a> use subword units for text with great success.
 The byte pair encoding algorithm has a hyperparameter controlling the size of the vocabulary. Setting it to higher values allows the models to find more rarely used character sequences in the text.</p>
@@ -816,7 +841,7 @@ The byte pair encoding algorithm has a hyperparameter controlling the size of th
 Using a subword tokenizer such as byte pair encoding should let us see the text with more granularity since we will have more and smaller tokens for each observation.</p>
 
 <div class="rmdnote">
-Character level CNNs have also proven successful in some contexts. They have been explored by <span class="citation"><a href="references.html#ref-Zhang2015" role="doc-biblioref">Zhang, Zhao, and LeCun</a> (<a href="references.html#ref-Zhang2015" role="doc-biblioref">2015</a>)</span> and work quite well on some shorter texts such as headlines and tweets <span class="citation">(<a href="references.html#ref-Vosoughi2016" role="doc-biblioref">Vosoughi, Vijayaraghavan, and Roy 2016</a>)</span>.
+Character level CNNs have also proven successful in some contexts. They have been explored by <span class="citation"><a href="#ref-Zhang2015" role="doc-biblioref">Zhang, Zhao, and LeCun</a> (<a href="#ref-Zhang2015" role="doc-biblioref">2015</a>)</span> and work quite well on some shorter texts such as headlines and tweets <span class="citation">(<a href="#ref-Vosoughi2016" role="doc-biblioref">Vosoughi, Vijayaraghavan, and Roy 2016</a>)</span>.
 </div>
 <p>We need to remind ourselves that these models don’t contain any linguistic knowledge at all; they only “learn” the morphological patterns of sequences of characters (Section <a href="language.html#morphology">1.2</a>) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.</p>
 <p>Since we are using a completely different preprocessing approach, we need to specify a new feature engineering recipe.</p>
@@ -991,7 +1016,7 @@ Examining the longest subword tokens gives you a good sense of the data you are 
 </div>
 <div id="lime" class="section level2" number="10.5">
 <h2><span class="header-section-number">10.5</span> Case study: explainability with LIME</h2>
-<p>We noted in Section <a href="dldnn.html#dllimitations">8.7</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using an algorithm for observation-level variable importance like <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="references.html#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short.</p>
+<p>We noted in Section <a href="dldnn.html#dllimitations">8.7</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using an algorithm for observation-level variable importance like <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short.</p>
 <div class="rmdnote">
 <p>
 As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.
@@ -1246,12 +1271,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.00       0.0341           0.992           1.00             0.805
-#&gt; 2 _tuning/20… 0.991      0.0374           0.991           0.991            0.805
-#&gt; 3 _tuning/20… 1.00       0.0408           0.990           1.00             0.804
-#&gt; 4 _tuning/20… 0.969      0.0289           0.994           0.969            0.810
-#&gt; 5 _tuning/20… 0.966      0.0357           0.992           0.966            0.812
-#&gt; 6 _tuning/20… 0.970      0.0451           0.989           0.970            0.811
+#&gt; 1 _tuning/20… 1.01       0.0329           0.993           1.01             0.807
+#&gt; 2 _tuning/20… 1.00       0.0353           0.992           1.00             0.806
+#&gt; 3 _tuning/20… 1.00       0.0456           0.988           1.00             0.805
+#&gt; 4 _tuning/20… 0.972      0.0305           0.994           0.972            0.810
+#&gt; 5 _tuning/20… 0.960      0.033            0.993           0.960            0.81 
+#&gt; 6 _tuning/20… 0.930      0.0493           0.987           0.930            0.810
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1266,13 +1291,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.812                 5             1
-#&gt; 2               0.811                 3             1
-#&gt; 3               0.810                 7             1
-#&gt; 4               0.805                 5             2
-#&gt; 5               0.805                 7             2
-#&gt; 6               0.804                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.810                 7             1
+#&gt; 2               0.81                  5             1
+#&gt; 3               0.810                 3             1
+#&gt; 4               0.807                 7             2
+#&gt; 5               0.806                 5             2
+#&gt; 6               0.805                 3             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1509,6 +1534,24 @@ For this particular data set of short text blurbs, a CNN model able to learn loc
 
 
 
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Gage1994ANA" class="csl-entry">
+Gage, P. 1994. <span>“A New Algorithm for Data Compression.”</span> <em>The C Users Journal Archive</em> 12: 23–38.
+</div>
+<div id="ref-kim2014" class="csl-entry">
+Kim, Yoon. 2014. <span>“Convolutional Neural Networks for Sentence Classification.”</span> In <em>Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (<span>EMNLP</span>)</em>, 1746–51. Doha, Qatar: Association for Computational Linguistics. <a href="https://doi.org/10.3115/v1/D14-1181">https://doi.org/10.3115/v1/D14-1181</a>.
+</div>
+<div id="ref-ribeiro2016why" class="csl-entry">
+Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> <a href="http://arxiv.org/abs/1602.04938">http://arxiv.org/abs/1602.04938</a>.
+</div>
+<div id="ref-Vosoughi2016" class="csl-entry">
+Vosoughi, Soroush, Prashanth Vijayaraghavan, and Deb Roy. 2016. <span>“Tweet2Vec: Learning Tweet Embeddings Using Character-Level CNN-LSTM Encoder-Decoder.”</span> In, 1041–44. <a href="https://doi.org/10.1145/2911451.2914762">https://doi.org/10.1145/2911451.2914762</a>.
+</div>
+<div id="ref-Zhang2015" class="csl-entry">
+Zhang, Xiang, Junbo Zhao, and Yann LeCun. 2015. <span>“Character-Level Convolutional Networks for Text Classification.”</span> In <em>Proceedings of the 28th International Conference on Neural Information Processing Systems - Volume 1</em>, 649–57. NIPS’15. Cambridge, MA, USA: MIT Press.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="16">
@@ -1544,6 +1587,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,

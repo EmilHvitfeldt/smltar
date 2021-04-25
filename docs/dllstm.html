@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -430,7 +455,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="dllstm" class="section level1" number="9">
 <h1><span class="header-section-number">Chapter 9</span> Long short-term memory (LSTM) networks</h1>
-<p>In Chapter <a href="dldnn.html#dldnn">8</a>, we trained our first deep learning models, with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>, but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of <strong>long short-term memory</strong> networks (LSTMs) <span class="citation">(<a href="references.html#ref-Hochreiter1997" role="doc-biblioref">Hochreiter and Schmidhuber 1997</a>)</span>.</p>
+<p>In Chapter <a href="dldnn.html#dldnn">8</a>, we trained our first deep learning models, with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>, but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of <strong>long short-term memory</strong> networks (LSTMs) <span class="citation">(<a href="#ref-Hochreiter1997" role="doc-biblioref">Hochreiter and Schmidhuber 1997</a>)</span>.</p>
 <div id="firstlstm" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> A first LSTM model</h2>
 <p>We will be using the same data from the previous chapter, described in Sections <a href="dldnn.html#kickstarter">8.1</a> and <a href="appendixdata.html#kickstarter-blurbs">B.4</a>. This data contains short text blurbs for prospective crowdfunding campaigns and whether those campaigns were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let’s start by splitting our data into training and testing sets.</p>
@@ -532,7 +557,7 @@ Notice the number of parameters in this LSTM model, about twice as many as the d
 <p>Next we <code>compile()</code> the model, which configures the model for training with a specific optimizer and set of metrics.</p>
 <div class="rmdnote">
 <p>
-A good default optimizer for many problems is <code>“adam”</code> <span class="citation"><span class="citation">(<a href="references.html#ref-kingma2017adam" role="doc-biblioref">Kingma and Ba 2017</a>)</span></span>, and a good loss function for binary classification is <code>“binary_crossentropy”</code>.
+A good default optimizer for many problems is <code>“adam”</code> <span class="citation"><span class="citation">(<a href="#ref-kingma2017adam" role="doc-biblioref">Kingma and Ba 2017</a>)</span></span>, and a good loss function for binary classification is <code>“binary_crossentropy”</code>.
 </p>
 </div>
 <div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="dllstm.html#cb521-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="sc">%&gt;%</span></span>
@@ -604,7 +629,7 @@ Remember that lower loss indicates a better fitting model, and higher accuracy (
 <p>Let’s also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (<code>dropout</code>) and in the feedback loops (<code>recurrent_dropout</code>).</p>
 <div class="rmdwarning">
 <p>
-When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting <span class="citation"><span class="citation">(<a href="references.html#ref-Srivastava2014" role="doc-biblioref">Srivastava et al. 2014</a>)</span></span>. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with <code>layer_dropout()</code>.
+When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting <span class="citation"><span class="citation">(<a href="#ref-Srivastava2014" role="doc-biblioref">Srivastava et al. 2014</a>)</span></span>. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with <code>layer_dropout()</code>.
 </p>
 </div>
 <div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="dllstm.html#cb532-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
@@ -668,7 +693,7 @@ FIGURE 9.4: ROC curve for LSTM with dropout predictions of Kickstarter campaign 
 </div>
 <div id="compare-to-a-recurrent-neural-network" class="section level2" number="9.2">
 <h2><span class="header-section-number">9.2</span> Compare to a recurrent neural network</h2>
-<p>An LSTM is actually a specific kind of recurrent neural network (RNN) <span class="citation">(<a href="references.html#ref-ELMAN1990179" role="doc-biblioref">Elman 1990</a>)</span>. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network <span class="math inline">\(A\)</span> in Figure <a href="dllstm.html#fig:rnndiag">9.1</a>. RNNs tend to have a very simple structure, typically just a single <code>tanh()</code> layer, much simpler than what happens in LSTMs.</p>
+<p>An LSTM is actually a specific kind of recurrent neural network (RNN) <span class="citation">(<a href="#ref-ELMAN1990179" role="doc-biblioref">Elman 1990</a>)</span>. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network <span class="math inline">\(A\)</span> in Figure <a href="dllstm.html#fig:rnndiag">9.1</a>. RNNs tend to have a very simple structure, typically just a single <code>tanh()</code> layer, much simpler than what happens in LSTMs.</p>
 <div class="rmdwarning">
 <p>
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context.
@@ -712,7 +737,7 @@ Simple RNNs can only connect very recent information and structure in sequences,
 FIGURE 9.5: Training and validation metrics for RNN
 </p>
 </div>
-<p>These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don’t work well compared to simpler deep learning architectures like the dense network introduced in Section <a href="dldnn.html#firstdlclassification">8.2</a> <span class="citation">(<a href="references.html#ref-Minaee2020" role="doc-biblioref">Minaee et al. 2020</a>)</span>, or even other machine learning approaches like regularized linear models with good preprocessing.</p>
+<p>These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don’t work well compared to simpler deep learning architectures like the dense network introduced in Section <a href="dldnn.html#firstdlclassification">8.2</a> <span class="citation">(<a href="#ref-Minaee2020" role="doc-biblioref">Minaee et al. 2020</a>)</span>, or even other machine learning approaches like regularized linear models with good preprocessing.</p>
 <p>Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better performing models.</p>
 </div>
 <div id="bilstm" class="section level2" number="9.3">
@@ -1163,6 +1188,24 @@ For this data set of Kickstarter campaign blurbs, an LSTM architecture is not tu
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ELMAN1990179" class="csl-entry">
+Elman, Jeffrey L. 1990. <span>“Finding Structure in Time.”</span> <em>Cognitive Science</em> 14 (2): 179–211. https://doi.org/<a href="https://doi.org/10.1016/0364-0213(90)90002-E">https://doi.org/10.1016/0364-0213(90)90002-E</a>.
+</div>
+<div id="ref-Hochreiter1997" class="csl-entry">
+Hochreiter, Sepp, and Jürgen Schmidhuber. 1997. <span>“Long Short-Term Memory.”</span> <em>Neural Comput.</em> 9 (8): 1735–80. <a href="https://doi.org/10.1162/neco.1997.9.8.1735">https://doi.org/10.1162/neco.1997.9.8.1735</a>.
+</div>
+<div id="ref-kingma2017adam" class="csl-entry">
+Kingma, Diederik P., and Jimmy Ba. 2017. <span>“Adam: A Method for Stochastic Optimization.”</span> <a href="http://arxiv.org/abs/1412.6980">http://arxiv.org/abs/1412.6980</a>.
+</div>
+<div id="ref-Minaee2020" class="csl-entry">
+Minaee, Shervin, Nal Kalchbrenner, Erik Cambria, Narjes Nikzad, Meysam Chenaghlu, and Jianfeng Gao. 2020. <span>“Deep Learning Based Text Classification: A Comprehensive Review.”</span> <em>arXiv Preprint arXiv:2004.03705</em>.
+</div>
+<div id="ref-Srivastava2014" class="csl-entry">
+Srivastava, Nitish, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. 2014. <span>“Dropout: A Simple Way to Prevent Neural Networks from Overfitting.”</span> <em>Journal of Machine Learning Research</em> 15 (56): 1929–58. <a href="http://jmlr.org/papers/v15/srivastava14a.html">http://jmlr.org/papers/v15/srivastava14a.html</a>.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="15">
@@ -1198,6 +1241,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,

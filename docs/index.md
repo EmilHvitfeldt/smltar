@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-04-18"
+date: "2021-04-24"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib, packages.bib]
@@ -97,7 +97,7 @@ Note box icons by Smashicons from flaticon.com
 
 This book was written in [RStudio](http://www.rstudio.com/ide/) using [bookdown](http://bookdown.org/). The [website](https://smltar.com/) is hosted via [GitHub Pages](https://pages.github.com/), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [ggplot2](https://ggplot2.tidyverse.org/) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors; modified code can be found [here](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
-This version of the book was built with R version 4.0.3 (2020-10-10) and the following packages:
+This version of the book was built with R version 4.0.5 (2021-03-31) and the following packages:
 
 
 |package        |version    |source                                 |

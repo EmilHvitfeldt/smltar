@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 1 Language and modeling | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 1 Language and modeling | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 1 Language and modeling | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -434,7 +459,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Throughout the course of this book, we will discuss creating predictors or features from text data, fitting statistical models to those features, and how these tasks are related to language. Data scientists involved in the everyday work of text analysis and text modeling typically don’t have formal training in how language works, but there is an entire field focused on exactly that, <strong>linguistics</strong>.</p>
 <div id="linguistics-for-text-analysis" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> Linguistics for text analysis</h2>
-<p><span class="citation"><a href="references.html#ref-Briscoe13" role="doc-biblioref">Briscoe</a> (<a href="references.html#ref-Briscoe13" role="doc-biblioref">2013</a>)</span> provides helpful introductions to what linguistics is and how it intersects with the practical computational field of natural language processing. The broad field of linguistics includes subfields focusing on different aspects of language, which are somewhat hierarchical, as shown in Table <a href="language.html#tab:lingsubfields">1.1</a>.</p>
+<p><span class="citation"><a href="#ref-Briscoe13" role="doc-biblioref">Briscoe</a> (<a href="#ref-Briscoe13" role="doc-biblioref">2013</a>)</span> provides helpful introductions to what linguistics is and how it intersects with the practical computational field of natural language processing. The broad field of linguistics includes subfields focusing on different aspects of language, which are somewhat hierarchical, as shown in Table <a href="language.html#tab:lingsubfields">1.1</a>.</p>
 <table>
 <caption><span id="tab:lingsubfields">TABLE 1.1: </span>Some subfields of linguistics, moving from smaller structures to broader structures</caption>
 <thead>
@@ -495,14 +520,14 @@ Remember that some language is signed, not spoken, so the description laid out h
 </div>
 <div id="morphology" class="section level2" number="1.2">
 <h2><span class="header-section-number">1.2</span> A glimpse into one area: morphology</h2>
-<p>How can a deeper knowledge of how language works inform text modeling? Let’s focus on <strong>morphology</strong>, the study of words’ internal structures and how they are formed, to illustrate this. Words are medium to small in length in English; English has a moderately low ratio of morphemes (the smallest unit of language with meaning) to words while other languages like Turkish and Russian have a higher ratio of morphemes to words <span class="citation">(<a href="references.html#ref-Bender13" role="doc-biblioref">Emily M. Bender 2013</a>)</span>. Related to this, languages can be either more analytic (like Mandarin or modern English, breaking up concepts into separate words) or synthetic (like Hungarian or Swahili, combining concepts into one word).</p>
-<p>Morphology focuses on how morphemes such as prefixes, suffixes, and root words come together to form words. Some languages, like Danish, use many compound words. Danish words such as “brandbil” (fire truck), “politibil” (police car), and “lastbil” (truck) all contain the morpheme “bil” (car) and start with prefixes denoting the type of car. Because of these compound words, some nouns seem more descriptive than their English counterpart; “vaskebjørn” (raccoon) splits into the morphemes “vaske” and “bjørn,” literally meaning “washing bear”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. When working with Danish and other languages with compound words, such as German, compound splitting to extract more information can be beneficial <span class="citation">(<a href="references.html#ref-Sugisaki2018" role="doc-biblioref">Sugisaki and Tuggener 2018</a>)</span>. However, even the very question of what a word is turns out to be difficult, and not only for languages other than English. Compound words in English like “real estate” and “dining room” represent one concept but contain whitespace.</p>
+<p>How can a deeper knowledge of how language works inform text modeling? Let’s focus on <strong>morphology</strong>, the study of words’ internal structures and how they are formed, to illustrate this. Words are medium to small in length in English; English has a moderately low ratio of morphemes (the smallest unit of language with meaning) to words while other languages like Turkish and Russian have a higher ratio of morphemes to words <span class="citation">(<a href="#ref-Bender13" role="doc-biblioref">Emily M. Bender 2013</a>)</span>. Related to this, languages can be either more analytic (like Mandarin or modern English, breaking up concepts into separate words) or synthetic (like Hungarian or Swahili, combining concepts into one word).</p>
+<p>Morphology focuses on how morphemes such as prefixes, suffixes, and root words come together to form words. Some languages, like Danish, use many compound words. Danish words such as “brandbil” (fire truck), “politibil” (police car), and “lastbil” (truck) all contain the morpheme “bil” (car) and start with prefixes denoting the type of car. Because of these compound words, some nouns seem more descriptive than their English counterpart; “vaskebjørn” (raccoon) splits into the morphemes “vaske” and “bjørn,” literally meaning “washing bear”<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. When working with Danish and other languages with compound words, such as German, compound splitting to extract more information can be beneficial <span class="citation">(<a href="#ref-Sugisaki2018" role="doc-biblioref">Sugisaki and Tuggener 2018</a>)</span>. However, even the very question of what a word is turns out to be difficult, and not only for languages other than English. Compound words in English like “real estate” and “dining room” represent one concept but contain whitespace.</p>
 <p>The morphological characteristics of a text data set are deeply connected to preprocessing steps like tokenization (Chapter <a href="tokenization.html#tokenization">2</a>), removing stop words (Chapter <a href="stopwords.html#stopwords">3</a>), and even stemming (Chapter <a href="stemming.html#stemming">4</a>). These preprocessing steps for creating natural language features, in turn, can have significant effects on model predictions or interpretation.</p>
 </div>
 <div id="different-languages" class="section level2" number="1.3">
 <h2><span class="header-section-number">1.3</span> Different languages</h2>
 <p>We believe that most of the readers of this book are probably native English speakers, and certainly most of the text used in training machine learning models is English. However, English is by no means a dominant language globally, especially as a native or first language. As an example close to home for us, of the two authors of this book, one is a native English speaker and one is not. According to the <a href="https://www.ethnologue.com/language/eng">comprehensive and detailed Ethnologue project</a>, less than 20% of the world’s population speaks English at all.</p>
-<p><span class="citation"><a href="references.html#ref-Bender11" role="doc-biblioref">Emily M. Bender</a> (<a href="references.html#ref-Bender11" role="doc-biblioref">2011</a>)</span> provides guidance to computational linguists building models for text, for any language. One specific point she makes is to name the language being studied.</p>
+<p><span class="citation"><a href="#ref-Bender11" role="doc-biblioref">Emily M. Bender</a> (<a href="#ref-Bender11" role="doc-biblioref">2011</a>)</span> provides guidance to computational linguists building models for text, for any language. One specific point she makes is to name the language being studied.</p>
 <blockquote>
 <p><strong>Do</strong> state the name of the language that is being studied, even if it’s English. Acknowledging that we are working on a particular language foregrounds the possibility that the techniques may in fact be language-specific. Conversely, neglecting to state that the particular data used were in, say, English, gives [a] false veneer of language-independence to the work.</p>
 </blockquote>
@@ -510,8 +535,8 @@ Remember that some language is signed, not spoken, so the description laid out h
 </div>
 <div id="other-ways-text-can-vary" class="section level2" number="1.4">
 <h2><span class="header-section-number">1.4</span> Other ways text can vary</h2>
-<p>The concept of differences in language is relevant for modeling beyond only the broadest language level (for example, English vs. Danish vs. German vs. Farsi). Language from a specific dialect often cannot be handled well with a model trained on data from the same language but not inclusive of that dialect. One dialect used in the United States is African American Vernacular English (AAVE). Models trained to detect toxic or hate speech are more likely to falsely identify AAVE as hate speech <span class="citation">(<a href="references.html#ref-Sap19" role="doc-biblioref">Sap et al. 2019</a>)</span>; this is deeply troubling not only because the model is less accurate than it should be, but because it amplifies harm against an already marginalized group.</p>
-<p>Language is also changing over time. This is a known characteristic of language; if you notice the evolution of your own language, don’t be depressed or angry, because it means that people are using it! Teenage girls are especially effective at language innovation, and have been for centuries <span class="citation">(<a href="references.html#ref-McCulloch15" role="doc-biblioref">McCulloch 2015</a>)</span>; innovations spread from groups such as young women to other parts of society. This is another difference that impacts modeling.</p>
+<p>The concept of differences in language is relevant for modeling beyond only the broadest language level (for example, English vs. Danish vs. German vs. Farsi). Language from a specific dialect often cannot be handled well with a model trained on data from the same language but not inclusive of that dialect. One dialect used in the United States is African American Vernacular English (AAVE). Models trained to detect toxic or hate speech are more likely to falsely identify AAVE as hate speech <span class="citation">(<a href="#ref-Sap19" role="doc-biblioref">Sap et al. 2019</a>)</span>; this is deeply troubling not only because the model is less accurate than it should be, but because it amplifies harm against an already marginalized group.</p>
+<p>Language is also changing over time. This is a known characteristic of language; if you notice the evolution of your own language, don’t be depressed or angry, because it means that people are using it! Teenage girls are especially effective at language innovation, and have been for centuries <span class="citation">(<a href="#ref-McCulloch15" role="doc-biblioref">McCulloch 2015</a>)</span>; innovations spread from groups such as young women to other parts of society. This is another difference that impacts modeling.</p>
 <div class="rmdwarning">
 <p>
 Differences in language relevant for models also include the use of slang, and even the context or medium of that text.
@@ -534,11 +559,35 @@ Differences in language relevant for models also include the use of slang, and e
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bender11" class="csl-entry">
+Bender, Emily M. 2011. <span>“On Achieving and Evaluating Language-Independence in NLP.”</span> <em>Linguistic Issues in Language Technology</em> 6 (3): 1–26.
+</div>
+<div id="ref-Bender13" class="csl-entry">
+———. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3): 1–184.
+</div>
+<div id="ref-Briscoe13" class="csl-entry">
+Briscoe, Ted. 2013. <span>“Introduction to Linguistics for Natural Language Processing.”</span> <a href="https://www.cl.cam.ac.uk/teaching/1314/L100/introling.pdf">https://www.cl.cam.ac.uk/teaching/1314/L100/introling.pdf</a>.
+</div>
+<div id="ref-Johnson1999" class="csl-entry">
+Johnson, Stephen B. 1999. <span>“A Semantic Lexicon for Medical Language Processing.”</span> <em>Journal of the American Medical Informatics Association</em> 6 (3): 205–18.
+</div>
+<div id="ref-McCulloch15" class="csl-entry">
+McCulloch, Gretchen. 2015. <span>“Move over Shakespeare, Teen Girls Are the Real Language Disruptors.”</span> <em>Quartz</em>. Quartz. <a href="https://qz.com/474671/move-over-shakespeare-teen-girls-are-the-real-language-disruptors/">https://qz.com/474671/move-over-shakespeare-teen-girls-are-the-real-language-disruptors/</a>.
+</div>
+<div id="ref-Sap19" class="csl-entry">
+Sap, Maarten, Dallas Card, Saadia Gabriel, Yejin Choi, and Noah A. Smith. 2019. <span>“The Risk of Racial Bias in Hate Speech Detection.”</span> In <em>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</em>, 1668–78. Florence, Italy: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/P19-1163">https://doi.org/10.18653/v1/P19-1163</a>.
+</div>
+<div id="ref-Sugisaki2018" class="csl-entry">
+Sugisaki, Kyoko, and Don Tuggener. 2018. <span>“German Compound Splitting Using the Compound Productivity of Morphemes,”</span> October.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="1">
 <li id="fn1"><p>The English word “raccoon” derives from an Algonquin word meaning, “scratches with his hands!”<a href="language.html#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Practitioners have built specialized computational resources for medical text <span class="citation">(<a href="references.html#ref-Johnson1999" role="doc-biblioref">Johnson 1999</a>)</span>.<a href="language.html#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Practitioners have built specialized computational resources for medical text <span class="citation">(<a href="#ref-Johnson1999" role="doc-biblioref">Johnson 1999</a>)</span>.<a href="language.html#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
@@ -570,6 +619,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,

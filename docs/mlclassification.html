@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -578,7 +603,7 @@ Before we calculate tf-idf we use <code>step_tokenfilter()</code> to only keep t
 <p>Now that we have a full specification of the preprocessing recipe, we can build up a tidymodels <code>workflow()</code> to bundle together our modeling components.</p>
 <div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="mlclassification.html#cb275-1" aria-hidden="true" tabindex="-1"></a>complaint_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb275-2"><a href="mlclassification.html#cb275-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(complaints_rec)</span></code></pre></div>
-<p>Let’s start with a naive Bayes model <span class="citation">(<a href="references.html#ref-kim2006" role="doc-biblioref">Sang-Bum Kim et al. 2006</a>; <a href="references.html#ref-Kibriya2005" role="doc-biblioref">Kibriya et al. 2005</a>; <a href="references.html#ref-Eibe2006" role="doc-biblioref">Frank and Bouckaert 2006</a>)</span>, which is available in the tidymodels package <strong>discrim</strong>.
+<p>Let’s start with a naive Bayes model <span class="citation">(<a href="#ref-kim2006" role="doc-biblioref">Sang-Bum Kim et al. 2006</a>; <a href="#ref-Kibriya2005" role="doc-biblioref">Kibriya et al. 2005</a>; <a href="#ref-Eibe2006" role="doc-biblioref">Frank and Bouckaert 2006</a>)</span>, which is available in the tidymodels package <strong>discrim</strong>.
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.</p>
 <div class="rmdpackage">
@@ -740,7 +765,7 @@ One metric alone cannot give you a complete picture of how well your classificat
 </div>
 <div id="comparetolasso" class="section level2" number="7.3">
 <h2><span class="header-section-number">7.3</span> Compare to a lasso classification model</h2>
-<p>Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model <span class="citation">(<a href="references.html#ref-Tibshirani1996" role="doc-biblioref">Tibshirani 1996</a>)</span>, where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem.</p>
+<p>Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model <span class="citation">(<a href="#ref-Tibshirani1996" role="doc-biblioref">Tibshirani 1996</a>)</span>, where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem.</p>
 <div class="rmdnote">
 <p>
 Using regularization helps us choose a simpler model that we expect to generalize better to new observations, and variable selection helps us identify which features to include in our model.
@@ -936,7 +961,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 #&gt; 3 0.000161     roc_auc binary     0.953    10 0.000822 Preprocessor1_Model19
 #&gt; 4 0.0000728    roc_auc binary     0.953    10 0.000821 Preprocessor1_Model18
 #&gt; 5 0.0000000001 roc_auc binary     0.952    10 0.000823 Preprocessor1_Model01</code></pre>
-<p>The best value for ROC AUC from this tuning run is 0.953. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with <code>select_best()</code>, or a simpler model with higher regularization with <code>select_by_pct_loss()</code> or <code>select_by_one_std_err()</code> Let’s choose the model with the best ROC AUC within one standard error of the numerically best model <span class="citation">(<a href="references.html#ref-Breiman1984" role="doc-biblioref">Breiman et al. 1984</a>)</span>.</p>
+<p>The best value for ROC AUC from this tuning run is 0.953. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with <code>select_best()</code>, or a simpler model with higher regularization with <code>select_by_pct_loss()</code> or <code>select_by_one_std_err()</code> Let’s choose the model with the best ROC AUC within one standard error of the numerically best model <span class="citation">(<a href="#ref-Breiman1984" role="doc-biblioref">Breiman et al. 1984</a>)</span>.</p>
 <div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="mlclassification.html#cb313-1" aria-hidden="true" tabindex="-1"></a>chosen_auc <span class="ot">&lt;-</span> tune_rs <span class="sc">%&gt;%</span></span>
 <span id="cb313-2"><a href="mlclassification.html#cb313-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_one_std_err</span>(<span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>, <span class="sc">-</span>penalty)</span>
 <span id="cb313-3"><a href="mlclassification.html#cb313-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1026,7 +1051,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 </div>
 <div class="sourceCode" id="cb322"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb322-1"><a href="mlclassification.html#cb322-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
 <span id="cb322-2"><a href="mlclassification.html#cb322-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
-<p>This “blueprint” lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition <code>"dgCMatrix"</code> is the most common sparse matrix type, from the Matrix package <span class="citation">(<a href="references.html#ref-R-Matrix" role="doc-biblioref">Bates and Maechler 2019</a>)</span>, used in R for modeling. We can use this <code>blueprint</code> argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.</p>
+<p>This “blueprint” lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition <code>"dgCMatrix"</code> is the most common sparse matrix type, from the Matrix package <span class="citation">(<a href="#ref-R-Matrix" role="doc-biblioref">Bates and Maechler 2019</a>)</span>, used in R for modeling. We can use this <code>blueprint</code> argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.</p>
 <div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="mlclassification.html#cb323-1" aria-hidden="true" tabindex="-1"></a>sparse_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb323-2"><a href="mlclassification.html#cb323-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(complaints_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
 <span id="cb323-3"><a href="mlclassification.html#cb323-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tune_spec)</span>
@@ -1546,7 +1571,7 @@ What happens when we use these censored dates as a feature in supervised machine
 </div>
 <p>Data censoring can be a form of preprocessing in your data pipeline.
 For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person’s social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
-More importantly, that information can become embedded in your model and begin to leak as demonstrated by <span class="citation"><a href="references.html#ref-carlini2018secret" role="doc-biblioref">Carlini et al.</a> (<a href="references.html#ref-carlini2018secret" role="doc-biblioref">2018</a>)</span>, <span class="citation"><a href="references.html#ref-Fredrikson2014" role="doc-biblioref">Matthew Fredrikson et al.</a> (<a href="references.html#ref-Fredrikson2014" role="doc-biblioref">2014</a>)</span>, and <span class="citation"><a href="references.html#ref-Fredrikson2015" role="doc-biblioref">Matt Fredrikson, Jha, and Ristenpart</a> (<a href="references.html#ref-Fredrikson2015" role="doc-biblioref">2015</a>)</span>.
+More importantly, that information can become embedded in your model and begin to leak as demonstrated by <span class="citation"><a href="#ref-carlini2018secret" role="doc-biblioref">Carlini et al.</a> (<a href="#ref-carlini2018secret" role="doc-biblioref">2018</a>)</span>, <span class="citation"><a href="#ref-Fredrikson2014" role="doc-biblioref">Matthew Fredrikson et al.</a> (<a href="#ref-Fredrikson2014" role="doc-biblioref">2014</a>)</span>, and <span class="citation"><a href="#ref-Fredrikson2015" role="doc-biblioref">Matt Fredrikson, Jha, and Ristenpart</a> (<a href="#ref-Fredrikson2015" role="doc-biblioref">2015</a>)</span>.
 Both of these issues are important, and one of them could land you in a lot of legal trouble.
 Exposing such PII to modeling is an example of where we should all stop to ask, “Should we even be doing this?” as we discussed in the foreword to these chapters.</p>
 <p>If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the <em>presence</em> of a social security number.
@@ -1576,7 +1601,7 @@ It’s a good idea to use a “word” that won’t be accidentally broken up by
 <p>This technique isn’t useful only for personally identifiable information but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.</p>
 
 <div class="rmdwarning">
-The practice of data re-identification or de-anonymization, where seemingly or partially “anonymized” data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as <span class="citation"><a href="references.html#ref-Sweeney2000" role="doc-biblioref">Sweeney</a> (<a href="references.html#ref-Sweeney2000" role="doc-biblioref">2000</a>)</span>, and current best practices to protect against such mining.
+The practice of data re-identification or de-anonymization, where seemingly or partially “anonymized” data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as <span class="citation"><a href="#ref-Sweeney2000" role="doc-biblioref">Sweeney</a> (<a href="#ref-Sweeney2000" role="doc-biblioref">2000</a>)</span>, and current best practices to protect against such mining.
 </div>
 </div>
 <div id="customfeatures" class="section level2" number="7.9">
@@ -1588,7 +1613,7 @@ As long as you can reasonably formulate what you are trying to count, chances ar
 This is where having a little bit of knowledge about regular expressions pays off.</p>
 
 <div class="rmdpackage">
-The <strong>textfeatures</strong> <span class="citation">(<a href="references.html#ref-R-textfeatures" role="doc-biblioref">Kearney 2019</a>)</span> package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the <code>step_textfeature()</code> function.
+The <strong>textfeatures</strong> <span class="citation">(<a href="#ref-R-textfeatures" role="doc-biblioref">Kearney 2019</a>)</span> package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the <code>step_textfeature()</code> function.
 </div>
 <p>Your specific domain knowledge may provide specific guidance about feature engineering for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
@@ -2074,6 +2099,42 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 
 
 
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-R-Matrix" class="csl-entry">
+Bates, Douglas, and Martin Maechler. 2019. <em>Matrix: Sparse and Dense Matrix Classes and Methods</em>. <a href="https://CRAN.R-project.org/package=Matrix">https://CRAN.R-project.org/package=Matrix</a>.
+</div>
+<div id="ref-Breiman1984" class="csl-entry">
+Breiman, Leo, Jerome Friedman, Charles J Stone, and Richard A Olshen. 1984. <em>Classification and Regression Trees</em>. CRC press.
+</div>
+<div id="ref-carlini2018secret" class="csl-entry">
+Carlini, Nicholas, Chang Liu, Úlfar Erlingsson, Jernej Kos, and Dawn Song. 2018. <span>“The Secret Sharer: Evaluating and Testing Unintended Memorization in Neural Networks.”</span> <a href="http://arxiv.org/abs/1802.08232">http://arxiv.org/abs/1802.08232</a>.
+</div>
+<div id="ref-Eibe2006" class="csl-entry">
+Frank, Eibe, and Remco R. Bouckaert. 2006. <span>“Naive Bayes for Text Classification with Unbalanced Classes.”</span> In <em>Knowledge Discovery in Databases: PKDD 2006</em>, edited by Johannes Fürnkranz, Tobias Scheffer, and Myra Spiliopoulou, 503–10. Berlin, Heidelberg: Springer Berlin Heidelberg.
+</div>
+<div id="ref-Fredrikson2014" class="csl-entry">
+Fredrikson, Matthew, Eric Lantz, Somesh Jha, Simon Lin, David Page, and Thomas Ristenpart. 2014. <span>“Privacy in Pharmacogenetics: An End-to-End Case Study of Personalized Warfarin Dosing.”</span> In <em>23rd <span>USENIX</span> Security Symposium (<span>USENIX</span> Security 14)</em>, 17–32. San Diego, CA: <span>USENIX</span> Association. <a href="https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/fredrikson_matthew">https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/fredrikson_matthew</a>.
+</div>
+<div id="ref-Fredrikson2015" class="csl-entry">
+Fredrikson, Matt, Somesh Jha, and Thomas Ristenpart. 2015. <span>“Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures.”</span> In, 1322–33. <a href="https://doi.org/10.1145/2810103.2813677">https://doi.org/10.1145/2810103.2813677</a>.
+</div>
+<div id="ref-R-textfeatures" class="csl-entry">
+Kearney, Michael W. 2019. <em>Textfeatures: Extracts Features from Text</em>. <a href="https://CRAN.R-project.org/package=textfeatures">https://CRAN.R-project.org/package=textfeatures</a>.
+</div>
+<div id="ref-Kibriya2005" class="csl-entry">
+Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. <span>“Multinomial Naive Bayes for Text Categorization Revisited.”</span> In <em>AI 2004: Advances in Artificial Intelligence</em>, edited by Geoffrey I. Webb and Xinghuo Yu, 488–99. Berlin, Heidelberg: Springer Berlin Heidelberg.
+</div>
+<div id="ref-kim2006" class="csl-entry">
+Sang-Bum Kim, Kyoung-Soo Han, Hae-Chang Rim, and Sung Hyon Myaeng. 2006. <span>“Some Effective Techniques for Naive Bayes Text Classification.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 18 (11): 1457–66.
+</div>
+<div id="ref-Sweeney2000" class="csl-entry">
+Sweeney, Latanya. 2000. <span>“Simple Demographics Often Identify People Uniquely.”</span> <em>Health (San Francisco)</em> 671 (2000): 1–34.
+</div>
+<div id="ref-Tibshirani1996" class="csl-entry">
+Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 58 (1): 267–88.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="10">
@@ -2109,6 +2170,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,

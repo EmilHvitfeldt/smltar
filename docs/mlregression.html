@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -430,7 +455,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="mlregression" class="section level1" number="6">
 <h1><span class="header-section-number">Chapter 6</span> Regression</h1>
-<p>In this chapter, we will use machine learning to predict <em>continuous values</em> that are associated with text data. Like in all predictive modeling tasks, this chapter demonstrates how to use learning algorithms to find and model relationships between an outcome or target variable and other input features. What is unique about the focus of this book is that our features are created from text data following the techniques laid out in Chapters <a href="language.html#language">1</a> through <a href="embeddings.html#embeddings">5</a>, and what is unique about the focus of this particular chapter is that our outcome is numeric and continuous. For example, let’s consider a sample of opinions from the United States Supreme Court, available in the <strong>scotus</strong> <span class="citation">(<a href="references.html#ref-R-scotus" role="doc-biblioref">Hvitfeldt 2019b</a>)</span> package.</p>
+<p>In this chapter, we will use machine learning to predict <em>continuous values</em> that are associated with text data. Like in all predictive modeling tasks, this chapter demonstrates how to use learning algorithms to find and model relationships between an outcome or target variable and other input features. What is unique about the focus of this book is that our features are created from text data following the techniques laid out in Chapters <a href="language.html#language">1</a> through <a href="embeddings.html#embeddings">5</a>, and what is unique about the focus of this particular chapter is that our outcome is numeric and continuous. For example, let’s consider a sample of opinions from the United States Supreme Court, available in the <strong>scotus</strong> <span class="citation">(<a href="#ref-R-scotus" role="doc-biblioref">Hvitfeldt 2019b</a>)</span> package.</p>
 <div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="mlregression.html#cb149-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb149-2"><a href="mlregression.html#cb149-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
 <span id="cb149-3"><a href="mlregression.html#cb149-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -555,12 +580,12 @@ In <strong>tidymodels</strong>, the <strong>workflows</strong> package offers in
 #&gt; ● step_tokenfilter()
 #&gt; ● step_tfidf()
 #&gt; ● step_normalize()</code></pre>
-<p>Notice that there is no model yet: <code>Model: None</code>. It’s time to specify the model we will use! Let’s build a support vector machine (SVM) model. While they don’t see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification <span class="citation">(<a href="references.html#ref-Joachims1998" role="doc-biblioref">Joachims 1998</a>)</span> and can give good performance <span class="citation">(<a href="references.html#ref-Vantu2016" role="doc-biblioref">Van-Tu and Anh-Cuong 2016</a>)</span>.</p>
+<p>Notice that there is no model yet: <code>Model: None</code>. It’s time to specify the model we will use! Let’s build a support vector machine (SVM) model. While they don’t see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification <span class="citation">(<a href="#ref-Joachims1998" role="doc-biblioref">Joachims 1998</a>)</span> and can give good performance <span class="citation">(<a href="#ref-Vantu2016" role="doc-biblioref">Van-Tu and Anh-Cuong 2016</a>)</span>.</p>
 
 <div class="rmdnote">
 An SVM model can be used for either regression or classification, and linear SVMs often work well with text data. Even better, linear SVMs typically do not need to be tuned (see Section <a href="mlclassification.html#tunelasso">7.4</a> for tuning model hyperparameters).
 </div>
-<p>Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let’s use the <strong>LiblineaR</strong> engine <span class="citation">(<a href="references.html#ref-R-LiblineaR" role="doc-biblioref">Helleputte 2017</a>)</span>.</p>
+<p>Before fitting, we set up a model specification. There are three components to specifying a model using tidymodels: the model algorithm (a linear SVM here), the mode (typically either classification or regression), and the computational engine we are choosing to use. For our linear SVM, let’s use the <strong>LiblineaR</strong> engine <span class="citation">(<a href="#ref-R-LiblineaR" role="doc-biblioref">Helleputte 2017</a>)</span>.</p>
 <div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb159-1"><a href="mlregression.html#cb159-1" aria-hidden="true" tabindex="-1"></a>svm_spec <span class="ot">&lt;-</span> <span class="fu">svm_linear</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb159-2"><a href="mlregression.html#cb159-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb159-3"><a href="mlregression.html#cb159-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;LiblineaR&quot;</span>)</span></code></pre></div>
@@ -761,7 +786,7 @@ A null model is a simple, non-informative model that always predicts the largest
 </div>
 <div id="comparerf" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Compare to a random forest model</h2>
-<p>Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see <span class="citation"><a href="references.html#ref-Caruana2008" role="doc-biblioref">Caruana, Karampatziakis, and Yessenalina</a> (<a href="references.html#ref-Caruana2008" role="doc-biblioref">2008</a>)</span> and <span class="citation"><a href="references.html#ref-Olson2017" role="doc-biblioref">Olson et al.</a> (<a href="references.html#ref-Olson2017" role="doc-biblioref">2017</a>)</span> for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark data sets; random forest models were one of the best overall. Let’s see how a random forest model performs with our data set of Supreme Court opinions.</p>
+<p>Random forest models are broadly used in predictive modeling contexts because they are low-maintenance and perform well. For example, see <span class="citation"><a href="#ref-Caruana2008" role="doc-biblioref">Caruana, Karampatziakis, and Yessenalina</a> (<a href="#ref-Caruana2008" role="doc-biblioref">2008</a>)</span> and <span class="citation"><a href="#ref-Olson2017" role="doc-biblioref">Olson et al.</a> (<a href="#ref-Olson2017" role="doc-biblioref">2017</a>)</span> for comparisons of the performance of common models such as random forest, decision tree, support vector machines, etc. trained on benchmark data sets; random forest models were one of the best overall. Let’s see how a random forest model performs with our data set of Supreme Court opinions.</p>
 <p>First, let’s build a random forest model specification, using the ranger implementation. Random forest models are known for performing well without hyperparameter tuning, so we will just make sure we have enough <code>trees</code>.</p>
 <div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="mlregression.html#cb176-1" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb176-2"><a href="mlregression.html#cb176-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -812,7 +837,7 @@ FIGURE 6.3: The random forest model did not perform very sensibly across years, 
 </p>
 </div>
 <p>Figure <a href="mlregression.html#fig:rfpredict">6.3</a> shows some of the strange behavior from our fitted model. The overall performance metrics look pretty good, but predictions are too high and too low around certain threshold years.</p>
-<p>It is very common to run into problems when using tree-based models like random forests with text data. One of the defining characteristics of text data is that it is <em>sparse</em>, with many features but most features not occurring in most observations. Tree-based models such as random forests are often not well-suited to sparse data because of how decision trees model outcomes <span class="citation">(<a href="references.html#ref-Tang2018" role="doc-biblioref">Tang, Garreau, and Luxburg 2018</a>)</span>.</p>
+<p>It is very common to run into problems when using tree-based models like random forests with text data. One of the defining characteristics of text data is that it is <em>sparse</em>, with many features but most features not occurring in most observations. Tree-based models such as random forests are often not well-suited to sparse data because of how decision trees model outcomes <span class="citation">(<a href="#ref-Tang2018" role="doc-biblioref">Tang, Garreau, and Luxburg 2018</a>)</span>.</p>
 <div class="rmdnote">
 <p>
 Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.
@@ -1006,7 +1031,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 </div>
 <div id="mlregressionlemmatization" class="section level2" number="6.6">
 <h2><span class="header-section-number">6.6</span> Case study: lemmatization</h2>
-<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the <strong>spacyr</strong> R package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>.</p>
+<p>As we discussed in Section <a href="stemming.html#lemmatization">4.6</a>, we can normalize words to their roots or <strong>lemmas</strong> based on each word’s context and the structure of a language. Table <a href="mlregression.html#tab:lemmatb">6.1</a> shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the <a href="https://spacy.io/">spaCy</a> library as made available through the <strong>spacyr</strong> R package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>.</p>
 <table>
 <caption><span id="tab:lemmatb">TABLE 6.1: </span>Lemmatization of one sentence from a Supreme Court opinion</caption>
 <thead>
@@ -1216,7 +1241,7 @@ This style of approach also doesn’t let us take advantage of new tokens we did
 <p>One method that has gained popularity in the machine learning field is the <strong>hashing trick</strong>.
 This method addresses many of the challenges outlined above and is very fast with a low memory footprint.</p>
 <p>Let’s start with the basics of feature hashing.
-First proposed by <span class="citation"><a href="references.html#ref-Weinberger2009" role="doc-biblioref">Weinberger et al.</a> (<a href="references.html#ref-Weinberger2009" role="doc-biblioref">2009</a>)</span>, feature hashing was introduced as a dimensionality reduction method with a simple premise.
+First proposed by <span class="citation"><a href="#ref-Weinberger2009" role="doc-biblioref">Weinberger et al.</a> (<a href="#ref-Weinberger2009" role="doc-biblioref">2009</a>)</span>, feature hashing was introduced as a dimensionality reduction method with a simple premise.
 We begin with a hashing function which we then apply to our tokens.</p>
 <div class="rmdwarning">
 <p>
@@ -1224,7 +1249,7 @@ A hashing function takes input of variable size and maps it to output of a fixed
 </p>
 </div>
 <p>We will use the <code>hash()</code> function from the <strong>rlang</strong> package package to illustrate the behavior of hashing functions.
-The <code>rlang::hash()</code> function uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a more complex hashing function than what is normally used for the hashing trick. The 32-bit version of MurmurHash3 <span class="citation">(<a href="references.html#ref-appleby2008" role="doc-biblioref">Appleby 2008</a>)</span> is often used for its speed and good properties.</p>
+The <code>rlang::hash()</code> function uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a more complex hashing function than what is normally used for the hashing trick. The 32-bit version of MurmurHash3 <span class="citation">(<a href="#ref-appleby2008" role="doc-biblioref">Appleby 2008</a>)</span> is often used for its speed and good properties.</p>
 <div class="rmdnote">
 <p>
 Hashing functions are typically very fast and have certain properties. For example, the output of a hash function is expected to be uniform, with the whole output space filled evenly. The “avalanche effect” describes how similar strings are hashed in such a way that their hashes are not similar in the output space.
@@ -1265,7 +1290,7 @@ Let’s take the modulo of these big integer values to project them down to a mo
 <p>This method is very fast; both the hashing and modulo can be performed independently for each input since neither need information about the full corpus.
 Since we are reducing the space, there is a chance that multiple words are hashed to the same value.
 This is called a collision and at first glance, it seems like it would be a big problem for a model.
-However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor <span class="citation">(<a href="references.html#ref-Forman2008" role="doc-biblioref">Forman and Kirshenbaum 2008</a>)</span>.</p>
+However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor <span class="citation">(<a href="#ref-Forman2008" role="doc-biblioref">Forman and Kirshenbaum 2008</a>)</span>.</p>
 <div class="rmdnote">
 <p>
 Another step that is taken to avoid the negative effects of hash collisions is to use a <em>second</em> hashing function that returns 1 and -1. This determines if we are adding or subtracting the index we get from the first hashing function. Suppose both the words “outdoor” and “pleasant” hash to the integer value 583. Without the second hashing they would collide to 2. Using signed hashing, we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.
@@ -1717,6 +1742,42 @@ Looking at examples that your model does not perform well for is well worth your
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-appleby2008" class="csl-entry">
+Appleby, Austin. 2008. <span>“MurmurHash.”</span> <a href="https://sites.google.com/site/murmurhash">https://sites.google.com/site/murmurhash</a>.
+</div>
+<div id="ref-Benoit19" class="csl-entry">
+Benoit, Kenneth, and Akitaka Matsuo. 2019. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+</div>
+<div id="ref-Caruana2008" class="csl-entry">
+Caruana, Rich, Nikos Karampatziakis, and Ainur Yessenalina. 2008. <span>“An Empirical Evaluation of Supervised Learning in High Dimensions.”</span> In <em>Proceedings of the 25th International Conference on Machine Learning</em>, 96–103.
+</div>
+<div id="ref-Forman2008" class="csl-entry">
+Forman, George, and Evan Kirshenbaum. 2008. <span>“Extremely Fast Text Feature Extraction for Classification and Indexing.”</span> In <em>Proceedings of the 17th ACM Conference on Information and Knowledge Management</em>, 1221–30. CIKM ’08. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1458082.1458243">https://doi.org/10.1145/1458082.1458243</a>.
+</div>
+<div id="ref-R-LiblineaR" class="csl-entry">
+Helleputte, Thibault. 2017. <em>LiblineaR: Linear Predictive Models Based on the LIBLINEAR c/c++ Library</em>.
+</div>
+<div id="ref-R-scotus" class="csl-entry">
+———. 2019b. <em>Scotus: Collection of Supreme Court of the United States’ Opinions</em>. <a href="https://github.com/EmilHvitfeldt/scotus">https://github.com/EmilHvitfeldt/scotus</a>.
+</div>
+<div id="ref-Joachims1998" class="csl-entry">
+Joachims, Thorsten. 1998. <span>“Text Categorization with Support Vector Machines: Learning with Many Relevant Features.”</span> In <em>Proceedings of the 10th European Conference on Machine Learning</em>, 137–42. ECML’98. Berlin, Heidelberg: Springer-Verlag. <a href="https://doi.org/10.1007/BFb0026683">https://doi.org/10.1007/BFb0026683</a>.
+</div>
+<div id="ref-Olson2017" class="csl-entry">
+Olson, Randal S., William La Cava, Zairah Mustahsan, Akshay Varik, and Jason H. Moore. 2017. <span>“Data-Driven Advice for Applying Machine Learning to Bioinformatics Problems.”</span> <a href="http://arxiv.org/abs/1708.05070">http://arxiv.org/abs/1708.05070</a>.
+</div>
+<div id="ref-Tang2018" class="csl-entry">
+Tang, Cheng, Damien Garreau, and Ulrike von Luxburg. 2018. <span>“When Do Random Forests Fail?”</span> In <em>Advances in Neural Information Processing Systems</em>, 2983–93.
+</div>
+<div id="ref-Vantu2016" class="csl-entry">
+Van-Tu, Nguyen, and Le Anh-Cuong. 2016. <span>“Improving Question Classification by Feature Extraction and Selection.”</span> <em>Indian Journal of Science and Technology</em> 9 (May). <a href="https://doi.org/10.17485/ijst/2016/v9i17/93160">https://doi.org/10.17485/ijst/2016/v9i17/93160</a>.
+</div>
+<div id="ref-Weinberger2009" class="csl-entry">
+Weinberger, Kilian, Anirban Dasgupta, John Langford, Alex Smola, and Josh Attenberg. 2009. <span>“Feature Hashing for Large Scale Multitask Learning.”</span> In <em>Proceedings of the 26th Annual International Conference on Machine Learning</em>, 1113–20. ICML ’09. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/1553374.1553516">https://doi.org/10.1145/1553374.1553516</a>.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="8">
@@ -1753,6 +1814,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,
