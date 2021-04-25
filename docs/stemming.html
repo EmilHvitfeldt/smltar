@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -456,7 +481,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>What if we aren’t interested in the difference between <code>"trees"</code> and <code>"tree"</code> and we want to treat both together? That idea is at the heart of <strong>stemming</strong>, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, <code>"trees"</code> would lose its letter <code>"s"</code> while <code>"tree"</code> stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem <code>"tree"</code> (89, if we also find the stem for <code>"tree's"</code>).</p>
 <div id="how-to-stem-text-in-r" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> How to stem text in R</h2>
-<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="references.html#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="references.html#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <a href="https://cran.r-project.org/package=SnowballC">SnowballC</a> package. (It has been extended to languages other than English as well.)</p>
+<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <a href="https://cran.r-project.org/package=SnowballC">SnowballC</a> package. (It has been extended to languages other than English as well.)</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="stemming.html#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
 <span id="cb83-2"><a href="stemming.html#cb83-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb83-3"><a href="stemming.html#cb83-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -584,7 +609,7 @@ FIGURE 4.1: Porter stemming results in five languages
 <span id="cb95-4"><a href="stemming.html#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, stem, n)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 9,642 documents, 135,570 features (99.5% sparse).</code></pre>
 <p>We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, <em>assuming that we haven’t lost any important information by stemming</em>.</p>
-<p>There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, <span class="citation"><a href="references.html#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="references.html#ref-Schofield16" role="doc-biblioref">2016</a>)</span> and related work explore how choices around stemming and other preprocessing steps don’t help and can actually hurt performance when training topic models for text. From <span class="citation"><a href="references.html#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="references.html#ref-Schofield16" role="doc-biblioref">2016</a>)</span> specifically,</p>
+<p>There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> and related work explore how choices around stemming and other preprocessing steps don’t help and can actually hurt performance when training topic models for text. From <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> specifically,</p>
 <blockquote>
 <p>Despite their frequent use in topic modeling, we find that stemmers produce no meaningful improvement in likelihood and coherence and in fact can degrade topic stability.</p>
 </blockquote>
@@ -619,7 +644,7 @@ and it is an <code>m = 3</code> word.</p>
 How would this work for a few example words? The word “supervised” loses its “ed” in step 1b and is not touched by the rest of the algorithm, ending at “supervis.” The word “relational” changes “ational” to “ate” in step 2 and loses its final “e” in step 5, ending at “relat.” Notice that neither of these results are regular English words, but instead special stem objects. This is expected.
 </p>
 </div>
-<p>This algorithm was first published in <span class="citation"><a href="references.html#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="references.html#ref-Porter80" role="doc-biblioref">1980</a>)</span> and is still broadly used; read <span class="citation"><a href="references.html#ref-Willett06" role="doc-biblioref">Willett</a> (<a href="references.html#ref-Willett06" role="doc-biblioref">2006</a>)</span> for background on how and why it has become a stemming standard. We can reach even <em>further</em> back and examine what is considered the first ever published stemming algorithm in <span class="citation"><a href="references.html#ref-Lovins68" role="doc-biblioref">Lovins</a> (<a href="references.html#ref-Lovins68" role="doc-biblioref">1968</a>)</span>. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!</p>
+<p>This algorithm was first published in <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span> and is still broadly used; read <span class="citation"><a href="#ref-Willett06" role="doc-biblioref">Willett</a> (<a href="#ref-Willett06" role="doc-biblioref">2006</a>)</span> for background on how and why it has become a stemming standard. We can reach even <em>further</em> back and examine what is considered the first ever published stemming algorithm in <span class="citation"><a href="#ref-Lovins68" role="doc-biblioref">Lovins</a> (<a href="#ref-Lovins68" role="doc-biblioref">1968</a>)</span>. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!</p>
 <div class="rmdwarning">
 <p>
 Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">steps of a Snowball stemming algorithm for German</a>.
@@ -675,7 +700,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <p>Let’s compare a few simple stemming algorithms and see what results we end with. Let’s look at “The Fir-Tree,” specifically the tidied data set from which we have removed stop words. Let’s compare three very straightforward stemming approaches.</p>
 <ul>
 <li><strong>Only remove final instances of the letter “s.”</strong> This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let’s see what the impact is.</li>
-<li><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="references.html#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="references.html#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></li>
+<li><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></li>
 <li><strong>Implement actual Porter stemming.</strong> We can now compare to the most commonly used stemming algorithm in English.</li>
 </ul>
 <div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="stemming.html#cb103-1" aria-hidden="true" tabindex="-1"></a>stemming <span class="ot">&lt;-</span> tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -757,16 +782,16 @@ Language use is connected to culture and identity. How might the results of stem
 <div id="lemmatization" class="section level2" number="4.6">
 <h2><span class="header-section-number">4.6</span> Lemmatization and stemming</h2>
 <p>When people use the word “stemming” in natural language processing, they typically mean a system like the one we’ve been describing in this chapter, with rules, conditions, heuristics, and lists of word endings. Think of stemming as typically implemented in NLP as <strong>rule-based</strong>, operating on the word by itself. There is another option for normalizing words to a root that takes a different approach. Instead of using rules to cut words down to their stems, lemmatization uses knowledge about a language’s structure to reduce words down to their lemmas, the canonical or dictionary forms of words. Think of lemmatization as typically implemented in NLP as <strong>linguistics-based</strong>, operating on the word in its context.</p>
-<p>Lemmatization requires more information than the rule-based stemmers we’ve discussed so far. We need to know what part of speech a word is to correctly identify its lemma,<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like <a href="https://wordnet.princeton.edu/">WordNet</a> as a way to look up word meanings for a given part-of-speech use <span class="citation">(<a href="references.html#ref-Miller95" role="doc-biblioref">Miller 1995</a>)</span>. Notice that lemmatization involves more linguistic knowledge of a language than stemming.</p>
+<p>Lemmatization requires more information than the rule-based stemmers we’ve discussed so far. We need to know what part of speech a word is to correctly identify its lemma,<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like <a href="https://wordnet.princeton.edu/">WordNet</a> as a way to look up word meanings for a given part-of-speech use <span class="citation">(<a href="#ref-Miller95" role="doc-biblioref">Miller 1995</a>)</span>. Notice that lemmatization involves more linguistic knowledge of a language than stemming.</p>
 <div class="rmdnote">
 <p>
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
 </p>
 </div>
-<p>A modern, efficient implementation for lemmatization is available in the excellent <a href="https://spacy.io/">spaCy</a> library <span class="citation">(<a href="references.html#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span>, which is written in Python.</p>
+<p>A modern, efficient implementation for lemmatization is available in the excellent <a href="https://spacy.io/">spaCy</a> library <span class="citation">(<a href="#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span>, which is written in Python.</p>
 
 <div class="rmdpackage">
-NLP practitioners who work with R can use this library via the <strong>spacyr</strong> package <span class="citation">(<a href="references.html#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="references.html#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="references.html#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
+NLP practitioners who work with R can use this library via the <strong>spacyr</strong> package <span class="citation">(<a href="#ref-Benoit19" role="doc-biblioref">Benoit and Matsuo 2019</a>)</span>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong></a> package <span class="citation">(<a href="#ref-Arnold17" role="doc-biblioref">Arnold 2017</a>)</span>, or as an “engine” in the <a href="https://textrecipes.tidymodels.org/"><strong>textrecipes</strong></a> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>.
 </div>
 <p>Section <a href="mlregression.html#mlregressionlemmatization">6.6</a> demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown <a href="https://rstudio.github.io/reticulate/articles/r_markdown.html">via its Python engine</a>.</p>
 <p>Let’s briefly walk through how to use spacyr.</p>
@@ -836,6 +861,39 @@ In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored wheth
 </div>
 </div>
 </div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Arnold17" class="csl-entry">
+Arnold, Taylor. 2017. <span>“A Tidy Data Model for Natural Language Processing Using cleanNLP.”</span> <em>The R Journal</em> 9 (2): 1–20. <a href="https://journal.r-project.org/archive/2017/RJ-2017-035/index.html">https://journal.r-project.org/archive/2017/RJ-2017-035/index.html</a>.
+</div>
+<div id="ref-Benoit19" class="csl-entry">
+Benoit, Kenneth, and Akitaka Matsuo. 2019. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+</div>
+<div id="ref-Harman91" class="csl-entry">
+Harman, Donna. 1991. <span>“How Effective Is Suffixing?”</span> <em>Journal of the American Society for Information Science</em> 42 (1): 7–15.
+</div>
+<div id="ref-spacy2" class="csl-entry">
+Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2</span>: Natural Language Understanding with <span>B</span>loom Embeddings, Convolutional Neural Networks and Incremental Parsing.”</span>
+</div>
+<div id="ref-textrecipes" class="csl-entry">
+———. 2020b. <em>Textrecipes: Extra ’Recipes’ for Text Processing</em>. <a href="https://CRAN.R-project.org/package=textrecipes">https://CRAN.R-project.org/package=textrecipes</a>.
+</div>
+<div id="ref-Lovins68" class="csl-entry">
+Lovins, Julie B. 1968. <span>“Development of a Stemming Algorithm.”</span> <em>Mechanical Translation and Computational Linguistics</em> 11: 22–31.
+</div>
+<div id="ref-Miller95" class="csl-entry">
+Miller, George A. 1995. <span>“WordNet: A Lexical Database for English.”</span> <em>Commun. ACM</em> 38 (11): 39–41. <a href="https://doi.org/10.1145/219717.219748">https://doi.org/10.1145/219717.219748</a>.
+</div>
+<div id="ref-Porter80" class="csl-entry">
+Porter, Martin F. 1980. <span>“An Algorithm for Suffix Stripping.”</span> <em>Program</em> 14 (3): 130–37. <a href="https://doi.org/10.1108/eb046814">https://doi.org/10.1108/eb046814</a>.
+</div>
+<div id="ref-Schofield16" class="csl-entry">
+Schofield, Alexandra, and David Mimno. 2016. <span>“Comparing Apples to Apple: The Effects of Stemmers on Topic Models.”</span> <em>Transactions of the Association for Computational Linguistics</em> 4: 287–300. <a href="https://doi.org/10.1162/tacl_a_00099">https://doi.org/10.1162/tacl_a_00099</a>.
+</div>
+<div id="ref-Willett06" class="csl-entry">
+Willett, P. 2006. <span>“The Porter Stemming Algorithm: Then and Now.”</span> <em>Program: Electronic Library and Information Systems</em> 40 (3): 219–23. <a href="http://eprints.whiterose.ac.uk/1434/">http://eprints.whiterose.ac.uk/1434/</a>.
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol start="6">
@@ -872,6 +930,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-18" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,6 +51,8 @@
 
 
 
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
@@ -120,6 +122,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -515,7 +540,7 @@ FIGURE 5.1: Memory requirements and sparsity increase with corpus size
 Modern word embeddings are based on a statistical approach to modeling language, rather than a linguistics or rules-based approach.
 </p>
 </div>
-<p>We can determine these vectors for a corpus of text using word counts and matrix factorization, as outlined by <span class="citation"><a href="references.html#ref-Moody2017" role="doc-biblioref">Moody</a> (<a href="references.html#ref-Moody2017" role="doc-biblioref">2017</a>)</span>. This approach is valuable because it allows practitioners to find word vectors for their own collections of text (with no need to rely on pre-trained vectors) using familiar techniques that are not difficult to understand. Let’s walk through how to do this using tidy data principles and sparse matrices, on the data set of CFPB complaints. First, let’s filter out words that are used only rarely in this data set and create a nested dataframe, with one row per complaint.</p>
+<p>We can determine these vectors for a corpus of text using word counts and matrix factorization, as outlined by <span class="citation"><a href="#ref-Moody2017" role="doc-biblioref">Moody</a> (<a href="#ref-Moody2017" role="doc-biblioref">2017</a>)</span>. This approach is valuable because it allows practitioners to find word vectors for their own collections of text (with no need to rely on pre-trained vectors) using familiar techniques that are not difficult to understand. Let’s walk through how to do this using tidy data principles and sparse matrices, on the data set of CFPB complaints. First, let’s filter out words that are used only rarely in this data set and create a nested dataframe, with one row per complaint.</p>
 <div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="embeddings.html#cb117-1" aria-hidden="true" tabindex="-1"></a>tidy_complaints <span class="ot">&lt;-</span> complaints <span class="sc">%&gt;%</span></span>
 <span id="cb117-2"><a href="embeddings.html#cb117-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(complaint_id, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
 <span id="cb117-3"><a href="embeddings.html#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
@@ -541,8 +566,8 @@ Modern word embeddings are based on a statistical approach to modeling language,
 #&gt;  9      3214857 &lt;tibble [64 × 1]&gt; 
 #&gt; 10      3417374 &lt;tibble [44 × 1]&gt; 
 #&gt; # … with 117,160 more rows</code></pre>
-<p>Next, let’s create a <code>slide_windows()</code> function, using the <code>slide()</code> function from the <strong>slider</strong> package <span class="citation">(<a href="references.html#ref-Vaughan2020" role="doc-biblioref">Vaughan 2020</a>)</span> which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see <code>word1</code> and <code>word2</code> together within this window? We can calculate probabilities based on when we do or do not.</p>
-<p>One of the arguments to this function is the <code>window_size</code>, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are <span class="citation">(<a href="references.html#ref-Levy2014" role="doc-biblioref">Levy and Goldberg 2014</a>)</span>. A smaller window size is also faster to compute.</p>
+<p>Next, let’s create a <code>slide_windows()</code> function, using the <code>slide()</code> function from the <strong>slider</strong> package <span class="citation">(<a href="#ref-Vaughan2020" role="doc-biblioref">Vaughan 2020</a>)</span> which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see <code>word1</code> and <code>word2</code> together within this window? We can calculate probabilities based on when we do or do not.</p>
+<p>One of the arguments to this function is the <code>window_size</code>, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are <span class="citation">(<a href="#ref-Levy2014" role="doc-biblioref">Levy and Goldberg 2014</a>)</span>. A smaller window size is also faster to compute.</p>
 <div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="embeddings.html#cb119-1" aria-hidden="true" tabindex="-1"></a>slide_windows <span class="ot">&lt;-</span> <span class="cf">function</span>(tbl, window_size) {</span>
 <span id="cb119-2"><a href="embeddings.html#cb119-2" aria-hidden="true" tabindex="-1"></a>  skipgrams <span class="ot">&lt;-</span> slider<span class="sc">::</span><span class="fu">slide</span>(</span>
 <span id="cb119-3"><a href="embeddings.html#cb119-3" aria-hidden="true" tabindex="-1"></a>    tbl, </span>
@@ -568,7 +593,7 @@ Modern word embeddings are based on a statistical approach to modeling language,
 <p>For this example, let’s use a window size of <strong>four</strong>.</p>
 
 <div class="rmdpackage">
-This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the <strong>furrr</strong> package <span class="citation">(<a href="references.html#ref-Vaughan2018" role="doc-biblioref">Vaughan and Dancho 2018</a>)</span> to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.
+This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the <strong>furrr</strong> package <span class="citation">(<a href="#ref-Vaughan2018" role="doc-biblioref">Vaughan and Dancho 2018</a>)</span> to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.
 </div>
 <div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="embeddings.html#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(widyr)</span>
 <span id="cb120-2"><a href="embeddings.html#cb120-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
@@ -603,7 +628,7 @@ The step above used <code>unite()</code>, a function from <strong>tidyr</strong>
 </p>
 </div>
 <p>We can next determine the word vectors from the PMI values using singular value decomposition (SVD).
-SVD is a method for dimensionality reduction via matrix factorization <span class="citation">(<a href="references.html#ref-Golub1970" role="doc-biblioref">Golub and Reinsch 1970</a>)</span> which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.</p>
+SVD is a method for dimensionality reduction via matrix factorization <span class="citation">(<a href="#ref-Golub1970" role="doc-biblioref">Golub and Reinsch 1970</a>)</span> which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.</p>
 <p>In our application, we will use SVD to factor the PMI matrix into a set of smaller matrices containing the word embeddings with a size we get to choose. The embedding size is typically chosen to be in the low hundreds. Thus we get a matrix of dimension (<code>n_vocabulary * n_dim</code>) instead of dimension (<code>n_vocabulary * n_vocabulary</code>), which can be a vast reduction in size for large vocabularies.
 Let’s use the <code>widely_svd()</code> function in <strong>widyr</strong>, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.</p>
 <div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="embeddings.html#cb122-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="ot">&lt;-</span> tidy_pmi <span class="sc">%&gt;%</span></span>
@@ -775,7 +800,7 @@ These hundred features are the word embeddings we learned from the text data its
 </p>
 </div>
 <p>If our word embeddings are of high quality, this translation of the high-dimensional space of words to the lower-dimensional space of the word embeddings allows our modeling based on such an input matrix to take advantage of the semantic meaning captured in the embeddings.</p>
-<p>This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe <span class="citation">(<a href="references.html#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span>, implemented in R in the <a href="http://text2vec.org/"><strong>text2vec</strong></a> package <span class="citation">(<a href="references.html#ref-Selivanov2018" role="doc-biblioref">Selivanov and Wang 2018</a>)</span>, word2vec <span class="citation">(<a href="references.html#ref-Mikolov2013" role="doc-biblioref">Mikolov et al. 2013</a>)</span>, and FastText <span class="citation">(<a href="references.html#ref-Bojanowski2016" role="doc-biblioref">Bojanowski et al. 2016</a>)</span>.</p>
+<p>This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span>, implemented in R in the <a href="http://text2vec.org/"><strong>text2vec</strong></a> package <span class="citation">(<a href="#ref-Selivanov2018" role="doc-biblioref">Selivanov and Wang 2018</a>)</span>, word2vec <span class="citation">(<a href="#ref-Mikolov2013" role="doc-biblioref">Mikolov et al. 2013</a>)</span>, and FastText <span class="citation">(<a href="#ref-Bojanowski2016" role="doc-biblioref">Bojanowski et al. 2016</a>)</span>.</p>
 </div>
 <div id="glove" class="section level2" number="5.4">
 <h2><span class="header-section-number">5.4</span> Use pre-trained word embeddings</h2>
@@ -785,7 +810,7 @@ These hundred features are the word embeddings we learned from the text data its
 How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of <em>how</em> words are used in any given data set. However, it may be unreasonable to expect good results with data sets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)
 </p>
 </div>
-<p>In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to <em>pre-trained</em> word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the <a href="https://cran.r-project.org/package=textdata"><strong>textdata</strong></a> package <span class="citation">(<a href="references.html#ref-Hvitfeldt2020" role="doc-biblioref">Hvitfeldt 2020a</a>)</span>. Let’s use <code>dimensions = 100</code>, since we trained 100-dimensional word embeddings in the previous section.</p>
+<p>In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to <em>pre-trained</em> word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the <a href="https://cran.r-project.org/package=textdata"><strong>textdata</strong></a> package <span class="citation">(<a href="#ref-Hvitfeldt2020" role="doc-biblioref">Hvitfeldt 2020a</a>)</span>. Let’s use <code>dimensions = 100</code>, since we trained 100-dimensional word embeddings in the previous section.</p>
 <div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="embeddings.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textdata)</span>
 <span id="cb136-2"><a href="embeddings.html#cb136-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb136-3"><a href="embeddings.html#cb136-3" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">embedding_glove6b</span>(<span class="at">dimensions =</span> <span class="dv">100</span>)</span>
@@ -925,7 +950,7 @@ These examples highlight how pre-trained word embeddings can be useful because o
 <p>Since these GloVe embeddings had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents which contain only words not included in the GloVe embeddings.</p>
 
 <div class="rmdpackage">
-The package <strong>wordsalad</strong> <span class="citation">(<a href="references.html#ref-R-wordsalad" role="doc-biblioref">Hvitfeldt 2020c</a>)</span> provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.
+The package <strong>wordsalad</strong> <span class="citation">(<a href="#ref-R-wordsalad" role="doc-biblioref">Hvitfeldt 2020c</a>)</span> provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.
 </div>
 </div>
 <div id="fairnessembeddings" class="section level2" number="5.5">
@@ -936,20 +961,20 @@ The package <strong>wordsalad</strong> <span class="citation">(<a href="referenc
 Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings.
 </p>
 </div>
-<p>This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. <span class="citation"><a href="references.html#ref-Caliskan2016" role="doc-biblioref">Islam, Bryson, and Narayanan</a> (<a href="references.html#ref-Caliskan2016" role="doc-biblioref">2016</a>)</span> show how the GloVe word embeddings (the same embeddings we used in Section <a href="embeddings.html#glove">5.4</a>) replicate human-like semantic biases.</p>
+<p>This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. <span class="citation"><a href="#ref-Caliskan2016" role="doc-biblioref">Islam, Bryson, and Narayanan</a> (<a href="#ref-Caliskan2016" role="doc-biblioref">2016</a>)</span> show how the GloVe word embeddings (the same embeddings we used in Section <a href="embeddings.html#glove">5.4</a>) replicate human-like semantic biases.</p>
 <ul>
 <li>Typically Black first names are associated with more unpleasant feelings than typically white first names.</li>
 <li>Women’s first names are more associated with family and men’s first names are more associated with career.</li>
 <li>Terms associated with women are more associated with the arts and terms associated with men are more associated with science.</li>
 </ul>
-<p>Results like these have been confirmed over and over again, such as when <span class="citation"><a href="references.html#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="references.html#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate <a href="https://twitter.com/seyyedreza/status/935291317252493312">exhibited apparently sexist behavior when translating text from languages with no gendered pronouns</a>. Google has since <a href="https://www.blog.google/products/translate/reducing-gender-bias-google-translate/">worked to correct this problem</a> but in 2021 the problem <a href="https://twitter.com/doravargha/status/1373211762108076034">still exists for some languages</a>. <span class="citation"><a href="references.html#ref-Garg2018" role="doc-biblioref">Garg et al.</a> (<a href="references.html#ref-Garg2018" role="doc-biblioref">2018</a>)</span> even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time.</p>
-<p>Remember that word embeddings are <em>learned</em> or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. <span class="citation"><a href="references.html#ref-Bender2021" role="doc-biblioref">Emily M. Bender et al.</a> (<a href="references.html#ref-Bender2021" role="doc-biblioref">2021</a>)</span> outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of <a href="https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia">Wikipedia</a>, but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself <span class="citation">(<a href="references.html#ref-Wagner2016" role="doc-biblioref">Wagner et al. 2016</a>)</span>.</p>
+<p>Results like these have been confirmed over and over again, such as when <span class="citation"><a href="#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate <a href="https://twitter.com/seyyedreza/status/935291317252493312">exhibited apparently sexist behavior when translating text from languages with no gendered pronouns</a>. Google has since <a href="https://www.blog.google/products/translate/reducing-gender-bias-google-translate/">worked to correct this problem</a> but in 2021 the problem <a href="https://twitter.com/doravargha/status/1373211762108076034">still exists for some languages</a>. <span class="citation"><a href="#ref-Garg2018" role="doc-biblioref">Garg et al.</a> (<a href="#ref-Garg2018" role="doc-biblioref">2018</a>)</span> even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time.</p>
+<p>Remember that word embeddings are <em>learned</em> or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. <span class="citation"><a href="#ref-Bender2021" role="doc-biblioref">Emily M. Bender et al.</a> (<a href="#ref-Bender2021" role="doc-biblioref">2021</a>)</span> outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of <a href="https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia">Wikipedia</a>, but Wikipedia itself has problems with, for example, gender bias. Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself <span class="citation">(<a href="#ref-Wagner2016" role="doc-biblioref">Wagner et al. 2016</a>)</span>.</p>
 <div class="rmdnote">
 <p>
 It’s safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
 </p>
 </div>
-<p>When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. <span class="citation"><a href="references.html#ref-Speer2017" role="doc-biblioref">Speer</a> (<a href="references.html#ref-Speer2017" role="doc-biblioref">2017</a>)</span> demonstrated how using pre-trained word embeddings to train a straightforward sentiment analysis model can result in text such as</p>
+<p>When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. <span class="citation"><a href="#ref-Speer2017" role="doc-biblioref">Speer</a> (<a href="#ref-Speer2017" role="doc-biblioref">2017</a>)</span> demonstrated how using pre-trained word embeddings to train a straightforward sentiment analysis model can result in text such as</p>
 <blockquote>
 <p>“Let’s go get Italian food”</p>
 </blockquote>
@@ -969,12 +994,12 @@ It’s safe to assume that any large corpus of language will contain latent stru
 You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.
 </p>
 </div>
-<p>NLP researchers have also proposed methods for debiasing embeddings. <span class="citation"><a href="references.html#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="references.html#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some specific bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals <span class="citation">(<a href="references.html#ref-Lu2018" role="doc-biblioref">Lu et al. 2018</a>)</span>. Recent work <span class="citation">(<a href="references.html#ref-Ethayarajh2019" role="doc-biblioref">Ethayarajh, Duvenaud, and Hirst 2019</a>)</span> has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.</p>
-<p>Other researchers, such as <span class="citation"><a href="references.html#ref-Caliskan2016" role="doc-biblioref">Islam, Bryson, and Narayanan</a> (<a href="references.html#ref-Caliskan2016" role="doc-biblioref">2016</a>)</span>, suggest that corrections for fairness should happen at the point of <em>decision</em> or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. <span class="citation"><a href="references.html#ref-Gonen2019" role="doc-biblioref">Gonen and Goldberg</a> (<a href="references.html#ref-Gonen2019" role="doc-biblioref">2019</a>)</span> highlight how pervasive and consistent gender bias is across different word embedding models, <em>even after</em> applying current debiasing methods.</p>
+<p>NLP researchers have also proposed methods for debiasing embeddings. <span class="citation"><a href="#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some specific bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals <span class="citation">(<a href="#ref-Lu2018" role="doc-biblioref">Lu et al. 2018</a>)</span>. Recent work <span class="citation">(<a href="#ref-Ethayarajh2019" role="doc-biblioref">Ethayarajh, Duvenaud, and Hirst 2019</a>)</span> has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.</p>
+<p>Other researchers, such as <span class="citation"><a href="#ref-Caliskan2016" role="doc-biblioref">Islam, Bryson, and Narayanan</a> (<a href="#ref-Caliskan2016" role="doc-biblioref">2016</a>)</span>, suggest that corrections for fairness should happen at the point of <em>decision</em> or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. <span class="citation"><a href="#ref-Gonen2019" role="doc-biblioref">Gonen and Goldberg</a> (<a href="#ref-Gonen2019" role="doc-biblioref">2019</a>)</span> highlight how pervasive and consistent gender bias is across different word embedding models, <em>even after</em> applying current debiasing methods.</p>
 </div>
 <div id="embeddingssummary" class="section level2" number="5.7">
 <h2><span class="header-section-number">5.7</span> Summary</h2>
-<p>Mapping words (or other tokens) to an embedding in a special vector space is a powerful approach in natural language processing. This chapter started from fundamentals to demonstrate how to determine word embeddings from a text data set, but a whole host of highly sophisticated techniques have been built on this foundation. For example, document embeddings can be learned from text directly <span class="citation">(<a href="references.html#ref-Le2014" role="doc-biblioref">Le and Mikolov 2014</a>)</span> rather than summarized from word embeddings. More recently, embeddings have acted as one part of language models with transformers like ULMFiT <span class="citation">(<a href="references.html#ref-Howard2018" role="doc-biblioref">Howard and Ruder 2018</a>)</span> and ELMo <span class="citation">(<a href="references.html#ref-Peters2018" role="doc-biblioref">Peters et al. 2018</a>)</span>. It’s important to keep in mind that even more advanced natural language algorithms, such as these language models with transformers, also exhibit such systemic biases <span class="citation">(<a href="references.html#ref-Sheng2019" role="doc-biblioref">Sheng et al. 2019</a>)</span>.</p>
+<p>Mapping words (or other tokens) to an embedding in a special vector space is a powerful approach in natural language processing. This chapter started from fundamentals to demonstrate how to determine word embeddings from a text data set, but a whole host of highly sophisticated techniques have been built on this foundation. For example, document embeddings can be learned from text directly <span class="citation">(<a href="#ref-Le2014" role="doc-biblioref">Le and Mikolov 2014</a>)</span> rather than summarized from word embeddings. More recently, embeddings have acted as one part of language models with transformers like ULMFiT <span class="citation">(<a href="#ref-Howard2018" role="doc-biblioref">Howard and Ruder 2018</a>)</span> and ELMo <span class="citation">(<a href="#ref-Peters2018" role="doc-biblioref">Peters et al. 2018</a>)</span>. It’s important to keep in mind that even more advanced natural language algorithms, such as these language models with transformers, also exhibit such systemic biases <span class="citation">(<a href="#ref-Sheng2019" role="doc-biblioref">Sheng et al. 2019</a>)</span>.</p>
 <div id="in-this-chapter-you-learned-4" class="section level3" number="5.7.1">
 <h3><span class="header-section-number">5.7.1</span> In this chapter, you learned:</h3>
 <ul>
@@ -993,6 +1018,81 @@ You can use the same approaches discussed in this chapter to check any new embed
 
 
 
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Bender2021" class="csl-entry">
+Bender, Emily M., Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. 2021. <span>“On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜.”</span> In <em>Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency</em>, 610–23. FAccT ’21. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a>.
+</div>
+<div id="ref-Bojanowski2016" class="csl-entry">
+Bojanowski, Piotr, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2016. <span>“Enriching Word Vectors with Subword Information.”</span> <em>CoRR</em> abs/1607.04606. <a href="http://arxiv.org/abs/1607.04606">http://arxiv.org/abs/1607.04606</a>.
+</div>
+<div id="ref-Bolukbasi2016" class="csl-entry">
+Bolukbasi, Tolga, Kai-Wei Chang, James Y. Zou, Venkatesh Saligrama, and Adam Tauman Kalai. 2016. <span>“Quantifying and Reducing Stereotypes in Word Embeddings.”</span> <em>CoRR</em> abs/1606.06121. <a href="http://arxiv.org/abs/1606.06121">http://arxiv.org/abs/1606.06121</a>.
+</div>
+<div id="ref-Ethayarajh2019" class="csl-entry">
+Ethayarajh, Kawin, David Duvenaud, and Graeme Hirst. 2019. <span>“Understanding Undesirable Word Embedding Associations.”</span> In <em>Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics</em>, 1696–1705. Florence, Italy: Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/P19-1166">https://doi.org/10.18653/v1/P19-1166</a>.
+</div>
+<div id="ref-Garg2018" class="csl-entry">
+Garg, Nikhil, Londa Schiebinger, Dan Jurafsky, and James Zou. 2018. <span>“Word Embeddings Quantify 100 Years of Gender and Ethnic Stereotypes.”</span> <em>Proceedings of the National Academy of Sciences</em> 115 (16): E3635–44. <a href="https://doi.org/10.1073/pnas.1720347115">https://doi.org/10.1073/pnas.1720347115</a>.
+</div>
+<div id="ref-Golub1970" class="csl-entry">
+Golub, G. H., and C. Reinsch. 1970. <span>“Singular Value Decomposition and Least Squares Solutions.”</span> <em>Numer. Math.</em> 14 (5): 403–20. <a href="https://doi.org/10.1007/BF02163027">https://doi.org/10.1007/BF02163027</a>.
+</div>
+<div id="ref-Gonen2019" class="csl-entry">
+Gonen, Hila, and Yoav Goldberg. 2019. <span>“Lipstick on a Pig: Debiasing Methods Cover up Systematic Gender Biases in Word Embeddings but Do Not Remove Them.”</span> <em>CoRR</em> abs/1903.03862. <a href="http://arxiv.org/abs/1903.03862">http://arxiv.org/abs/1903.03862</a>.
+</div>
+<div id="ref-Howard2018" class="csl-entry">
+Howard, Jeremy, and Sebastian Ruder. 2018. <span>“Fine-Tuned Language Models for Text Classification.”</span> <em>CoRR</em> abs/1801.06146. <a href="http://arxiv.org/abs/1801.06146">http://arxiv.org/abs/1801.06146</a>.
+</div>
+<div id="ref-Hvitfeldt2020" class="csl-entry">
+———. 2020a. <em>Textdata: Download and Load Various Text Datasets</em>. <a href="https://github.com/EmilHvitfeldt/textdata">https://github.com/EmilHvitfeldt/textdata</a>.
+</div>
+<div id="ref-R-wordsalad" class="csl-entry">
+———. 2020c. <em>Wordsalad: Provide Tools to Extract and Analyze Word Vectors</em>. <a href="https://CRAN.R-project.org/package=wordsalad">https://CRAN.R-project.org/package=wordsalad</a>.
+</div>
+<div id="ref-Caliskan2016" class="csl-entry">
+Islam, Aylin Caliskan, Joanna J. Bryson, and Arvind Narayanan. 2016. <span>“Semantics Derived Automatically from Language Corpora Necessarily Contain Human Biases.”</span> <em>CoRR</em> abs/1608.07187. <a href="http://arxiv.org/abs/1608.07187">http://arxiv.org/abs/1608.07187</a>.
+</div>
+<div id="ref-Le2014" class="csl-entry">
+Le, Quoc V., and Tomas Mikolov. 2014. <span>“Distributed Representations of Sentences and Documents.”</span> <em>CoRR</em> abs/1405.4053. <a href="http://arxiv.org/abs/1405.4053">http://arxiv.org/abs/1405.4053</a>.
+</div>
+<div id="ref-Levy2014" class="csl-entry">
+Levy, Omer, and Yoav Goldberg. 2014. <span>“Dependency-Based Word Embeddings.”</span> In <em>Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)</em>, 302–8. Baltimore, Maryland: Association for Computational Linguistics. <a href="https://doi.org/10.3115/v1/P14-2050">https://doi.org/10.3115/v1/P14-2050</a>.
+</div>
+<div id="ref-Lu2018" class="csl-entry">
+Lu, Kaiji, Piotr Mardziel, Fangjing Wu, Preetam Amancharla, and Anupam Datta. 2018. <span>“Gender Bias in Neural Natural Language Processing.”</span> <em>CoRR</em> abs/1807.11714. <a href="http://arxiv.org/abs/1807.11714">http://arxiv.org/abs/1807.11714</a>.
+</div>
+<div id="ref-Mikolov2013" class="csl-entry">
+Mikolov, Tomas, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. <span>“Efficient Estimation of Word Representations in Vector Space.”</span> <em>arXiv Preprint arXiv:1301.3781</em>.
+</div>
+<div id="ref-Moody2017" class="csl-entry">
+Moody, Chris. 2017. <span>“Stop Using Word2vec.”</span> <em>Multithreaded</em>. StitchFix. <a href="https://multithreaded.stitchfix.com/blog/2017/10/18/stop-using-word2vec/">https://multithreaded.stitchfix.com/blog/2017/10/18/stop-using-word2vec/</a>.
+</div>
+<div id="ref-Pennington2014" class="csl-entry">
+Pennington, Jeffrey, Richard Socher, and Christopher D. Manning. 2014. <span>“GloVe: Global Vectors for Word Representation.”</span> In <em>Empirical Methods in Natural Language Processing (EMNLP)</em>, 1532–43. <a href="http://www.aclweb.org/anthology/D14-1162">http://www.aclweb.org/anthology/D14-1162</a>.
+</div>
+<div id="ref-Peters2018" class="csl-entry">
+Peters, Matthew E., Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, and Luke Zettlemoyer. 2018. <span>“Deep Contextualized Word Representations.”</span> <em>CoRR</em> abs/1802.05365. <a href="http://arxiv.org/abs/1802.05365">http://arxiv.org/abs/1802.05365</a>.
+</div>
+<div id="ref-Selivanov2018" class="csl-entry">
+Selivanov, Dmitriy, and Qing Wang. 2018. <em>Text2vec: Modern Text Mining Framework for r</em>. <a href="https://CRAN.R-project.org/package=text2vec">https://CRAN.R-project.org/package=text2vec</a>.
+</div>
+<div id="ref-Sheng2019" class="csl-entry">
+Sheng, Emily, Kai-Wei Chang, Premkumar Natarajan, and Nanyun Peng. 2019. <span>“The Woman Worked as a Babysitter: On Biases in Language Generation.”</span> <a href="http://arxiv.org/abs/1909.01326">http://arxiv.org/abs/1909.01326</a>.
+</div>
+<div id="ref-Speer2017" class="csl-entry">
+Speer, Robyn. 2017. <span>“How to Make a Racist AI Without Really Trying.”</span> <em>ConceptNet Blog</em>. <a href="http://blog.conceptnet.io/posts/2017/how-to-make-a-racist-ai-without-really-trying/">http://blog.conceptnet.io/posts/2017/how-to-make-a-racist-ai-without-really-trying/</a>.
+</div>
+<div id="ref-Vaughan2020" class="csl-entry">
+Vaughan, Davis. 2020. <em>Slider: Sliding Window Functions</em>. <a href="https://CRAN.R-project.org/package=slider">https://CRAN.R-project.org/package=slider</a>.
+</div>
+<div id="ref-Vaughan2018" class="csl-entry">
+Vaughan, Davis, and Matt Dancho. 2018. <em>Furrr: Apply Mapping Functions in Parallel Using Futures</em>. <a href="https://CRAN.R-project.org/package=furrr">https://CRAN.R-project.org/package=furrr</a>.
+</div>
+<div id="ref-Wagner2016" class="csl-entry">
+Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 2016. <span>“Women Through the Glass Ceiling: Gender Asymmetries in Wikipedia.”</span> <em>EPJ Data Science</em> 5 (1): 5.
+</div>
+</div>
             </section>
 
           </div>
@@ -1022,6 +1122,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": null,
