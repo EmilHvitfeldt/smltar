@@ -138,6 +138,7 @@ There are `r scales::comma(nrow(kickstarter_train))` blurbs in the training set 
 Preprocessing for deep learning models is different than preprocessing for most other text models. These neural networks model _sequences_, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away) and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model and we need to select this value such that we don't: 
 
 - overshoot and introduce a lot of padded zeroes which would make the model hard to train, or 
+
 - undershoot and cut off too much informative text from our documents.
 
 We can use the `count_words()` function from the tokenizers package to calculate the number of words and generate a histogram in Figure \@ref(fig:kickstarterwordlength). Notice how we are only using the training data set to avoid data leakage when selecting this value.
@@ -292,8 +293,11 @@ dense_model
 Let us step through this model specification one layer at a time.
 
 - We initiate the Keras model by using `keras_model_sequential()` to indicate that we want to compose a linear stack of layers.
+
 - Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` data cube.
+
 - The next `layer_flatten()` layer takes the matrix for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` long vector for each observation. 
+
 - Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.
 
 We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an *optimizer* and a *loss function* to be able to compile. 
@@ -849,7 +853,9 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 We compared these three model options using the validation set we created. Let's return to the testing set now that we know which model we expect to perform best and obtain a final estimate for how we expect it to perform on new data. For this final evaluation, we will:
 
 - preprocess the test data using the feature engineering recipe `kick_prep` so it is in the correct format for our deep learning model,
+
 - find the predictions for the processed testing data, and
+
 - compute metrics for these results.
 
 ```{r}
@@ -914,9 +920,15 @@ However, feature engineering is not completely out of our hands as practitioners
 ### In this chapter, you learned:
 
 - that you can tokenize and preprocess text to retain the order of the tokens
+
 - how to build and train a dense neural network with Keras
+
 - that you can evaluate deep learning models with the same approaches used for other types of models
+
 - how to train word embeddings alongside your model
+
 - how to use pre-trained word embeddings in a neural network
+
 - about resampling strategies for deep learning models
+
 - about the low interpretability of deep learning models
