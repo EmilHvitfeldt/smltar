@@ -139,10 +139,3 @@ cm_heat <- function(x) {
     ) %+%
     ggplot2::geom_text(ggplot2::aes(label = Freq))
 }
-
-
-conf_mat_resampled <- function(x) {
-  tune::conf_mat_resampled(x, tidy = FALSE) %>%
-    as.table() %>%
-    conf_mat()
-}
