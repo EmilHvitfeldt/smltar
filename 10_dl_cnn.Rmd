@@ -520,7 +520,7 @@ As indicated by its name, LIME is an approach to compute local feature importanc
 ```
 
 ```{block, type = "rmdpackage"}
-The **lime** package in R implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction. 
+The **lime** package in R [@R-lime] implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drive the outcome of the prediction. 
 ```
 
 To use this package we need to write a helper function to get the data in the format we want. The `lime()` function takes two mandatory arguments, `x` and `model`. The `model` argument is the trained model we are trying to explain. The `lime()` function works out of the box with Keras models so we should be good to go there.  The `x` argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting `x` to be a character vector so we'll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.
