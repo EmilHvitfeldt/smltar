@@ -57,8 +57,8 @@ scotus_test <- testing(scotus_split)
 
 Next, let's preprocess our data to get it ready for modeling using a recipe. We'll use both general preprocessing functions from **tidymodels** and specialized functions just for text from **textrecipes** in this preprocessing. 
 
-```{block, type = "rmdpackage"}
-The **recipes** package is part of **tidymodels** and provides functions for data preprocessing and feature engineering. The **textrecipes** package extends **recipes** by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
+```{block2, type = "rmdpackage"}
+The **recipes** package [@R-recipes] is part of **tidymodels** and provides functions for data preprocessing and feature engineering. The **textrecipes** package [@textrecipes] extends **recipes** by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
 ```
 
 What are the steps in creating this recipe?
@@ -96,8 +96,8 @@ dim(scotus_bake)
 
 For most modeling tasks, you will not need to `prep()` or `bake()` your recipe directly; instead you can build up a tidymodels `workflow()` to bundle together your modeling components.
 
-```{block, type = "rmdpackage"}
-In **tidymodels**, the **workflows** package offers infrastructure for bundling model components. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
+```{block2, type = "rmdpackage"}
+In **tidymodels**, the **workflows** package [@R-workflows] offers infrastructure for bundling model components. A _model workflow_ is a convenient way to combine different modeling components (a preprocessor plus a model specification); when these are bundled explicitly, it can be easier to keep track of your modeling plan, as well as fit your model and predict on new data.
 ```
 
 Let's create a `workflow()` to bundle together our recipe with any model specifications we may want to create later. First, let's create an empty `workflow()` and then only add the data preprocessor `scotus_rec` to it.
@@ -172,7 +172,7 @@ What are we to do, then, if we want to train multiple models and find the best o
 Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
 
 ```{block, type = "rmdpackage"}
-In **tidymodels**, the package for data splitting and resampling is **rsample**.
+In **tidymodels**, the package for data splitting and resampling is **rsample** [@R-rsample].
 ```
 
 Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.

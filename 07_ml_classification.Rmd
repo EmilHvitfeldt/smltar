@@ -133,7 +133,7 @@ One of the main advantages of a naive Bayes model is its ability to handle a lar
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
 ```{block, type = "rmdpackage"}
-In **tidymodels**, the package for creating model specifications is **parsnip**. The **parsnip** package provides the functions for creating all the models we have used so far, but other extra packages provide more. The **discrim** package is an extension package for **parsnip** that contains model definitions for various discriminant analysis models, including naive Bayes.
+In **tidymodels**, the package for creating model specifications is **parsnip** [@R-parsnip]. The **parsnip** package provides the functions for creating all the models we have used so far, but other extra packages provide more. The **discrim** package is an extension package for **parsnip** that contains model definitions for various discriminant analysis models, including naive Bayes.
 ```
 
 ```{r nbspec}
@@ -157,7 +157,7 @@ We have trained our first classification model!
 
 ### Evaluation
 
-Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use **resampling** methods to evaluate our model.
+Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use *resampling* methods to evaluate our model.
 
 Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
@@ -492,7 +492,7 @@ Since we are using a linear model, the model coefficients are directly interpret
 
 We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
-To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package [**hardhat**](https://hardhat.tidymodels.org/).
+To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package **hardhat** [@R-hardhat].
 
 ```{block, type = "rmdpackage"}
 The **hardhat** package is used by other tidymodels packages like recipes and parsnip under the hood. As a tidymodels user, you typically don't use hardhat functions directly. The exception is when you need to customize something about your model or preprocessing, like in this sparse data example.
@@ -616,7 +616,7 @@ When you have multiple classes in your data, it is possible to formulate the mul
 
 There are many different ways to deal with imbalanced data.
 We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
-We will be using the [**themis**](https://themis.tidymodels.org) add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
+We will be using the **themis** [@R-themis] add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
 
 ```{block, type = "rmdpackage"}
 The **themis** package provides many more algorithms to deal with imbalanced data during data preprocessing.
@@ -1268,8 +1268,8 @@ final_grid <- grid_regular(
 final_grid
 ```
 
-```{block, type = "rmdpackage"}
-We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`. The **tidymodels** package for creating and handling tuning parameters and parameter grids is **dials**.
+```{block2, type = "rmdpackage"}
+We used `grid_regular()` here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as `grid_max_entropy()` or `grid_latin_hypercube()`. The **tidymodels** package for creating and handling tuning parameters and parameter grids is **dials** [@R-dials].
 ```
 
 Now it's time to set up our tuning grid. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.
