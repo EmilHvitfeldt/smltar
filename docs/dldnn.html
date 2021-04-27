@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-04-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -530,22 +530,35 @@ FIGURE 8.2: Distribution of character count for Kickstarter campaign blurbs
 <span id="cb423-3"><a href="dldnn.html#cb423-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">==</span> <span class="dv">135</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb423-4"><a href="dldnn.html#cb423-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb423-5"><a href="dldnn.html#cb423-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;A science fiction/drama about a young man and woman encountering beings not of this earth. Armed with only their minds to confront this&quot;
-#&gt; [2] &quot;No, not my virginity. That was taken by a girl named Ramona the night of my senior prom. I&#39;m talking about my novel, THE USE OF REGRET.&quot;
-#&gt; [3] &quot;In a city where the sun has stopped rising, the music never stops. Now only a man and his guitar can free the people from the Red King.&quot;
-#&gt; [4] &quot;First Interfaith &amp; Community FM Radio Station needs transmitter in Menifee, CA Programs online, too CLICK PHOTO ABOVE FOR OUR CAT VIDEO&quot;
-#&gt; [5] &quot;This documentary asks if the twenty-four hour news cycle has altered people&#39;s opinions of one another. We explore unity in one another.&quot;</code></pre>
+<pre><code>#&gt; [1] &quot;A science fiction/drama about a young man and woman encountering beings
+not of this earth. Armed with only their minds to confront this&quot;
+#&gt; [2] &quot;No, not my virginity. That was taken by a girl named Ramona the night
+of my senior prom. I&#39;m talking about my novel, THE USE OF REGRET.&quot;
+#&gt; [3] &quot;In a city where the sun has stopped rising, the music never stops. Now
+only a man and his guitar can free the people from the Red King.&quot;
+#&gt; [4] &quot;First Interfaith &amp; Community FM Radio Station needs transmitter in
+Menifee, CA Programs online, too CLICK PHOTO ABOVE FOR OUR CAT VIDEO&quot;
+#&gt; [5] &quot;This documentary asks if the twenty-four hour news cycle has altered
+people&#39;s opinions of one another. We explore unity in one another.&quot;</code></pre>
 <p>All of these blurbs appear coherent and some of them even end with a period to end the sentence. Let’s now look at blurbs with more than 135 characters to see if they are different.</p>
 <div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb425-1"><a href="dldnn.html#cb425-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb425-2"><a href="dldnn.html#cb425-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="sc">%&gt;%</span></span>
 <span id="cb425-3"><a href="dldnn.html#cb425-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;</span> <span class="dv">135</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb425-4"><a href="dldnn.html#cb425-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb425-5"><a href="dldnn.html#cb425-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span></code></pre></div>
-<pre><code>#&gt; [1] &quot;This is a puzzle game for the Atari 2600. The unique thing about this is that (some) of the cartridge cases will be made out of real wood, hand carved&quot;
-#&gt; [2] &quot;Art supplies for 10 girls on the east side of Detroit to make drawings of their neighborhood, which is also home to LOVELAND&#39;s Plymouth microhood&quot;     
-#&gt; [3] &quot;Help us make a video for &#39;Never&#39;, one of the most popular songs on Songs To Wear Pants To and the lead single from Your Heart&#39;s upcoming album Autumn.&quot;
-#&gt; [4] &quot;Pyramid Cocoon is an interactive sculpture to be installed during the Burning Man Festival 2010. Users can rest, commune or cocoon in the piece&quot;       
-#&gt; [5] &quot;Back us to own, wear, or see a show of great student art we&#39;ve collected from Artloop partner schools in NYC. The $ goes right back to art programs!&quot;</code></pre>
+<pre><code>#&gt; [1] &quot;This is a puzzle game for the Atari 2600. The unique thing about this
+is that (some) of the cartridge cases will be made out of real wood, hand
+carved&quot;
+#&gt; [2] &quot;Art supplies for 10 girls on the east side of Detroit to make drawings
+of their neighborhood, which is also home to LOVELAND&#39;s Plymouth microhood&quot;
+#&gt; [3] &quot;Help us make a video for &#39;Never&#39;, one of the most popular songs on
+Songs To Wear Pants To and the lead single from Your Heart&#39;s upcoming album
+Autumn.&quot;
+#&gt; [4] &quot;Pyramid Cocoon is an interactive sculpture to be installed during the
+Burning Man Festival 2010. Users can rest, commune or cocoon in the piece&quot;
+#&gt; [5] &quot;Back us to own, wear, or see a show of great student art we&#39;ve
+collected from Artloop partner schools in NYC. The $ goes right back to art
+programs!&quot;</code></pre>
 <p>All of these blurbs also look fine so the strange distribution doesn’t seem like a data collection issue.</p>
 <p>The <code>kickstarter</code> data set also includes a <code>created_at</code> variable; let’s explore that next. Figure <a href="dldnn.html#fig:kickstarterheatmap">8.3</a> is a heatmap of the lengths of blurbs and the time the campaign was posted.</p>
 <div class="sourceCode" id="cb427"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb427-1"><a href="dldnn.html#cb427-1" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="sc">%&gt;%</span></span>
@@ -1265,13 +1278,13 @@ If you have enough text data in the field you are working in, then it is worth c
 <span id="cb497-4"><a href="dldnn.html#cb497-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
 #&gt; # A tibble: 5 x 3
-#&gt;   splits                 id    validation      
-#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;          
-#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble [4 × 3]&gt;
-#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble [4 × 3]&gt;
-#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble [4 × 3]&gt;
-#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble [4 × 3]&gt;
-#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble [4 × 3]&gt;</code></pre>
+#&gt;   splits                 id    validation          
+#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;              
+#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble[,3] [4 × 3]&gt;
+#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble[,3] [4 × 3]&gt;</code></pre>
 <p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
 <div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="dldnn.html#cb499-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
 <span id="cb499-2"><a href="dldnn.html#cb499-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>

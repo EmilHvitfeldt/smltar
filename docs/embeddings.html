@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-04-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -478,7 +478,7 @@ You shall know a word by the company it keeps.<br />
 <span id="cb112-10"><a href="embeddings.html#cb112-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
 <span id="cb112-11"><a href="embeddings.html#cb112-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
 <span id="cb112-12"><a href="embeddings.html#cb112-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
 <div class="rmdwarning">
 <p>
 A <em>sparse matrix</em> is a matrix where most of the elements are zero. When working with text data, we say our data is “sparse” because most documents do not contain most words, resulting in a representation of mostly zeroes. There are special data structures and algorithms for dealing with sparse data that can take advantage of their structure. For example, an array can more efficiently store the locations and values of only the non-zero elements instead of all elements.
@@ -495,7 +495,7 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 <span id="cb114-5"><a href="embeddings.html#cb114-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
 <span id="cb114-6"><a href="embeddings.html#cb114-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(stem, complaint_id, n) <span class="sc">%&gt;%</span></span>
 <span id="cb114-7"><a href="embeddings.html#cb114-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, tf_idf)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
 <p>Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in <strong>glmnet</strong> <span class="citation">(<a href="#ref-Friedman2010" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010</a>)</span>. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don’t always solve all the problems that come along with big text data sets.</p>
 <p>As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure <a href="embeddings.html#fig:sparsityram">5.1</a> shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.</p>
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="embeddings.html#cb116-1" aria-hidden="true" tabindex="-1"></a>get_dfm <span class="ot">&lt;-</span> <span class="cf">function</span>(frac) {</span>
@@ -553,18 +553,18 @@ Modern word embeddings are based on a statistical approach to modeling language,
 <span id="cb117-10"><a href="embeddings.html#cb117-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb117-11"><a href="embeddings.html#cb117-11" aria-hidden="true" tabindex="-1"></a>nested_words</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 117,170 x 2
-#&gt;    complaint_id words             
-#&gt;           &lt;dbl&gt; &lt;list&gt;            
-#&gt;  1      3384392 &lt;tibble [18 × 1]&gt; 
-#&gt;  2      3417821 &lt;tibble [71 × 1]&gt; 
-#&gt;  3      3433198 &lt;tibble [77 × 1]&gt; 
-#&gt;  4      3366475 &lt;tibble [69 × 1]&gt; 
-#&gt;  5      3385399 &lt;tibble [213 × 1]&gt;
-#&gt;  6      3444592 &lt;tibble [19 × 1]&gt; 
-#&gt;  7      3379924 &lt;tibble [121 × 1]&gt;
-#&gt;  8      3446975 &lt;tibble [22 × 1]&gt; 
-#&gt;  9      3214857 &lt;tibble [64 × 1]&gt; 
-#&gt; 10      3417374 &lt;tibble [44 × 1]&gt; 
+#&gt;    complaint_id words                 
+#&gt;           &lt;dbl&gt; &lt;list&gt;                
+#&gt;  1      3384392 &lt;tibble[,1] [18 × 1]&gt; 
+#&gt;  2      3417821 &lt;tibble[,1] [71 × 1]&gt; 
+#&gt;  3      3433198 &lt;tibble[,1] [77 × 1]&gt; 
+#&gt;  4      3366475 &lt;tibble[,1] [69 × 1]&gt; 
+#&gt;  5      3385399 &lt;tibble[,1] [213 × 1]&gt;
+#&gt;  6      3444592 &lt;tibble[,1] [19 × 1]&gt; 
+#&gt;  7      3379924 &lt;tibble[,1] [121 × 1]&gt;
+#&gt;  8      3446975 &lt;tibble[,1] [22 × 1]&gt; 
+#&gt;  9      3214857 &lt;tibble[,1] [64 × 1]&gt; 
+#&gt; 10      3417374 &lt;tibble[,1] [44 × 1]&gt; 
 #&gt; # … with 117,160 more rows</code></pre>
 <p>Next, let’s create a <code>slide_windows()</code> function, using the <code>slide()</code> function from the <strong>slider</strong> package <span class="citation">(<a href="#ref-Vaughan2020" role="doc-biblioref">Vaughan 2021a</a>)</span> which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see <code>word1</code> and <code>word2</code> together within this window? We can calculate probabilities based on when we do or do not.</p>
 <p>One of the arguments to this function is the <code>window_size</code>, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are <span class="citation">(<a href="#ref-Levy2014" role="doc-biblioref">Levy and Goldberg 2014</a>)</span>. A smaller window size is also faster to compute.</p>
@@ -874,7 +874,7 @@ How small is too small? It is hard to make definitive statements because being a
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1       value
 #&gt;    &lt;chr&gt;       &lt;dbl&gt;
-#&gt;  1 error       1.   
+#&gt;  1 error       1    
 #&gt;  2 errors      0.792
 #&gt;  3 mistake     0.664
 #&gt;  4 correct     0.621
@@ -910,7 +910,7 @@ How small is too small? It is hard to make definitive statements because being a
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
-#&gt;  1 fee          1.   
+#&gt;  1 fee          1    
 #&gt;  2 fees         0.832
 #&gt;  3 payment      0.741
 #&gt;  4 pay          0.711

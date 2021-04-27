@@ -390,7 +390,7 @@ The function `conf_mat_resampled()` computes a separate confusion matrix for eac
 
 
 ```r
-conf_mat_resampled(nb_rs) %>%
+conf_mat_resampled(nb_rs, tidy = FALSE) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -399,13 +399,13 @@ conf_mat_resampled(nb_rs) %>%
 <p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'</p>
 </div>
 
-In Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Other" class are being mispredicted as "Credit".
+In Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
 
 <div class="rmdwarning">
 <p>One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.</p>
 </div>
 
-This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more "Credit" complaints are correctly identified than "Other" complaints, either for consumers or for policymakers? 
+This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more "Other" complaints are correctly identified than "Credit" complaints, either for consumers or for policymakers? 
 
 ## Compare to the null model {#classnull}
 
@@ -559,7 +559,7 @@ Our lasso model is better at separating the classes than the naive Bayes model i
 
 
 ```r
-conf_mat_resampled(lasso_rs) %>%
+conf_mat_resampled(lasso_rs, tidy = FALSE) %>%
   autoplot(type = "heatmap")
 ```
 
@@ -610,7 +610,7 @@ lambda_grid
 #> # A tibble: 30 x 1
 #>     penalty
 #>       <dbl>
-#>  1 1.00e-10
+#>  1 1   e-10
 #>  2 2.21e-10
 #>  3 4.89e-10
 #>  4 1.08e- 9
@@ -654,18 +654,18 @@ tune_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits             id     .metrics        .notes         .predictions        
-#>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [60 × … <tibble [0 × … <tibble [263,760 × …
-#>  2 <split [79120/879… Fold02 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  3 <split [79120/879… Fold03 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  4 <split [79120/879… Fold04 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  5 <split [79120/879… Fold05 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  6 <split [79120/879… Fold06 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  7 <split [79120/879… Fold07 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  8 <split [79120/879… Fold08 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  9 <split [79120/879… Fold09 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#> 10 <split [79120/879… Fold10 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>    splits          id     .metrics         .notes          .predictions         
+#>    <list>          <chr>  <list>           <list>          <list>               
+#>  1 <split [79119/… Fold01 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,760…
+#>  2 <split [79120/… Fold02 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  3 <split [79120/… Fold03 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  4 <split [79120/… Fold04 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  5 <split [79120/… Fold05 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  6 <split [79120/… Fold06 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  7 <split [79120/… Fold07 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  8 <split [79120/… Fold08 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>  9 <split [79120/… Fold09 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#> 10 <split [79120/… Fold10 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
 ```
 
 <div class="rmdwarning">
@@ -683,8 +683,8 @@ collect_metrics(tune_rs)
 #> # A tibble: 60 x 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
-#>  1 1.00e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
-#>  2 1.00e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
+#>  1 1   e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
+#>  2 1   e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
 #>  3 2.21e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model02
 #>  4 2.21e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model02
 #>  5 4.89e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model03
@@ -949,18 +949,18 @@ sparse_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 4
-#>    splits               id     .metrics          .notes          
-#>    <list>               <chr>  <list>            <list>          
-#>  1 <split [79119/8792]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  2 <split [79120/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  3 <split [79120/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  4 <split [79120/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  5 <split [79120/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  6 <split [79120/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  7 <split [79120/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  8 <split [79120/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  9 <split [79120/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
-#> 10 <split [79120/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
+#>    splits               id     .metrics              .notes              
+#>    <list>               <chr>  <list>                <list>              
+#>  1 <split [79119/8792]> Fold01 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  2 <split [79120/8791]> Fold02 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  3 <split [79120/8791]> Fold03 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  4 <split [79120/8791]> Fold04 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  5 <split [79120/8791]> Fold05 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  6 <split [79120/8791]> Fold06 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  7 <split [79120/8791]> Fold07 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  8 <split [79120/8791]> Fold08 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>  9 <split [79120/8791]> Fold09 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#> 10 <split [79120/8791]> Fold10 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
 ```
 
 How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of `set_engine("glmnet")`?
@@ -1177,18 +1177,18 @@ multi_lasso_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits             id     .metrics        .notes         .predictions        
-#>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,840 × …
-#>  2 <split [79120/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  3 <split [79120/879… Fold03 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#>  4 <split [79120/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  5 <split [79120/879… Fold05 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#>  6 <split [79120/879… Fold06 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#>  7 <split [79120/879… Fold07 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#>  8 <split [79120/879… Fold08 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#>  9 <split [79120/879… Fold09 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#> 10 <split [79120/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>    splits          id     .metrics          .notes         .predictions         
+#>    <list>          <chr>  <list>            <list>         <list>               
+#>  1 <split [79119/… Fold01 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,84…
+#>  2 <split [79120/… Fold02 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  3 <split [79120/… Fold03 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  4 <split [79120/… Fold04 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  5 <split [79120/… Fold05 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  6 <split [79120/… Fold06 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  7 <split [79120/… Fold07 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  8 <split [79120/… Fold08 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>  9 <split [79120/… Fold09 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#> 10 <split [79120/… Fold10 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
 ```
 
 What do we see, in terms of performance metrics?
@@ -1205,14 +1205,14 @@ best_acc
 #> # A tibble: 5 x 7
 #>    penalty .metric  .estimator  mean     n std_err .config              
 #>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1 0.00234  accuracy multiclass 0.755    10 0.00220 Preprocessor1_Model10
-#> 2 0.00428  accuracy multiclass 0.751    10 0.00238 Preprocessor1_Model11
-#> 3 0.00127  accuracy multiclass 0.749    10 0.00273 Preprocessor1_Model09
-#> 4 0.00785  accuracy multiclass 0.740    10 0.00219 Preprocessor1_Model12
-#> 5 0.000695 accuracy multiclass 0.740    10 0.00451 Preprocessor1_Model08
+#> 1 0.00234  accuracy multiclass 0.753    10 0.00226 Preprocessor1_Model10
+#> 2 0.00428  accuracy multiclass 0.750    10 0.00250 Preprocessor1_Model11
+#> 3 0.00127  accuracy multiclass 0.747    10 0.00278 Preprocessor1_Model09
+#> 4 0.00785  accuracy multiclass 0.739    10 0.00236 Preprocessor1_Model12
+#> 5 0.000695 accuracy multiclass 0.732    10 0.00244 Preprocessor1_Model08
 ```
 
-The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.5%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
+The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
 
 <div class="rmdwarning">
 <p>In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.</p>
@@ -1904,13 +1904,13 @@ The confusion matrix, a contingency table of observed classes and predicted clas
 
 
 ```r
-conf_mat_resampled(nb_rs)
+conf_mat_resampled(nb_rs, tidy = FALSE)
 ```
 
 ```
 #>        Credit  Other
-#> Credit 3009.5 1157.4
-#> Other   549.1 4075.1
+#> Credit 3009.5  549.1
+#> Other  1157.4 4075.1
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.

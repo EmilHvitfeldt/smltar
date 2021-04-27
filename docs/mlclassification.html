@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-04-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -722,7 +722,7 @@ FIGURE 7.1: ROC curve for naive Bayes classifier with resamples of US Consumer F
 <p>The area under each of these curves is the <code>roc_auc</code> metric we have computed. If the curve was close to the diagonal line, then the model’s predictions would be no better than random guessing.</p>
 <p>Another way to evaluate our model is to evaluate the confusion matrix. A confusion matrix tabulates a model’s false positives and false negatives for each class.
 The function <code>conf_mat_resampled()</code> computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.</p>
-<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="mlclassification.html#cb288-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs) <span class="sc">%&gt;%</span></span>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="mlclassification.html#cb288-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb288-2"><a href="mlclassification.html#cb288-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstheatmap"></span>
 <img src="07_ml_classification_files/figure-html/firstheatmap-1.png" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
@@ -730,13 +730,13 @@ The function <code>conf_mat_resampled()</code> computes a separate confusion mat
 FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias towards predicting ‘Credit’
 </p>
 </div>
-<p>In Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>, the squares for “Credit”/“Credit” and “Other”/“Other” have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the “Other” class are being mispredicted as “Credit.”</p>
+<p>In Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>, the squares for “Credit”/“Credit” and “Other”/“Other” have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the “Credit” class are being mispredicted as “Other.”</p>
 <div class="rmdwarning">
 <p>
 One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.
 </p>
 </div>
-<p>This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more “Credit” complaints are correctly identified than “Other” complaints, either for consumers or for policymakers?</p>
+<p>This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more “Other” complaints are correctly identified than “Credit” complaints, either for consumers or for policymakers?</p>
 </div>
 </div>
 <div id="classnull" class="section level2" number="7.2">
@@ -834,7 +834,7 @@ FIGURE 7.3: ROC curve for lasso regularized classifier with resamples of US Cons
 </div>
 <p>Let’s finish this section by generating a confusion matrix, shown in Figure <a href="mlclassification.html#fig:lassoheatmap">7.4</a>.
 Our lasso model is better at separating the classes than the naive Bayes model in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, and our results are more symmetrical than those for the naive Bayes model in Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>.</p>
-<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="mlclassification.html#cb301-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(lasso_rs) <span class="sc">%&gt;%</span></span>
+<div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="mlclassification.html#cb301-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(lasso_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb301-2"><a href="mlclassification.html#cb301-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lassoheatmap"></span>
 <img src="07_ml_classification_files/figure-html/lassoheatmap-1.png" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
@@ -870,7 +870,7 @@ Think of <code>tune()</code> here as a placeholder for the regularization penalt
 <pre><code>#&gt; # A tibble: 30 x 1
 #&gt;     penalty
 #&gt;       &lt;dbl&gt;
-#&gt;  1 1.00e-10
+#&gt;  1 1   e-10
 #&gt;  2 2.21e-10
 #&gt;  3 4.89e-10
 #&gt;  4 1.08e- 9
@@ -905,18 +905,18 @@ In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</s
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 5
-#&gt;    splits             id     .metrics        .notes         .predictions        
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,760 × …
-#&gt;  2 &lt;split [79120/879… Fold02 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  3 &lt;split [79120/879… Fold03 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  4 &lt;split [79120/879… Fold04 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  5 &lt;split [79120/879… Fold05 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  6 &lt;split [79120/879… Fold06 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  7 &lt;split [79120/879… Fold07 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  8 &lt;split [79120/879… Fold08 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  9 &lt;split [79120/879… Fold09 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt; 10 &lt;split [79120/879… Fold10 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …</code></pre>
+#&gt;    splits          id     .metrics         .notes          .predictions         
+#&gt;    &lt;list&gt;          &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          &lt;list&gt;               
+#&gt;  1 &lt;split [79119/… Fold01 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,760…
+#&gt;  2 &lt;split [79120/… Fold02 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  3 &lt;split [79120/… Fold03 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  4 &lt;split [79120/… Fold04 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  5 &lt;split [79120/… Fold05 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  6 &lt;split [79120/… Fold06 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  7 &lt;split [79120/… Fold07 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  8 &lt;split [79120/… Fold08 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt;  9 &lt;split [79120/… Fold09 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…
+#&gt; 10 &lt;split [79120/… Fold10 &lt;tibble[,5] [60… &lt;tibble[,1] [0… &lt;tibble[,7] [263,730…</code></pre>
 <div class="rmdwarning">
 <p>
 Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.
@@ -927,8 +927,8 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <pre><code>#&gt; # A tibble: 60 x 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt;  1 1.00e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
-#&gt;  2 1.00e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
+#&gt;  1 1   e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
+#&gt;  2 1   e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
 #&gt;  3 2.21e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model02
 #&gt;  4 2.21e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model02
 #&gt;  5 4.89e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model03
@@ -1114,18 +1114,18 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 4
-#&gt;    splits               id     .metrics          .notes          
-#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
-#&gt;  1 &lt;split [79119/8792]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  2 &lt;split [79120/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  3 &lt;split [79120/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  4 &lt;split [79120/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  5 &lt;split [79120/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  6 &lt;split [79120/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  7 &lt;split [79120/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  8 &lt;split [79120/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  9 &lt;split [79120/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt; 10 &lt;split [79120/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+#&gt;    splits               id     .metrics              .notes              
+#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;                &lt;list&gt;              
+#&gt;  1 &lt;split [79119/8792]&gt; Fold01 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  2 &lt;split [79120/8791]&gt; Fold02 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  3 &lt;split [79120/8791]&gt; Fold03 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  4 &lt;split [79120/8791]&gt; Fold04 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  5 &lt;split [79120/8791]&gt; Fold05 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  6 &lt;split [79120/8791]&gt; Fold06 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  7 &lt;split [79120/8791]&gt; Fold07 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  8 &lt;split [79120/8791]&gt; Fold08 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  9 &lt;split [79120/8791]&gt; Fold09 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt; 10 &lt;split [79120/8791]&gt; Fold10 &lt;tibble[,5] [40 × 5]&gt; &lt;tibble[,1] [0 × 1]&gt;</code></pre>
 <p>How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of <code>set_engine("glmnet")</code>?</p>
 <div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb329-1"><a href="mlclassification.html#cb329-1" aria-hidden="true" tabindex="-1"></a>sparse_rs <span class="sc">%&gt;%</span></span>
 <span id="cb329-2"><a href="mlclassification.html#cb329-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
@@ -1273,18 +1273,18 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 5
-#&gt;    splits             id     .metrics        .notes         .predictions        
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,840 × …
-#&gt;  2 &lt;split [79120/879… Fold02 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  3 &lt;split [79120/879… Fold03 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  4 &lt;split [79120/879… Fold04 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  5 &lt;split [79120/879… Fold05 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  6 &lt;split [79120/879… Fold06 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  7 &lt;split [79120/879… Fold07 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  8 &lt;split [79120/879… Fold08 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  9 &lt;split [79120/879… Fold09 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt; 10 &lt;split [79120/879… Fold10 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …</code></pre>
+#&gt;    splits          id     .metrics          .notes         .predictions         
+#&gt;    &lt;list&gt;          &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;         &lt;list&gt;               
+#&gt;  1 &lt;split [79119/… Fold01 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,84…
+#&gt;  2 &lt;split [79120/… Fold02 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  3 &lt;split [79120/… Fold03 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  4 &lt;split [79120/… Fold04 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  5 &lt;split [79120/… Fold05 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  6 &lt;split [79120/… Fold06 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  7 &lt;split [79120/… Fold07 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  8 &lt;split [79120/… Fold08 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt;  9 &lt;split [79120/… Fold09 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…
+#&gt; 10 &lt;split [79120/… Fold10 &lt;tibble[,5] [40 … &lt;tibble[,1] [… &lt;tibble[,14] [175,82…</code></pre>
 <p>What do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="mlclassification.html#cb342-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
 <span id="cb342-2"><a href="mlclassification.html#cb342-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
@@ -1293,12 +1293,12 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <pre><code>#&gt; # A tibble: 5 x 7
 #&gt;    penalty .metric  .estimator  mean     n std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.00234  accuracy multiclass 0.755    10 0.00220 Preprocessor1_Model10
-#&gt; 2 0.00428  accuracy multiclass 0.751    10 0.00238 Preprocessor1_Model11
-#&gt; 3 0.00127  accuracy multiclass 0.749    10 0.00273 Preprocessor1_Model09
-#&gt; 4 0.00785  accuracy multiclass 0.740    10 0.00219 Preprocessor1_Model12
-#&gt; 5 0.000695 accuracy multiclass 0.740    10 0.00451 Preprocessor1_Model08</code></pre>
-<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.5%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
+#&gt; 1 0.00234  accuracy multiclass 0.753    10 0.00226 Preprocessor1_Model10
+#&gt; 2 0.00428  accuracy multiclass 0.750    10 0.00250 Preprocessor1_Model11
+#&gt; 3 0.00127  accuracy multiclass 0.747    10 0.00278 Preprocessor1_Model09
+#&gt; 4 0.00785  accuracy multiclass 0.739    10 0.00236 Preprocessor1_Model12
+#&gt; 5 0.000695 accuracy multiclass 0.732    10 0.00244 Preprocessor1_Model08</code></pre>
+<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
 <div class="rmdwarning">
 <p>
 In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.
@@ -1774,10 +1774,10 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 #&gt; 10 Fold10 recall  binary         0.725</code></pre>
 <p>Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates.
 The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="mlclassification.html#cb394-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs)</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="mlclassification.html#cb394-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>#&gt;        Credit  Other
-#&gt; Credit 3009.5 1157.4
-#&gt; Other   549.1 4075.1</code></pre>
+#&gt; Credit 3009.5  549.1
+#&gt; Other  1157.4 4075.1</code></pre>
 <p>It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.</p>
 <div class="rmdnote">
 <p>

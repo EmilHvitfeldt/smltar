@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-04-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -518,7 +518,7 @@ FIGURE 6.1: Supreme Court opinions per decade in sample
 <p>Next, let’s preprocess our data to get it ready for modeling using a recipe. We’ll use both general preprocessing functions from <strong>tidymodels</strong> and specialized functions just for text from <strong>textrecipes</strong> in this preprocessing.</p>
 
 <div class="rmdpackage">
-The <strong>recipes</strong> package <span class="citation">(<a href="#ref-R-recipes" role="doc-biblioref">Kuhn and Wickham 2020b</a>)</span> is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020a</a>)</span> extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
+The <strong>recipes</strong> package <span class="citation">(<a href="#ref-R-recipes" role="doc-biblioref">Kuhn and Wickham 2021</a>)</span> is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020a</a>)</span> extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
 </div>
 <p>What are the steps in creating this recipe?</p>
 <ul>
@@ -682,18 +682,18 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 <pre><code>#&gt; # Resampling results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 5
-#&gt;    splits             id     .metrics         .notes           .predictions     
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;           &lt;list&gt;           
-#&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  2 &lt;split [6750/750]&gt; Fold02 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  3 &lt;split [6750/750]&gt; Fold03 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  4 &lt;split [6750/750]&gt; Fold04 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  5 &lt;split [6750/750]&gt; Fold05 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  6 &lt;split [6750/750]&gt; Fold06 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  7 &lt;split [6750/750]&gt; Fold07 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  8 &lt;split [6750/750]&gt; Fold08 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt;  9 &lt;split [6750/750]&gt; Fold09 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
-#&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…</code></pre>
+#&gt;    splits          id     .metrics          .notes           .predictions       
+#&gt;    &lt;list&gt;          &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;             
+#&gt;  1 &lt;split [6750/7… Fold01 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  2 &lt;split [6750/7… Fold02 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  3 &lt;split [6750/7… Fold03 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  4 &lt;split [6750/7… Fold04 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  5 &lt;split [6750/7… Fold05 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  6 &lt;split [6750/7… Fold06 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  7 &lt;split [6750/7… Fold07 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  8 &lt;split [6750/7… Fold08 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt;  9 &lt;split [6750/7… Fold09 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…
+#&gt; 10 &lt;split [6750/7… Fold10 &lt;tibble[,4] [2 ×… &lt;tibble[,1] [0 … &lt;tibble[,4] [750 ×…</code></pre>
 <p>These results look a lot like the resamples, but they have some additional columns, like the <code>.metrics</code> that we can use to measure how well this model performed and the <code>.predictions</code> we can use to explore that performance more deeply. What results do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb169-1"><a href="mlregression.html#cb169-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(svm_rs)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 x 6
@@ -762,18 +762,18 @@ A null model is a simple, non-informative model that always predicts the largest
 <pre><code>#&gt; # Resampling results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 4
-#&gt;    splits             id     .metrics         .notes          
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          
-#&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  2 &lt;split [6750/750]&gt; Fold02 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  3 &lt;split [6750/750]&gt; Fold03 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  4 &lt;split [6750/750]&gt; Fold04 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  5 &lt;split [6750/750]&gt; Fold05 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  6 &lt;split [6750/750]&gt; Fold06 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  7 &lt;split [6750/750]&gt; Fold07 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  8 &lt;split [6750/750]&gt; Fold08 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  9 &lt;split [6750/750]&gt; Fold09 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
-#&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+#&gt;    splits             id     .metrics             .notes              
+#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;               &lt;list&gt;              
+#&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  2 &lt;split [6750/750]&gt; Fold02 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  3 &lt;split [6750/750]&gt; Fold03 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  4 &lt;split [6750/750]&gt; Fold04 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  5 &lt;split [6750/750]&gt; Fold05 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  6 &lt;split [6750/750]&gt; Fold06 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  7 &lt;split [6750/750]&gt; Fold07 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  8 &lt;split [6750/750]&gt; Fold08 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt;  9 &lt;split [6750/750]&gt; Fold09 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;
+#&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble[,4] [1 × 4]&gt; &lt;tibble[,1] [0 × 1]&gt;</code></pre>
 <p>What results do we obtain from the null model, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="mlregression.html#cb174-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(null_rs)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 x 6
@@ -1547,18 +1547,18 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 x 5
-#&gt;    splits            id     .metrics         .notes          .predictions       
-#&gt;    &lt;list&gt;            &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          &lt;list&gt;             
-#&gt;  1 &lt;split [6750/750… Fold01 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  2 &lt;split [6750/750… Fold02 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  3 &lt;split [6750/750… Fold03 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  4 &lt;split [6750/750… Fold04 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  5 &lt;split [6750/750… Fold05 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  6 &lt;split [6750/750… Fold06 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  7 &lt;split [6750/750… Fold07 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  8 &lt;split [6750/750… Fold08 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  9 &lt;split [6750/750… Fold09 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt; 10 &lt;split [6750/750… Fold10 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…</code></pre>
+#&gt;    splits          id     .metrics          .notes          .predictions        
+#&gt;    &lt;list&gt;          &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          &lt;list&gt;              
+#&gt;  1 &lt;split [6750/7… Fold01 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  2 &lt;split [6750/7… Fold02 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  3 &lt;split [6750/7… Fold03 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  4 &lt;split [6750/7… Fold04 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  5 &lt;split [6750/7… Fold05 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  6 &lt;split [6750/7… Fold06 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  7 &lt;split [6750/7… Fold07 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  8 &lt;split [6750/7… Fold08 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt;  9 &lt;split [6750/7… Fold09 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …
+#&gt; 10 &lt;split [6750/7… Fold10 &lt;tibble[,5] [18 … &lt;tibble[,1] [0… &lt;tibble[,5] [4,500 …</code></pre>
 <p>We trained all these models!</p>
 </div>
 <div id="regression-final-evaluation" class="section level3" number="6.9.4">
@@ -1767,7 +1767,7 @@ Hvitfeldt, Emil. 2020a. <em>Textrecipes: Extra ’Recipes’ for Text Processing
 Joachims, Thorsten. 1998. <span>“Text Categorization with Support Vector Machines: Learning with Many Relevant Features.”</span> In <em>Proceedings of the 10th European Conference on Machine Learning</em>, 137–142. ECML’98. Berlin, Heidelberg: Springer-Verlag. doi:<a href="https://doi.org/10.1007/BFb0026683">10.1007/BFb0026683</a>.
 </div>
 <div id="ref-R-recipes" class="csl-entry">
-Kuhn, Max, and Hadley Wickham. 2020b. <em>Recipes: Preprocessing Tools to Create Design Matrices</em>. <a href="https://CRAN.R-project.org/package=recipes">https://CRAN.R-project.org/package=recipes</a>.
+Kuhn, Max, and Hadley Wickham. 2021. <em>Recipes: Preprocessing Tools to Create Design Matrices</em>. <a href="https://CRAN.R-project.org/package=recipes">https://CRAN.R-project.org/package=recipes</a>.
 </div>
 <div id="ref-Olson2017" class="csl-entry">
 Olson, Randal S., William La Cava, Zairah Mustahsan, Akshay Varik, and Jason H. Moore. 2017. <span>“Data-Driven Advice for Applying Machine Learning to Bioinformatics Problems.”</span> <a href="http://arxiv.org/abs/1708.05070">http://arxiv.org/abs/1708.05070</a>.

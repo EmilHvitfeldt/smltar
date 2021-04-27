@@ -1,10 +1,10 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-04-24"
+date: "2021-04-26"
 site: bookdown::bookdown_site
 documentclass: krantz
-bibliography: [book.bib, packages.bib]
+bibliography: [book.bib]
 biblio-style: apalike
 csl: taylor-and-francis-chicago-author-date.csl
 link-citations: yes
@@ -104,8 +104,8 @@ This version of the book was built with R version 4.0.5 (2021-03-31) and the fol
 |package        |version    |source                                 |
 |:--------------|:----------|:--------------------------------------|
 |bench          |1.1.1      |CRAN (R 4.0.0)                         |
-|bookdown       |0.21       |CRAN (R 4.0.2)                         |
-|broom          |0.7.5      |CRAN (R 4.0.3)                         |
+|bookdown       |0.22       |CRAN (R 4.0.5)                         |
+|broom          |0.7.6      |CRAN (R 4.0.2)                         |
 |corpus         |0.10.1     |CRAN (R 4.0.0)                         |
 |dials          |0.0.9      |CRAN (R 4.0.2)                         |
 |discrim        |0.1.1      |CRAN (R 4.0.2)                         |
@@ -125,37 +125,37 @@ This version of the book was built with R version 4.0.5 (2021-03-31) and the fol
 |lime           |0.5.2      |CRAN (R 4.0.2)                         |
 |lobstr         |1.1.1      |CRAN (R 4.0.0)                         |
 |naivebayes     |0.9.7      |CRAN (R 4.0.0)                         |
-|parsnip        |0.1.5.9002 |Github (tidymodels/parsnip\@8238826)   |
+|parsnip        |0.1.5.9002 |Github (tidymodels/parsnip\@c7e1010)   |
 |prismatic      |1.0.0      |CRAN (R 4.0.2)                         |
-|quanteda       |2.1.2      |CRAN (R 4.0.2)                         |
+|quanteda       |3.0.0      |CRAN (R 4.0.2)                         |
 |ranger         |0.12.1     |CRAN (R 4.0.0)                         |
-|recipes        |0.1.15     |CRAN (R 4.0.2)                         |
-|remotes        |2.2.0      |CRAN (R 4.0.2)                         |
-|reticulate     |1.18       |CRAN (R 4.0.2)                         |
+|recipes        |0.1.16     |CRAN (R 4.0.2)                         |
+|remotes        |2.3.0      |CRAN (R 4.0.2)                         |
+|reticulate     |1.19       |CRAN (R 4.0.2)                         |
 |rsample        |0.0.9      |CRAN (R 4.0.2)                         |
 |rsparse        |0.4.0      |CRAN (R 4.0.1)                         |
 |scico          |1.2.0      |CRAN (R 4.0.0)                         |
 |scotus         |0.0.0.9001 |Github (EmilHvitfeldt/scotus\@43ca597) |
-|servr          |0.21       |CRAN (R 4.0.2)                         |
+|servr          |0.22       |CRAN (R 4.0.3)                         |
 |sessioninfo    |1.1.1      |CRAN (R 4.0.0)                         |
 |slider         |0.2.1      |CRAN (R 4.0.2)                         |
 |SnowballC      |0.7.0      |CRAN (R 4.0.0)                         |
 |spacyr         |1.2.1      |CRAN (R 4.0.0)                         |
 |stopwords      |2.2        |CRAN (R 4.0.3)                         |
-|styler         |1.4.0      |CRAN (R 4.0.2)                         |
+|styler         |1.4.1      |CRAN (R 4.0.2)                         |
 |text2vec       |0.6        |CRAN (R 4.0.1)                         |
 |textdata       |0.4.1      |CRAN (R 4.0.0)                         |
 |textfeatures   |0.3.3      |CRAN (R 4.0.2)                         |
 |textrecipes    |0.4.0      |CRAN (R 4.0.2)                         |
 |tfruns         |1.5.0      |CRAN (R 4.0.2)                         |
 |themis         |0.1.3      |CRAN (R 4.0.2)                         |
-|tidymodels     |0.1.2      |CRAN (R 4.0.2)                         |
-|tidytext       |0.3.0      |CRAN (R 4.0.2)                         |
-|tidyverse      |1.3.0      |CRAN (R 4.0.2)                         |
+|tidymodels     |0.1.3      |CRAN (R 4.0.2)                         |
+|tidytext       |0.3.1      |CRAN (R 4.0.2)                         |
+|tidyverse      |1.3.1      |CRAN (R 4.0.3)                         |
 |tokenizers     |0.2.1      |CRAN (R 4.0.0)                         |
 |tokenizers.bpe |0.1.0      |CRAN (R 4.0.2)                         |
 |tufte          |0.9        |CRAN (R 4.0.2)                         |
-|tune           |0.1.3      |CRAN (R 4.0.3)                         |
+|tune           |0.1.5      |CRAN (R 4.0.5)                         |
 |UpSetR         |1.4.0      |CRAN (R 4.0.0)                         |
 |vip            |0.3.2      |CRAN (R 4.0.2)                         |
 |widyr          |0.1.3      |CRAN (R 4.0.2)                         |
