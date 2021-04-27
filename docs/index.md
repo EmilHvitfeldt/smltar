@@ -60,6 +60,19 @@ Some of the topics in the second and third sections overlap as they provide diff
 
 Throughout the book, we will demonstrate with examples and build models using a selection of text data sets. A description of these data sets can be found in Appendix \@ref(appendixdata).
 
+<div class="rmdnote">
+<p>We use three kinds of info boxes throughout the book to invite attention to notes and other ideas.</p>
+</div>
+
+<div class="rmdwarning">
+<p>Some boxes call out warnings or possible problems to watch out for.</p>
+</div>
+
+<div class="rmdpackage">
+<p>Boxes marked with hexagons highlight information about specific R packages and how they are used. We use <strong>bold</strong> for the names of R packages.</p>
+</div>
+
+
 ## Topics this book will not cover {-}
 
 This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. The [CRAN Task View on Natural Language Processing](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
