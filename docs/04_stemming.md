@@ -116,7 +116,7 @@ tidy_by_lang %>%
 
 Figure \@ref(fig:porterlanguages) demonstrates some of the challenges in working with languages other English; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.
 
-The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the **hunspell** [R-hunspell] package.
+The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library. The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the **hunspell** [@R-hunspell] package.
 
 
 ```r
@@ -194,7 +194,7 @@ tidy_scotus %>%
 #> # … with 167,869 more rows
 ```
 
-There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix (technically, a document-feature matrix object from the **quanteda** [@R-quanteda] package).
+There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let's `cast()` this tidy data to a sparse matrix, technically, a document-feature matrix object from the **quanteda** [@R-quanteda] package.
 
 
 ```r
@@ -204,7 +204,7 @@ tidy_scotus %>%
 ```
 
 ```
-#> Document-feature matrix of: 9,642 documents, 167,879 features (99.5% sparse).
+#> Document-feature matrix of: 9,642 documents, 167,879 features (99.49% sparse) and 0 docvars.
 ```
 
 Look at the sparsity of this matrix. It's high! Think of this sparsity as the sparsity of data that we will want to use to build a supervised machine learning model.
@@ -220,7 +220,7 @@ tidy_scotus %>%
 ```
 
 ```
-#> Document-feature matrix of: 9,642 documents, 135,570 features (99.5% sparse).
+#> Document-feature matrix of: 9,642 documents, 135,570 features (99.48% sparse) and 0 docvars.
 ```
 
 We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.

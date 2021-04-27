@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-04-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -543,7 +543,7 @@ FIGURE 4.1: Porter stemming results in five languages
 </p>
 </div>
 <p>Figure <a href="stemming.html#fig:porterlanguages">4.1</a> demonstrates some of the challenges in working with languages other English; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.</p>
-<p>The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that’s not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the <a href="http://hunspell.github.io/">Hunspell</a> library. The “Hun” in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the <strong>hunspell</strong> [R-hunspell] package.</p>
+<p>The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that’s not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the <a href="http://hunspell.github.io/">Hunspell</a> library. The “Hun” in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology. The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the <strong>hunspell</strong> <span class="citation">(<a href="#ref-R-hunspell" role="doc-biblioref">Ooms 2020b</a>)</span> package.</p>
 <div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="stemming.html#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hunspell)</span>
 <span id="cb87-2"><a href="stemming.html#cb87-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb87-3"><a href="stemming.html#cb87-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -596,18 +596,18 @@ FIGURE 4.1: Porter stemming results in five languages
 #&gt;  9 upon   105069
 #&gt; 10 united 103267
 #&gt; # … with 167,869 more rows</code></pre>
-<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix (technically, a document-feature matrix object from the <strong>quanteda</strong> <span class="citation">(<a href="#ref-R-quanteda" role="doc-biblioref">Benoit et al. 2020</a>)</span> package).</p>
+<p>There are 167,879 distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like <code>"state"</code> and <code>"states"</code>. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix. Let’s <code>cast()</code> this tidy data to a sparse matrix, technically, a document-feature matrix object from the <strong>quanteda</strong> <span class="citation">(<a href="#ref-R-quanteda" role="doc-biblioref">Benoit et al. 2018</a>)</span> package.</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="stemming.html#cb93-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span></span>
 <span id="cb93-2"><a href="stemming.html#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, word) <span class="sc">%&gt;%</span></span>
 <span id="cb93-3"><a href="stemming.html#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, word, n)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 167,879 features (99.5% sparse).</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 167,879 features (99.49% sparse) and 0 docvars.</code></pre>
 <p>Look at the sparsity of this matrix. It’s high! Think of this sparsity as the sparsity of data that we will want to use to build a supervised machine learning model.</p>
 <p>What if instead we use stemming as a preprocessing step here?</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="stemming.html#cb95-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span></span>
 <span id="cb95-2"><a href="stemming.html#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
 <span id="cb95-3"><a href="stemming.html#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, stem) <span class="sc">%&gt;%</span></span>
 <span id="cb95-4"><a href="stemming.html#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, stem, n)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 135,570 features (99.5% sparse).</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 135,570 features (99.48% sparse) and 0 docvars.</code></pre>
 <p>We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, <em>assuming that we haven’t lost any important information by stemming</em>.</p>
 <p>There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> and related work explore how choices around stemming and other preprocessing steps don’t help and can actually hurt performance when training topic models for text. From <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> specifically,</p>
 <blockquote>
@@ -870,7 +870,7 @@ Arnold, Taylor. 2017. <span>“A Tidy Data Model for Natural Language Processing
 Benoit, Kenneth, and Akitaka Matsuo. 2020. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
 </div>
 <div id="ref-R-quanteda" class="csl-entry">
-Benoit, Kenneth, Kohei Watanabe, Haiyan Wang, Paul Nulty, Adam Obeng, Stefan Müller, Akitaka Matsuo, Jiong Wei Lua, Jouni Kuha, and William Lowe. 2020. <em>Quanteda: Quantitative Analysis of Textual Data</em>. <a href="https://quanteda.io">https://quanteda.io</a>.
+Benoit, Kenneth, Kohei Watanabe, Haiyan Wang, Paul Nulty, Adam Obeng, Stefan Müller, and Akitaka Matsuo. 2018. <span>“Quanteda: An r Package for the Quantitative Analysis of Textual Data.”</span> <em>Journal of Open Source Software</em> 3 (30): 774. doi:<a href="https://doi.org/10.21105/joss.00774">10.21105/joss.00774</a>.
 </div>
 <div id="ref-R-SnowballC" class="csl-entry">
 Bouchet-Valat, Milan. 2020. <em>SnowballC: Snowball Stemmers Based on the c ’Libstemmer’ UTF-8 Library</em>. <a href="https://CRAN.R-project.org/package=SnowballC">https://CRAN.R-project.org/package=SnowballC</a>.
@@ -889,6 +889,9 @@ Lovins, Julie B. 1968. <span>“Development of a Stemming Algorithm.”</span> <
 </div>
 <div id="ref-Miller95" class="csl-entry">
 Miller, George A. 1995. <span>“WordNet: A Lexical Database for English.”</span> <em>Commun. ACM</em> 38 (11). New York, NY, USA: ACM: 39–41. doi:<a href="https://doi.org/10.1145/219717.219748">10.1145/219717.219748</a>.
+</div>
+<div id="ref-R-hunspell" class="csl-entry">
+Ooms, Jeroen. 2020b. <em>Hunspell: High-Performance Stemmer, Tokenizer, and Spell Checker</em>. <a href="https://CRAN.R-project.org/package=hunspell">https://CRAN.R-project.org/package=hunspell</a>.
 </div>
 <div id="ref-Porter80" class="csl-entry">
 Porter, Martin F. 1980. <span>“An Algorithm for Suffix Stripping.”</span> <em>Program</em> 14 (3): 130–137. doi:<a href="https://doi.org/10.1108/eb046814">10.1108/eb046814</a>.

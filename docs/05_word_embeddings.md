@@ -26,7 +26,7 @@ complaints %>%
 ```
 
 ```
-#> Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).
+#> Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.
 ```
 
 <div class="rmdwarning">
@@ -53,7 +53,7 @@ complaints %>%
 ```
 
 ```
-#> Document-feature matrix of: 117,214 documents, 46,099 features (99.9% sparse).
+#> Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.
 ```
 
 Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet** [@Friedman2010]. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
@@ -124,18 +124,18 @@ nested_words
 
 ```
 #> # A tibble: 117,170 x 2
-#>    complaint_id words             
-#>           <dbl> <list>            
-#>  1      3384392 <tibble [18 × 1]> 
-#>  2      3417821 <tibble [71 × 1]> 
-#>  3      3433198 <tibble [77 × 1]> 
-#>  4      3366475 <tibble [69 × 1]> 
-#>  5      3385399 <tibble [213 × 1]>
-#>  6      3444592 <tibble [19 × 1]> 
-#>  7      3379924 <tibble [121 × 1]>
-#>  8      3446975 <tibble [22 × 1]> 
-#>  9      3214857 <tibble [64 × 1]> 
-#> 10      3417374 <tibble [44 × 1]> 
+#>    complaint_id words                 
+#>           <dbl> <list>                
+#>  1      3384392 <tibble[,1] [18 × 1]> 
+#>  2      3417821 <tibble[,1] [71 × 1]> 
+#>  3      3433198 <tibble[,1] [77 × 1]> 
+#>  4      3366475 <tibble[,1] [69 × 1]> 
+#>  5      3385399 <tibble[,1] [213 × 1]>
+#>  6      3444592 <tibble[,1] [19 × 1]> 
+#>  7      3379924 <tibble[,1] [121 × 1]>
+#>  8      3446975 <tibble[,1] [22 × 1]> 
+#>  9      3214857 <tibble[,1] [64 × 1]> 
+#> 10      3417374 <tibble[,1] [44 × 1]> 
 #> # … with 117,160 more rows
 ```
 
@@ -551,7 +551,7 @@ tidy_glove %>%
 #> # A tibble: 400,000 x 2
 #>    item1       value
 #>    <chr>       <dbl>
-#>  1 error       1.   
+#>  1 error       1    
 #>  2 errors      0.792
 #>  3 mistake     0.664
 #>  4 correct     0.621
@@ -605,7 +605,7 @@ tidy_glove %>%
 #> # A tibble: 400,000 x 2
 #>    item1        value
 #>    <chr>        <dbl>
-#>  1 fee          1.   
+#>  1 fee          1    
 #>  2 fees         0.832
 #>  3 payment      0.741
 #>  4 pay          0.711

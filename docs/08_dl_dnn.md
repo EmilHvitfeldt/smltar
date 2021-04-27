@@ -108,11 +108,16 @@ kickstarter %>%
 ```
 
 ```
-#> [1] "A science fiction/drama about a young man and woman encountering beings not of this earth. Armed with only their minds to confront this"
-#> [2] "No, not my virginity. That was taken by a girl named Ramona the night of my senior prom. I'm talking about my novel, THE USE OF REGRET."
-#> [3] "In a city where the sun has stopped rising, the music never stops. Now only a man and his guitar can free the people from the Red King."
-#> [4] "First Interfaith & Community FM Radio Station needs transmitter in Menifee, CA Programs online, too CLICK PHOTO ABOVE FOR OUR CAT VIDEO"
-#> [5] "This documentary asks if the twenty-four hour news cycle has altered people's opinions of one another. We explore unity in one another."
+#> [1] "A science fiction/drama about a young man and woman encountering beings
+not of this earth. Armed with only their minds to confront this"
+#> [2] "No, not my virginity. That was taken by a girl named Ramona the night
+of my senior prom. I'm talking about my novel, THE USE OF REGRET."
+#> [3] "In a city where the sun has stopped rising, the music never stops. Now
+only a man and his guitar can free the people from the Red King."
+#> [4] "First Interfaith & Community FM Radio Station needs transmitter in
+Menifee, CA Programs online, too CLICK PHOTO ABOVE FOR OUR CAT VIDEO"
+#> [5] "This documentary asks if the twenty-four hour news cycle has altered
+people's opinions of one another. We explore unity in one another."
 ```
 
 All of these blurbs appear coherent and some of them even end with a period to end the sentence. Let's now look at blurbs with more than 135 characters to see if they are different.
@@ -127,11 +132,19 @@ kickstarter %>%
 ```
 
 ```
-#> [1] "This is a puzzle game for the Atari 2600. The unique thing about this is that (some) of the cartridge cases will be made out of real wood, hand carved"
-#> [2] "Art supplies for 10 girls on the east side of Detroit to make drawings of their neighborhood, which is also home to LOVELAND's Plymouth microhood"     
-#> [3] "Help us make a video for 'Never', one of the most popular songs on Songs To Wear Pants To and the lead single from Your Heart's upcoming album Autumn."
-#> [4] "Pyramid Cocoon is an interactive sculpture to be installed during the Burning Man Festival 2010. Users can rest, commune or cocoon in the piece"       
-#> [5] "Back us to own, wear, or see a show of great student art we've collected from Artloop partner schools in NYC. The $ goes right back to art programs!"
+#> [1] "This is a puzzle game for the Atari 2600. The unique thing about this
+is that (some) of the cartridge cases will be made out of real wood, hand
+carved"
+#> [2] "Art supplies for 10 girls on the east side of Detroit to make drawings
+of their neighborhood, which is also home to LOVELAND's Plymouth microhood"
+#> [3] "Help us make a video for 'Never', one of the most popular songs on
+Songs To Wear Pants To and the lead single from Your Heart's upcoming album
+Autumn."
+#> [4] "Pyramid Cocoon is an interactive sculpture to be installed during the
+Burning Man Festival 2010. Users can rest, commune or cocoon in the piece"
+#> [5] "Back us to own, wear, or see a show of great student art we've
+collected from Artloop partner schools in NYC. The $ goes right back to art
+programs!"
 ```
 
 All of these blurbs also look fine so the strange distribution doesn't seem like a data collection issue. 
@@ -1164,13 +1177,13 @@ cv_fitted
 ```
 #> #  5-fold cross-validation 
 #> # A tibble: 5 x 3
-#>   splits                 id    validation      
-#>   <list>                 <chr> <list>          
-#> 1 <split [161674/40419]> Fold1 <tibble [4 × 3]>
-#> 2 <split [161674/40419]> Fold2 <tibble [4 × 3]>
-#> 3 <split [161674/40419]> Fold3 <tibble [4 × 3]>
-#> 4 <split [161675/40418]> Fold4 <tibble [4 × 3]>
-#> 5 <split [161675/40418]> Fold5 <tibble [4 × 3]>
+#>   splits                 id    validation          
+#>   <list>                 <chr> <list>              
+#> 1 <split [161674/40419]> Fold1 <tibble[,3] [4 × 3]>
+#> 2 <split [161674/40419]> Fold2 <tibble[,3] [4 × 3]>
+#> 3 <split [161674/40419]> Fold3 <tibble[,3] [4 × 3]>
+#> 4 <split [161675/40418]> Fold4 <tibble[,3] [4 × 3]>
+#> 5 <split [161675/40418]> Fold5 <tibble[,3] [4 × 3]>
 ```
 
 Now we can use `unnest()` to find the metrics we computed.
