@@ -6,7 +6,7 @@ To build features for supervised machine learning from natural language, we need
 
 ## What is a token?
 
-In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+In R, text is typically represented with the *character* data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
 <div class="rmdpackage">
@@ -77,7 +77,7 @@ strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
 #> [15] "it"
 ```
 
-At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (`"fir-tree"`) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, **tokenizers** [@Mullen18] and **spacy** [@spacy2] implement fast, consistent tokenizers we can use. Let's demonstrate with the **tokenizers** package.
+At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (`"fir-tree"`) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, **tokenizers** [@Mullen18] and **spaCy** [@spacy2] implement fast, consistent tokenizers we can use. Let's demonstrate with the **tokenizers** package.
 
 
 ```r
@@ -847,7 +847,7 @@ Our discussion of tokenization so far has focused on text where words are separa
 One of these languages is Chinese where each "word" can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called "word segmentation" and is still an active area of research [@ma-etal-2018-state; @Huang2019].
 
-We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package [@R-jiebaR]. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
 
 
 ```r
@@ -888,11 +888,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       83.5ms   85.5ms     11.7     4.59MB     0   
-#> 2 tokenizers   96.2ms   97.7ms     10.2     1.01MB     1.14
-#> 3 text2vec     83.2ms   84.4ms     11.8    20.59MB     1.31
-#> 4 quanteda      150ms  155.3ms      6.46     8.7MB     1.62
-#> 5 base R      317.4ms  322.6ms      3.10   10.51MB     1.33
+#> 1 corpus       76.1ms   78.4ms     12.7     4.59MB     0   
+#> 2 tokenizers   92.7ms   93.9ms     10.4     1.01MB     1.15
+#> 3 text2vec     77.1ms   81.9ms     12.2    20.59MB     1.36
+#> 4 quanteda    142.6ms  149.4ms      6.74     8.7MB     1.68
+#> 5 base R        308ms  316.9ms      3.16   10.51MB     2.11
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.

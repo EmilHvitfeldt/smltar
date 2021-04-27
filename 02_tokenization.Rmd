@@ -18,7 +18,7 @@ To build features for supervised machine learning from natural language, we need
 
 ## What is a token?
 
-In R, text is typically represented with the **character** data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+In R, text is typically represented with the *character* data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.
 
 ```{block, type = "rmdpackage"}
@@ -55,7 +55,7 @@ To understand the process of tokenization, let's start with a overly simple defi
 strsplit(the_fir_tree[1:2], "[^a-zA-Z0-9]+")
 ```
 
-At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (`"fir-tree"`) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, **tokenizers** [@Mullen18] and **spacy** [@spacy2] implement fast, consistent tokenizers we can use. Let's demonstrate with the **tokenizers** package.
+At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (`"fir-tree"`) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, **tokenizers** [@Mullen18] and **spaCy** [@spacy2] implement fast, consistent tokenizers we can use. Let's demonstrate with the **tokenizers** package.
 
 ```{r}
 library(tokenizers)
@@ -616,7 +616,7 @@ Our discussion of tokenization so far has focused on text where words are separa
 One of these languages is Chinese where each "word" can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called "word segmentation" and is still an active area of research [@ma-etal-2018-state; @Huang2019].
 
-We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package [@R-jiebaR]. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
 
 ```{r}
 library(jiebaR)
