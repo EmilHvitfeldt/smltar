@@ -37,6 +37,8 @@ suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(tidymodels))
 theme_set(theme_light())
 tidymodels_prefer()
+conflicted::conflict_prefer("vi", "vip")
+conflicted::conflict_prefer("explain", "lime")
 
 update_geom_defaults("col", list(fill = "#8097ae", alpha = 0.9))
 update_geom_defaults("bar", list(fill = "#8097ae", alpha = 0.9))
