@@ -1068,12 +1068,12 @@ runs_results
 #> # A tibble: 6 x 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.02       0.0312           0.993           1.02             0.807
-#> 2 _tuning/20… 0.997      0.0344           0.992           0.997            0.804
-#> 3 _tuning/20… 0.997      0.0504           0.987           0.997            0.804
-#> 4 _tuning/20… 0.971      0.0319           0.993           0.971            0.811
-#> 5 _tuning/20… 0.944      0.0339           0.993           0.944            0.811
-#> 6 _tuning/20… 0.959      0.0426           0.989           0.959            0.810
+#> 1 _tuning/20… 1.01       0.035            0.992           1.01             0.807
+#> 2 _tuning/20… 1.01       0.0428           0.989           1.01             0.804
+#> 3 _tuning/20… 0.972      0.0456           0.988           0.972            0.802
+#> 4 _tuning/20… 0.956      0.0284           0.994           0.956            0.811
+#> 5 _tuning/20… 0.969      0.0331           0.993           0.969            0.811
+#> 6 _tuning/20… 0.886      0.0555           0.985           0.886            0.810
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1096,15 +1096,15 @@ best_runs
 #> # A tibble: 6 x 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
-#> 1               0.811                 7             1
-#> 2               0.811                 5             1
+#> 1               0.811                 5             1
+#> 2               0.811                 7             1
 #> 3               0.810                 3             1
 #> 4               0.807                 7             2
 #> 5               0.804                 5             2
-#> 6               0.804                 3             2
+#> 6               0.802                 3             2
 ```
 
-There isn't much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.
+There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 

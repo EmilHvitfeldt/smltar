@@ -458,7 +458,7 @@ div.csl-indent {
 <p>To build features for supervised machine learning from natural language, we need some way of representing raw text as numbers so we can perform computation on them. Typically, one of the first steps in this transformation from natural language to feature, or any of kind of text analysis, is <em>tokenization</em>. Knowing what tokenization and tokens are, along with the related concept of an n-gram, is important for almost any natural language processing task.</p>
 <div id="what-is-a-token" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> What is a token?</h2>
-<p>In R, text is typically represented with the <strong>character</strong> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <strong>hcandersenr</strong> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
+<p>In R, text is typically represented with the <em>character</em> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <strong>hcandersenr</strong> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled “The Fir Tree,” we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.</p>
 <div class="rmdpackage">
 <p>
@@ -501,7 +501,7 @@ These elements don’t contain any metadata or information to tell us which char
 FIGURE 2.1: A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.
 </p>
 </div>
-<p>Most commonly, the meaningful unit or type of token that we want to split text into units of is a <strong>word</strong>. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous <span class="citation">(<a href="#ref-Bender13" role="doc-biblioref">Emily M. Bender 2013</a>)</span>. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like “didn’t” may more accurately be considered two words with no space.</p>
+<p>Most commonly, the meaningful unit or type of token that we want to split text into units of is a <strong>word</strong>. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous <span class="citation">(<a href="#ref-Bender13" role="doc-biblioref">Bender 2013</a>)</span>. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like “didn’t” may more accurately be considered two words with no space.</p>
 <p>To understand the process of tokenization, let’s start with a overly simple definition for a word: any selection of alphanumeric (letters and numbers) symbols. Let’s use some regular expressions (or regex for short, see Appendix <a href="regexp.html#regexp">A</a>) with <code>strsplit()</code> to split the first two lines of “The Fir Tree” by any characters that are not alphanumeric.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="tokenization.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(the_fir_tree[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="st">&quot;[^a-zA-Z0-9]+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
@@ -512,7 +512,7 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 #&gt;  [1] &quot;resting&quot; &quot;place&quot;   &quot;grew&quot;    &quot;a&quot;       &quot;pretty&quot;  &quot;little&quot;  &quot;fir&quot;    
 #&gt;  [8] &quot;tree&quot;    &quot;and&quot;     &quot;yet&quot;     &quot;it&quot;      &quot;was&quot;     &quot;not&quot;     &quot;happy&quot;  
 #&gt; [15] &quot;it&quot;</code></pre>
-<p>At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (<code>"fir-tree"</code>) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, <strong>tokenizers</strong> <span class="citation">(<a href="#ref-Mullen18" role="doc-biblioref">Mullen et al. 2018</a>)</span> and <strong>spacy</strong> <span class="citation">(<a href="#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span> implement fast, consistent tokenizers we can use. Let’s demonstrate with the <strong>tokenizers</strong> package.</p>
+<p>At first sight, this result looks pretty decent. However, we have lost all punctuation, which may or may not be helpful for our modeling goal, and the hero of this story (<code>"fir-tree"</code>) was split in half. Already it is clear that tokenization is going to be quite complicated. Luckily for us, a lot of work has been invested in this process, and typically it is best to use these existing tools. For example, <strong>tokenizers</strong> <span class="citation">(<a href="#ref-Mullen18" role="doc-biblioref">Mullen et al. 2018</a>)</span> and <strong>spaCy</strong> <span class="citation">(<a href="#ref-spacy2" role="doc-biblioref">Honnibal and Montani 2017</a>)</span> implement fast, consistent tokenizers we can use. Let’s demonstrate with the <strong>tokenizers</strong> package.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="tokenization.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tokenizers)</span>
 <span id="cb5-2"><a href="tokenization.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tokenize_words</span>(the_fir_tree[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>])</span></code></pre></div>
 <pre><code>#&gt; [[1]]
@@ -997,7 +997,7 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 <p>Our discussion of tokenization so far has focused on text where words are separated by white space and punctuation. For such text, even a quite basic tokenizer can give decent results. However, many written languages don’t separate words in this way.</p>
 <p>One of these languages is Chinese where each “word” can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called “word segmentation” and is still an active area of research <span class="citation">(<a href="#ref-ma-etal-2018-state" role="doc-biblioref">Ma, Ganchev, and Weiss 2018</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al. 2019</a>)</span>.</p>
-<p>We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the <strong>jiebaR</strong> package. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into <code>segment()</code> along with the string we want to segment.</p>
+<p>We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the <strong>jiebaR</strong> package <span class="citation">(<a href="#ref-R-jiebaR" role="doc-biblioref">Wenfeng and Yanyi 2019</a>)</span>. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into <code>segment()</code> along with the string we want to segment.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="tokenization.html#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jiebaR)</span>
 <span id="cb65-2"><a href="tokenization.html#cb65-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;下面是不分行输出的结果&quot;</span>, <span class="st">&quot;下面是不输出的结果&quot;</span>)</span>
 <span id="cb65-3"><a href="tokenization.html#cb65-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1024,11 +1024,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 x 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       83.5ms   85.5ms     11.7     4.59MB     0   
-#&gt; 2 tokenizers   96.2ms   97.7ms     10.2     1.01MB     1.14
-#&gt; 3 text2vec     83.2ms   84.4ms     11.8    20.59MB     1.31
-#&gt; 4 quanteda      150ms  155.3ms      6.46     8.7MB     1.62
-#&gt; 5 base R      317.4ms  322.6ms      3.10   10.51MB     1.33</code></pre>
+#&gt; 1 corpus       76.1ms   78.4ms     12.7     4.59MB     0   
+#&gt; 2 tokenizers   92.7ms   93.9ms     10.4     1.01MB     1.15
+#&gt; 3 text2vec     77.1ms   81.9ms     12.2    20.59MB     1.36
+#&gt; 4 quanteda    142.6ms  149.4ms      6.74     8.7MB     1.68
+#&gt; 5 base R        308ms  316.9ms      3.16   10.51MB     2.11</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">
@@ -1049,7 +1049,7 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender13" class="csl-entry">
-Bender, Emily M. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3). Morgan &amp; Claypool Publishers: 1–184.
+Bender, Emily. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3). Morgan &amp; Claypool Publishers: 1–184.
 </div>
 <div id="ref-Gagolewski19" class="csl-entry">
 Gagolewski, Marek. 2020. <em>R Package Stringi: Character String Processing Facilities</em>. <a href="http://www.gagolewski.com/software/stringi/">http://www.gagolewski.com/software/stringi/</a>.
@@ -1080,6 +1080,9 @@ Perry, Patrick O. 2020. <em>Corpus: Text Corpus Analysis</em>. <a href="https://
 </div>
 <div id="ref-Silge16" class="csl-entry">
 Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in r.”</span> <em>JOSS</em> 1 (3). The Open Journal. doi:<a href="https://doi.org/10.21105/joss.00037">10.21105/joss.00037</a>.
+</div>
+<div id="ref-R-jiebaR" class="csl-entry">
+Wenfeng, Qin, and Wu Yanyi. 2019. <em>jiebaR: Chinese Text Segmentation</em>. <a href="https://CRAN.R-project.org/package=jiebaR">https://CRAN.R-project.org/package=jiebaR</a>.
 </div>
 </div>
 <div class="footnotes">

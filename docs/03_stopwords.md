@@ -1,6 +1,6 @@
 # Stop words {#stopwords}
 
-Once we have split text into tokens, it often becomes clear that not all words carry the same amount of information, if any information at all, for a predictive modeling task. Common words that carry little (or perhaps no) meaningful information are called **stop words**. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.
+Once we have split text into tokens, it often becomes clear that not all words carry the same amount of information, if any information at all, for a predictive modeling task. Common words that carry little (or perhaps no) meaningful information are called *stop words*. It is common advice and practice to remove stop words for various NLP tasks, but the task of stop word removal is more nuanced than many resources may lead you to believe. In this chapter, we will investigate what a stop word list is, the differences between them, and the effects of using them in your preprocessing workflow.
 
 The concept of stop words has a long history with Hans Peter Luhn credited with coining the term in 1960 [@Luhn1960]. Examples of these words in English are "a", "the", "of", and "didn't". These words are very common and typically don't add much to the meaning of a text but instead ensure the structure of a sentence is sound. 
 
