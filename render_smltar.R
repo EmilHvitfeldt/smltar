@@ -3,6 +3,7 @@
 ##----------------------------------------------------------
 
 devtools::install_dev_deps()
+devtools::install_github("r-lib/pillar") ## for non-ugly tibble list col printing
 
 ##----------------------------------------------------------
 
