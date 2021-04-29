@@ -19,7 +19,7 @@ spacyr::spacy_install(python_version = "3.6.9", envname = "spacy_condaenv", prom
 ## double check for unexpected GitHub versions:
 deps <- desc::desc_get_deps()
 pkgs <- sort(deps$package[deps$type == "Imports"])
-sessioninfo::package_info(pkgs, dependencies = FALSE)
+sessioninfo::package_info(c(pkgs, "pillar"), dependencies = FALSE)
 
 ##----------------------------------------------------------
 
