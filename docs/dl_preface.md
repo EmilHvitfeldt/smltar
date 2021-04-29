@@ -24,10 +24,9 @@ For the following chapters, we will use tidymodels packages along with [Tensorfl
 <p>The <strong>keras</strong> R package provides an interface for R users to Keras, a high-level API for building neural networks.</p>
 </div>
 
-Table \@ref(tab:comparedlml) presents some key differences between deep learning and what, in this book, we call machine learning methods.
+The following table presents some key differences between deep learning and what, in this book, we call machine learning methods.
 
 <table>
-<caption>(\#tab:comparedlml)Comparing deep learning with other machine learning methods</caption>
  <thead>
   <tr>
    <th style="text-align:left;font-weight: bold;"> Machine learning </th>
