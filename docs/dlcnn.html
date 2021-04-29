@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-26" />
+<meta name="date" content="2021-04-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -455,7 +455,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="dlcnn" class="section level1" number="10">
 <h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks</h1>
-<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
+<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Y. Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
 <p>CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.</p>
 <div class="rmdnote">
 <p>
@@ -1271,12 +1271,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.01       0.035            0.992           1.01             0.807
-#&gt; 2 _tuning/20… 1.01       0.0428           0.989           1.01             0.804
-#&gt; 3 _tuning/20… 0.972      0.0456           0.988           0.972            0.802
-#&gt; 4 _tuning/20… 0.956      0.0284           0.994           0.956            0.811
-#&gt; 5 _tuning/20… 0.969      0.0331           0.993           0.969            0.811
-#&gt; 6 _tuning/20… 0.886      0.0555           0.985           0.886            0.810
+#&gt; 1 _tuning/20… 1.02       0.0321           0.993           1.02             0.806
+#&gt; 2 _tuning/20… 0.986      0.0343           0.992           0.986            0.809
+#&gt; 3 _tuning/20… 0.966      0.044            0.989           0.966            0.808
+#&gt; 4 _tuning/20… 0.984      0.0314           0.994           0.984            0.809
+#&gt; 5 _tuning/20… 0.981      0.0316           0.994           0.981            0.806
+#&gt; 6 _tuning/20… 0.931      0.049            0.987           0.931            0.807
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1291,13 +1291,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.811                 5             1
-#&gt; 2               0.811                 7             1
-#&gt; 3               0.810                 3             1
-#&gt; 4               0.807                 7             2
-#&gt; 5               0.804                 5             2
-#&gt; 6               0.802                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.809                 5             2
+#&gt; 2               0.809                 7             1
+#&gt; 3               0.808                 3             2
+#&gt; 4               0.807                 3             1
+#&gt; 5               0.806                 7             2
+#&gt; 6               0.806                 5             1</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 2 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1546,10 +1546,10 @@ Kim, Yoon. 2014. <span>“Convolutional Neural Networks for Sentence Classificat
 Pedersen, Thomas Lin, and Michaël Benesty. 2021. <em>Lime: Local Interpretable Model-Agnostic Explanations</em>. <a href="https://CRAN.R-project.org/package=lime">https://CRAN.R-project.org/package=lime</a>.
 </div>
 <div id="ref-ribeiro2016why" class="csl-entry">
-Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> <a href="http://arxiv.org/abs/1602.04938">http://arxiv.org/abs/1602.04938</a>.
+Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> In <em>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</em>, 1135–1144. KDD ’16. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/2939672.2939778">10.1145/2939672.2939778</a>.
 </div>
 <div id="ref-Vosoughi2016" class="csl-entry">
-Vosoughi, Soroush, Prashanth Vijayaraghavan, and Deb Roy. 2016. <span>“Tweet2Vec: Learning Tweet Embeddings Using Character-Level CNN-LSTM Encoder-Decoder.”</span> In, 1041–1044. doi:<a href="https://doi.org/10.1145/2911451.2914762">10.1145/2911451.2914762</a>.
+Vosoughi, Soroush, Prashanth Vijayaraghavan, and Deb Roy. 2016. <span>“Tweet2Vec: Learning Tweet Embeddings Using Character-Level CNN-LSTM Encoder-Decoder.”</span> In <em>Proceedings of the 39th International ACM SIGIR Conference on Research and Development in Information Retrieval</em>, 1041–1044. SIGIR ’16. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/2911451.2914762">10.1145/2911451.2914762</a>.
 </div>
 <div id="ref-Zhang2015" class="csl-entry">
 Zhang, Xiang, Junbo Zhao, and Yann LeCun. 2015. <span>“Character-Level Convolutional Networks for Text Classification.”</span> In <em>Proceedings of the 28th International Conference on Neural Information Processing Systems - Volume 1</em>, 649–657. NIPS’15. Cambridge, MA, USA: MIT Press.
