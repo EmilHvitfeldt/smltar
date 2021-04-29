@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-26" />
+<meta name="date" content="2021-04-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -603,7 +603,7 @@ Before we calculate tf-idf we use <code>step_tokenfilter()</code> to only keep t
 <p>Now that we have a full specification of the preprocessing recipe, we can build up a tidymodels <code>workflow()</code> to bundle together our modeling components.</p>
 <div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="mlclassification.html#cb275-1" aria-hidden="true" tabindex="-1"></a>complaint_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb275-2"><a href="mlclassification.html#cb275-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(complaints_rec)</span></code></pre></div>
-<p>Let’s start with a naive Bayes model <span class="citation">(<a href="#ref-kim2006" role="doc-biblioref">Sang-Bum Kim et al. 2006</a>; <a href="#ref-Kibriya2005" role="doc-biblioref">Kibriya et al. 2005</a>; <a href="#ref-Eibe2006" role="doc-biblioref">Frank and Bouckaert 2006</a>)</span>, which is available in the tidymodels package <strong>discrim</strong>.
+<p>Let’s start with a naive Bayes model <span class="citation">(<a href="#ref-kim2006" role="doc-biblioref">S.-B. Kim et al. 2006</a>; <a href="#ref-Kibriya2005" role="doc-biblioref">Kibriya et al. 2005</a>; <a href="#ref-Eibe2006" role="doc-biblioref">Frank and Bouckaert 2006</a>)</span>, which is available in the tidymodels package <strong>discrim</strong>.
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.</p>
 <div class="rmdpackage">
@@ -1571,7 +1571,7 @@ What happens when we use these censored dates as a feature in supervised machine
 </div>
 <p>Data censoring can be a form of preprocessing in your data pipeline.
 For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person’s social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
-More importantly, that information can become embedded in your model and begin to leak as demonstrated by <span class="citation"><a href="#ref-carlini2018secret" role="doc-biblioref">Carlini et al.</a> (<a href="#ref-carlini2018secret" role="doc-biblioref">2018</a>)</span>, <span class="citation"><a href="#ref-Fredrikson2014" role="doc-biblioref">Matthew Fredrikson et al.</a> (<a href="#ref-Fredrikson2014" role="doc-biblioref">2014</a>)</span>, and <span class="citation"><a href="#ref-Fredrikson2015" role="doc-biblioref">Matt Fredrikson, Jha, and Ristenpart</a> (<a href="#ref-Fredrikson2015" role="doc-biblioref">2015</a>)</span>.
+More importantly, that information can become embedded in your model and begin to leak as demonstrated by <span class="citation"><a href="#ref-carlini2018secret" role="doc-biblioref">Carlini et al.</a> (<a href="#ref-carlini2018secret" role="doc-biblioref">2019</a>)</span>, <span class="citation"><a href="#ref-Fredrikson2014" role="doc-biblioref">Matthew Fredrikson et al.</a> (<a href="#ref-Fredrikson2014" role="doc-biblioref">2014</a>)</span>, and <span class="citation"><a href="#ref-Fredrikson2015" role="doc-biblioref">Matt Fredrikson, Jha, and Ristenpart</a> (<a href="#ref-Fredrikson2015" role="doc-biblioref">2015</a>)</span>.
 Both of these issues are important, and one of them could land you in a lot of legal trouble.
 Exposing such PII to modeling is an example of where we should all stop to ask, “Should we even be doing this?” as we discussed in the foreword to these chapters.</p>
 <p>If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the <em>presence</em> of a social security number.
@@ -2107,16 +2107,16 @@ Bates, Douglas, and Martin Maechler. 2021. <em>Matrix: Sparse and Dense Matrix C
 Breiman, Leo, Jerome Friedman, Charles J Stone, and Richard A Olshen. 1984. <em>Classification and Regression Trees</em>. CRC press.
 </div>
 <div id="ref-carlini2018secret" class="csl-entry">
-Carlini, Nicholas, Chang Liu, Úlfar Erlingsson, Jernej Kos, and Dawn Song. 2018. <span>“The Secret Sharer: Evaluating and Testing Unintended Memorization in Neural Networks.”</span> <a href="http://arxiv.org/abs/1802.08232">http://arxiv.org/abs/1802.08232</a>.
+Carlini, Nicholas, Chang Liu, Úlfar Erlingsson, Jernej Kos, and Dawn Song. 2019. <span>“The Secret Sharer: Evaluating and Testing Unintended Memorization in Neural Networks.”</span> In <em>Proceedings of the 28th USENIX Conference on Security Symposium</em>, 267–284. SEC’19. USA: USENIX Association.
 </div>
 <div id="ref-Eibe2006" class="csl-entry">
-Frank, Eibe, and Remco R. Bouckaert. 2006. <span>“Naive Bayes for Text Classification with Unbalanced Classes.”</span> In <em>Knowledge Discovery in Databases: PKDD 2006</em>, edited by Johannes Fürnkranz, Tobias Scheffer, and Myra Spiliopoulou, 503–510. Berlin, Heidelberg: Springer Berlin Heidelberg.
+Frank, Eibe, and Remco R. Bouckaert. 2006. <span>“Naive Bayes for Text Classification with Unbalanced Classes.”</span> In <em>Knowledge Discovery in Databases: PKDD 2006</em>, edited by Johannes Fürnkranz, Tobias Scheffer, and Myra Spiliopoulou, 503–510. Berlin, Heidelberg: Springer Berlin Heidelberg. doi:<a href="https://doi.org/10.1007/11871637_49">10.1007/11871637_49</a>.
 </div>
 <div id="ref-Fredrikson2014" class="csl-entry">
-Fredrikson, Matthew, Eric Lantz, Somesh Jha, Simon Lin, David Page, and Thomas Ristenpart. 2014. <span>“Privacy in Pharmacogenetics: An End-to-End Case Study of Personalized Warfarin Dosing.”</span> In <em>23rd <span>USENIX</span> Security Symposium (<span>USENIX</span> Security 14)</em>, 17–32. San Diego, CA: <span>USENIX</span> Association. <a href="https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/fredrikson_matthew">https://www.usenix.org/conference/usenixsecurity14/technical-sessions/presentation/fredrikson_matthew</a>.
+Fredrikson, Matthew, Eric Lantz, Somesh Jha, Simon Lin, David Page, and Thomas Ristenpart. 2014. <span>“Privacy in Pharmacogenetics: An End-to-End Case Study of Personalized Warfarin Dosing.”</span> In <em>Proceedings of the 23rd USENIX Conference on Security Symposium</em>, 17–32. SEC’14. USA: USENIX Association.
 </div>
 <div id="ref-Fredrikson2015" class="csl-entry">
-Fredrikson, Matt, Somesh Jha, and Thomas Ristenpart. 2015. <span>“Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures.”</span> In, 1322–1333. doi:<a href="https://doi.org/10.1145/2810103.2813677">10.1145/2810103.2813677</a>.
+Fredrikson, Matt, Somesh Jha, and Thomas Ristenpart. 2015. <span>“Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures.”</span> In, 1322–1333. CCS ’15. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/2810103.2813677">10.1145/2810103.2813677</a>.
 </div>
 <div id="ref-R-themis" class="csl-entry">
 Hvitfeldt, Emil. 2020d. <em>Themis: Extra Recipes Steps for Dealing with Unbalanced Data</em>. <a href="https://CRAN.R-project.org/package=themis">https://CRAN.R-project.org/package=themis</a>.
@@ -2125,7 +2125,10 @@ Hvitfeldt, Emil. 2020d. <em>Themis: Extra Recipes Steps for Dealing with Unbalan
 Kearney, Michael W. 2019. <em>Textfeatures: Extracts Features from Text</em>. <a href="https://CRAN.R-project.org/package=textfeatures">https://CRAN.R-project.org/package=textfeatures</a>.
 </div>
 <div id="ref-Kibriya2005" class="csl-entry">
-Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. <span>“Multinomial Naive Bayes for Text Categorization Revisited.”</span> In <em>AI 2004: Advances in Artificial Intelligence</em>, edited by Geoffrey I. Webb and Xinghuo Yu, 488–499. Berlin, Heidelberg: Springer Berlin Heidelberg.
+Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. <span>“Multinomial Naive Bayes for Text Categorization Revisited.”</span> In <em>AI 2004: Advances in Artificial Intelligence</em>, edited by Geoffrey I. Webb and Xinghuo Yu, 488–499. Berlin, Heidelberg: Springer Berlin Heidelberg. doi:<a href="https://doi.org/10.1007/978-3-540-30549-1_43">10.1007/978-3-540-30549-1_43</a>.
+</div>
+<div id="ref-kim2006" class="csl-entry">
+Kim, Sang-Bum, Kyoung-Soo Han, Hae-Chang Rim, and Sung Hyon Myaeng. 2006. <span>“Some Effective Techniques for Naive Bayes Text Classification.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 18 (11): 1457–1466. doi:<a href="https://doi.org/10.1109/TKDE.2006.180">10.1109/TKDE.2006.180</a>.
 </div>
 <div id="ref-R-dials" class="csl-entry">
 Kuhn, Max. 2020. <em>Dials: Tools for Creating Tuning Parameter Values</em>. <a href="https://CRAN.R-project.org/package=dials">https://CRAN.R-project.org/package=dials</a>.
@@ -2133,14 +2136,11 @@ Kuhn, Max. 2020. <em>Dials: Tools for Creating Tuning Parameter Values</em>. <a 
 <div id="ref-R-parsnip" class="csl-entry">
 Kuhn, Max, and Davis Vaughan. 2021b. <em>Parsnip: A Common API to Modeling and Analysis Functions</em>.
 </div>
-<div id="ref-kim2006" class="csl-entry">
-Sang-Bum Kim, Kyoung-Soo Han, Hae-Chang Rim, and Sung Hyon Myaeng. 2006. <span>“Some Effective Techniques for Naive Bayes Text Classification.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 18 (11): 1457–1466.
-</div>
 <div id="ref-Sweeney2000" class="csl-entry">
-Sweeney, Latanya. 2000. <span>“Simple Demographics Often Identify People Uniquely.”</span> <em>Health (San Francisco)</em> 671 (2000): 1–34.
+Sweeney, Latanya. 2000. <em>Simple Demographics Often Identify People Uniquely</em>. Data Privacy Working Paper 3. Carnegie Mellon University. <a href="https://dataprivacylab.org/projects/identifiability/">https://dataprivacylab.org/projects/identifiability/</a>.
 </div>
 <div id="ref-Tibshirani1996" class="csl-entry">
-Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 58 (1). Wiley Online Library: 267–288.
+Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 58 (1). [Royal Statistical Society, Wiley]: 267–288. <a href="http://www.jstor.org/stable/2346178">http://www.jstor.org/stable/2346178</a>.
 </div>
 <div id="ref-R-hardhat" class="csl-entry">
 Vaughan, Davis, and Max Kuhn. 2020. <em>Hardhat: Construct Modeling Packages</em>. <a href="https://CRAN.R-project.org/package=hardhat">https://CRAN.R-project.org/package=hardhat</a>.

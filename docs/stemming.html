@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-26" />
+<meta name="date" content="2021-04-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -481,7 +481,7 @@ div.csl-indent {
 <p>What if we aren’t interested in the difference between <code>"trees"</code> and <code>"tree"</code> and we want to treat both together? That idea is at the heart of <em>stemming</em>, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, <code>"trees"</code> would lose its letter <code>"s"</code> while <code>"tree"</code> stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem <code>"tree"</code> (89, if we also find the stem for <code>"tree's"</code>).</p>
 <div id="how-to-stem-text-in-r" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> How to stem text in R</h2>
-<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <strong>SnowballC</strong> package <span class="citation">(<a href="#ref-R-SnowballC" role="doc-biblioref">Bouchet-Valat 2020</a>)</span>. (It has been extended to languages other than English as well.)</p>
+<p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <strong>SnowballC</strong> package <span class="citation">(<a href="#ref-R-SnowballC" role="doc-biblioref">Bouchet-Valat 2020</a>)</span>. (It has been extended to languages other than English as well.)</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="stemming.html#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
 <span id="cb83-2"><a href="stemming.html#cb83-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb83-3"><a href="stemming.html#cb83-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -644,7 +644,7 @@ and it is an <code>m = 3</code> word.</p>
 How would this work for a few example words? The word “supervised” loses its “ed” in step 1b and is not touched by the rest of the algorithm, ending at “supervis.” The word “relational” changes “ational” to “ate” in step 2 and loses its final “e” in step 5, ending at “relat.” Notice that neither of these results are regular English words, but instead special stem objects. This is expected.
 </p>
 </div>
-<p>This algorithm was first published in <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Martin F. Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span> and is still broadly used; read <span class="citation"><a href="#ref-Willett06" role="doc-biblioref">Willett</a> (<a href="#ref-Willett06" role="doc-biblioref">2006</a>)</span> for background on how and why it has become a stemming standard. We can reach even <em>further</em> back and examine what is considered the first ever published stemming algorithm in <span class="citation"><a href="#ref-Lovins68" role="doc-biblioref">Lovins</a> (<a href="#ref-Lovins68" role="doc-biblioref">1968</a>)</span>. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!</p>
+<p>This algorithm was first published in <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span> and is still broadly used; read <span class="citation"><a href="#ref-Willett06" role="doc-biblioref">Willett</a> (<a href="#ref-Willett06" role="doc-biblioref">2006</a>)</span> for background on how and why it has become a stemming standard. We can reach even <em>further</em> back and examine what is considered the first ever published stemming algorithm in <span class="citation"><a href="#ref-Lovins68" role="doc-biblioref">Lovins</a> (<a href="#ref-Lovins68" role="doc-biblioref">1968</a>)</span>. The domain Lovins worked in was engineering, so her approach was particularly suited to technical terms. This algorithm uses much larger lists of word endings, conditions, and rules than the Porter algorithm and, although considered old-fashioned, is actually faster!</p>
 <div class="rmdwarning">
 <p>
 Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">steps of a Snowball stemming algorithm for German</a>.
@@ -864,7 +864,7 @@ In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored wheth
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Arnold17" class="csl-entry">
-Arnold, Taylor. 2017. <span>“A Tidy Data Model for Natural Language Processing Using cleanNLP.”</span> <em>The R Journal</em> 9 (2): 1–20. <a href="https://journal.r-project.org/archive/2017/RJ-2017-035/index.html">https://journal.r-project.org/archive/2017/RJ-2017-035/index.html</a>.
+Arnold, Taylor. 2017. <span>“<span class="nocase">A Tidy Data Model for Natural Language Processing using cleanNLP</span>.”</span> <em><span>The R Journal</span></em> 9 (2): 248–267. doi:<a href="https://doi.org/10.32614/RJ-2017-035">10.32614/RJ-2017-035</a>.
 </div>
 <div id="ref-Benoit19" class="csl-entry">
 Benoit, Kenneth, and Akitaka Matsuo. 2020. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
@@ -876,7 +876,7 @@ Benoit, Kenneth, Kohei Watanabe, Haiyan Wang, Paul Nulty, Adam Obeng, Stefan Mü
 Bouchet-Valat, Milan. 2020. <em>SnowballC: Snowball Stemmers Based on the c ’Libstemmer’ UTF-8 Library</em>. <a href="https://CRAN.R-project.org/package=SnowballC">https://CRAN.R-project.org/package=SnowballC</a>.
 </div>
 <div id="ref-Harman91" class="csl-entry">
-Harman, Donna. 1991. <span>“How Effective Is Suffixing?”</span> <em>Journal of the American Society for Information Science</em> 42 (1). Wiley Online Library: 7–15.
+Harman, Donna. 1991. <span>“How Effective Is Suffixing?”</span> <em>Journal of the American Society for Information Science</em> 42 (1): 7–15. doi:<a href="https://doi.org/10.1002/(SICI)1097-4571(199101)42:1&lt;7::AID-ASI2&gt;3.0.CO;2-P">10.1002/(SICI)1097-4571(199101)42:1&lt;7::AID-ASI2&gt;3.0.CO;2-P</a>.
 </div>
 <div id="ref-spacy2" class="csl-entry">
 Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2</span>: Natural Language Understanding with <span>B</span>loom Embeddings, Convolutional Neural Networks and Incremental Parsing.”</span>
@@ -900,7 +900,7 @@ Porter, Martin F. 1980. <span>“An Algorithm for Suffix Stripping.”</span> <e
 Schofield, Alexandra, and David Mimno. 2016. <span>“Comparing Apples to Apple: The Effects of Stemmers on Topic Models.”</span> <em>Transactions of the Association for Computational Linguistics</em> 4: 287–300. doi:<a href="https://doi.org/10.1162/tacl_a_00099">10.1162/tacl_a_00099</a>.
 </div>
 <div id="ref-Willett06" class="csl-entry">
-Willett, P. 2006. <span>“The Porter Stemming Algorithm: Then and Now.”</span> <em>Program: Electronic Library and Information Systems</em> 40 (3). Emerald: 219–223. <a href="http://eprints.whiterose.ac.uk/1434/">http://eprints.whiterose.ac.uk/1434/</a>.
+Willett, P. 2006. <span>“The Porter Stemming Algorithm: Then and Now.”</span> <em>Program: Electronic Library and Information Systems</em> 40 (3). Emerald: 219–223. doi:<a href="https://doi.org/10.1108/00330330610681295">10.1108/00330330610681295</a>.
 </div>
 </div>
 <div class="footnotes">

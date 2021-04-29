@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-26" />
+<meta name="date" content="2021-04-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -996,7 +996,7 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 <h2><span class="header-section-number">2.5</span> Tokenization for non-Latin alphabets</h2>
 <p>Our discussion of tokenization so far has focused on text where words are separated by white space and punctuation. For such text, even a quite basic tokenizer can give decent results. However, many written languages don’t separate words in this way.</p>
 <p>One of these languages is Chinese where each “word” can be represented by one or more consecutive characters.
-Splitting Chinese text into words is called “word segmentation” and is still an active area of research <span class="citation">(<a href="#ref-ma-etal-2018-state" role="doc-biblioref">Ma, Ganchev, and Weiss 2018</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al. 2019</a>)</span>.</p>
+Splitting Chinese text into words is called “word segmentation” and is still an active area of research <span class="citation">(<a href="#ref-ma-etal-2018-state" role="doc-biblioref">Ma, Ganchev, and Weiss 2018</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al. 2020</a>)</span>.</p>
 <p>We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the <strong>jiebaR</strong> package <span class="citation">(<a href="#ref-R-jiebaR" role="doc-biblioref">Wenfeng and Yanyi 2019</a>)</span>. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into <code>segment()</code> along with the string we want to segment.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="tokenization.html#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jiebaR)</span>
 <span id="cb65-2"><a href="tokenization.html#cb65-2" aria-hidden="true" tabindex="-1"></a>words <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;下面是不分行输出的结果&quot;</span>, <span class="st">&quot;下面是不输出的结果&quot;</span>)</span>
@@ -1049,7 +1049,7 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender13" class="csl-entry">
-Bender, Emily. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3). Morgan &amp; Claypool Publishers: 1–184.
+Bender, Emily M. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3). Morgan &amp; Claypool Publishers: 1–184.
 </div>
 <div id="ref-Gagolewski19" class="csl-entry">
 Gagolewski, Marek. 2020. <em>R Package Stringi: Character String Processing Facilities</em>. <a href="http://www.gagolewski.com/software/stringi/">http://www.gagolewski.com/software/stringi/</a>.
@@ -1061,7 +1061,7 @@ Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2
 https://www.unicode.org/. 2019. <span>“Unicode Text Segmentation.”</span> <a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a>.
 </div>
 <div id="ref-Huang2019" class="csl-entry">
-Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2019. <span>“Toward Fast and Accurate Neural Chinese Word Segmentation with Multi-Criteria Learning.”</span>
+Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2020. <span>“Towards Fast and Accurate Neural <span>C</span>hinese Word Segmentation with Multi-Criteria Learning.”</span> In <em>Proceedings of the 28th International Conference on Computational Linguistics</em>, 2062–2072. Barcelona, Spain (Online): International Committee on Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/2020.coling-main.186">10.18653/v1/2020.coling-main.186</a>.
 </div>
 <div id="ref-R-hcandersenr" class="csl-entry">
 Hvitfeldt, Emil. 2019a. <em>Hcandersenr: H.c. Andersens Fairy Tales</em>. <a href="https://CRAN.R-project.org/package=hcandersenr">https://CRAN.R-project.org/package=hcandersenr</a>.
@@ -1079,7 +1079,7 @@ Mullen, Lincoln A., Kenneth Benoit, Os Keyes, Dmitry Selivanov, and Jeffrey Arno
 Perry, Patrick O. 2020. <em>Corpus: Text Corpus Analysis</em>. <a href="https://CRAN.R-project.org/package=corpus">https://CRAN.R-project.org/package=corpus</a>.
 </div>
 <div id="ref-Silge16" class="csl-entry">
-Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in r.”</span> <em>JOSS</em> 1 (3). The Open Journal. doi:<a href="https://doi.org/10.21105/joss.00037">10.21105/joss.00037</a>.
+Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in <span>R</span>.”</span> <em>JOSS</em> 1 (3). The Open Journal. doi:<a href="https://doi.org/10.21105/joss.00037">10.21105/joss.00037</a>.
 </div>
 <div id="ref-R-jiebaR" class="csl-entry">
 Wenfeng, Qin, and Wu Yanyi. 2019. <em>jiebaR: Chinese Text Segmentation</em>. <a href="https://CRAN.R-project.org/package=jiebaR">https://CRAN.R-project.org/package=jiebaR</a>.
