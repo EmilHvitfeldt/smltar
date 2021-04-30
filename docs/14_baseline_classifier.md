@@ -215,18 +215,18 @@ lasso_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 4
-#>    splits                 id     .metrics              .notes              
-#>    <list>                 <chr>  <list>                <list>              
-#>  1 <split [181883/20210]> Fold01 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  2 <split [181883/20210]> Fold02 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  3 <split [181883/20210]> Fold03 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  4 <split [181884/20209]> Fold04 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  5 <split [181884/20209]> Fold05 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  6 <split [181884/20209]> Fold06 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  7 <split [181884/20209]> Fold07 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  8 <split [181884/20209]> Fold08 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  9 <split [181884/20209]> Fold09 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#> 10 <split [181884/20209]> Fold10 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>    splits                 id     .metrics          .notes          
+#>    <list>                 <chr>  <list>            <list>          
+#>  1 <split [181883/20210]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  2 <split [181883/20210]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  3 <split [181883/20210]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  4 <split [181884/20209]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  5 <split [181884/20209]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  6 <split [181884/20209]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  7 <split [181884/20209]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  8 <split [181884/20209]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  9 <split [181884/20209]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
+#> 10 <split [181884/20209]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
 ```
 
 What are the best models?

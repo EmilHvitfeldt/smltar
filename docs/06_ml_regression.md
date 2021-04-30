@@ -162,10 +162,10 @@ scotus_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 4 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
-#> ● step_normalize()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
+#> • step_normalize()
 ```
 
 Notice that there is no model yet: `Model: None`. It's time to specify the model we will use! Let's build a support vector machine (SVM) model. While they don't see widespread use in cutting-edge machine learning research today, they are frequently used in practice and have properties that make them well-suited for text classification [@Joachims1998] and can give good performance [@Vantu2016].
@@ -317,18 +317,18 @@ svm_rs
 #> # Resampling results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits          id     .metrics          .notes           .predictions       
-#>    <list>          <chr>  <list>            <list>           <list>             
-#>  1 <split [6750/7… Fold01 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  2 <split [6750/7… Fold02 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  3 <split [6750/7… Fold03 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  4 <split [6750/7… Fold04 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  5 <split [6750/7… Fold05 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  6 <split [6750/7… Fold06 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  7 <split [6750/7… Fold07 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  8 <split [6750/7… Fold08 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#>  9 <split [6750/7… Fold09 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
-#> 10 <split [6750/7… Fold10 <tibble[,4] [2 ×… <tibble[,1] [0 … <tibble[,4] [750 ×…
+#>    splits             id     .metrics         .notes           .predictions     
+#>    <list>             <chr>  <list>           <list>           <list>           
+#>  1 <split [6750/750]> Fold01 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  2 <split [6750/750]> Fold02 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  3 <split [6750/750]> Fold03 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  4 <split [6750/750]> Fold04 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  5 <split [6750/750]> Fold05 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  6 <split [6750/750]> Fold06 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  7 <split [6750/750]> Fold07 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  8 <split [6750/750]> Fold08 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#>  9 <split [6750/750]> Fold09 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
+#> 10 <split [6750/750]> Fold10 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
 ```
 
 These results look a lot like the resamples, but they have some additional columns, like the `.metrics` that we can use to measure how well this model performed and the `.predictions` we can use to explore that performance more deeply. What results do we see, in terms of performance metrics?
@@ -412,18 +412,18 @@ null_rs
 #> # Resampling results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 4
-#>    splits             id     .metrics             .notes              
-#>    <list>             <chr>  <list>               <list>              
-#>  1 <split [6750/750]> Fold01 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  2 <split [6750/750]> Fold02 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  3 <split [6750/750]> Fold03 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  4 <split [6750/750]> Fold04 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  5 <split [6750/750]> Fold05 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  6 <split [6750/750]> Fold06 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  7 <split [6750/750]> Fold07 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  8 <split [6750/750]> Fold08 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#>  9 <split [6750/750]> Fold09 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
-#> 10 <split [6750/750]> Fold10 <tibble[,4] [1 × 4]> <tibble[,1] [0 × 1]>
+#>    splits             id     .metrics         .notes          
+#>    <list>             <chr>  <list>           <list>          
+#>  1 <split [6750/750]> Fold01 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  2 <split [6750/750]> Fold02 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  3 <split [6750/750]> Fold03 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  4 <split [6750/750]> Fold04 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  5 <split [6750/750]> Fold05 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  6 <split [6750/750]> Fold06 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  7 <split [6750/750]> Fold07 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  8 <split [6750/750]> Fold08 <tibble [1 × 4]> <tibble [0 × 1]>
+#>  9 <split [6750/750]> Fold09 <tibble [1 × 4]> <tibble [0 × 1]>
+#> 10 <split [6750/750]> Fold10 <tibble [1 × 4]> <tibble [0 × 1]>
 ```
 
 What results do we obtain from the null model, in terms of performance metrics?
@@ -1358,10 +1358,10 @@ tune_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 4 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
-#> ● step_normalize()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
+#> • step_normalize()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Linear Support Vector Machine Specification (regression)
@@ -1419,18 +1419,18 @@ final_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits          id     .metrics          .notes          .predictions        
-#>    <list>          <chr>  <list>            <list>          <list>              
-#>  1 <split [6750/7… Fold01 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  2 <split [6750/7… Fold02 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  3 <split [6750/7… Fold03 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  4 <split [6750/7… Fold04 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  5 <split [6750/7… Fold05 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  6 <split [6750/7… Fold06 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  7 <split [6750/7… Fold07 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  8 <split [6750/7… Fold08 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#>  9 <split [6750/7… Fold09 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
-#> 10 <split [6750/7… Fold10 <tibble[,5] [18 … <tibble[,1] [0… <tibble[,5] [4,500 …
+#>    splits            id     .metrics         .notes          .predictions       
+#>    <list>            <chr>  <list>           <list>          <list>             
+#>  1 <split [6750/750… Fold01 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  2 <split [6750/750… Fold02 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  3 <split [6750/750… Fold03 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  4 <split [6750/750… Fold04 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  5 <split [6750/750… Fold05 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  6 <split [6750/750… Fold06 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  7 <split [6750/750… Fold07 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  8 <split [6750/750… Fold08 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#>  9 <split [6750/750… Fold09 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#> 10 <split [6750/750… Fold10 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
 ```
 
 We trained all these models!
@@ -1496,10 +1496,10 @@ final_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 4 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
-#> ● step_normalize()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
+#> • step_normalize()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Linear Support Vector Machine Specification (regression)

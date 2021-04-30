@@ -1177,13 +1177,13 @@ cv_fitted
 ```
 #> #  5-fold cross-validation 
 #> # A tibble: 5 x 3
-#>   splits                 id    validation          
-#>   <list>                 <chr> <list>              
-#> 1 <split [161674/40419]> Fold1 <tibble[,3] [4 × 3]>
-#> 2 <split [161674/40419]> Fold2 <tibble[,3] [4 × 3]>
-#> 3 <split [161674/40419]> Fold3 <tibble[,3] [4 × 3]>
-#> 4 <split [161675/40418]> Fold4 <tibble[,3] [4 × 3]>
-#> 5 <split [161675/40418]> Fold5 <tibble[,3] [4 × 3]>
+#>   splits                 id    validation      
+#>   <list>                 <chr> <list>          
+#> 1 <split [161674/40419]> Fold1 <tibble [4 × 3]>
+#> 2 <split [161674/40419]> Fold2 <tibble [4 × 3]>
+#> 3 <split [161674/40419]> Fold3 <tibble [4 × 3]>
+#> 4 <split [161675/40418]> Fold4 <tibble [4 × 3]>
+#> 5 <split [161675/40418]> Fold5 <tibble [4 × 3]>
 ```
 
 Now we can use `unnest()` to find the metrics we computed.

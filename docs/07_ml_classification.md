@@ -311,9 +311,9 @@ nb_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 3 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Naive Bayes Model Specification (classification)
@@ -654,18 +654,18 @@ tune_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits          id     .metrics         .notes          .predictions         
-#>    <list>          <chr>  <list>           <list>          <list>               
-#>  1 <split [79119/… Fold01 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,760…
-#>  2 <split [79120/… Fold02 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  3 <split [79120/… Fold03 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  4 <split [79120/… Fold04 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  5 <split [79120/… Fold05 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  6 <split [79120/… Fold06 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  7 <split [79120/… Fold07 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  8 <split [79120/… Fold08 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#>  9 <split [79120/… Fold09 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
-#> 10 <split [79120/… Fold10 <tibble[,5] [60… <tibble[,1] [0… <tibble[,7] [263,730…
+#>    splits             id     .metrics        .notes         .predictions        
+#>    <list>             <chr>  <list>          <list>         <list>              
+#>  1 <split [79119/879… Fold01 <tibble [60 × … <tibble [0 × … <tibble [263,760 × …
+#>  2 <split [79120/879… Fold02 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  3 <split [79120/879… Fold03 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  4 <split [79120/879… Fold04 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  5 <split [79120/879… Fold05 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  6 <split [79120/879… Fold06 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  7 <split [79120/879… Fold07 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  8 <split [79120/879… Fold08 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#>  9 <split [79120/879… Fold09 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#> 10 <split [79120/879… Fold10 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
 ```
 
 <div class="rmdwarning">
@@ -767,9 +767,9 @@ final_lasso
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 3 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
@@ -883,9 +883,9 @@ sparse_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 3 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
@@ -949,18 +949,18 @@ sparse_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 4
-#>    splits               id     .metrics              .notes              
-#>    <list>               <chr>  <list>                <list>              
-#>  1 <split [79119/8792]> Fold01 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  2 <split [79120/8791]> Fold02 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  3 <split [79120/8791]> Fold03 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  4 <split [79120/8791]> Fold04 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  5 <split [79120/8791]> Fold05 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  6 <split [79120/8791]> Fold06 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  7 <split [79120/8791]> Fold07 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  8 <split [79120/8791]> Fold08 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#>  9 <split [79120/8791]> Fold09 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
-#> 10 <split [79120/8791]> Fold10 <tibble[,5] [40 × 5]> <tibble[,1] [0 × 1]>
+#>    splits               id     .metrics          .notes          
+#>    <list>               <chr>  <list>            <list>          
+#>  1 <split [79119/8792]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  2 <split [79120/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  3 <split [79120/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  4 <split [79120/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  5 <split [79120/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  6 <split [79120/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  7 <split [79120/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  8 <split [79120/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  9 <split [79120/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
+#> 10 <split [79120/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
 ```
 
 How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of `set_engine("glmnet")`?
@@ -1144,10 +1144,10 @@ multi_lasso_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 4 Recipe Steps
 #> 
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
-#> ● step_downsample()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
+#> • step_downsample()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Multinomial Regression Model Specification (classification)
@@ -1177,18 +1177,18 @@ multi_lasso_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 x 5
-#>    splits          id     .metrics          .notes         .predictions         
-#>    <list>          <chr>  <list>            <list>         <list>               
-#>  1 <split [79119/… Fold01 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,84…
-#>  2 <split [79120/… Fold02 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  3 <split [79120/… Fold03 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  4 <split [79120/… Fold04 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  5 <split [79120/… Fold05 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  6 <split [79120/… Fold06 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  7 <split [79120/… Fold07 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  8 <split [79120/… Fold08 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#>  9 <split [79120/… Fold09 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
-#> 10 <split [79120/… Fold10 <tibble[,5] [40 … <tibble[,1] [… <tibble[,14] [175,82…
+#>    splits             id     .metrics        .notes         .predictions        
+#>    <list>             <chr>  <list>          <list>         <list>              
+#>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,840 × …
+#>  2 <split [79120/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  3 <split [79120/879… Fold03 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#>  4 <split [79120/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  5 <split [79120/879… Fold05 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  6 <split [79120/879… Fold06 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  7 <split [79120/879… Fold07 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#>  8 <split [79120/879… Fold08 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#>  9 <split [79120/879… Fold09 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
+#> 10 <split [79120/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
 ```
 
 What do we see, in terms of performance metrics?
@@ -1354,14 +1354,14 @@ more_vars_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 8 Recipe Steps
 #> 
-#> ● step_date()
-#> ● step_rm()
-#> ● step_dummy()
-#> ● step_unknown()
-#> ● step_dummy()
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_date()
+#> • step_rm()
+#> • step_dummy()
+#> • step_unknown()
+#> • step_dummy()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
@@ -2003,11 +2003,11 @@ sparse_wf_v2
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 5 Recipe Steps
 #> 
-#> ● step_mutate()
-#> ● step_textfeature()
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_mutate()
+#> • step_textfeature()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
@@ -2124,11 +2124,11 @@ final_wf
 #> ── Preprocessor ────────────────────────────────────────────────────────────────
 #> 5 Recipe Steps
 #> 
-#> ● step_mutate()
-#> ● step_textfeature()
-#> ● step_tokenize()
-#> ● step_tokenfilter()
-#> ● step_tfidf()
+#> • step_mutate()
+#> • step_textfeature()
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
 #> 
 #> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
