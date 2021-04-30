@@ -1271,12 +1271,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.02       0.0327           0.993           1.02             0.806
-#&gt; 2 _tuning/20… 0.983      0.0382           0.991           0.983            0.807
-#&gt; 3 _tuning/20… 0.967      0.0442           0.989           0.967            0.804
-#&gt; 4 _tuning/20… 0.958      0.0312           0.993           0.958            0.810
-#&gt; 5 _tuning/20… 0.974      0.0321           0.994           0.974            0.812
-#&gt; 6 _tuning/20… 0.910      0.0448           0.989           0.910            0.810
+#&gt; 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
+#&gt; 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
+#&gt; 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
+#&gt; 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
+#&gt; 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
+#&gt; 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1292,11 +1292,11 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
 #&gt; 1               0.812                 5             1
-#&gt; 2               0.810                 7             1
-#&gt; 3               0.810                 3             1
-#&gt; 4               0.807                 5             2
-#&gt; 5               0.806                 7             2
-#&gt; 6               0.804                 3             2</code></pre>
+#&gt; 2               0.811                 7             1
+#&gt; 3               0.809                 7             2
+#&gt; 4               0.808                 5             2
+#&gt; 5               0.807                 3             1
+#&gt; 6               0.803                 3             2</code></pre>
 <p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
@@ -1362,13 +1362,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb636-4"><a href="dlcnn.html#cb636-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
 #&gt; # A tibble: 5 x 3
-#&gt;   splits                 id    validation          
-#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;              
-#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble[,3] [4 × 3]&gt;
-#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble[,3] [4 × 3]&gt;
-#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble[,3] [4 × 3]&gt;
-#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble[,3] [4 × 3]&gt;
-#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble[,3] [4 × 3]&gt;</code></pre>
+#&gt;   splits                 id    validation      
+#&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;          
+#&gt; 1 &lt;split [161674/40419]&gt; Fold1 &lt;tibble [4 × 3]&gt;
+#&gt; 2 &lt;split [161674/40419]&gt; Fold2 &lt;tibble [4 × 3]&gt;
+#&gt; 3 &lt;split [161674/40419]&gt; Fold3 &lt;tibble [4 × 3]&gt;
+#&gt; 4 &lt;split [161675/40418]&gt; Fold4 &lt;tibble [4 × 3]&gt;
+#&gt; 5 &lt;split [161675/40418]&gt; Fold5 &lt;tibble [4 × 3]&gt;</code></pre>
 <p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
 <div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="dlcnn.html#cb638-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
 <span id="cb638-2"><a href="dlcnn.html#cb638-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>

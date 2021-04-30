@@ -553,18 +553,18 @@ Modern word embeddings are based on a statistical approach to modeling language,
 <span id="cb117-10"><a href="embeddings.html#cb117-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb117-11"><a href="embeddings.html#cb117-11" aria-hidden="true" tabindex="-1"></a>nested_words</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 117,170 x 2
-#&gt;    complaint_id words                 
-#&gt;           &lt;dbl&gt; &lt;list&gt;                
-#&gt;  1      3384392 &lt;tibble[,1] [18 × 1]&gt; 
-#&gt;  2      3417821 &lt;tibble[,1] [71 × 1]&gt; 
-#&gt;  3      3433198 &lt;tibble[,1] [77 × 1]&gt; 
-#&gt;  4      3366475 &lt;tibble[,1] [69 × 1]&gt; 
-#&gt;  5      3385399 &lt;tibble[,1] [213 × 1]&gt;
-#&gt;  6      3444592 &lt;tibble[,1] [19 × 1]&gt; 
-#&gt;  7      3379924 &lt;tibble[,1] [121 × 1]&gt;
-#&gt;  8      3446975 &lt;tibble[,1] [22 × 1]&gt; 
-#&gt;  9      3214857 &lt;tibble[,1] [64 × 1]&gt; 
-#&gt; 10      3417374 &lt;tibble[,1] [44 × 1]&gt; 
+#&gt;    complaint_id words             
+#&gt;           &lt;dbl&gt; &lt;list&gt;            
+#&gt;  1      3384392 &lt;tibble [18 × 1]&gt; 
+#&gt;  2      3417821 &lt;tibble [71 × 1]&gt; 
+#&gt;  3      3433198 &lt;tibble [77 × 1]&gt; 
+#&gt;  4      3366475 &lt;tibble [69 × 1]&gt; 
+#&gt;  5      3385399 &lt;tibble [213 × 1]&gt;
+#&gt;  6      3444592 &lt;tibble [19 × 1]&gt; 
+#&gt;  7      3379924 &lt;tibble [121 × 1]&gt;
+#&gt;  8      3446975 &lt;tibble [22 × 1]&gt; 
+#&gt;  9      3214857 &lt;tibble [64 × 1]&gt; 
+#&gt; 10      3417374 &lt;tibble [44 × 1]&gt; 
 #&gt; # … with 117,160 more rows</code></pre>
 <p>Next, let’s create a <code>slide_windows()</code> function, using the <code>slide()</code> function from the <strong>slider</strong> package <span class="citation">(<a href="#ref-Vaughan2020" role="doc-biblioref">Vaughan 2021a</a>)</span> which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see <code>word1</code> and <code>word2</code> together within this window? We can calculate probabilities based on when we do or do not.</p>
 <p>One of the arguments to this function is the <code>window_size</code>, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are <span class="citation">(<a href="#ref-Levy2014" role="doc-biblioref">Levy and Goldberg 2014</a>)</span>. A smaller window size is also faster to compute.</p>

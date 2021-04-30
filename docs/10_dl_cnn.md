@@ -1068,12 +1068,12 @@ runs_results
 #> # A tibble: 6 x 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.02       0.0327           0.993           1.02             0.806
-#> 2 _tuning/20… 0.983      0.0382           0.991           0.983            0.807
-#> 3 _tuning/20… 0.967      0.0442           0.989           0.967            0.804
-#> 4 _tuning/20… 0.958      0.0312           0.993           0.958            0.810
-#> 5 _tuning/20… 0.974      0.0321           0.994           0.974            0.812
-#> 6 _tuning/20… 0.910      0.0448           0.989           0.910            0.810
+#> 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
+#> 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
+#> 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
+#> 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
+#> 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
+#> 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1097,11 +1097,11 @@ best_runs
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
 #> 1               0.812                 5             1
-#> 2               0.810                 7             1
-#> 3               0.810                 3             1
-#> 4               0.807                 5             2
-#> 5               0.806                 7             2
-#> 6               0.804                 3             2
+#> 2               0.811                 7             1
+#> 3               0.809                 7             2
+#> 4               0.808                 5             2
+#> 5               0.807                 3             1
+#> 6               0.803                 3             2
 ```
 
 There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
@@ -1189,13 +1189,13 @@ cv_fitted
 ```
 #> #  5-fold cross-validation 
 #> # A tibble: 5 x 3
-#>   splits                 id    validation          
-#>   <list>                 <chr> <list>              
-#> 1 <split [161674/40419]> Fold1 <tibble[,3] [4 × 3]>
-#> 2 <split [161674/40419]> Fold2 <tibble[,3] [4 × 3]>
-#> 3 <split [161674/40419]> Fold3 <tibble[,3] [4 × 3]>
-#> 4 <split [161675/40418]> Fold4 <tibble[,3] [4 × 3]>
-#> 5 <split [161675/40418]> Fold5 <tibble[,3] [4 × 3]>
+#>   splits                 id    validation      
+#>   <list>                 <chr> <list>          
+#> 1 <split [161674/40419]> Fold1 <tibble [4 × 3]>
+#> 2 <split [161674/40419]> Fold2 <tibble [4 × 3]>
+#> 3 <split [161674/40419]> Fold3 <tibble [4 × 3]>
+#> 4 <split [161675/40418]> Fold4 <tibble [4 × 3]>
+#> 5 <split [161675/40418]> Fold5 <tibble [4 × 3]>
 ```
 
 Now we can use `unnest()` to find the metrics we computed.
