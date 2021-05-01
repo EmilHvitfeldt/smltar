@@ -62,7 +62,7 @@ library(tokenizers)
 tokenize_words(the_fir_tree[1:2])
 ```
 
-We see sensible single-word results here; the `tokenize_words()` function uses the **stringi** package [@Gagolewski19] and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm [@ICUWordBoundary] work? It can be outlined as follows:
+We see sensible single-word results here; the `tokenize_words()` function uses the **stringi** package [@Gagolewski19] and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm^[https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries] work? It can be outlined as follows:
 
 - Break at the start and end of text, unless the text is empty.
 
