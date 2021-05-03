@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-29" />
+<meta name="date" content="2021-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -700,7 +700,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <p>Let’s compare a few simple stemming algorithms and see what results we end with. Let’s look at “The Fir-Tree,” specifically the tidied data set from which we have removed stop words. Let’s compare three very straightforward stemming approaches.</p>
 <ul>
 <li><p><strong>Only remove final instances of the letter “s.”</strong> This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let’s see what the impact is.</p></li>
-<li><p><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p></li>
+<li><p><strong>Handle plural endings with slightly more complex rules in the “S” stemmer.</strong> The S-removal stemmer or “S” stemmer of <span class="citation"><a href="#ref-Harman91" role="doc-biblioref">Harman</a> (<a href="#ref-Harman91" role="doc-biblioref">1991</a>)</span> is a simple algorithm with only three rules.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p></li>
 <li><p><strong>Implement actual Porter stemming.</strong> We can now compare to the most commonly used stemming algorithm in English.</p></li>
 </ul>
 <div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="stemming.html#cb103-1" aria-hidden="true" tabindex="-1"></a>stemming <span class="ot">&lt;-</span> tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -782,7 +782,7 @@ Language use is connected to culture and identity. How might the results of stem
 <div id="lemmatization" class="section level2" number="4.6">
 <h2><span class="header-section-number">4.6</span> Lemmatization and stemming</h2>
 <p>When people use the word “stemming” in natural language processing, they typically mean a system like the one we’ve been describing in this chapter, with rules, conditions, heuristics, and lists of word endings. Think of stemming as typically implemented in NLP as <strong>rule-based</strong>, operating on the word by itself. There is another option for normalizing words to a root that takes a different approach. Instead of using rules to cut words down to their stems, lemmatization uses knowledge about a language’s structure to reduce words down to their lemmas, the canonical or dictionary forms of words. Think of lemmatization as typically implemented in NLP as <strong>linguistics-based</strong>, operating on the word in its context.</p>
-<p>Lemmatization requires more information than the rule-based stemmers we’ve discussed so far. We need to know what part of speech a word is to correctly identify its lemma,<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like <a href="https://wordnet.princeton.edu/">WordNet</a> as a way to look up word meanings for a given part-of-speech use <span class="citation">(<a href="#ref-Miller95" role="doc-biblioref">Miller 1995</a>)</span>. Notice that lemmatization involves more linguistic knowledge of a language than stemming.</p>
+<p>Lemmatization requires more information than the rule-based stemmers we’ve discussed so far. We need to know what part of speech a word is to correctly identify its lemma,<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like <a href="https://wordnet.princeton.edu/">WordNet</a> as a way to look up word meanings for a given part-of-speech use <span class="citation">(<a href="#ref-Miller95" role="doc-biblioref">Miller 1995</a>)</span>. Notice that lemmatization involves more linguistic knowledge of a language than stemming.</p>
 <div class="rmdnote">
 <p>
 How does lemmatization work in languages other than English? Lookup dictionaries connecting words, lemmas, and parts of speech for languages other than English have been developed as well.
@@ -905,9 +905,9 @@ Willett, P. 2006. <span>“The Porter Stemming Algorithm: Then and Now.”</span
 </div>
 <div class="footnotes">
 <hr />
-<ol start="6">
-<li id="fn6"><p>This simple, “weak” stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using <code>dplyr::case_when()</code>.<a href="stemming.html#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>Part-of-speech information is also sometimes used directly in machine learning<a href="stemming.html#fnref7" class="footnote-back">↩︎</a></p></li>
+<ol start="7">
+<li id="fn7"><p>This simple, “weak” stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using <code>dplyr::case_when()</code>.<a href="stemming.html#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>Part-of-speech information is also sometimes used directly in machine learning<a href="stemming.html#fnref8" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

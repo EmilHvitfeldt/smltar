@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-29" />
+<meta name="date" content="2021-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1520,7 +1520,7 @@ FIGURE 7.9: Many of the most frequent trigrams feature censored words, but there
 </div>
 <p>There is a difference in these proportions across classes. Tokens like “on xx xx” and “of xx xx” are used when referencing a date, e.g., “we had a problem on 06/25/2018.”
 Remember that the current tokenization engine strips punctuation before tokenizing.
-This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.</p>
+This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
 <p>To crudely simulate what the data might look like before it was censored, we can replace all cases of “XX” and “XXXX” with random integers.
 This isn’t quite right since dates will be given values between <code>00</code> and <code>99</code> and we don’t know for sure that only numerals have been censored, but it gives us a place to start.
 Below is a simple function <code>uncensor_vec()</code> that locates all instances of <code>"XX"</code> and replaces them with a number between 11 and 99.
@@ -2148,8 +2148,8 @@ Vaughan, Davis, and Max Kuhn. 2020. <em>Hardhat: Construct Modeling Packages</em
 </div>
 <div class="footnotes">
 <hr />
-<ol start="10">
-<li id="fn10"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref10" class="footnote-back">↩︎</a></p></li>
+<ol start="11">
+<li id="fn11"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref11" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

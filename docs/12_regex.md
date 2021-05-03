@@ -98,7 +98,7 @@ str_detect(math, "\\+")
 
 If we tried to use the plus sign without escaping it, like `"+"`, we would get an error and this line of code would not run.
 
-The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@theopengroup2018][@levithan2012regular].
+The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@levithan2012regular].
 
 
 Table: (\#tab:metacharacters)All meta characters

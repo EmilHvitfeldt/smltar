@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-29" />
+<meta name="date" content="2021-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -523,7 +523,7 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 #&gt;  [1] &quot;resting&quot; &quot;place&quot;   &quot;grew&quot;    &quot;a&quot;       &quot;pretty&quot;  &quot;little&quot;  &quot;fir&quot;    
 #&gt;  [8] &quot;tree&quot;    &quot;and&quot;     &quot;yet&quot;     &quot;it&quot;      &quot;was&quot;     &quot;not&quot;     &quot;happy&quot;  
 #&gt; [15] &quot;it&quot;</code></pre>
-<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2020</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm <span class="citation">(<a href="#ref-ICUWordBoundary" role="doc-biblioref">https://www.unicode.org/ 2019</a>)</span> work? It can be outlined as follows:</p>
+<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2020</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> work? It can be outlined as follows:</p>
 <ul>
 <li><p>Break at the start and end of text, unless the text is empty.</p></li>
 <li><p>Do not break within CRLF (new line characters).</p></li>
@@ -651,7 +651,7 @@ The <strong>tidytext</strong> package provides functions to transform text to an
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;\U0001f1e8\U0001f1e6&quot; &quot;\U0001f1e6\U0001f1f6&quot; &quot;\U0001f1ea\U0001f1fa&quot;
 #&gt; [4] &quot;\U0001f1ef\U0001f1f5&quot;</code></pre>
-<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
+<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
 </div>
 <div id="word-tokens" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Word tokens</h3>
@@ -1057,9 +1057,6 @@ Gagolewski, Marek. 2020. <em>R Package Stringi: Character String Processing Faci
 <div id="ref-spacy2" class="csl-entry">
 Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2</span>: Natural Language Understanding with <span>B</span>loom Embeddings, Convolutional Neural Networks and Incremental Parsing.”</span>
 </div>
-<div id="ref-ICUWordBoundary" class="csl-entry">
-https://www.unicode.org/. 2019. <span>“Unicode Text Segmentation.”</span> <a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a>.
-</div>
 <div id="ref-Huang2019" class="csl-entry">
 Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2020. <span>“Towards Fast and Accurate Neural <span>C</span>hinese Word Segmentation with Multi-Criteria Learning.”</span> In <em>Proceedings of the 28th International Conference on Computational Linguistics</em>, 2062–2072. Barcelona, Spain (Online): International Committee on Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/2020.coling-main.186">10.18653/v1/2020.coling-main.186</a>.
 </div>
@@ -1088,7 +1085,8 @@ Wenfeng, Qin, and Wu Yanyi. 2019. <em>jiebaR: Chinese Text Segmentation</em>. <a
 <div class="footnotes">
 <hr />
 <ol start="3">
-<li id="fn3"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p><a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries" class="uri">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a><a href="tokenization.html#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-29" />
+<meta name="date" content="2021-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1064,7 +1064,7 @@ Be sure that the preprocess function <em>matches</em> the preprocessing that was
 <span id="cb617-5"><a href="dlcnn.html#cb617-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
 <span id="cb617-6"><a href="dlcnn.html#cb617-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
 <span id="cb617-7"><a href="dlcnn.html#cb617-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
+<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
 <div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
 <span id="cb618-2"><a href="dlcnn.html#cb618-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
 <span id="cb618-3"><a href="dlcnn.html#cb618-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
@@ -1271,12 +1271,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
-#&gt; 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
-#&gt; 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
-#&gt; 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
-#&gt; 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
-#&gt; 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
+#&gt; 1 _tuning/20… 1.00       0.0316           0.993           1.00             0.808
+#&gt; 2 _tuning/20… 1.02       0.036            0.992           1.02             0.804
+#&gt; 3 _tuning/20… 0.971      0.0488           0.987           0.971            0.804
+#&gt; 4 _tuning/20… 0.966      0.0292           0.994           0.966            0.812
+#&gt; 5 _tuning/20… 0.940      0.0313           0.994           0.940            0.810
+#&gt; 6 _tuning/20… 0.958      0.0434           0.989           0.958            0.810
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1291,13 +1291,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.812                 5             1
-#&gt; 2               0.811                 7             1
-#&gt; 3               0.809                 7             2
-#&gt; 4               0.808                 5             2
-#&gt; 5               0.807                 3             1
-#&gt; 6               0.803                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.812                 7             1
+#&gt; 2               0.810                 3             1
+#&gt; 3               0.810                 5             1
+#&gt; 4               0.808                 7             2
+#&gt; 5               0.804                 5             2
+#&gt; 6               0.804                 3             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1557,8 +1557,8 @@ Zhang, Xiang, Junbo Zhao, and Yann LeCun. 2015. <span>“Character-Level Convolu
 </div>
 <div class="footnotes">
 <hr />
-<ol start="16">
-<li id="fn16"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref16" class="footnote-back">↩︎</a></p></li>
+<ol start="17">
+<li id="fn17"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref17" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

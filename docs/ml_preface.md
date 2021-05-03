@@ -2,6 +2,8 @@
 
 # Foreword {#mlforeword .unnumbered}
 
+\thispagestyle{myheadings}
+
 It's time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context, to make predictions from text data. In the next two chapters, we will focus putting into practice such machine learning algorithms as:
 
 - naive Bayes, 
@@ -29,6 +31,8 @@ Rachel Thomas proposed a checklist at [ODSC West 2019](https://opendatascience.c
 
 ## Should we even be doing this? {-}
 
+\thispagestyle{myheadings}
+
 This is always the first step. Machine learning algorithms involve math and data, but that does not mean they are neutral. They can be used for purposes that are helpful, harmful, or even unethical.
 
 ## What bias is already in the data? {-}
@@ -40,6 +44,8 @@ Chapter \@ref(mlregression) uses a data set of United States Supreme Court opini
 In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the data sets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.
 
 ## What are the error rates for sub-groups? {-}
+
+\thispagestyle{myheadings}
 
 In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the **yardstick** package makes this task well within the reach of data practitioners.
 
@@ -57,5 +63,7 @@ Chapter \@ref(mlclassification) shows how to train models to predict the categor
 If models such as those built in Chapter \@ref(mlclassification) were put into production by an organization, what would happen if a complaint was classified incorrectly? We as data practitioners typically (hopefully) have a reasonable estimate of the true positive rate and true negative rate for models we train, so processes to handle misclassifications can be built with a good understanding of how often they will be used.
 
 ## How diverse is the team that built it? {-}
+
+\thispagestyle{myheadings}
 
 The two-person team that wrote this book includes perspectives from a man and woman, and from someone who has always lived inside the United States and someone who is from a European country. However, we are both white with similar educational backgrounds. We must be aware of how the limited life experiences of individuals training and assessing machine learning models can cause unintentional harm.

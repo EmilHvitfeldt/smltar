@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-04-29" />
+<meta name="date" content="2021-05-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -691,7 +691,7 @@ Steps like <code>step_tf()</code> and <code>step_tfidf()</code> are used for app
 What does the function <code>prep()</code> do? Before when we have used recipes, we put them in a <code>workflow()</code> which handles low-level processing. The <code>prep()</code> function will compute or estimate statistics from the training set; the output of <code>prep()</code> is a prepped recipe.
 </p>
 </div>
-<p>Once we have the prepped recipe, we can <code>tidy()</code> it to extract the vocabulary, represented in the <code>vocabulary</code> and <code>token</code> columns<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
+<p>Once we have the prepped recipe, we can <code>tidy()</code> it to extract the vocabulary, represented in the <code>vocabulary</code> and <code>token</code> columns<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>.</p>
 <div class="sourceCode" id="cb436"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb436-1"><a href="dldnn.html#cb436-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prep</span>(small_spec) <span class="sc">%&gt;%</span></span>
 <span id="cb436-2"><a href="dldnn.html#cb436-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">2</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 14 x 4
@@ -804,15 +804,15 @@ When we <code>bake()</code> a prepped recipe, we apply the preprocessing to a da
 <li><p>Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.</p></li>
 </ul>
 <p>We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an <em>optimizer</em> and a <em>loss function</em> to be able to compile.</p>
-<p>When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network’s weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>; you can even create custom optimizers if what you need isn’t on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.</p>
+<p>When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network’s weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>; you can even create custom optimizers if what you need isn’t on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.</p>
 <div class="rmdnote">
 <p>
 An optimizer can either be set with the name of the optimizer as a character or by supplying the function <code>optimizer_foo()</code> where <code>foo</code> is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
 </p>
 </div>
-<p>During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are.
+<p>During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are.
 Since we are working on a binary classification task and the final layer of the network returns a probability, binary cross-entropy is an appropriate loss function. Binary cross-entropy does well at dealing with probabilities because it measures the “distance” between probability distributions. In our case, this would be the ground-truth distribution and the predictions.</p>
-<p>We can also add any number of metrics<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics’ only job is to report back a single number that will inform you how well the model is performing. We will select accuracy as a reported metric for now.</p>
+<p>We can also add any number of metrics<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics’ only job is to report back a single number that will inform you how well the model is performing. We will select accuracy as a reported metric for now.</p>
 <p>Let’s set these 3 options (<code>optimizer</code>, <code>loss</code>, and <code>metrics</code>) using the <code>compile()</code> function:</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="dldnn.html#cb448-1" aria-hidden="true" tabindex="-1"></a>dense_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
 <span id="cb448-2"><a href="dldnn.html#cb448-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
@@ -1494,11 +1494,11 @@ Ushey, Kevin, JJ Allaire, and Yuan Tang. 2021. <em>Reticulate: Interface to ’P
 </div>
 <div class="footnotes">
 <hr />
-<ol start="11">
-<li id="fn11"><p>The <code>terms</code> column refers to the column we have applied <code>step_sequence_onehot()</code> to and <code>id</code> is its unique identifier. Note that <strong>textrecipes</strong> allows <code>step_sequence_onehot()</code> to be applied to multiple text variables independently and they will have their own vocabularies.<a href="dldnn.html#fnref11" class="footnote-back">↩︎</a></p></li>
-<li id="fn12"><p><a href="https://keras.io/api/optimizers/" class="uri">https://keras.io/api/optimizers/</a><a href="dldnn.html#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p><a href="https://keras.io/api/losses/" class="uri">https://keras.io/api/losses/</a><a href="dldnn.html#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p><a href="https://keras.io/api/metrics/" class="uri">https://keras.io/api/metrics/</a><a href="dldnn.html#fnref14" class="footnote-back">↩︎</a></p></li>
+<ol start="12">
+<li id="fn12"><p>The <code>terms</code> column refers to the column we have applied <code>step_sequence_onehot()</code> to and <code>id</code> is its unique identifier. Note that <strong>textrecipes</strong> allows <code>step_sequence_onehot()</code> to be applied to multiple text variables independently and they will have their own vocabularies.<a href="dldnn.html#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p><a href="https://keras.io/api/optimizers/" class="uri">https://keras.io/api/optimizers/</a><a href="dldnn.html#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p><a href="https://keras.io/api/losses/" class="uri">https://keras.io/api/losses/</a><a href="dldnn.html#fnref14" class="footnote-back">↩︎</a></p></li>
+<li id="fn15"><p><a href="https://keras.io/api/metrics/" class="uri">https://keras.io/api/metrics/</a><a href="dldnn.html#fnref15" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
