@@ -362,7 +362,7 @@ conf_mat_resampled(lasso_rs, tidy = FALSE) %>%
 
 ## Tuning lasso hyperparameters {#tunelasso}
 
-The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
+\index{models!tuning}The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
 ```{r complaintstunespec}
 tune_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
