@@ -5,7 +5,7 @@ library(keras)
 tensorflow::tf$random$set_seed(1234)
 ``` 
 
-In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs) [@Hochreiter1997].
+In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures\index{network architecture} that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks\index{neural network!long short-term memory} (LSTMs) [@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
 
@@ -28,7 +28,7 @@ kickstarter_train <- training(kickstarter_split)
 kickstarter_test <- testing(kickstarter_split)
 ```
 
-Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlregression) and \@ref(mlclassification). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter to keep only how many words we'll include in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this data set.
+Just as described in Chapter \@ref(dldnn), the \index{preprocessing}preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlregression) and \@ref(mlclassification). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter to keep only how many words we'll include in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this data set.
 
 ```{r}
 library(textrecipes)
@@ -67,10 +67,11 @@ Here we use `composition = "matrix"` because the Keras modeling functions operat
 
 ### Building an LSTM
 
-An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
+An LSTM\index{neural network!long short-term memory} is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine \index{translation}translation, and similar problems.
 
 Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, $A$, operates on some of the input and outputs a value. During this process, some information is held inside $A$ to make the network "remember" this updated network. Network $A$ is then applied to the next input where it predicts new output and its memory is updated.
 
+\index{neural network!recurrent}
 ```{r rnndiag, echo= FALSE, fig.cap="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.", out.width="90%"}
 knitr::include_graphics("diagram-files/rnn-architecture.png")
 ```
@@ -131,7 +132,7 @@ lstm_history <- lstm_mod %>%
 lstm_history
 ```
 
-The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
+The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting\index{overfitting} pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
 
 ```{r firstlstmhistory, fig.cap="Training and validation metrics for LSTM"}
 plot(lstm_history)
@@ -172,9 +173,9 @@ state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
 state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 ```
 
-Let's also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
+Let's also think about our LSTM model architecture. We saw evidence for significant overfitting\index{overfitting} with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
 
-```{block, type = "rmdwarning"}
+```{block2, type = "rmdwarning"}
 When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting [@Srivastava2014]. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with `layer_dropout()`.
 ```
 
@@ -204,7 +205,7 @@ val_history <- lstm_mod %>%
 val_history
 ```
 
-The overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
+The \index{overfitting}overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
 
 ```{r lstmvalhistory, fig.cap="Training and validation metrics for LSTM with dropout"}
 plot(val_history)
@@ -239,7 +240,7 @@ val_res %>%
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network $A$ in Figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically just a single `tanh()` layer, much simpler than what happens in LSTMs.
+\index{neural network!recurrent}An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network $A$ in Figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically just a single `tanh()` layer, much simpler than what happens in LSTMs.
 
 ```{block, type = "rmdwarning"}
 Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context. 
@@ -273,7 +274,7 @@ rnn_history <- rnn_mod %>%
 rnn_history
 ```
 
-Looks like more overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
+Looks like more \index{overfitting}overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
 
 ```{r rnnhistory, fig.cap="Training and validation metrics for RNN"}
 plot(rnn_history)
@@ -285,7 +286,7 @@ Fortunately, we can build on the ideas of a simple RNN with more complex archite
 
 ## Case study: bidirectional LSTM {#bilstm}
 
-The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward _only_. In language, the structures move both directions, though; the words that come _after_ a given structure or word can be just as important for understanding it as the ones that come before it.
+The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward _only_. In language, the \index{language!structures}structures move both directions, though; the words that come _after_ a given structure or word can be just as important for understanding it as the ones that come before it.
 
 We can build this into our neural network architecture with a **bidirectional** wrapper for RNNs or LSTMs. 
 
@@ -380,7 +381,7 @@ We can gradually improve a model by changing and adding to its architecture.
 
 ## Case study: padding {#lstmpadding}
 
-One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
+\index{preprocessing!impact}One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
 
 Either way, the sequences that are too long must be truncated and the sequences that are too short must be padded, typically with zeroes. This does literally mean that words or tokens are thrown away for the long documents and zeroes are added to the shorter documents, with the goal of creating a rectangular matrix that can be used for computation. 
 
@@ -388,7 +389,7 @@ Either way, the sequences that are too long must be truncated and the sequences 
 It is possible to set up an LSTM network that works with sequences of varied length; this can sometimes improve performance but takes more work to set up and is outside the scope of this book.
 ```
 
-The default in textrecipes, as well as most deep learning for text, is `padding = "pre"`, where zeroes are added at the beginning, and `truncating = "pre"`, where values at the beginning are removed. What happens if we change one of these defaults?
+The default in textrecipes, as well as most deep learning for text, is `padding = "pre"`, where zeroes are added at the beginning, and `truncating = "pre"`, where values at the beginning are removed. \index{preprocessing!impact}What happens if we change one of these defaults?
 
 ```{r}
 padding_rec <- recipe(~ blurb, data = kickstarter_train) %>%
@@ -548,7 +549,7 @@ The main problem with this regression model is that there isn't that much data t
 
 ## Case study: vocabulary size
 
-In this chapter so far, we've worked with a vocabulary of 20,000 words or tokens. This is a _hyperparameter_ of the model, and could be tuned, as we show in detail in Section \@ref(keras-hyperparameter). Instead of tuning in this chapter, let's try a smaller value, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
+In this chapter so far, we've worked with a vocabulary of 20,000 words or tokens. This is a _hyperparameter_ of the model, and could be tuned, as we show in detail in Section \@ref(keras-hyperparameter). Instead of tuning in this chapter, let's try a smaller value, corresponding to faster \index{preprocessing}preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
 
 ```{r}
 max_words <- 1e4
@@ -613,7 +614,7 @@ We've come a long way in this chapter, even though we've focused on a very speci
 
 ### Preprocess the data {#lstmfullpreprocess}
 
-We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
+\index{preprocessing}We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
 
 ```{r}
 max_words <- 2e4
@@ -695,7 +696,7 @@ final_res %>%
   autoplot()
 ```
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
+We have been able to incrementally improve our model by adding to the structure and making good choices about \index{preprocessing}preprocessing. We can visualize this final LSTM model's performance using a \index{matrix!confusion}confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
 
 ```{r lstmheatmap, fig.cap="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success"}
 final_res %>%
@@ -709,19 +710,19 @@ Notice that this final model still does not perform as well as any of the best m
 For this data set of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give a great result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.
 ```
 
-For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
+For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more \index{computational speed}time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
 
 ## Summary {#dllstmsummary}
 
-LSTMs are a specific kind of recurrent neural network that are capable of learning long-range dependencies and broader context. They are often an excellent choice for building supervised models for text because of this ability to model sequences and structures within text like word dependencies. Text must be heavily preprocessed for LSTMs in much the same way it needs to be preprocessed for dense neural networks, with tokenization and one-hot encoding of sequences. A major characteristic of LSTMs, like other deep learning architectures, is their tendency to memorize the features of training data; we can use strategies like dropout and ensuring that the batch size is large enough to reduce overfitting.
+LSTMs are a specific kind of recurrent neural network that are capable of learning long-range dependencies and broader context. They are often an excellent choice for building supervised models for text because of this ability to model sequences and structures within text like word dependencies. Text must be heavily preprocessed\index{preprocessing} for LSTMs in much the same way it needs to be preprocessed for dense neural networks, with tokenization and one-hot encoding of sequences. A major characteristic of LSTMs, like other deep learning architectures, is their tendency to memorize the features of training data; we can use strategies like dropout and ensuring that the batch size is large enough to reduce overfitting.
 
 ### In this chapter, you learned:
 
-- how to preprocess text data for LSTM models
+- how to preprocess text data for LSTM models\index{preprocessing}
 
 - about RNN, LSTM, and bidirectional LSTM network architectures
 
-- how to use dropout to reduce overfitting for deep learning models
+- how to use dropout to reduce overfitting\index{overfitting} for deep learning models
 
 - that network layers (including RNNs and LSTMs) can be stacked for greater model capacity
 
