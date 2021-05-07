@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -692,6 +692,9 @@ Using a <code>workflow()</code> isn’t required (you can fit or tune a model pl
 #&gt; 1 accuracy binary     0.806    10 0.00184  Preprocessor1_Model1
 #&gt; 2 roc_auc  binary     0.878    10 0.000715 Preprocessor1_Model1</code></pre>
 <p>The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.6%.</p>
+
+
+
 <div class="rmdnote">
 <p>
 Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.
@@ -714,7 +717,7 @@ ROC AUC measures how well a classifier performs at different thresholds. The ROC
 <span id="cb287-8"><a href="mlclassification.html#cb287-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each resample fold is shown in a different color&quot;</span></span>
 <span id="cb287-9"><a href="mlclassification.html#cb287-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstroccurve"></span>
-<img src="07_ml_classification_files/figure-html/firstroccurve-1.png" alt="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
+<img src="07_ml_classification_files/figure-html/firstroccurve-1.svg" alt="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">
 FIGURE 7.1: ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints
 </p>
@@ -725,7 +728,7 @@ The function <code>conf_mat_resampled()</code> computes a separate confusion mat
 <div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="mlclassification.html#cb288-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb288-2"><a href="mlclassification.html#cb288-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstheatmap"></span>
-<img src="07_ml_classification_files/figure-html/firstheatmap-1.png" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
+<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
 <p class="caption">
 FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias towards predicting ‘Credit’
 </p>
@@ -736,6 +739,7 @@ FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias towar
 One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.
 </p>
 </div>
+<p></p>
 <p>This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more “Other” complaints are correctly identified than “Credit” complaints, either for consumers or for policymakers?</p>
 </div>
 </div>
@@ -827,7 +831,7 @@ Figure <a href="mlclassification.html#fig:lassoroccurve">7.3</a> shows the ROC c
 <span id="cb300-8"><a href="mlclassification.html#cb300-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each resample fold is shown in a different color&quot;</span></span>
 <span id="cb300-9"><a href="mlclassification.html#cb300-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lassoroccurve"></span>
-<img src="07_ml_classification_files/figure-html/lassoroccurve-1.png" alt="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
+<img src="07_ml_classification_files/figure-html/lassoroccurve-1.svg" alt="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">
 FIGURE 7.3: ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints
 </p>
@@ -837,7 +841,7 @@ Our lasso model is better at separating the classes than the naive Bayes model i
 <div class="sourceCode" id="cb301"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb301-1"><a href="mlclassification.html#cb301-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(lasso_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb301-2"><a href="mlclassification.html#cb301-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lassoheatmap"></span>
-<img src="07_ml_classification_files/figure-html/lassoheatmap-1.png" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
+<img src="07_ml_classification_files/figure-html/lassoheatmap-1.svg" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
 <p class="caption">
 FIGURE 7.4: Confusion matrix for a lasso regularized classifier, with more symmetric results
 </p>
@@ -922,6 +926,7 @@ In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</s
 Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.
 </p>
 </div>
+<p></p>
 <p>Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.</p>
 <div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="mlclassification.html#cb308-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(tune_rs)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 60 x 7
@@ -945,7 +950,7 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <span id="cb310-4"><a href="mlclassification.html#cb310-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance metrics can be used to identity the best penalty&quot;</span></span>
 <span id="cb310-5"><a href="mlclassification.html#cb310-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintstunevis"></span>
-<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
+<img src="07_ml_classification_files/figure-html/complaintstunevis-1.svg" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
 <p class="caption">
 FIGURE 7.5: We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty.
 </p>
@@ -1314,7 +1319,7 @@ In binary classification, there is one right answer and one wrong answer; in thi
 <span id="cb344-7"><a href="mlclassification.html#cb344-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
 <span id="cb344-8"><a href="mlclassification.html#cb344-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:multiheatmap"></span>
-<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
+<img src="07_ml_classification_files/figure-html/multiheatmap-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
 <p class="caption">
 FIGURE 7.6: Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal
 </p>
@@ -1333,7 +1338,7 @@ A trick to deal with this problem is to remove all the correctly predicted obser
 <span id="cb345-8"><a href="mlclassification.html#cb345-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
 <span id="cb345-9"><a href="mlclassification.html#cb345-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:multiheatmapminusdiag"></span>
-<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
+<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
 <p class="caption">
 FIGURE 7.7: Confusion matrix for multiclass lasso regularized classifier without diagonal
 </p>
@@ -1376,7 +1381,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <span id="cb347-2"><a href="mlclassification.html#cb347-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_date</span>(date_received, <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;month&quot;</span>, <span class="st">&quot;dow&quot;</span>), <span class="at">role =</span> <span class="st">&quot;dates&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb347-3"><a href="mlclassification.html#cb347-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(date_received) <span class="sc">%&gt;%</span></span>
 <span id="cb347-4"><a href="mlclassification.html#cb347-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">has_role</span>(<span class="st">&quot;dates&quot;</span>))</span></code></pre></div>
-<p>The <code>tags</code> variable has some missing data. We can deal with this by using <code>step_unknown()</code>, which adds a new level to this factor variable for cases of missing data. Then we “dummify” (create dummy/indicator variables) the variable with <code>step_dummy()</code></p>
+<p>The <code>tags</code> variable has some missing data. We can deal with this by using <code>step_unknown()</code>, which adds a new level to this factor variable for cases of missing data. Then we “dummify” (create dummy/indicator variables) the variable with <code>step_dummy()</code>.</p>
 <div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="mlclassification.html#cb348-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
 <span id="cb348-2"><a href="mlclassification.html#cb348-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_unknown</span>(tags) <span class="sc">%&gt;%</span></span>
 <span id="cb348-3"><a href="mlclassification.html#cb348-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(tags)</span></code></pre></div>
@@ -1483,7 +1488,7 @@ This data censoring can be viewed as data <em>annotation</em>; specific account 
 <span id="cb357-13"><a href="mlclassification.html#cb357-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb357-14"><a href="mlclassification.html#cb357-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:censoredtrigram"></span>
-<img src="07_ml_classification_files/figure-html/censoredtrigram-1.png" alt="Many of the most frequent trigrams feature censored information" width="672" />
+<img src="07_ml_classification_files/figure-html/censoredtrigram-1.svg" alt="Many of the most frequent trigrams feature censored information" width="672" />
 <p class="caption">
 FIGURE 7.8: Many of the most frequent trigrams feature censored information
 </p>
@@ -1513,14 +1518,14 @@ and plot the proportions for “Credit” and “Other.”</p>
 <span id="cb358-18"><a href="mlclassification.html#cb358-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, trigrams, <span class="at">fill =</span> product)) <span class="sc">+</span></span>
 <span id="cb358-19"><a href="mlclassification.html#cb358-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;fill&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:trigram25"></span>
-<img src="07_ml_classification_files/figure-html/trigram25-1.png" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
+<img src="07_ml_classification_files/figure-html/trigram25-1.svg" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
 <p class="caption">
 FIGURE 7.9: Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class
 </p>
 </div>
 <p>There is a difference in these proportions across classes. Tokens like “on xx xx” and “of xx xx” are used when referencing a date, e.g., “we had a problem on 06/25/2018.”
 Remember that the current tokenization engine strips punctuation before tokenizing.
-This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
+This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.</p>
 <p>To crudely simulate what the data might look like before it was censored, we can replace all cases of “XX” and “XXXX” with random integers.
 This isn’t quite right since dates will be given values between <code>00</code> and <code>99</code> and we don’t know for sure that only numerals have been censored, but it gives us a place to start.
 Below is a simple function <code>uncensor_vec()</code> that locates all instances of <code>"XX"</code> and replaces them with a number between 11 and 99.
@@ -1555,7 +1560,7 @@ We don’t need to handle the special case of <code>XXXX</code> as it automatica
 <span id="cb362-11"><a href="mlclassification.html#cb362-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb362-12"><a href="mlclassification.html#cb362-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:uncensoredtrigram"></span>
-<img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.png" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
+<img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.svg" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
 <p class="caption">
 FIGURE 7.10: Trigrams without numbers float to the top as the uncensored tokens are too spread out
 </p>
@@ -1629,6 +1634,7 @@ They can also be more engineered such as the percentage of capitalization, wheth
 <p>A credit card number is represented as four groups of four capital Xs in this data set.
 Since the data is fairly well processed we are fairly sure that spacing will not be an issue and all credit cards will be represented as “XXXX XXXX XXXX XXXX.”
 A first naive attempt may be to use <code>str_detect()</code> with “XXXX XXXX XXXX XXXX” to find all the credit cards.</p>
+
 <div class="rmdnote">
 <p>
 It is a good idea to create a small example regular expression where you know the answer, and then prototype your function before moving to the main data set.
@@ -1680,6 +1686,7 @@ We can extract the presence of a credit card with <code>str_detect()</code> and 
 There are often many ways to get to the same solution when working with regular expressions.
 </p>
 </div>
+<p></p>
 <p>Let’s attack this problem by counting the number of X’s in each string, then count the number of alphanumeric characters and divide the two to get a percentage.</p>
 <div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="mlclassification.html#cb375-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;X&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 32 16  4 20</code></pre>
@@ -1910,7 +1917,7 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb404-5"><a href="mlclassification.html#cb404-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
 <span id="cb404-6"><a href="mlclassification.html#cb404-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintsfinaltunevis"></span>
-<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
+<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.svg" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
 <p class="caption">
 FIGURE 7.11: Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty.
 </p>
@@ -1970,7 +1977,7 @@ Notice that this is the first time we have used our testing data during this ent
 <span id="cb411-2"><a href="mlclassification.html#cb411-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> product, <span class="at">estimate =</span> .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb411-3"><a href="mlclassification.html#cb411-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:finalheatmap"></span>
-<img src="07_ml_classification_files/figure-html/finalheatmap-1.png" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
+<img src="07_ml_classification_files/figure-html/finalheatmap-1.svg" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
 FIGURE 7.12: Confusion matrix on the test set for final lasso regularized classifier
 </p>
@@ -1985,7 +1992,7 @@ FIGURE 7.12: Confusion matrix on the test set for final lasso regularized classi
 <span id="cb412-7"><a href="mlclassification.html#cb412-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;With final tuned lasso regularized classifier on the test set&quot;</span></span>
 <span id="cb412-8"><a href="mlclassification.html#cb412-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:finalroccurve"></span>
-<img src="07_ml_classification_files/figure-html/finalroccurve-1.png" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
+<img src="07_ml_classification_files/figure-html/finalroccurve-1.svg" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
 FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 </p>
@@ -2020,7 +2027,7 @@ FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 <span id="cb413-27"><a href="mlclassification.html#cb413-27" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;whether a complaint is about credit or not&quot;</span>)</span>
 <span id="cb413-28"><a href="mlclassification.html#cb413-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:complaintsvip"></span>
-<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
+<img src="07_ml_classification_files/figure-html/complaintsvip-1.svg" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
 <p class="caption">
 FIGURE 7.14: Some words increase a CFPB complaint’s probability of being about credit reporting while some decrease that probability
 </p>
@@ -2119,10 +2126,10 @@ Fredrikson, Matthew, Eric Lantz, Somesh Jha, Simon Lin, David Page, and Thomas R
 Fredrikson, Matt, Somesh Jha, and Thomas Ristenpart. 2015. <span>“Model Inversion Attacks That Exploit Confidence Information and Basic Countermeasures.”</span> In, 1322–1333. CCS ’15. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/2810103.2813677">10.1145/2810103.2813677</a>.
 </div>
 <div id="ref-R-themis" class="csl-entry">
-Hvitfeldt, Emil. 2020d. <em>Themis: Extra Recipes Steps for Dealing with Unbalanced Data</em>. <a href="https://CRAN.R-project.org/package=themis">https://CRAN.R-project.org/package=themis</a>.
+Hvitfeldt, Emil. 2020d. <em><span class="nocase">themis</span>: Extra Recipes Steps for Dealing with Unbalanced Data</em>. <a href="https://CRAN.R-project.org/package=themis">https://CRAN.R-project.org/package=themis</a>.
 </div>
 <div id="ref-R-textfeatures" class="csl-entry">
-Kearney, Michael W. 2019. <em>Textfeatures: Extracts Features from Text</em>. <a href="https://CRAN.R-project.org/package=textfeatures">https://CRAN.R-project.org/package=textfeatures</a>.
+Kearney, Michael W. 2019. <em><span class="nocase">textfeatures</span>: Extracts Features from Text</em>. <a href="https://CRAN.R-project.org/package=textfeatures">https://CRAN.R-project.org/package=textfeatures</a>.
 </div>
 <div id="ref-Kibriya2005" class="csl-entry">
 Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. <span>“Multinomial Naive Bayes for Text Categorization Revisited.”</span> In <em>AI 2004: Advances in Artificial Intelligence</em>, edited by Geoffrey I. Webb and Xinghuo Yu, 488–499. Berlin, Heidelberg: Springer Berlin Heidelberg. doi:<a href="https://doi.org/10.1007/978-3-540-30549-1_43">10.1007/978-3-540-30549-1_43</a>.
@@ -2131,10 +2138,10 @@ Kibriya, Ashraf M., Eibe Frank, Bernhard Pfahringer, and Geoffrey Holmes. 2005. 
 Kim, Sang-Bum, Kyoung-Soo Han, Hae-Chang Rim, and Sung Hyon Myaeng. 2006. <span>“Some Effective Techniques for Naive Bayes Text Classification.”</span> <em>IEEE Transactions on Knowledge and Data Engineering</em> 18 (11): 1457–1466. doi:<a href="https://doi.org/10.1109/TKDE.2006.180">10.1109/TKDE.2006.180</a>.
 </div>
 <div id="ref-R-dials" class="csl-entry">
-Kuhn, Max. 2020. <em>Dials: Tools for Creating Tuning Parameter Values</em>. <a href="https://CRAN.R-project.org/package=dials">https://CRAN.R-project.org/package=dials</a>.
+Kuhn, Max. 2020. <em><span class="nocase">dials</span>: Tools for Creating Tuning Parameter Values</em>. <a href="https://CRAN.R-project.org/package=dials">https://CRAN.R-project.org/package=dials</a>.
 </div>
 <div id="ref-R-parsnip" class="csl-entry">
-Kuhn, Max, and Davis Vaughan. 2021b. <em>Parsnip: A Common API to Modeling and Analysis Functions</em>.
+Kuhn, Max, and Davis Vaughan. 2021b. <em><span class="nocase">parsnip</span>: A Common API to Modeling and Analysis Functions</em>.
 </div>
 <div id="ref-Sweeney2000" class="csl-entry">
 Sweeney, Latanya. 2000. <em>Simple Demographics Often Identify People Uniquely</em>. Data Privacy Working Paper 3. Carnegie Mellon University. <a href="https://dataprivacylab.org/projects/identifiability/">https://dataprivacylab.org/projects/identifiability/</a>.
@@ -2143,13 +2150,13 @@ Sweeney, Latanya. 2000. <em>Simple Demographics Often Identify People Uniquely</
 Tibshirani, Robert. 1996. <span>“Regression Shrinkage and Selection via the Lasso.”</span> <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 58 (1). [Royal Statistical Society, Wiley]: 267–288. <a href="http://www.jstor.org/stable/2346178">http://www.jstor.org/stable/2346178</a>.
 </div>
 <div id="ref-R-hardhat" class="csl-entry">
-Vaughan, Davis, and Max Kuhn. 2020. <em>Hardhat: Construct Modeling Packages</em>. <a href="https://CRAN.R-project.org/package=hardhat">https://CRAN.R-project.org/package=hardhat</a>.
+Vaughan, Davis, and Max Kuhn. 2020. <em><span class="nocase">hardhat</span>: Construct Modeling Packages</em>. <a href="https://CRAN.R-project.org/package=hardhat">https://CRAN.R-project.org/package=hardhat</a>.
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="11">
-<li id="fn11"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref11" class="footnote-back">↩︎</a></p></li>
+<ol start="10">
+<li id="fn10"><p>The censored trigrams that include “oh” seem mysterious but upon closer examination, they come from censored addresses, with “oh” representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.<a href="mlclassification.html#fnref10" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

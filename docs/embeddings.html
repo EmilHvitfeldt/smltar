@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -479,6 +479,7 @@ You shall know a word by the company it keeps.<br />
 <span id="cb112-11"><a href="embeddings.html#cb112-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
 <span id="cb112-12"><a href="embeddings.html#cb112-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
+
 <div class="rmdwarning">
 <p>
 A <em>sparse matrix</em> is a matrix where most of the elements are zero. When working with text data, we say our data is “sparse” because most documents do not contain most words, resulting in a representation of mostly zeroes. There are special data structures and algorithms for dealing with sparse data that can take advantage of their structure. For example, an array can more efficiently store the locations and values of only the non-zero elements instead of all elements.
@@ -486,8 +487,9 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 </div>
 <p>The data set of consumer complaints used in this book has been filtered to those submitted to the CFPB since 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text).</p>
 <p>Another way to represent our text data is to create a sparse matrix where the elements are weighted, rather than straightforward counts only. The <em>term frequency</em> of a word is how frequently a word occurs in a document, and the <em>inverse document frequency</em> of a word decreases the weight for commonly used words and increases the weight for words that are not used often in a collection of documents. It is typically defined as:</p>
-<p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span></p>
-<p>These two quantities can be combined to calculate a term’s tf-idf (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features.</p>
+<p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span>
+
+These two quantities can be combined to calculate a term’s tf-idf (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features.</p>
 <div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="embeddings.html#cb114-1" aria-hidden="true" tabindex="-1"></a>complaints <span class="sc">%&gt;%</span></span>
 <span id="cb114-2"><a href="embeddings.html#cb114-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
 <span id="cb114-3"><a href="embeddings.html#cb114-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -497,7 +499,9 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 <span id="cb114-7"><a href="embeddings.html#cb114-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, tf_idf)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
 <p>Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in <strong>glmnet</strong> <span class="citation">(<a href="#ref-Friedman2010" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010</a>)</span>. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don’t always solve all the problems that come along with big text data sets.</p>
-<p>As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure <a href="embeddings.html#fig:sparsityram">5.1</a> shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.</p>
+<p>
+
+As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure <a href="embeddings.html#fig:sparsityram">5.1</a> shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.</p>
 <div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="embeddings.html#cb116-1" aria-hidden="true" tabindex="-1"></a>get_dfm <span class="ot">&lt;-</span> <span class="cf">function</span>(frac) {</span>
 <span id="cb116-2"><a href="embeddings.html#cb116-2" aria-hidden="true" tabindex="-1"></a>  complaints <span class="sc">%&gt;%</span></span>
 <span id="cb116-3"><a href="embeddings.html#cb116-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_frac</span>(frac) <span class="sc">%&gt;%</span></span>
@@ -525,7 +529,7 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 <span id="cb116-25"><a href="embeddings.html#cb116-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of unique words in corpus (log scale)&quot;</span>,</span>
 <span id="cb116-26"><a href="embeddings.html#cb116-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:sparsityram"></span>
-<img src="05_word_embeddings_files/figure-html/sparsityram-1.png" alt="Memory requirements and sparsity increase with corpus size" width="672" />
+<img src="05_word_embeddings_files/figure-html/sparsityram-1.svg" alt="Memory requirements and sparsity increase with corpus size" width="672" />
 <p class="caption">
 FIGURE 5.1: Memory requirements and sparsity increase with corpus size
 </p>
@@ -775,7 +779,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <span id="cb133-17"><a href="embeddings.html#cb133-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;the most variation&quot;</span>)</span>
 <span id="cb133-18"><a href="embeddings.html#cb133-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:embeddingpca"></span>
-<img src="05_word_embeddings_files/figure-html/embeddingpca-1.png" alt="Word embeddings for Consumer Finance Protection Bureau complaints" width="768" />
+<img src="05_word_embeddings_files/figure-html/embeddingpca-1.svg" alt="Word embeddings for Consumer Finance Protection Bureau complaints" width="768" />
 <p class="caption">
 FIGURE 5.2: Word embeddings for Consumer Finance Protection Bureau complaints
 </p>
@@ -800,7 +804,10 @@ These hundred features are the word embeddings we learned from the text data its
 </p>
 </div>
 <p>If our word embeddings are of high quality, this translation of the high-dimensional space of words to the lower-dimensional space of the word embeddings allows our modeling based on such an input matrix to take advantage of the semantic meaning captured in the embeddings.</p>
-<p>This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span>, implemented in R in the <strong>text2vec</strong> package <span class="citation">(<a href="#ref-Selivanov2018" role="doc-biblioref">Selivanov, Bickel, and Wang 2020</a>)</span>, word2vec <span class="citation">(<a href="#ref-Mikolov2013" role="doc-biblioref">Mikolov et al. 2013</a>)</span>, and FastText <span class="citation">(<a href="#ref-Bojanowski2016" role="doc-biblioref">Bojanowski et al. 2017</a>)</span>.</p>
+<p>This is a straightforward method for finding and using word embeddings, based on counting and linear algebra. It is valuable both for understanding what word embeddings are and how they work, but also in many real-world applications. This is not the method to reach for if you want to publish an academic NLP paper, but is excellent for many applied purposes. Other methods for determining word embeddings include GloVe <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span>, implemented in R in the <strong>text2vec</strong> package <span class="citation">(<a href="#ref-Selivanov2018" role="doc-biblioref">Selivanov, Bickel, and Wang 2020</a>)</span>, word2vec <span class="citation">(<a href="#ref-Mikolov2013" role="doc-biblioref">Mikolov et al. 2013</a>)</span>, and FastText <span class="citation">(<a href="#ref-Bojanowski2016" role="doc-biblioref">Bojanowski et al. 2017</a>)</span>.
+
+
+</p>
 </div>
 <div id="glove" class="section level2" number="5.4">
 <h2><span class="header-section-number">5.4</span> Use pre-trained word embeddings</h2>
@@ -922,6 +929,7 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt; 10 expenses     0.619
 #&gt; # … with 399,990 more rows</code></pre>
 <p>The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.</p>
+<p></p>
 <div class="rmdnote">
 <p>
 These examples highlight how pre-trained word embeddings can be useful because of the incredibly rich semantic relationships they encode, but also how these vector representations are often less than ideal for specific tasks.
@@ -952,10 +960,13 @@ These examples highlight how pre-trained word embeddings can be useful because o
 <div class="rmdpackage">
 The package <strong>wordsalad</strong> <span class="citation">(<a href="#ref-R-wordsalad" role="doc-biblioref">Hvitfeldt 2020c</a>)</span> provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.
 </div>
+<p>
+</p>
 </div>
 <div id="fairnessembeddings" class="section level2" number="5.5">
 <h2><span class="header-section-number">5.5</span> Fairness and word embeddings</h2>
 <p>Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias.</p>
+
 <div class="rmdwarning">
 <p>
 Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings.
@@ -974,6 +985,8 @@ Embeddings are trained or learned from a large corpus of text data, and whatever
 It’s safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.
 </p>
 </div>
+<p>
+</p>
 <p>When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. <span class="citation"><a href="#ref-Speer2017" role="doc-biblioref">Speer</a> (<a href="#ref-Speer2017" role="doc-biblioref">2017</a>)</span> demonstrated how using pre-trained word embeddings to train a straightforward sentiment analysis model can result in text such as</p>
 <blockquote>
 <p>“Let’s go get Italian food”</p>
@@ -994,6 +1007,7 @@ It’s safe to assume that any large corpus of language will contain latent stru
 You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.
 </p>
 </div>
+<p></p>
 <p>NLP researchers have also proposed methods for debiasing embeddings. <span class="citation"><a href="#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some specific bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals <span class="citation">(<a href="#ref-Lu2018" role="doc-biblioref">Lu et al. 2020</a>)</span>. Recent work <span class="citation">(<a href="#ref-Ethayarajh2019" role="doc-biblioref">Ethayarajh, Duvenaud, and Hirst 2019</a>)</span> has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.</p>
 <p>Other researchers, such as <span class="citation"><a href="#ref-Caliskan2016" role="doc-biblioref">Caliskan, Bryson, and Narayanan</a> (<a href="#ref-Caliskan2016" role="doc-biblioref">2017</a>)</span>, suggest that corrections for fairness should happen at the point of <em>decision</em> or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. <span class="citation"><a href="#ref-Gonen2019" role="doc-biblioref">Gonen and Goldberg</a> (<a href="#ref-Gonen2019" role="doc-biblioref">2019</a>)</span> highlight how pervasive and consistent gender bias is across different word embedding models, <em>even after</em> applying current debiasing methods.</p>
 </div>
@@ -1051,10 +1065,10 @@ Gonen, Hila, and Yoav Goldberg. 2019. <span>“Lipstick on a Pig: <span>D</span>
 Howard, Jeremy, and Sebastian Ruder. 2018. <span>“Universal Language Model Fine-Tuning for Text Classification.”</span> In <em>Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)</em>, 328–339. Melbourne, Australia: Association for Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/P18-1031">10.18653/v1/P18-1031</a>.
 </div>
 <div id="ref-Hvitfeldt2020" class="csl-entry">
-Hvitfeldt, Emil. 2020b. <em>Textdata: Download and Load Various Text Datasets</em>. <a href="https://CRAN.R-project.org/package=textdata">https://CRAN.R-project.org/package=textdata</a>.
+Hvitfeldt, Emil. 2020b. <em><span class="nocase">textdata</span>: Download and Load Various Text Datasets</em>. <a href="https://CRAN.R-project.org/package=textdata">https://CRAN.R-project.org/package=textdata</a>.
 </div>
 <div id="ref-R-wordsalad" class="csl-entry">
-Hvitfeldt, Emil. 2020c. <em>Wordsalad: Provide Tools to Extract and Analyze Word Vectors</em>. <a href="https://CRAN.R-project.org/package=wordsalad">https://CRAN.R-project.org/package=wordsalad</a>.
+Hvitfeldt, Emil. 2020c. <em><span class="nocase">wordsalad</span>: Provide Tools to Extract and Analyze Word Vectors</em>. <a href="https://CRAN.R-project.org/package=wordsalad">https://CRAN.R-project.org/package=wordsalad</a>.
 </div>
 <div id="ref-Le2014" class="csl-entry">
 Le, Quoc, and Tomas Mikolov. 2014. <span>“Distributed Representations of Sentences and Documents.”</span> In <em>Proceedings of the 31st International Conference on Machine Learning</em>, edited by Eric P. Xing and Tony Jebara, 32:1188–1196. Proceedings of Machine Learning Research 2. Bejing, China: PMLR. <a href="http://proceedings.mlr.press/v32/le14.html">http://proceedings.mlr.press/v32/le14.html</a>.
@@ -1078,10 +1092,10 @@ Pennington, Jeffrey, Richard Socher, and Christopher Manning. 2014. <span>“<sp
 Peters, Matthew, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, and Luke Zettlemoyer. 2018. <span>“Deep Contextualized Word Representations.”</span> In <em>Proceedings of the 2018 Conference of the North <span>A</span>merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)</em>, 2227–2237. New Orleans, Louisiana: Association for Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/N18-1202">10.18653/v1/N18-1202</a>.
 </div>
 <div id="ref-R-widyr" class="csl-entry">
-Robinson, David. 2020. <em>Widyr: Widen, Process, Then Re-Tidy Data</em>. <a href="https://CRAN.R-project.org/package=widyr">https://CRAN.R-project.org/package=widyr</a>.
+Robinson, David. 2020. <em><span class="nocase">widyr</span>: Widen, Process, Then Re-Tidy Data</em>. <a href="https://CRAN.R-project.org/package=widyr">https://CRAN.R-project.org/package=widyr</a>.
 </div>
 <div id="ref-Selivanov2018" class="csl-entry">
-Selivanov, Dmitriy, Manuel Bickel, and Qing Wang. 2020. <em>Text2vec: Modern Text Mining Framework for r</em>. <a href="https://CRAN.R-project.org/package=text2vec">https://CRAN.R-project.org/package=text2vec</a>.
+Selivanov, Dmitriy, Manuel Bickel, and Qing Wang. 2020. <em><span class="nocase">text2vec</span>: Modern Text Mining Framework for <span>R</span></em>. <a href="https://CRAN.R-project.org/package=text2vec">https://CRAN.R-project.org/package=text2vec</a>.
 </div>
 <div id="ref-Sheng2019" class="csl-entry">
 Sheng, Emily, Kai-Wei Chang, Premkumar Natarajan, and Nanyun Peng. 2019. <span>“The Woman Worked as a Babysitter: On Biases in Language Generation.”</span> In <em>Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)</em>, 3407–3412. Hong Kong, China: Association for Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/D19-1339">10.18653/v1/D19-1339</a>.
@@ -1090,10 +1104,10 @@ Sheng, Emily, Kai-Wei Chang, Premkumar Natarajan, and Nanyun Peng. 2019. <span>�
 Speer, Robyn. 2017. <span>“How to Make a Racist AI Without Really Trying.”</span> <em>ConceptNet Blog</em>. <a href="http://blog.conceptnet.io/posts/2017/how-to-make-a-racist-ai-without-really-trying/">http://blog.conceptnet.io/posts/2017/how-to-make-a-racist-ai-without-really-trying/</a>.
 </div>
 <div id="ref-Vaughan2020" class="csl-entry">
-Vaughan, Davis. 2021a. <em>Slider: Sliding Window Functions</em>. <a href="https://CRAN.R-project.org/package=slider">https://CRAN.R-project.org/package=slider</a>.
+Vaughan, Davis. 2021a. <em><span class="nocase">slider</span>: Sliding Window Functions</em>. <a href="https://CRAN.R-project.org/package=slider">https://CRAN.R-project.org/package=slider</a>.
 </div>
 <div id="ref-Vaughan2018" class="csl-entry">
-Vaughan, Davis, and Matt Dancho. 2021. <em>Furrr: Apply Mapping Functions in Parallel Using Futures</em>. <a href="https://CRAN.R-project.org/package=furrr">https://CRAN.R-project.org/package=furrr</a>.
+Vaughan, Davis, and Matt Dancho. 2021. <em><span class="nocase">furrr</span>: Apply Mapping Functions in Parallel Using Futures</em>. <a href="https://CRAN.R-project.org/package=furrr">https://CRAN.R-project.org/package=furrr</a>.
 </div>
 <div id="ref-Wagner2016" class="csl-entry">
 Wagner, Claudia, Eduardo Graells-Garrido, David Garcia, and Filippo Menczer. 2016. <span>“Women Through the Glass Ceiling: Gender Asymmetries in Wikipedia.”</span> <em>EPJ Data Science</em> 5 (1). SpringerOpen: 5. doi:<a href="https://doi.org/10.1140/epjds/s13688-016-0066-4">10.1140/epjds/s13688-016-0066-4</a>.

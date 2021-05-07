@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-05-02"
+date: "2021-05-06"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
@@ -35,7 +35,7 @@ This is the [website](https://smltar.com/) for *Supervised Machine Learning for 
 
 Modeling as a statistical practice can encompass a wide variety of activities. This book focuses on *supervised or predictive modeling for text*, using text data to make predictions about the world around us. We use the [tidymodels](https://www.tidymodels.org/) framework for modeling, a consistent and flexible collection of R packages developed to encourage good statistical practice.
 
-Supervised machine learning using text data involves building a statistical model to estimate some output from input that includes language. The two types of models we train in this book are regression and classification. Think of regression models as predicting numeric or continuous outputs, such as predicting the year of a United States Supreme Court opinion from the text of that opinion. Think of classification models as predicting outputs that are discrete quantities or class labels, such as predicting whether a GitHub issue is about documentation or not from the text of the issue. Models like these can be used to make predictions for new observations, to understand what features or characteristics contribute to differences in the output, and more. We can evaluate our models using performance metrics to determine which are best, which are acceptable for our specific context, and even which are fair.
+Supervised machine learning using text data involves building a statistical model to estimate some output from input that includes language. The two types of models we train in this book are regression and classification. Think of \index{regression}regression models as predicting numeric or continuous outputs, such as predicting the year of a United States Supreme Court opinion from the text of that opinion. Think of \index{classification}classification models as predicting outputs that are discrete quantities or class labels, such as predicting whether a GitHub issue is about documentation or not from the text of the issue. Models like these can be used to make predictions for new observations, to understand what features or characteristics contribute to differences in the output, and more. We can evaluate our models using performance metrics to determine which are best, which are acceptable for our specific context, and even which are fair.
 
 <div class="rmdnote">
 <p>Text data is important for many domains, from healthcare to marketing to the digital humanities, but specialized approaches are necessary to create features (predictors) for machine learning from language.</p>
@@ -75,17 +75,17 @@ Throughout the book, we will demonstrate with examples and build models using a 
 
 ## Topics this book will not cover {-}
 
-This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. The [CRAN Task View on Natural Language Processing](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
+This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. \index{CRAN}The [CRAN Task View on Natural Language Processing](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
 
 - **Reading text data into memory:** Text data may come to a data practitioner in any of a long list of heterogeneous formats. Text data exists in PDFs, databases, plain text files (single or multiple for a given project), websites, APIs, literal paper, and more. The skills needed to access and sometimes wrangle text data sets so that they are in memory and ready for analysis are so varied and extensive that we cannot hope to cover them in this book. We point readers to R packages such as **readr** [@R-readr], **pdftools** [@R-pdftools], and **httr** [@R-httr], which we have found helpful in these tasks.
 
-- **Unsupervised machine learning for text:** @Silge2017 provide an introduction to one method of unsupervised text modeling, and Chapter \@ref(embeddings) does dive deep into word embeddings, which learn from the latent structure in text data. However, many more unsupervised machine learning algorithms can be used for the goal of learning about the structure or distribution of text data when there are no outcome or output variables to predict.
+- **Unsupervised machine learning for text:** @Silge2017 provide an introduction to one method of unsupervised text modeling\index{machine learning!unsupervised}, and Chapter \@ref(embeddings) does dive deep into word embeddings, which learn from the latent structure in text data. However, many more unsupervised machine learning algorithms can be used for the goal of learning about the structure or distribution of text data when there are no outcome or output variables to predict.
 
-- **Text generation:** The deep learning model architectures we discuss in Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn) can be used to generate new text, as well as to model existing text. @Chollet2018 provide details on how to use neural network architectures and training data for text generation.
+- **Text generation:** The deep learning model architectures we discuss in Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn) can be used to generate new text\index{text generation}, as well as to model existing text. @Chollet2018 provide details on how to use neural network architectures and training data for text generation.
 
-- **Speech processing:** Models that detect words in audio recordings of speech are typically based on many of the principles outlined in this book, but the training data is _audio_ rather than written text. R users can access pre-trained speech-to-text models via large cloud providers, such as Google Cloud's Speech-to-Text API accessible in R through the **googleLanguageR** package [@R-googleLanguageR].
+- **Speech processing:** Models that detect words in audio recordings of speech\index{speech} are typically based on many of the principles outlined in this book, but the training data is _audio_ rather than written text. R users can access pre-trained speech-to-text models via large cloud providers, such as Google Cloud's Speech-to-Text API accessible in R through the **googleLanguageR** package [@R-googleLanguageR].
 
-- **Machine translation:** Machine translation of text between languages, based on either older statistical methods or newer neural network methods, is a complex, involved topic. Today, the most successful and well-known implementations of machine translation are proprietary, because large tech companies have access to both the right expertise and enough data in multiple languages to train successful models for general machine translation. Google is one such example, and Google Cloud's Translation API is again available in R through the **googleLanguageR** package.
+- **Machine translation:** Machine translation\index{translation} of text between languages, based on either older statistical methods or newer neural network methods, is a complex, involved topic. Today, the most successful and well-known implementations of machine translation are proprietary, because large tech companies have access to both the right expertise and enough data in multiple languages to train successful models for general machine translation. Google is one such example, and Google Cloud's Translation API is again available in R through the **googleLanguageR** package.
 
 ## Who is this book for? {-}
 
@@ -99,7 +99,7 @@ We don't assume an extensive background in text analysis, but [*Text Mining with
 
 We are so thankful for the contributions, help, and perspectives of people who have supported us in this project. There are several we would like to thank in particular.
 
-We would like to thank Max Kuhn and Davis Vaughan for their investment in the **tidymodels** packages, David Robinson for his collaboration on the **tidytext** package, Yihui Xie for his work on **knitr**, **bookdown**, and the R Markdown ecosystem, and Desirée De Leon for the site design for this online work. We would also like to thank Carol Haney, Kasia Kulma, David Mimno, Kanishka Misra, and an additional anonymous technical reviewer for their detailed, insightful feedback that substantively improved this book, as well as our editor John Kimmel for his perspective and guidance during the process of writing and publishing.
+We would like to thank Max Kuhn and Davis Vaughan for their investment in the **tidymodels** packages, David Robinson for his collaboration on the **tidytext** package, and Yihui Xie for his work on **knitr**, **bookdown**, and the R Markdown ecosystem. Thank you to Desirée De Leon for the site design of the online work and to Sarah Lin for the expert creation of the published work's index. We would also like to thank Carol Haney, Kasia Kulma, David Mimno, Kanishka Misra, and an additional anonymous technical reviewer for their detailed, insightful feedback that substantively improved this book, as well as our editor John Kimmel for his perspective and guidance during the process of writing and publishing.
 
 
 
@@ -109,7 +109,7 @@ Note box icons by Smashicons from flaticon.com
 
 ## Colophon {-}
 
-This book was written in [RStudio](http://www.rstudio.com/ide/) using [**bookdown**](http://bookdown.org/). The [website](https://smltar.com/) is hosted via [GitHub Pages](https://pages.github.com/), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org/) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
+This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdown**](https://bookdown.org). The [website](https://smltar.com) is hosted via [GitHub Pages](https://pages.github.com), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
 This version of the book was built with R version 4.0.5 (2021-03-31) and the following packages:
 
@@ -119,7 +119,7 @@ This version of the book was built with R version 4.0.5 (2021-03-31) and the fol
 |bench          |1.1.1      |CRAN (R 4.0.0)                         |
 |bookdown       |0.22       |CRAN (R 4.0.5)                         |
 |broom          |0.7.6      |CRAN (R 4.0.2)                         |
-|corpus         |0.10.1     |CRAN (R 4.0.0)                         |
+|corpus         |0.10.2     |CRAN (R 4.0.2)                         |
 |dials          |0.0.9      |CRAN (R 4.0.2)                         |
 |discrim        |0.1.1      |CRAN (R 4.0.2)                         |
 |doParallel     |1.0.16     |CRAN (R 4.0.2)                         |
@@ -132,6 +132,7 @@ This version of the book was built with R version 4.0.5 (2021-03-31) and the fol
 |irlba          |2.3.3      |CRAN (R 4.0.0)                         |
 |jiebaR         |0.11       |CRAN (R 4.0.2)                         |
 |jsonlite       |1.7.2      |CRAN (R 4.0.2)                         |
+|kableExtra     |1.3.4      |CRAN (R 4.0.3)                         |
 |keras          |2.4.0      |CRAN (R 4.0.3)                         |
 |klaR           |0.6-15     |CRAN (R 4.0.0)                         |
 |LiblineaR      |2.10-12    |CRAN (R 4.0.2)                         |
@@ -144,11 +145,11 @@ This version of the book was built with R version 4.0.5 (2021-03-31) and the fol
 |ranger         |0.12.1     |CRAN (R 4.0.0)                         |
 |recipes        |0.1.16     |CRAN (R 4.0.2)                         |
 |remotes        |2.3.0      |CRAN (R 4.0.2)                         |
-|reticulate     |1.19       |CRAN (R 4.0.2)                         |
+|reticulate     |1.20       |CRAN (R 4.0.2)                         |
 |rsample        |0.0.9      |CRAN (R 4.0.2)                         |
 |rsparse        |0.4.0      |CRAN (R 4.0.1)                         |
 |scico          |1.2.0      |CRAN (R 4.0.0)                         |
-|scotus         |0.0.0.9001 |Github (EmilHvitfeldt/scotus\@43ca597) |
+|scotus         |1.0.0      |Github (EmilHvitfeldt/scotus\@e5ccdea) |
 |servr          |0.22       |CRAN (R 4.0.3)                         |
 |sessioninfo    |1.1.1      |CRAN (R 4.0.0)                         |
 |slider         |0.2.1      |CRAN (R 4.0.2)                         |

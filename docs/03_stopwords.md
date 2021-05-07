@@ -12,18 +12,18 @@ Historically, one of the main reasons for removing stop words was to decrease th
 
 Stop words can have different roles in a corpus. We generally categorize stop words into three groups: global, subject, and document stop words. 
 
-Global stop words are words that are almost always low in meaning in a given language; these are words such as "of" and "and" in English which are needed to glue text together. These words are likely a safe bet for removal but they are small in number. You can find some global stop words in pre-made stop word lists (Section \@ref(premadestopwords)).
+\index{stop words!global}Global stop words are words that are almost always low in meaning in a given language; these are words such as "of" and "and" in English which are needed to glue text together. These words are likely a safe bet for removal but they are small in number. You can find some global stop words in pre-made stop word lists (Section \@ref(premadestopwords)).
 
-Next up are subject-specific stop words. These words are uninformative for a given subject area. Subjects can be broad like finance and medicine or can be more specific like obituaries, health code violations, and job listings for librarians in Kansas.
+\index{stop words!subject}Next up are subject-specific stop words. These words are uninformative for a given subject area. Subjects can be broad like finance and medicine or can be more specific like obituaries, health code violations, and job listings for librarians in Kansas.
 Words like "bath", "bedroom", and "entryway" are generally not considered stop words in English, but they may not provide much information for differentiating suburban house listings and could be subject stop words for certain analysis. You will likely need to manually construct such a stop word list (Section \@ref(homemadestopwords)). These kinds of stop words may improve your performance if you have the domain expertise to create a good list.
 
-Lastly, we have document level stop words. These words do not provide any or much information for a given document. These are difficult to classify and won't be worth the trouble to identify. Even if you can find document stop words, it is not obvious how to incorporate this kind of information in a regression or classification task.
+\index{stop words!document}Lastly, we have document level stop words. These words do not provide any or much information for a given document. These are difficult to classify and won't be worth the trouble to identify. Even if you can find document stop words, it is not obvious how to incorporate this kind of information in a regression or classification task.
 
 ## Using premade stop word lists {#premadestopwords}
 
-A quick option for using stop words is to get a list that has already been created. This is appealing because it is not difficult, but be aware that not all lists are created equal. @nothman-etal-2018-stop found some alarming results in a study of 52 stop word lists available in open-source software packages. Among some of the more grave issues were misspellings ("fify" instead of "fifty"), the inclusion of clearly informative words such as "computer" and "cry", and internal inconsistencies such as including the word "has" but not the word "does". This is not to say that you should never use a stop word list that has been included in an open-source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn't changed since you used it last, and also to check that it is appropriate for your use case.
+A quick option for using stop words is to get a list that has already been created. This is appealing because it is not difficult, but be aware that not all lists are created equal. @nothman-etal-2018-stop found some alarming results in a study of 52 stop word lists available in open-source software packages. Among some of the more grave issues were misspellings\index{misspellings} ("fify" instead of "fifty"), the inclusion of clearly informative words such as "computer" and "cry", and internal inconsistencies such as including the word "has" but not the word "does". This is not to say that you should never use a stop word list that has been included in an open-source software project. However, you should always inspect and verify the list you are using, both to make sure it hasn't changed since you used it last, and also to check that it is appropriate for your use case.
 
-There is a broad selection of stop word lists available today. For the purpose of this chapter, we will focus on three of the lists of English stop words provided by the **stopwords** package [@R-stopwords]. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. The second is the English Snowball stop word list [@porter2001snowball], and the last is the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection. These stop word lists are all considered general purpose and not domain-specific.
+There is a broad selection of stop word lists available today. For the purpose of this chapter, we will focus on three of the lists of English stop words provided by the **stopwords** package [@R-stopwords]. The first is from the SMART (System for the Mechanical Analysis and Retrieval of Text) Information Retrieval System\index{stop word lists!SMART}, an information retrieval system developed at Cornell University in the 1960s [@Lewis2014]. The second is the \index{stop word lists!Snowball}English Snowball stop word list [@porter2001snowball], and the last is the English list from the [Stopwords ISO](https://github.com/stopwords-iso/stopwords-iso) collection\index{stop word lists!Stopwords ISO}. These stop word lists are all considered general purpose and not domain-specific.
 
 <div class="rmdpackage">
 <p>The <strong>stopwords</strong> package contains a comprehensive collection of stop word lists in one place for ease of use in analysis and other packages.</p>
@@ -47,8 +47,12 @@ length(stopwords(source = "stopwords-iso"))
 
 The lengths of these lists are quite different, with the longest list being over seven times longer than the shortest! Let's examine the overlap of the words that appear in the three lists in an UpSet plot in Figure \@ref(fig:stopwordoverlap). An UpSet plot [@Lex2014] visualizes intersections and aggregates of intersections of sets using a matrix layout, presenting the number of elements as well as summary statistics.
 
+\index{stop word lists!SMART}
+\index{stop word lists!Snowball}
+\index{stop word lists!Stopwords ISO}
+
 <div class="figure" style="text-align: center">
-<img src="03_stopwords_files/figure-html/stopwordoverlap-1.png" alt="Set intersections for three common stop word lists visualized as an UpSet plot" width="672" />
+<img src="03_stopwords_files/figure-html/stopwordoverlap-1.svg" alt="Set intersections for three common stop word lists visualized as an UpSet plot" width="672" />
 <p class="caption">(\#fig:stopwordoverlap)Set intersections for three common stop word lists visualized as an UpSet plot</p>
 </div>
 
@@ -65,6 +69,8 @@ setdiff(stopwords(source = "snowball"),
 #>  [8] "when's"  "why's"   "how's"
 ```
 
+\index{stop word lists!SMART}
+\index{stop word lists!Snowball}
 All these words are contractions. This is *not* because the SMART lexicon doesn't include contractions; if we look, there are almost fifty of them.
 
 
@@ -83,13 +89,13 @@ str_subset(stopwords(source = "smart"), "'")
 #> [43] "wouldn't"  "you'd"     "you'll"    "you're"    "you've"
 ```
 
-We seem to have stumbled upon an inconsistency; why does SMART include `"he's"` but not `"she's"`? It is hard to say, but this could be worth rectifying before applying these stop word lists to an analysis or model preprocessing. This stop word list was likely generated by selecting the most frequent words across a large corpus of text that had more representation for text about men than women. This is once again a reminder that we should always look carefully at any pre-made word list or another artifact we use to make sure it works well with our needs^[This advice applies to any kind of pre-made lexicon or word list, not just stop words. For instance, the same concerns apply to sentiment lexicons. The NRC sentiment lexicon of @Mohammad13 associates the word "white" with trust and the word "black" with sadness, which could have unintended consequences when analyzing text about racial groups.]. 
+We seem to have stumbled upon an inconsistency; why does \index{stop word lists!SMART}SMART include `"he's"` but not `"she's"`? It is hard to say, but this could be worth rectifying before applying these stop word lists to an analysis or model preprocessing.\index{preprocessing!challenges} This stop word list was likely generated by selecting the most frequent words across a large corpus of text that had more representation for text about men than women. This is once again a reminder that we should always look carefully at any pre-made word list or another artifact we use to make sure it works well with our needs^[This advice applies to any kind of pre-made lexicon or word list, not just stop words. For instance, the same concerns apply to sentiment lexicons. The NRC sentiment lexicon of @Mohammad13 associates the word "white" with trust and the word "black" with sadness, which could have unintended consequences when analyzing text about racial groups.]. 
 
 <div class="rmdwarning">
 <p>It is perfectly acceptable to start with a premade word list and remove or append additional words according to your particular use case.</p>
 </div>
 
-When you select a stop word list, it is important that you consider its size and breadth. Having a small and concise list of words can moderately reduce your token count while not having too great of an influence on your models, assuming that you picked appropriate words. As the size of your stop word list grows, each word added will have a diminishing positive effect with the increasing risk that a meaningful word has been placed on the list by mistake. In Section \@ref(casestudystopwords), we show the effects of different stop word lists on model training.
+\index{preprocessing}When you select a stop word list, it is important that you consider its size and breadth. Having a small and concise list of words can moderately reduce your token count while not having too great of an influence on your models, assuming that you picked appropriate words. As the size of your stop word list grows, each word added will have a diminishing positive effect with the increasing risk that a meaningful word has been placed on the list by mistake. In Section \@ref(casestudystopwords), we show the effects of different stop word lists on model training.
 
 ### Stop word removal in R
 
@@ -109,7 +115,7 @@ tidy_fir_tree <- fir_tree %>%
   unnest_tokens(word, text)
 ```
 
-Let's use the Snowball stop word list as an example. Since the stop words return from this function as a vector, we will use `filter()`.
+\index{stop word lists!Snowball}Let's use the Snowball stop word list as an example. Since the stop words return from this function as a vector, we will use `filter()`.
 
 
 ```r
@@ -293,9 +299,10 @@ Another way to get a stop word list is to create one yourself. Let's explore a f
 </div>
 ```
 
-We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see `"tree"` at 3, `"fir"` at 12 and `"little"` at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a **corpus** of documents, not an individual document. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well. 
+We recognize many of what we would consider stop words in the first column here, with three big exceptions. We see `"tree"` at 3, `"fir"` at 12 and `"little"` at 22. These words appear high on our list but they do provide valuable information as they all reference the main character. \index{preprocessing!challenges}What went wrong with this approach? Creating a stop word list using high-frequency words works best when it is created on a **corpus** of documents\index{corpus}, not an individual document. This is because the words found in a single document will be document specific and the overall pattern of words will not generalize that well. 
 
 \BeginKnitrBlock{rmdnote}<div class="rmdnote">In NLP, a corpus is a set of texts or documents. The set of Hans Christian Andersen's fairy tales can be considered a corpus, with each fairy tale a document within that corpus. The set of United States Supreme Court opinions can be considered a different corpus, with each written opinion being a document within *that* corpus. Both data sets are described in more detail in Appendix \@ref(appendixdata).</div>\EndKnitrBlock{rmdnote}
+\index{corpus!definition}
 
 The word `"tree"` does seem important as it is about the main character, but it could also be appearing so often that it stops providing any information. Let's try a different approach, extracting high-frequency words from the corpus of *all* English fairy tales by H.C. Andersen.
 
@@ -430,7 +437,7 @@ The word `"tree"` does seem important as it is about the main character, but it 
 
 This list is more appropriate for our concept of stop words, and now it is time for us to make some choices. How many do we want to include in our stop word list? Which words should we add and/or remove based on prior information? Selecting the number of words to remove is best done by a case-by-case basis as it can be difficult to determine a priori how many different "meaningless" words appear in a corpus. Our suggestion is to start with a low number like twenty and increase by ten words until you get to words that are not appropriate as stop words for your analytical purpose. 
 
-It is worth keeping in mind that such a list is not perfect. Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased. In our example here, all the fairy tales were written by the same European white man from the early 1800s. 
+It is worth keeping in mind that such a list is not perfect.\index{preprocessing!challenges} Depending on how your text was generated or processed, strange tokens can surface as possible stop words due to encoding or optical character recognition errors. Further, these results are based on the corpus of documents we have available, which is potentially biased. In our example here, all the fairy tales were written by the same European white man from the early 1800s. 
 
 <div class="rmdnote">
 <p>This bias can be minimized by removing words we would expect to be over-represented or to add words we expect to be under-represented.</p>
@@ -438,16 +445,16 @@ It is worth keeping in mind that such a list is not perfect. Depending on how yo
 
 Easy examples are to include the complements to the words in the list if they are not already present. Include "big" if "small" is present, "old" if "young" is present. This example list has words associated with women often listed lower in rank than words associated with men. With `"man"` being at rank 79 but `"woman"` at rank 179, choosing a threshold of 100 would lead to only one of these words being included. Depending on how important you think such nouns are going to be in your texts, consider either adding `"woman"` or deleting `"man"`.^[On the other hand, the more biased stop word list may be helpful when modeling a corpus with gender imbalance, depending on your goal; words like "she" and "her" can identify where women are mentioned.]
 
-Figure \@ref(fig:genderrank) shows how the words associated with men have a higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.
+\index{bias}Figure \@ref(fig:genderrank) shows how the words associated with men have a higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.
 
 <div class="figure" style="text-align: center">
-<img src="03_stopwords_files/figure-html/genderrank-1.png" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="768" />
+<img src="03_stopwords_files/figure-html/genderrank-1.svg" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="768" />
 <p class="caption">(\#fig:genderrank)Tokens ranked according to total occurrences, with rank 1 having the most occurrences</p>
 </div>
 
 Imagine now we would like to create a stop word list that spans multiple different genres, in such a way that the subject-specific stop words don't overlap. For this case, we would like words to be denoted as a stop word only if it is a stop word in all the genres. You could find the words individually in each genre and use the right intersections. However, that approach might take a substantial amount of time.
 
-Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the [*inverse document frequency*](https://www.tidytextmining.com/tfidf.html) (IDF) of each word. The inverse document frequency of a word is a quantity that is low for commonly used words in a collection of documents and high for words not used often in a collection of documents. It is typically defined as
+Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the [*inverse document frequency*](https://www.tidytextmining.com/tfidf.html) (IDF) \index{inverse document frequency}of each word. The inverse document frequency of a word is a quantity that is low for commonly used words in a collection of documents and high for words not used often in a collection of documents. It is typically defined as
 
 $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$
 If the word "dog" appears in 4 out of 100 documents then it would have an `idf("dog") = log(100/4) = 3.22` and if the word "cat" appears in 99 out of 100 documents then it would have an `idf("cat") = log(100/99) = 0.01`. Notice how the idf values goes to zero (as a matter of fact when a term appears in all the documents then the idf of that word is 0 `log(100/100) = log(1) = 0`), the more documents it is contained in.
@@ -609,6 +616,8 @@ Here is the result when we try to create a cross-language list of stop words, by
 <p>This didn’t work very well because there is very little overlap between common words. Instead, let us limit the calculation to only one language and calculate the IDF of each word we can find compared to words that appear in a lot of documents.</p>
 </div>
 
+\index{inverse document frequency}
+
 
 
 
@@ -741,7 +750,7 @@ This time we get better results. The list starts with "a", "the", "and", and "to
 
 ## All stop word lists are context-specific
 
-Context is important in text modeling, so it is important to ensure that the stop word lexicon you use reflects the word space that you are planning on using it in. One common concern to consider is how pronouns bring information to your text. Pronouns are included in many different stop word lists (although inconsistently) but they will often *not* be noise in text data. Similarly, @Bender2021 discuss how a list of about 400 "Dirty, Naughty, Obscene or Otherwise Bad Words" were used to filter and remove text before training a trillion parameter large language model, to protect it from learning offensive language, but the authors point out that in some community contexts, such words are reclaimed or used to describe marginalized identities.
+\index{preprocessing!challenges}Context is important in text modeling, so it is important to ensure that the stop word lexicon you use reflects the word space that you are planning on using it in. One common concern to consider is how pronouns bring information to your text. Pronouns are included in many different stop word lists (although inconsistently) but they will often *not* be noise in text data. Similarly, @Bender2021 discuss how a list of about 400 "Dirty, Naughty, Obscene or Otherwise Bad Words"\index{language!obscene} were used to filter and remove text before training a trillion parameter large language model, to protect it from learning offensive language, but the authors point out that in some community contexts, such words are reclaimed or used to describe marginalized identities.\index{context!importance of}
 
 On the other hand, sometimes you will have to add in words yourself, depending on the domain. If you are working with texts for dessert recipes, certain ingredients (sugar, eggs, water) and actions (whisking, baking, stirring) may be frequent enough to pass your stop word threshold, but you may want to keep them as they may be informative. Throwing away "eggs" as a common word would make it harder or downright impossible to determine if certain recipes are vegan or not while whisking and stirring may be fine to remove as distinguishing between recipes that do and don't require a whisk might not be that big of a deal.
 
@@ -750,29 +759,29 @@ On the other hand, sometimes you will have to add in words yourself, depending o
 We have discussed different ways of finding and removing stop words; now let's see what happens once you do remove them. First, let's explore the impact of the number of words that are included in the list. Figure \@ref(fig:stopwordresults) shows what percentage of words are removed as a function of the number of words in a text. The different colors represent the three different stop word lists we have considered in this chapter.
 
 <div class="figure" style="text-align: center">
-<img src="03_stopwords_files/figure-html/stopwordresults-1.png" alt="Proportion of words removed for different stop word lists and different document lengths" width="672" />
+<img src="03_stopwords_files/figure-html/stopwordresults-1.svg" alt="Proportion of words removed for different stop word lists and different document lengths" width="672" />
 <p class="caption">(\#fig:stopwordresults)Proportion of words removed for different stop word lists and different document lengths</p>
 </div>
 
 We notice, as we would predict, that larger stop word lists remove more words than shorter stop word lists. In this example with fairy tales, over half of the words have been removed, with the largest list removing over 80% of the words. We observe that shorter texts have a lower percentage of stop words. Since we are looking at fairy tales, this could be explained by the fact that a story has to be told regardless of the length of the fairy tale, so shorter texts are going to be denser with more informative words.
 
-Another problem you may face is dealing with misspellings. 
+Another problem you may face is dealing with misspellings.\index{misspellings} 
 
 <div class="rmdwarning">
 <p>Most premade stop word lists assume that all the words are spelled correctly.</p>
 </div>
 
-Handling misspellings when using premade lists can be done by manually adding common misspellings. You could imagine creating all words that are a certain string distance away from the stop words, but we do not recommend this as you would quickly include informative words this way.
+Handling misspellings when using premade lists can be done by manually adding common misspellings.\index{misspellings} You could imagine creating all words that are a certain string distance away from the stop words, but we do not recommend this as you would quickly include informative words this way.
 
-One of the downsides of creating your own stop word lists using frequencies is that you are limited to using words that you have already observed. It could happen that "she'd" is included in your training corpus but the word "he'd" did not reach the threshold. This is a case where you need to look at your words and adjust accordingly. Here the large premade stop word lists can serve as inspiration for missing words.
+\index{preprocessing!challenges}One of the downsides of creating your own stop word lists using frequencies is that you are limited to using words that you have already observed. It could happen that "she'd" is included in your training corpus but the word "he'd" did not reach the threshold. This is a case where you need to look at your words and adjust accordingly. Here the large premade stop word lists can serve as inspiration for missing words.
 
 In Section \@ref(casestudystopwords) we investigate the influence of removing stop words in the context of modeling. Given the right list of words, we see no harm to the model performance, and may even find improvement in due to noise reduction [@Feldman2007].
 
 ## Stop words in languages other than English
 
-So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of "short" and "long" lists we have used so far are specific to English as a language. You should expect different languages to have a different number of "uninformative" words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.
+So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of "short" and "long" lists we have used so far are specific to English as a language. You should expect different languages\index{language!Non-English} to have a different number of "uninformative" words, and for this number to depend on the morphological\index{morphology} richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.
 
-Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are tables showing the use of definite and indefinite articles in German [@germanarticles]. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.
+Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. Below are tables showing the use of [definite and indefinite articles in German](https://deutsch.lingolia.com/en/grammar/nouns-and-articles/articles-noun-markers). Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case which can be used when selecting a list of stop words in German, or any other language where the grammatical case is reflected in the text.
 
 
 ```{=html}
@@ -780,7 +789,7 @@ Different languages have different numbers of words in each class of words. An e
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#spoziskmlw .gt_table {
+#nrraoukxxq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -805,7 +814,7 @@ Different languages have different numbers of words in each class of words. An e
   border-left-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_heading {
+#nrraoukxxq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -817,7 +826,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_title {
+#nrraoukxxq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -827,7 +836,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-width: 0;
 }
 
-#spoziskmlw .gt_subtitle {
+#nrraoukxxq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -837,13 +846,13 @@ Different languages have different numbers of words in each class of words. An e
   border-top-width: 0;
 }
 
-#spoziskmlw .gt_bottom_border {
+#nrraoukxxq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_col_headings {
+#nrraoukxxq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -858,7 +867,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_col_heading {
+#nrraoukxxq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -878,7 +887,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#spoziskmlw .gt_column_spanner_outer {
+#nrraoukxxq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -890,15 +899,15 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 4px;
 }
 
-#spoziskmlw .gt_column_spanner_outer:first-child {
+#nrraoukxxq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#spoziskmlw .gt_column_spanner_outer:last-child {
+#nrraoukxxq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#spoziskmlw .gt_column_spanner {
+#nrraoukxxq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -910,7 +919,7 @@ Different languages have different numbers of words in each class of words. An e
   width: 100%;
 }
 
-#spoziskmlw .gt_group_heading {
+#nrraoukxxq .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -932,7 +941,7 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#spoziskmlw .gt_empty_group_heading {
+#nrraoukxxq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -947,15 +956,15 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#spoziskmlw .gt_from_md > :first-child {
+#nrraoukxxq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#spoziskmlw .gt_from_md > :last-child {
+#nrraoukxxq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#spoziskmlw .gt_row {
+#nrraoukxxq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -974,7 +983,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#spoziskmlw .gt_stub {
+#nrraoukxxq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -986,7 +995,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-left: 12px;
 }
 
-#spoziskmlw .gt_summary_row {
+#nrraoukxxq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -996,7 +1005,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#spoziskmlw .gt_first_summary_row {
+#nrraoukxxq .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1006,7 +1015,7 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_grand_summary_row {
+#nrraoukxxq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1016,7 +1025,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#spoziskmlw .gt_first_grand_summary_row {
+#nrraoukxxq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1026,11 +1035,11 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_striped {
+#nrraoukxxq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#spoziskmlw .gt_table_body {
+#nrraoukxxq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1039,7 +1048,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_footnotes {
+#nrraoukxxq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1053,13 +1062,13 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_footnote {
+#nrraoukxxq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#spoziskmlw .gt_sourcenotes {
+#nrraoukxxq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1073,46 +1082,46 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#spoziskmlw .gt_sourcenote {
+#nrraoukxxq .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#spoziskmlw .gt_left {
+#nrraoukxxq .gt_left {
   text-align: left;
 }
 
-#spoziskmlw .gt_center {
+#nrraoukxxq .gt_center {
   text-align: center;
 }
 
-#spoziskmlw .gt_right {
+#nrraoukxxq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#spoziskmlw .gt_font_normal {
+#nrraoukxxq .gt_font_normal {
   font-weight: normal;
 }
 
-#spoziskmlw .gt_font_bold {
+#nrraoukxxq .gt_font_bold {
   font-weight: bold;
 }
 
-#spoziskmlw .gt_font_italic {
+#nrraoukxxq .gt_font_italic {
   font-style: italic;
 }
 
-#spoziskmlw .gt_super {
+#nrraoukxxq .gt_super {
   font-size: 65%;
 }
 
-#spoziskmlw .gt_footnote_marks {
+#nrraoukxxq .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="spoziskmlw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="nrraoukxxq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="5" class="gt_heading gt_title gt_font_normal" style>German Definite Articles (the)</th>
@@ -1171,7 +1180,7 @@ Different languages have different numbers of words in each class of words. An e
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hzyhzbyagx .gt_table {
+#tocwxhfffq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1196,7 +1205,7 @@ Different languages have different numbers of words in each class of words. An e
   border-left-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_heading {
+#tocwxhfffq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1208,7 +1217,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_title {
+#tocwxhfffq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1218,7 +1227,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-width: 0;
 }
 
-#hzyhzbyagx .gt_subtitle {
+#tocwxhfffq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1228,13 +1237,13 @@ Different languages have different numbers of words in each class of words. An e
   border-top-width: 0;
 }
 
-#hzyhzbyagx .gt_bottom_border {
+#tocwxhfffq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_col_headings {
+#tocwxhfffq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1249,7 +1258,7 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_col_heading {
+#tocwxhfffq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1269,7 +1278,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#hzyhzbyagx .gt_column_spanner_outer {
+#tocwxhfffq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1281,15 +1290,15 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 4px;
 }
 
-#hzyhzbyagx .gt_column_spanner_outer:first-child {
+#tocwxhfffq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hzyhzbyagx .gt_column_spanner_outer:last-child {
+#tocwxhfffq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hzyhzbyagx .gt_column_spanner {
+#tocwxhfffq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1301,7 +1310,7 @@ Different languages have different numbers of words in each class of words. An e
   width: 100%;
 }
 
-#hzyhzbyagx .gt_group_heading {
+#tocwxhfffq .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1323,7 +1332,7 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#hzyhzbyagx .gt_empty_group_heading {
+#tocwxhfffq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1338,15 +1347,15 @@ Different languages have different numbers of words in each class of words. An e
   vertical-align: middle;
 }
 
-#hzyhzbyagx .gt_from_md > :first-child {
+#tocwxhfffq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hzyhzbyagx .gt_from_md > :last-child {
+#tocwxhfffq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hzyhzbyagx .gt_row {
+#tocwxhfffq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1365,7 +1374,7 @@ Different languages have different numbers of words in each class of words. An e
   overflow-x: hidden;
 }
 
-#hzyhzbyagx .gt_stub {
+#tocwxhfffq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1377,7 +1386,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-left: 12px;
 }
 
-#hzyhzbyagx .gt_summary_row {
+#tocwxhfffq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1387,7 +1396,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#hzyhzbyagx .gt_first_summary_row {
+#tocwxhfffq .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1397,7 +1406,7 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_grand_summary_row {
+#tocwxhfffq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1407,7 +1416,7 @@ Different languages have different numbers of words in each class of words. An e
   padding-right: 5px;
 }
 
-#hzyhzbyagx .gt_first_grand_summary_row {
+#tocwxhfffq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1417,11 +1426,11 @@ Different languages have different numbers of words in each class of words. An e
   border-top-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_striped {
+#tocwxhfffq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hzyhzbyagx .gt_table_body {
+#tocwxhfffq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1430,7 +1439,7 @@ Different languages have different numbers of words in each class of words. An e
   border-bottom-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_footnotes {
+#tocwxhfffq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1444,13 +1453,13 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_footnote {
+#tocwxhfffq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hzyhzbyagx .gt_sourcenotes {
+#tocwxhfffq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1464,46 +1473,46 @@ Different languages have different numbers of words in each class of words. An e
   border-right-color: #D3D3D3;
 }
 
-#hzyhzbyagx .gt_sourcenote {
+#tocwxhfffq .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hzyhzbyagx .gt_left {
+#tocwxhfffq .gt_left {
   text-align: left;
 }
 
-#hzyhzbyagx .gt_center {
+#tocwxhfffq .gt_center {
   text-align: center;
 }
 
-#hzyhzbyagx .gt_right {
+#tocwxhfffq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hzyhzbyagx .gt_font_normal {
+#tocwxhfffq .gt_font_normal {
   font-weight: normal;
 }
 
-#hzyhzbyagx .gt_font_bold {
+#tocwxhfffq .gt_font_bold {
   font-weight: bold;
 }
 
-#hzyhzbyagx .gt_font_italic {
+#tocwxhfffq .gt_font_italic {
   font-style: italic;
 }
 
-#hzyhzbyagx .gt_super {
+#tocwxhfffq .gt_super {
   font-size: 65%;
 }
 
-#hzyhzbyagx .gt_footnote_marks {
+#tocwxhfffq .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="hzyhzbyagx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="tocwxhfffq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="4" class="gt_heading gt_title gt_font_normal" style>German Indefinite Articles (a/an)</th>
@@ -1557,7 +1566,7 @@ Building lists of stop words in Chinese has been done both manually and automati
 <p>Chinese text is much more complex than portrayed here. With different systems and billions of users, there is much we won’t be able to touch on here.</p>
 </div>
 
-The main difference from English is the use of logograms instead of letters to convey information. However, Chinese characters should not be confused with Chinese words. The majority of words in modern Chinese are composed of multiple characters. This means that inferring the presence of words is more complicated and the notion of stop words will affect how this segmentation of characters is done.
+\index{language!Non-English}The main difference from English is the use of logograms instead of letters to convey information. However, Chinese characters should not be confused with Chinese words. The majority of words in modern Chinese are composed of multiple characters. This means that inferring the presence of words is more complicated and the notion of stop words will affect how this segmentation of characters is done.
 
 ## Summary {#stopwordssummary}
 

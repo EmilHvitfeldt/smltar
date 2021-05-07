@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -497,7 +497,7 @@ If we want to build a model to predict which court opinions were written in whic
 <span id="cb151-6"><a href="mlregression.html#cb151-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb151-7"><a href="mlregression.html#cb151-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of opinions per decade&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:scotushist"></span>
-<img src="06_ml_regression_files/figure-html/scotushist-1.png" alt="Supreme Court opinions per decade in sample" width="672" />
+<img src="06_ml_regression_files/figure-html/scotushist-1.svg" alt="Supreme Court opinions per decade in sample" width="672" />
 <p class="caption">
 FIGURE 6.1: Supreme Court opinions per decade in sample
 </p>
@@ -505,7 +505,7 @@ FIGURE 6.1: Supreme Court opinions per decade in sample
 <p>This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.</p>
 <div id="firstregression" class="section level3" number="6.1.1">
 <h3><span class="header-section-number">6.1.1</span> Building our first regression model</h3>
-<p>Our first step in building a model is to split our data into training and testing sets. We use functions from <strong>tidymodels</strong> for this; we use <code>initial_split()</code> to set up <em>how</em> to split the data, and then we use the functions <code>training()</code> and <code>testing()</code> to create the data sets we need. Let’s also convert the year to a numeric value since it was originally stored as a character, and remove the <code>'</code> character because of its effect on one of the models<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> we want to try out.</p>
+<p>Our first step in building a model is to split our data into training and testing sets. We use functions from <strong>tidymodels</strong> for this; we use <code>initial_split()</code> to set up <em>how</em> to split the data, and then we use the functions <code>training()</code> and <code>testing()</code> to create the data sets we need. Let’s also convert the year to a numeric value since it was originally stored as a character, and remove the <code>'</code> character because of its effect on one of the models<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a> we want to try out.</p>
 <div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb152-1"><a href="mlregression.html#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb152-2"><a href="mlregression.html#cb152-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb152-3"><a href="mlregression.html#cb152-3" aria-hidden="true" tabindex="-1"></a>scotus_split <span class="ot">&lt;-</span> scotus_filtered <span class="sc">%&gt;%</span></span>
@@ -520,6 +520,8 @@ FIGURE 6.1: Supreme Court opinions per decade in sample
 <div class="rmdpackage">
 The <strong>recipes</strong> package <span class="citation">(<a href="#ref-R-recipes" role="doc-biblioref">Kuhn and Wickham 2021</a>)</span> is part of <strong>tidymodels</strong> and provides functions for data preprocessing and feature engineering. The <strong>textrecipes</strong> package <span class="citation">(<a href="#ref-textrecipes" role="doc-biblioref">Hvitfeldt 2020a</a>)</span> extends <strong>recipes</strong> by providing steps that create features for modeling from text, as we explored in the first five chapters of this book.
 </div>
+<p>
+</p>
 <p>What are the steps in creating this recipe?</p>
 <ul>
 <li><p>First, we must specify in our initial <code>recipe()</code> statement the form of our model (with the formula <code>year ~ text</code>, meaning we will predict the year of each opinion from the text of that opinion) and what our training data is.</p></li>
@@ -701,7 +703,10 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   15.9      10 0.189   Preprocessor1_Model1
 #&gt; 2 rsq     standard    0.892    10 0.00150 Preprocessor1_Model1</code></pre>
-<p>The default performance metrics to be computed for regression models are RMSE (root mean squared error) and <span class="math inline">\(R^2\)</span>. RMSE is a metric that is in the same units as the original data, so in units of <em>years</em>, in our case; the RMSE of this first regression model is 15.9 years.</p>
+<p>The default performance metrics to be computed for regression models are RMSE (root mean squared error) and <span class="math inline">\(R^2\)</span> (coefficient of determination). RMSE is a metric that is in the same units as the original data, so in units of <em>years</em>, in our case; the RMSE of this first regression model is 15.9 years.</p>
+
+
+
 <div class="rmdnote">
 <p>
 RSME and <span class="math inline"><span class="math inline">\(R^2\)</span></span> are performance metrics used for regression models.
@@ -727,7 +732,7 @@ RSME is a measure of the difference between the predicted and observed values; i
 <span id="cb171-11"><a href="mlregression.html#cb171-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each cross-validation fold is shown in a different color&quot;</span></span>
 <span id="cb171-12"><a href="mlregression.html#cb171-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstregpredict"></span>
-<img src="06_ml_regression_files/figure-html/firstregpredict-1.png" alt="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years" width="672" />
+<img src="06_ml_regression_files/figure-html/firstregpredict-1.svg" alt="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years" width="672" />
 <p class="caption">
 FIGURE 6.2: Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years
 </p>
@@ -745,7 +750,7 @@ Hopefully you are convinced that using resampled data sets for measuring perform
 <p>One way to assess a model like this one is to compare its performance to a “null model.”</p>
 
 <div class="rmdnote">
-A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.
+A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.
 </div>
 <p>We can use the same function <code>fit_resamples()</code> and the same preprocessing recipe as before, switching out our SVM model specification for the <code>null_model()</code> specification.</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="mlregression.html#cb172-1" aria-hidden="true" tabindex="-1"></a>null_regression <span class="ot">&lt;-</span> <span class="fu">null_model</span>() <span class="sc">%&gt;%</span></span>
@@ -829,12 +834,12 @@ A null model is a simple, non-informative model that always predicts the largest
 <span id="cb181-11"><a href="mlregression.html#cb181-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each cross-validation fold is shown in a different color&quot;</span></span>
 <span id="cb181-12"><a href="mlregression.html#cb181-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:rfpredict"></span>
-<img src="06_ml_regression_files/figure-html/rfpredict-1.png" alt="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model" width="672" />
+<img src="06_ml_regression_files/figure-html/rfpredict-1.svg" alt="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model" width="672" />
 <p class="caption">
 FIGURE 6.3: The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model
 </p>
 </div>
-<p>Figure <a href="mlregression.html#fig:rfpredict">6.3</a> shows some of the strange behavior from our fitted model. The overall performance metrics look pretty good, but predictions are too high and too low around certain threshold years.</p>
+<p>Figure <a href="mlregression.html#fig:rfpredict">6.3</a> shows some of the strange behavior from our fitted model. The overall performance metrics look pretty good, but predictions are too high and too low around certain threshold years. </p>
 <p>It is very common to run into problems when using tree-based models like random forests with text data. One of the defining characteristics of text data is that it is <em>sparse</em>, with many features but most features not occurring in most observations. Tree-based models such as random forests are often not well-suited to sparse data because of how decision trees model outcomes <span class="citation">(<a href="#ref-Tang2018" role="doc-biblioref">Tang, Garreau, and Luxburg 2018</a>)</span>.</p>
 <div class="rmdnote">
 <p>
@@ -935,7 +940,7 @@ Models that work best with text tend to be models designed for or otherwise appr
 <span id="cb190-16"><a href="mlregression.html#cb190-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Model performance for three stop word lexicons&quot;</span>,</span>
 <span id="cb190-17"><a href="mlregression.html#cb190-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">&quot;For this data set, the Snowball lexicon performed best&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:snowballrmse"></span>
-<img src="06_ml_regression_files/figure-html/snowballrmse-1.png" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons" width="672" />
+<img src="06_ml_regression_files/figure-html/snowballrmse-1.svg" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons" width="672" />
 <p class="caption">
 FIGURE 6.4: Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons
 </p>
@@ -1019,7 +1024,7 @@ We could have created this type of small function for trying out different stop 
 <span id="cb198-15"><a href="mlregression.html#cb198-15" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;bigrams plus unigrams performed best&quot;</span>)</span>
 <span id="cb198-16"><a href="mlregression.html#cb198-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:ngramrmse"></span>
-<img src="06_ml_regression_files/figure-html/ngramrmse-1.png" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams" width="672" />
+<img src="06_ml_regression_files/figure-html/ngramrmse-1.svg" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams" width="672" />
 <p class="caption">
 FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams
 </p>
@@ -1228,6 +1233,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 We can use <code>engine = “spacyr”</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.
 </p>
 </div>
+<p></p>
 </div>
 <div id="case-study-feature-hashing" class="section level2" number="6.7">
 <h2><span class="header-section-number">6.7</span> Case study: feature hashing</h2>
@@ -1375,6 +1381,7 @@ How these methods work is beyond the scope of this book, but know that the text 
 This issue of text normalization can be important even if you don’t use feature hashing in your machine learning.
 </p>
 </div>
+<p></p>
 <p>Since these words are encoded in different ways, they will be counted separately when we are counting token frequencies.
 Representing what should be a single token in multiple ways will split the counts. This will introduce noise in the best case, and in worse cases, some tokens will fall below the cutoff when we select tokens, leading to a loss of potentially informative words.</p>
 <p>Luckily this is easily addressed by using <code>stri_trans_nfc()</code> on our text columns <em>before</em> starting preprocessing, or perhaps more conveniently, by using <code>textrecipes::step_text_normalize()</code> <em>within</em> a preprocessing recipe.</p>
@@ -1577,7 +1584,7 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <span id="cb249-11"><a href="mlregression.html#cb249-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance improves as we include more tokens&quot;</span></span>
 <span id="cb249-12"><a href="mlregression.html#cb249-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:scotusfinaltunevis"></span>
-<img src="06_ml_regression_files/figure-html/scotusfinaltunevis-1.png" alt="Performance improves significantly at about 4000 tokens" width="672" />
+<img src="06_ml_regression_files/figure-html/scotusfinaltunevis-1.svg" alt="Performance improves significantly at about 4000 tokens" width="672" />
 <p class="caption">
 FIGURE 6.6: Performance improves significantly at about 4000 tokens
 </p>
@@ -1658,7 +1665,7 @@ Notice that this is the first time we have used our testing data during this ent
 <span id="cb256-26"><a href="mlregression.html#cb256-26" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;in predicting the year of an opinion&quot;</span>)</span>
 <span id="cb256-27"><a href="mlregression.html#cb256-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:scotusvip"></span>
-<img src="06_ml_regression_files/figure-html/scotusvip-1.png" alt="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier" width="672" />
+<img src="06_ml_regression_files/figure-html/scotusvip-1.svg" alt="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier" width="672" />
 <p class="caption">
 FIGURE 6.7: Some words or bigrams increase a Supreme Court opinion’s probability of being written later (more recently) while some increase its probability of being written earlier
 </p>
@@ -1683,7 +1690,7 @@ Some of these features are unigrams and some are bigrams, and stop words are inc
 <span id="cb257-11"><a href="mlregression.html#cb257-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;For the testing set, predictions are more reliable after 1850&quot;</span></span>
 <span id="cb257-12"><a href="mlregression.html#cb257-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:scotusfinalpredvis"></span>
-<img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.png" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams" width="672" />
+<img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.svg" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams" width="672" />
 <p class="caption">
 FIGURE 6.8: Predicted and true years from a linear SVM regression model with bigrams and unigrams
 </p>
@@ -1746,7 +1753,7 @@ Looking at examples that your model does not perform well for is well worth your
 Appleby, Austin. 2008. <span>“MurmurHash.”</span> <a href="https://sites.google.com/site/murmurhash">https://sites.google.com/site/murmurhash</a>.
 </div>
 <div id="ref-Benoit19" class="csl-entry">
-Benoit, Kenneth, and Akitaka Matsuo. 2020. <em>Spacyr: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
+Benoit, Kenneth, and Akitaka Matsuo. 2020. <em><span class="nocase">spacyr</span>: Wrapper to the ’spaCy’ ’NLP’ Library</em>. <a href="https://CRAN.R-project.org/package=spacyr">https://CRAN.R-project.org/package=spacyr</a>.
 </div>
 <div id="ref-Caruana2008" class="csl-entry">
 Caruana, Rich, Nikos Karampatziakis, and Ainur Yessenalina. 2008. <span>“An Empirical Evaluation of Supervised Learning in High Dimensions.”</span> In <em>Proceedings of the 25th International Conference on Machine Learning</em>, 96–103. ICML ’08. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/1390156.1390169">10.1145/1390156.1390169</a>.
@@ -1761,19 +1768,19 @@ Helleputte, Thibault. 2021. <em>LiblineaR: Linear Predictive Models Based on the
 Hvitfeldt, Emil. 2019b. <em>Scotus: Collection of Supreme Court of the United States’ Opinions</em>. <a href="https://github.com/EmilHvitfeldt/scotus">https://github.com/EmilHvitfeldt/scotus</a>.
 </div>
 <div id="ref-textrecipes" class="csl-entry">
-Hvitfeldt, Emil. 2020a. <em>Textrecipes: Extra ’Recipes’ for Text Processing</em>. <a href="https://CRAN.R-project.org/package=textrecipes">https://CRAN.R-project.org/package=textrecipes</a>.
+Hvitfeldt, Emil. 2020a. <em><span class="nocase">textrecipes</span>: Extra ’Recipes’ for Text Processing</em>. <a href="https://CRAN.R-project.org/package=textrecipes">https://CRAN.R-project.org/package=textrecipes</a>.
 </div>
 <div id="ref-Joachims1998" class="csl-entry">
 Joachims, Thorsten. 1998. <span>“Text Categorization with Support Vector Machines: Learning with Many Relevant Features.”</span> In <em>Proceedings of the 10th European Conference on Machine Learning</em>, 137–142. ECML’98. Berlin, Heidelberg: Springer-Verlag. doi:<a href="https://doi.org/10.1007/BFb0026683">10.1007/BFb0026683</a>.
 </div>
 <div id="ref-R-recipes" class="csl-entry">
-Kuhn, Max, and Hadley Wickham. 2021. <em>Recipes: Preprocessing Tools to Create Design Matrices</em>. <a href="https://CRAN.R-project.org/package=recipes">https://CRAN.R-project.org/package=recipes</a>.
+Kuhn, Max, and Hadley Wickham. 2021. <em><span class="nocase">recipes</span>: Preprocessing Tools to Create Design Matrices</em>. <a href="https://CRAN.R-project.org/package=recipes">https://CRAN.R-project.org/package=recipes</a>.
 </div>
 <div id="ref-Olson2017" class="csl-entry">
 Olson, Randal S, William La Cava, Zairah Mustahsan, Akshay Varik, and Jason H Moore. 2018. <span>“Data-Driven Advice for Applying Machine Learning to Bioinformatics Problems.”</span> In <em>PACIFIC SYMPOSIUM ON BIOCOMPUTING 2018: Proceedings of the Pacific Symposium</em>, 192–203. World Scientific. doi:<a href="https://doi.org/10.1142/9789813235533_0018">10.1142/9789813235533_0018</a>.
 </div>
 <div id="ref-R-rsample" class="csl-entry">
-Silge, Julia, Fanny Chow, Max Kuhn, and Hadley Wickham. 2021. <em>Rsample: General Resampling Infrastructure</em>. <a href="https://CRAN.R-project.org/package=rsample">https://CRAN.R-project.org/package=rsample</a>.
+Silge, Julia, Fanny Chow, Max Kuhn, and Hadley Wickham. 2021. <em><span class="nocase">rsample</span>: General Resampling Infrastructure</em>. <a href="https://CRAN.R-project.org/package=rsample">https://CRAN.R-project.org/package=rsample</a>.
 </div>
 <div id="ref-Tang2018" class="csl-entry">
 Tang, Cheng, Damien Garreau, and Ulrike von Luxburg. 2018. <span>“When Do Random Forests Fail?”</span> In, 2987–2997. NIPS’18. Red Hook, NY, USA: Curran Associates Inc.
@@ -1782,7 +1789,7 @@ Tang, Cheng, Damien Garreau, and Ulrike von Luxburg. 2018. <span>“When Do Rand
 Van-Tu, Nguyen, and Le Anh-Cuong. 2016. <span>“Improving Question Classification by Feature Extraction and Selection.”</span> <em>Indian Journal of Science and Technology</em> 9 (May). doi:<a href="https://doi.org/10.17485/ijst/2016/v9i17/93160">10.17485/ijst/2016/v9i17/93160</a>.
 </div>
 <div id="ref-R-workflows" class="csl-entry">
-Vaughan, Davis. 2021b. <em>Workflows: Modeling Workflows</em>. <a href="https://CRAN.R-project.org/package=workflows">https://CRAN.R-project.org/package=workflows</a>.
+Vaughan, Davis. 2021b. <em><span class="nocase">workflows</span>: Modeling Workflows</em>. <a href="https://CRAN.R-project.org/package=workflows">https://CRAN.R-project.org/package=workflows</a>.
 </div>
 <div id="ref-Weinberger2009" class="csl-entry">
 Weinberger, Kilian, Anirban Dasgupta, John Langford, Alex Smola, and Josh Attenberg. 2009. <span>“Feature Hashing for Large Scale Multitask Learning.”</span> In <em>Proceedings of the 26th Annual International Conference on Machine Learning</em>, 1113–1120. ICML ’09. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/1553374.1553516">10.1145/1553374.1553516</a>.
@@ -1790,9 +1797,9 @@ Weinberger, Kilian, Anirban Dasgupta, John Langford, Alex Smola, and Josh Attenb
 </div>
 <div class="footnotes">
 <hr />
-<ol start="9">
-<li id="fn9"><p>The random forest implementation in the ranger package, demonstrated in Section <a href="mlregression.html#comparerf">6.3</a>, does not handle special characters in columns names well.<a href="mlregression.html#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>This is sometimes called a “baseline model.”<a href="mlregression.html#fnref10" class="footnote-back">↩︎</a></p></li>
+<ol start="8">
+<li id="fn8"><p>The random forest implementation in the ranger package, demonstrated in Section <a href="mlregression.html#comparerf">6.3</a>, does not handle special characters in columns names well.<a href="mlregression.html#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>This is sometimes called a “baseline model.”<a href="mlregression.html#fnref9" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

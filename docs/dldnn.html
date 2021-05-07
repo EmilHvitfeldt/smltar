@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -455,7 +455,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="dldnn" class="section level1" number="8">
 <h1><span class="header-section-number">Chapter 8</span> Dense neural networks</h1>
-<p>Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by network architecture, rathern than by outcome type as we did in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.
+<p>Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by network architecture, rather than by outcome type as we did in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.
 We’ll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate <span class="citation">(<a href="#ref-R-reticulate" role="doc-biblioref">Ushey, Allaire, and Tang 2021</a>)</span>, R.
 Keras provides an extensive, high-level API for creating and training many kinds of neural networks, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks.</p>
 <div class="rmdpackage">
@@ -500,7 +500,7 @@ FIGURE 8.1: A high-level diagram of a feed-forward neural network. The lines con
 <span id="cb420-4"><a href="dldnn.html#cb420-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of characters per campaign blurb&quot;</span>,</span>
 <span id="cb420-5"><a href="dldnn.html#cb420-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:kickstartercharhist"></span>
-<img src="08_dl_dnn_files/figure-html/kickstartercharhist-1.png" alt="Distribution of character count for Kickstarter campaign blurbs" width="672" />
+<img src="08_dl_dnn_files/figure-html/kickstartercharhist-1.svg" alt="Distribution of character count for Kickstarter campaign blurbs" width="672" />
 <p class="caption">
 FIGURE 8.2: Distribution of character count for Kickstarter campaign blurbs
 </p>
@@ -567,7 +567,7 @@ programs!&quot;</code></pre>
 <span id="cb427-4"><a href="dldnn.html#cb427-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
 <span id="cb427-5"><a href="dldnn.html#cb427-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of characters per campaign blurb&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:kickstarterheatmap"></span>
-<img src="08_dl_dnn_files/figure-html/kickstarterheatmap-1.png" alt="Distribution of character count for Kickstarter campaign blurbs over time" width="672" />
+<img src="08_dl_dnn_files/figure-html/kickstarterheatmap-1.svg" alt="Distribution of character count for Kickstarter campaign blurbs over time" width="672" />
 <p class="caption">
 FIGURE 8.3: Distribution of character count for Kickstarter campaign blurbs over time
 </p>
@@ -585,6 +585,7 @@ FIGURE 8.3: Distribution of character count for Kickstarter campaign blurbs over
 <div id="firstdlclassification" class="section level2" number="8.2">
 <h2><span class="header-section-number">8.2</span> A first deep learning model</h2>
 <p>Like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data.</p>
+
 <div class="rmdwarning">
 <p>
 It is very easy to overfit deep learning models, so an unbiased estimate of future performance from a test set is more important than ever.
@@ -615,7 +616,7 @@ It is very easy to overfit deep learning models, so an unbiased estimate of futu
 <span id="cb431-5"><a href="dldnn.html#cb431-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of words per campaign blurb&quot;</span>,</span>
 <span id="cb431-6"><a href="dldnn.html#cb431-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:kickstarterwordlength"></span>
-<img src="08_dl_dnn_files/figure-html/kickstarterwordlength-1.png" alt="Distribution of word count for Kickstarter campaign blurbs" width="672" />
+<img src="08_dl_dnn_files/figure-html/kickstarterwordlength-1.svg" alt="Distribution of word count for Kickstarter campaign blurbs" width="672" />
 <p class="caption">
 FIGURE 8.4: Distribution of word count for Kickstarter campaign blurbs
 </p>
@@ -625,6 +626,7 @@ FIGURE 8.4: Distribution of word count for Kickstarter campaign blurbs
 <div class="rmdpackage">
 We will use the <strong>recipes</strong> and <strong>textrecipes</strong> packages for data preprocessing and feature engineering for our deep learning models, just like we did for our models in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. To use a recipe, we first specify it with the variables we want to include and the steps we want to use in feature engineering.
 </div>
+<p></p>
 <div class="sourceCode" id="cb432"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb432-1"><a href="dldnn.html#cb432-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
 <span id="cb432-2"><a href="dldnn.html#cb432-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb432-3"><a href="dldnn.html#cb432-3" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
@@ -691,7 +693,7 @@ Steps like <code>step_tf()</code> and <code>step_tfidf()</code> are used for app
 What does the function <code>prep()</code> do? Before when we have used recipes, we put them in a <code>workflow()</code> which handles low-level processing. The <code>prep()</code> function will compute or estimate statistics from the training set; the output of <code>prep()</code> is a prepped recipe.
 </p>
 </div>
-<p>Once we have the prepped recipe, we can <code>tidy()</code> it to extract the vocabulary, represented in the <code>vocabulary</code> and <code>token</code> columns<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>.</p>
+<p>Once we have the prepped recipe, we can <code>tidy()</code> it to extract the vocabulary, represented in the <code>vocabulary</code> and <code>token</code> columns<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a>.</p>
 <div class="sourceCode" id="cb436"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb436-1"><a href="dldnn.html#cb436-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prep</span>(small_spec) <span class="sc">%&gt;%</span></span>
 <span id="cb436-2"><a href="dldnn.html#cb436-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">2</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 14 x 4
@@ -804,15 +806,16 @@ When we <code>bake()</code> a prepped recipe, we apply the preprocessing to a da
 <li><p>Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.</p></li>
 </ul>
 <p>We still have a few things left to add to this model before we can fit it to the data. A Keras model requires an <em>optimizer</em> and a <em>loss function</em> to be able to compile.</p>
-<p>When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network’s weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>; you can even create custom optimizers if what you need isn’t on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.</p>
+<p>When the neural network finishes passing a batch of data through the network, it needs a way to use the difference between the predicted values and true values to update the network’s weights. The algorithm that determines those weights is known as the optimization algorithm. Many optimizers are available within Keras itself<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a>; you can even create custom optimizers if what you need isn’t on the list. We will start by using the Adam optimizer, a good default optimizer for many problems.</p>
 <div class="rmdnote">
 <p>
 An optimizer can either be set with the name of the optimizer as a character or by supplying the function <code>optimizer_foo()</code> where <code>foo</code> is the name of the optimizer. If you use the function then you can specify parameters for the optimizer.
 </p>
 </div>
-<p>During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a>. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are.
+<p></p>
+<p>During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a>. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are.
 Since we are working on a binary classification task and the final layer of the network returns a probability, binary cross-entropy is an appropriate loss function. Binary cross-entropy does well at dealing with probabilities because it measures the “distance” between probability distributions. In our case, this would be the ground-truth distribution and the predictions.</p>
-<p>We can also add any number of metrics<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics’ only job is to report back a single number that will inform you how well the model is performing. We will select accuracy as a reported metric for now.</p>
+<p>We can also add any number of metrics<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics’ only job is to report back a single number that will inform you how well the model is performing. We will select accuracy as a reported metric for now.</p>
 <p>Let’s set these 3 options (<code>optimizer</code>, <code>loss</code>, and <code>metrics</code>) using the <code>compile()</code> function:</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="dldnn.html#cb448-1" aria-hidden="true" tabindex="-1"></a>dense_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
 <span id="cb448-2"><a href="dldnn.html#cb448-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
@@ -838,7 +841,7 @@ This is sufficient information to get started training the model, but we are goi
 <p>We can visualize the results of the training loop by plotting the <code>dense_history</code> in Figure <a href="dldnn.html#fig:densemodelhistoryplot">8.5</a>.</p>
 <div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="dldnn.html#cb450-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dense_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:densemodelhistoryplot"></span>
-<img src="08_dl_dnn_files/figure-html/densemodelhistoryplot-1.png" alt="Training and validation metrics for dense network" width="672" />
+<img src="08_dl_dnn_files/figure-html/densemodelhistoryplot-1.svg" alt="Training and validation metrics for dense network" width="672" />
 <p class="caption">
 FIGURE 8.5: Training and validation metrics for dense network
 </p>
@@ -908,7 +911,7 @@ We have dealt with accuracy in other chapters; remember that a higher value (a v
 <p>Figure <a href="dldnn.html#fig:valhistoryplot">8.6</a> still shows that significant overfitting at 10 epochs.</p>
 <div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="dldnn.html#cb461-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:valhistoryplot"></span>
-<img src="08_dl_dnn_files/figure-html/valhistoryplot-1.png" alt="Training and validation metrics for dense network with validation set" width="672" />
+<img src="08_dl_dnn_files/figure-html/valhistoryplot-1.svg" alt="Training and validation metrics for dense network with validation set" width="672" />
 <p class="caption">
 FIGURE 8.6: Training and validation metrics for dense network with validation set
 </p>
@@ -963,7 +966,7 @@ The heatmap in Figure <a href="dldnn.html#fig:dnnheatmap">8.7</a> shows that the
 <span id="cb467-2"><a href="dldnn.html#cb467-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb467-3"><a href="dldnn.html#cb467-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:dnnheatmap"></span>
-<img src="08_dl_dnn_files/figure-html/dnnheatmap-1.png" alt="Confusion matrix for first DNN model predictions of Kickstarter campaign success" width="672" />
+<img src="08_dl_dnn_files/figure-html/dnnheatmap-1.svg" alt="Confusion matrix for first DNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.7: Confusion matrix for first DNN model predictions of Kickstarter campaign success
 </p>
@@ -976,7 +979,7 @@ FIGURE 8.7: Confusion matrix for first DNN model predictions of Kickstarter camp
 <span id="cb468-5"><a href="dldnn.html#cb468-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb468-6"><a href="dldnn.html#cb468-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:dnnroccurve"></span>
-<img src="08_dl_dnn_files/figure-html/dnnroccurve-1.png" alt="ROC curve for first DNN model predictions of Kickstarter campaign success" width="672" />
+<img src="08_dl_dnn_files/figure-html/dnnroccurve-1.svg" alt="ROC curve for first DNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.8: ROC curve for first DNN model predictions of Kickstarter campaign success
 </p>
@@ -1161,7 +1164,7 @@ Freezing the weights stops them from being updated during the training loop.
 #&gt; 2 kap      binary         0.214</code></pre>
 <p>Why did this happen? Part of the training loop for a model like this one typically <em>adjusts</em> the weights in the network.
 When we froze the weights in this network, we froze them at values that did not perform very well.
-These pre-trained glove embeddings <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span> are trained on a Wikipedia dump and <a href="https://catalog.ldc.upenn.edu/LDC2011T07">Gigaword 5</a>, a comprehensive archive of newswire text.
+These pre-trained GloVe embeddings <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span> are trained on a Wikipedia dump and <a href="https://catalog.ldc.upenn.edu/LDC2011T07">Gigaword 5</a>, a comprehensive archive of newswire text.
 The text contained on Wikipedia and in news articles both follow certain styles and semantics.
 Both will tend to be written formally and in the past tense, with longer and complete sentences.
 There are many more distinct features of both Wikipedia text and news articles, but the relevant aspect here is how similar they are to the data we are trying to model.
@@ -1328,6 +1331,7 @@ If you have enough text data in the field you are working in, then it is worth c
 #&gt; 3 mn_log_loss 1.04      5 0.0160  
 #&gt; 4 roc_auc     0.856     5 0.000661</code></pre>
 <p>This data set is large enough that we probably wouldn’t need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.</p>
+
 <div class="rmdnote">
 <p>
 Training deep learning models typically takes more time than other kinds of machine learning, so resampling may be an unfeasible choice. There is special hardware available that speeds up deep learning because it is particularly well-suited to fitting such models. GPUs (graphics processing units) are used for displaying graphics (as indicated in their name) and gaming, but also for deep learning because of their highly parallel computational ability. GPUs can make solving deep learning problems faster, or even tractable to start with. Be aware, though, that you might not need a GPU for even real-world deep learning modeling. All the models in this book were trained on a CPU only.
@@ -1364,11 +1368,12 @@ Training deep learning models typically takes more time than other kinds of mach
 <span id="cb506-6"><a href="dldnn.html#cb506-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb506-7"><a href="dldnn.html#cb506-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:alldnnroccurve"></span>
-<img src="08_dl_dnn_files/figure-html/alldnnroccurve-1.png" alt="ROC curve for all DNN models' predictions of Kickstarter campaign success" width="672" />
+<img src="08_dl_dnn_files/figure-html/alldnnroccurve-1.svg" alt="ROC curve for all DNN models' predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.9: ROC curve for all DNN models’ predictions of Kickstarter campaign success
 </p>
 </div>
+
 
 <div class="rmdnote">
 Using pre-trained embeddings is not the only way to take advantage of ready-to-use, state-of-the-art deep learning models. You can also use whole pre-trained models in your analyses, such as the <code>transformers</code> models available from Hugging Face. Check out <a href="https://blogs.rstudio.com/ai/posts/2020-07-30-state-of-the-art-nlp-models-from-r/">this blog post for a tutorial</a> on how to use Hugging Face <code>transfomers</code> in R with Keras. Large language models like these are subject to many of the same concerns as embeddings discussed in Section <a href="embeddings.html#fairnessembeddings">5.5</a>.
@@ -1489,16 +1494,16 @@ Shrikumar, Avanti, Peyton Greenside, and Anshul Kundaje. 2017. <span>“Learning
 Shwartz-Ziv, Ravid, and Naftali Tishby. 2017. <span>“Opening the Black Box of Deep Neural Networks via Information.”</span> <a href="http://arxiv.org/abs/1703.00810">http://arxiv.org/abs/1703.00810</a>.
 </div>
 <div id="ref-R-reticulate" class="csl-entry">
-Ushey, Kevin, JJ Allaire, and Yuan Tang. 2021. <em>Reticulate: Interface to ’Python’</em>. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.
+Ushey, Kevin, JJ Allaire, and Yuan Tang. 2021. <em><span class="nocase">reticulate</span>: Interface to ’Python’</em>. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.
 </div>
 </div>
 <div class="footnotes">
 <hr />
-<ol start="12">
-<li id="fn12"><p>The <code>terms</code> column refers to the column we have applied <code>step_sequence_onehot()</code> to and <code>id</code> is its unique identifier. Note that <strong>textrecipes</strong> allows <code>step_sequence_onehot()</code> to be applied to multiple text variables independently and they will have their own vocabularies.<a href="dldnn.html#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p><a href="https://keras.io/api/optimizers/" class="uri">https://keras.io/api/optimizers/</a><a href="dldnn.html#fnref13" class="footnote-back">↩︎</a></p></li>
-<li id="fn14"><p><a href="https://keras.io/api/losses/" class="uri">https://keras.io/api/losses/</a><a href="dldnn.html#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p><a href="https://keras.io/api/metrics/" class="uri">https://keras.io/api/metrics/</a><a href="dldnn.html#fnref15" class="footnote-back">↩︎</a></p></li>
+<ol start="11">
+<li id="fn11"><p>The <code>terms</code> column refers to the column we have applied <code>step_sequence_onehot()</code> to and <code>id</code> is its unique identifier. Note that <strong>textrecipes</strong> allows <code>step_sequence_onehot()</code> to be applied to multiple text variables independently and they will have their own vocabularies.<a href="dldnn.html#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p><a href="https://keras.io/api/optimizers/" class="uri">https://keras.io/api/optimizers/</a><a href="dldnn.html#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p><a href="https://keras.io/api/losses/" class="uri">https://keras.io/api/losses/</a><a href="dldnn.html#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p><a href="https://keras.io/api/metrics/" class="uri">https://keras.io/api/metrics/</a><a href="dldnn.html#fnref14" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>
