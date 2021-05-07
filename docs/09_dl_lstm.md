@@ -2,7 +2,7 @@
 
 
 
-In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks (LSTMs) [@Hochreiter1997].
+In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures\index{network architecture} that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks\index{neural network!long short-term memory} (LSTMs) [@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
 
@@ -45,7 +45,7 @@ kickstarter_train <- training(kickstarter_split)
 kickstarter_test <- testing(kickstarter_split)
 ```
 
-Just as described in Chapter \@ref(dldnn), the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlregression) and \@ref(mlclassification). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter to keep only how many words we'll include in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this data set.
+Just as described in Chapter \@ref(dldnn), the \index{preprocessing}preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters \@ref(mlregression) and \@ref(mlclassification). The first step is still to tokenize the text, as described in Chapter \@ref(tokenization). After we tokenize, we filter to keep only how many words we'll include in the analysis; `step_tokenfilter()` keeps the top tokens based on frequency in this data set.
 
 
 ```r
@@ -88,10 +88,11 @@ Here we use `composition = "matrix"` because the Keras modeling functions operat
 
 ### Building an LSTM
 
-An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.
+An LSTM\index{neural network!long short-term memory} is a specific kind of network architecture with feedback loops that allow information to persist through steps^[Vanilla neural networks do not have this ability for information to persist at all; they start learning from scratch at every step.] and memory cells that can learn to "remember" and "forget" information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine \index{translation}translation, and similar problems.
 
 Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, $A$, operates on some of the input and outputs a value. During this process, some information is held inside $A$ to make the network "remember" this updated network. Network $A$ is then applied to the next input where it predicts new output and its memory is updated.
 
+\index{neural network!recurrent}
 <div class="figure" style="text-align: center">
 <img src="diagram-files/rnn-architecture.png" alt="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks." width="90%" />
 <p class="caption">(\#fig:rnndiag)High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.</p>
@@ -179,7 +180,7 @@ lstm_history
 #> val_accuracy: 0.7825
 ```
 
-The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
+The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting\index{overfitting} pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
 
 
 ```r
@@ -187,7 +188,7 @@ plot(lstm_history)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/firstlstmhistory-1.png" alt="Training and validation metrics for LSTM" width="672" />
+<img src="09_dl_lstm_files/figure-html/firstlstmhistory-1.svg" alt="Training and validation metrics for LSTM" width="672" />
 <p class="caption">(\#fig:firstlstmhistory)Training and validation metrics for LSTM</p>
 </div>
 
@@ -247,11 +248,9 @@ state_analysis <- analysis(kick_val$splits[[1]]) %>% pull(state)
 state_assess <- assessment(kick_val$splits[[1]]) %>% pull(state)
 ```
 
-Let's also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
+Let's also think about our LSTM model architecture. We saw evidence for significant overfitting\index{overfitting} with our first LSTM, and we can counteract that by including dropout, both in the regular sense (`dropout`) and in the feedback loops (`recurrent_dropout`). 
 
-<div class="rmdwarning">
-<p>When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting <span class="citation">[@Srivastava2014]</span>. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with <code>layer_dropout()</code>.</p>
-</div>
+\BeginKnitrBlock{rmdwarning}<div class="rmdwarning">When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting [@Srivastava2014]. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with `layer_dropout()`.</div>\EndKnitrBlock{rmdwarning}
 
 
 ```r
@@ -283,13 +282,13 @@ val_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3758
-#>     accuracy: 0.8218
-#>     val_loss: 0.6023
-#> val_accuracy: 0.7383
+#>         loss: 0.3811
+#>     accuracy: 0.8201
+#>     val_loss: 0.5968
+#> val_accuracy: 0.7363
 ```
 
-The overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
+The \index{overfitting}overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
 
 
 ```r
@@ -297,7 +296,7 @@ plot(val_history)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/lstmvalhistory-1.png" alt="Training and validation metrics for LSTM with dropout" width="672" />
+<img src="09_dl_lstm_files/figure-html/lstmvalhistory-1.svg" alt="Training and validation metrics for LSTM with dropout" width="672" />
 <p class="caption">(\#fig:lstmvalhistory)Training and validation metrics for LSTM with dropout</p>
 </div>
 
@@ -313,10 +312,10 @@ val_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.738
-#> 2 kap         binary         0.475
-#> 3 mn_log_loss binary         0.602
-#> 4 roc_auc     binary         0.808
+#> 1 accuracy    binary         0.736
+#> 2 kap         binary         0.470
+#> 3 mn_log_loss binary         0.597
+#> 4 roc_auc     binary         0.807
 ```
 
 
@@ -331,13 +330,13 @@ val_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/lstmvalroc-1.png" alt="ROC curve for LSTM with dropout predictions of Kickstarter campaign success" width="672" />
+<img src="09_dl_lstm_files/figure-html/lstmvalroc-1.svg" alt="ROC curve for LSTM with dropout predictions of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:lstmvalroc)ROC curve for LSTM with dropout predictions of Kickstarter campaign success</p>
 </div>
 
 ## Compare to a recurrent neural network
 
-An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network $A$ in Figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically just a single `tanh()` layer, much simpler than what happens in LSTMs.
+\index{neural network!recurrent}An LSTM is actually a specific kind of recurrent neural network (RNN) [@ELMAN1990179]. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network $A$ in Figure \@ref(fig:rnndiag). RNNs tend to have a very simple structure, typically just a single `tanh()` layer, much simpler than what happens in LSTMs.
 
 <div class="rmdwarning">
 <p>Simple RNNs can only connect very recent information and structure in sequences, but LSTMS can learn long-range dependencies and broader context.</p>
@@ -375,13 +374,13 @@ rnn_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.5009
-#>     accuracy: 0.7645
-#>     val_loss: 0.6023
-#> val_accuracy: 0.7123
+#>         loss: 0.5011
+#>     accuracy: 0.7644
+#>     val_loss: 0.6109
+#> val_accuracy: 0.7058
 ```
 
-Looks like more overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
+Looks like more \index{overfitting}overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
 
 
 ```r
@@ -389,7 +388,7 @@ plot(rnn_history)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/rnnhistory-1.png" alt="Training and validation metrics for RNN" width="672" />
+<img src="09_dl_lstm_files/figure-html/rnnhistory-1.svg" alt="Training and validation metrics for RNN" width="672" />
 <p class="caption">(\#fig:rnnhistory)Training and validation metrics for RNN</p>
 </div>
 
@@ -399,7 +398,7 @@ Fortunately, we can build on the ideas of a simple RNN with more complex archite
 
 ## Case study: bidirectional LSTM {#bilstm}
 
-The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward _only_. In language, the structures move both directions, though; the words that come _after_ a given structure or word can be just as important for understanding it as the ones that come before it.
+The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward _only_. In language, the \index{language!structures}structures move both directions, though; the words that come _after_ a given structure or word can be just as important for understanding it as the ones that come before it.
 
 We can build this into our neural network architecture with a **bidirectional** wrapper for RNNs or LSTMs. 
 
@@ -440,10 +439,10 @@ bilstm_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3765
-#>     accuracy: 0.825
-#>     val_loss: 0.6056
-#> val_accuracy: 0.7362
+#>         loss: 0.3707
+#>     accuracy: 0.827
+#>     val_loss: 0.6151
+#> val_accuracy: 0.7382
 ```
 
 The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well. 
@@ -458,13 +457,13 @@ bilstm_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.736
-#> 2 kap         binary         0.471
-#> 3 mn_log_loss binary         0.606
-#> 4 roc_auc     binary         0.805
+#> 1 accuracy    binary         0.738
+#> 2 kap         binary         0.475
+#> 3 mn_log_loss binary         0.615
+#> 4 roc_auc     binary         0.808
 ```
 
-This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.738). 
+This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736). 
 
 ## Case study: stacking LSTM layers
 
@@ -508,10 +507,10 @@ stacked_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3896
-#>     accuracy: 0.8171
-#>     val_loss: 0.6071
-#> val_accuracy: 0.7344
+#>         loss: 0.3865
+#>     accuracy: 0.8191
+#>     val_loss: 0.5994
+#> val_accuracy: 0.7365
 ```
 
 Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
@@ -526,17 +525,17 @@ stacked_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.734
-#> 2 kap         binary         0.468
-#> 3 mn_log_loss binary         0.607
-#> 4 roc_auc     binary         0.804
+#> 1 accuracy    binary         0.737
+#> 2 kap         binary         0.471
+#> 3 mn_log_loss binary         0.599
+#> 4 roc_auc     binary         0.805
 ```
 
 We can gradually improve a model by changing and adding to its architecture.
 
 ## Case study: padding {#lstmpadding}
 
-One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
+\index{preprocessing!impact}One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
 
 Either way, the sequences that are too long must be truncated and the sequences that are too short must be padded, typically with zeroes. This does literally mean that words or tokens are thrown away for the long documents and zeroes are added to the shorter documents, with the goal of creating a rectangular matrix that can be used for computation. 
 
@@ -544,7 +543,7 @@ Either way, the sequences that are too long must be truncated and the sequences 
 <p>It is possible to set up an LSTM network that works with sequences of varied length; this can sometimes improve performance but takes more work to set up and is outside the scope of this book.</p>
 </div>
 
-The default in textrecipes, as well as most deep learning for text, is `padding = "pre"`, where zeroes are added at the beginning, and `truncating = "pre"`, where values at the beginning are removed. What happens if we change one of these defaults?
+The default in textrecipes, as well as most deep learning for text, is `padding = "pre"`, where zeroes are added at the beginning, and `truncating = "pre"`, where values at the beginning are removed. \index{preprocessing!impact}What happens if we change one of these defaults?
 
 
 ```r
@@ -604,10 +603,10 @@ padding_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4327
-#>     accuracy: 0.7845
-#>     val_loss: 0.5884
-#> val_accuracy: 0.7212
+#>         loss: 0.4422
+#>     accuracy: 0.779
+#>     val_loss: 0.5969
+#> val_accuracy: 0.7155
 ```
 
 This padding strategy results in noticeably worse performance than the default option!
@@ -622,13 +621,13 @@ padding_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.721
-#> 2 kap         binary         0.440
-#> 3 mn_log_loss binary         0.588
-#> 4 roc_auc     binary         0.794
+#> 1 accuracy    binary         0.715
+#> 2 kap         binary         0.431
+#> 3 mn_log_loss binary         0.597
+#> 4 roc_auc     binary         0.789
 ```
 
-The same model architecture with default padding preprocessing resulted in an accuracy of 0.738 and an AUC of 0.808; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
+The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.807; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
 
 <div class="rmdwarning">
 <p>Different preprocessing strategies have a huge impact on deep learning results.</p>
@@ -736,9 +735,9 @@ scotus_res %>% metrics(year, .pred)
 #> # A tibble: 3 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 rmse    standard      18.7  
-#> 2 rsq     standard       0.849
-#> 3 mae     standard      13.6
+#> 1 rmse    standard      18.0  
+#> 2 rsq     standard       0.864
+#> 3 mae     standard      13.2
 ```
 
 This is much worse than the final regularized linear model trained in Section \@ref(mlregressionfull), with an RMSE almost a decade worth of years worse. It's possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline. 
@@ -749,7 +748,7 @@ This is much worse than the final regularized linear model trained in Section \@
 
 ## Case study: vocabulary size
 
-In this chapter so far, we've worked with a vocabulary of 20,000 words or tokens. This is a _hyperparameter_ of the model, and could be tuned, as we show in detail in Section \@ref(keras-hyperparameter). Instead of tuning in this chapter, let's try a smaller value, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
+In this chapter so far, we've worked with a vocabulary of 20,000 words or tokens. This is a _hyperparameter_ of the model, and could be tuned, as we show in detail in Section \@ref(keras-hyperparameter). Instead of tuning in this chapter, let's try a smaller value, corresponding to faster \index{preprocessing}preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance. 
 
 
 ```r
@@ -800,10 +799,10 @@ smaller_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4704
-#>     accuracy: 0.7678
-#>     val_loss: 0.5829
-#> val_accuracy: 0.7114
+#>         loss: 0.4695
+#>     accuracy: 0.7693
+#>     val_loss: 0.5807
+#> val_accuracy: 0.7121
 ```
 
 How did this smaller model, based on a smaller vocabulary in the model, perform?
@@ -818,13 +817,13 @@ smaller_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.711
-#> 2 kap         binary         0.421
-#> 3 mn_log_loss binary         0.583
-#> 4 roc_auc     binary         0.783
+#> 1 accuracy    binary         0.712
+#> 2 kap         binary         0.423
+#> 3 mn_log_loss binary         0.581
+#> 4 roc_auc     binary         0.784
 ```
 
-The original LSTM model with the larger vocabulary had an accuracy of 0.738 and an AUC of 0.808. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
+The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.807. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
 
 <div class="rmdnote">
 <p>The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.</p>
@@ -836,7 +835,7 @@ We've come a long way in this chapter, even though we've focused on a very speci
 
 ### Preprocess the data {#lstmfullpreprocess}
 
-We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
+\index{preprocessing}We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.
 
 
 ```r
@@ -910,10 +909,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3395
-#>     accuracy: 0.8496
-#>     val_loss: 0.5365
-#> val_accuracy: 0.7774
+#>         loss: 0.3335
+#>     accuracy: 0.8509
+#>     val_loss: 0.5248
+#> val_accuracy: 0.7775
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -932,8 +931,8 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.765
 #> 2 kap         binary         0.529
-#> 3 mn_log_loss binary         0.562
-#> 4 roc_auc     binary         0.831
+#> 3 mn_log_loss binary         0.549
+#> 4 roc_auc     binary         0.832
 ```
 
 This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).
@@ -946,11 +945,11 @@ final_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/lstmfinalroc-1.png" alt="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="09_dl_lstm_files/figure-html/lstmfinalroc-1.svg" alt="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:lstmfinalroc)ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success</p>
 </div>
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model's performance using a confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
+We have been able to incrementally improve our model by adding to the structure and making good choices about \index{preprocessing}preprocessing. We can visualize this final LSTM model's performance using a \index{matrix!confusion}confusion matrix as well, in Figure \@ref(fig:lstmheatmap).
 
 
 ```r
@@ -960,7 +959,7 @@ final_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="09_dl_lstm_files/figure-html/lstmheatmap-1.png" alt="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="09_dl_lstm_files/figure-html/lstmheatmap-1.svg" alt="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:lstmheatmap)Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success</p>
 </div>
 
@@ -970,11 +969,11 @@ Notice that this final model still does not perform as well as any of the best m
 <p>For this data set of Kickstarter campaign blurbs, an LSTM architecture is not turning out to give a great result compared to other options. However, LSTMs typically perform very well for text data and are an important piece of the text modeling toolkit.</p>
 </div>
 
-For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
+For the Kickstarter data, these less-than-spectacular results are likely due to the documents' short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more \index{computational speed}time and memory to train, compared to the simpler models discussed in Chapter \@ref(dldnn).
 
 ## Summary {#dllstmsummary}
 
-LSTMs are a specific kind of recurrent neural network that are capable of learning long-range dependencies and broader context. They are often an excellent choice for building supervised models for text because of this ability to model sequences and structures within text like word dependencies. Text must be heavily preprocessed for LSTMs in much the same way it needs to be preprocessed for dense neural networks, with tokenization and one-hot encoding of sequences. A major characteristic of LSTMs, like other deep learning architectures, is their tendency to memorize the features of training data; we can use strategies like dropout and ensuring that the batch size is large enough to reduce overfitting.
+LSTMs are a specific kind of recurrent neural network that are capable of learning long-range dependencies and broader context. They are often an excellent choice for building supervised models for text because of this ability to model sequences and structures within text like word dependencies. Text must be heavily preprocessed\index{preprocessing} for LSTMs in much the same way it needs to be preprocessed for dense neural networks, with tokenization and one-hot encoding of sequences. A major characteristic of LSTMs, like other deep learning architectures, is their tendency to memorize the features of training data; we can use strategies like dropout and ensuring that the batch size is large enough to reduce overfitting.
 
 ### In this chapter, you learned:
 

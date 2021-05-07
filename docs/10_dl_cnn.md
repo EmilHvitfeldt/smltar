@@ -3,9 +3,9 @@
 
 
 
-The first neural networks we built in Chapter \@ref(dldnn) did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within data.
+The first neural networks\index{network architecture} we built in Chapter \@ref(dldnn) did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on \index{neural network!convolutional} **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within data.
 
-CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.
+CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures\index{language!structure} in the data.
 
 <div class="rmdnote">
 <p>Let’s take more time with CNNs in this chapter to explore their construction, different features, and the hyperparameters we can tune.</p>
@@ -49,7 +49,7 @@ By contrast, a kernel size of 5 with word tokenization will learn patterns withi
 
 ## A first CNN model {#firstcnn}
 
-We will be using the same data which we examine in Sections \@ref(kickstarter) and \@ref(kickstarter-blurbs), and use throughout Chapters \@ref(dldnn) and \@ref(dllstm). This data set contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections \@ref(dnnrecipe) and \@ref(firstlstm).
+\index{neural network!convolutional}We will be using the same data which we examine in Sections \@ref(kickstarter) and \@ref(kickstarter-blurbs), and use throughout Chapters \@ref(dldnn) and \@ref(dllstm). This data set contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same \index{preprocessing}preprocessing and feature engineering recipe that we created and described in Sections \@ref(dnnrecipe) and \@ref(firstlstm).
 
 
 
@@ -99,7 +99,7 @@ The `layer_global_max_pooling_1d()` layer collapses the remaining CNN output int
 This might not end up being the best CNN configuration, but it is a good starting point.
 One of the challenges when working with CNNs is to ensure that we manage the dimensionality correctly. The length of the sequence decreases by `(kernel_size - 1)` for each layer. For this input, we have a sequence of length `max_length = 30`, which is decreased by `(5 - 1) = 4` resulting in a sequence of 26, as shown in the printed output of `simple_cnn_model`. We could create seven layers with `kernel_size = 5`, since we would end with `30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2` elements in the resulting sequence. However, we would not be able to do a network with 3 layers of 
 `kernel_size = 7` followed by 3 layers of `kernel_size = 5` since the resulting sequence would be `30 - 6 - 6 - 6 - 4 - 4 - 4 = 0` and we must have a positive length for our sequence.
-Remember that `kernel_size` is not the only argument that will change the length of the resulting sequence. 
+Remember that `kernel_size` is not the only argument that will change the length of the resulting sequence. \index{network architecture}
 
 <div class="rmdnote">
 <p>Constructing a sequence layer by layer and using Keras’ print method to check the configuration is a great way to make sure your architecture is valid.</p>
@@ -125,7 +125,7 @@ cnn_history <- simple_cnn_model %>% fit(
 )
 ```
 
-
+\index{optimization algorithm}
 <div class="rmdnote">
 <p>We are using the <code>"adam"</code> optimizer since it performs well for many kinds of models. You may have to experiment to find the optimizer that works best for your model and data.</p>
 </div>
@@ -174,7 +174,7 @@ metrics(val_res, state, .pred_class, .pred_1)
 
 We already see improvement over the densely connected network from Chapter \@ref(dldnn), our best performing model on the Kickstarter data so far.
 
-The heatmap in Figure \@ref(fig:cnnheatmap) shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model!
+The heatmap\index{matrix!confusion} in Figure \@ref(fig:cnnheatmap) shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model!
 
 
 ```r
@@ -184,7 +184,7 @@ val_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/cnnheatmap-1.png" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnheatmap-1.svg" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:cnnheatmap)Confusion matrix for first CNN model predictions of Kickstarter campaign success</p>
 </div>
 
@@ -201,7 +201,7 @@ val_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/cnnroccurve-1.png" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnroccurve-1.svg" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:cnnroccurve)ROC curve for first CNN model predictions of Kickstarter campaign success</p>
 </div>
 
@@ -214,7 +214,7 @@ This case study will examine:
 
 - how additional _dense_ layers can be added.
 
-Let's start by adding another fully connected layer. We take the architecture we used in `simple_cnn_model` and add another `layer_dense()` after the first `layer_dense()` in the model.
+\index{network architecture}Let's start by adding another fully connected layer. We take the architecture we used in `simple_cnn_model` and add another `layer_dense()` after the first `layer_dense()` in the model.
 Increasing the depth of the model via the fully connected layers allows the model to find more complex patterns.
 There is, however, a trade-off. Adding more layers adds more weights to the model, making it more complex and harder to train. If you don't have enough data or the patterns you are trying to classify aren't that complex, then model performance will suffer since the model will start overfitting as it starts memorizing patterns in the training data that don't generalize to new data.
 
@@ -223,7 +223,7 @@ There is, however, a trade-off. Adding more layers adds more weights to the mode
 <p>When working with CNNs, the different layers perform different tasks. A convolutional layer extracts local patterns as it slides along the sequences, while a fully connected layer finds global patterns.</p>
 </div>
 
-We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers creates richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
+We can think of the convolutional layers as doing preprocessing\index{preprocessing} on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers creates richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.
 
 
 ```r
@@ -478,7 +478,7 @@ all_cnn_model_predictions %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.png" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.svg" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:allcnnroccurve)ROC curve for three CNN variants' predictions of Kickstarter campaign success</p>
 </div>
 
@@ -487,7 +487,7 @@ This doesn't mean that we are done with CNNs! There are still many things we can
 
 ## Case study: byte pair encoding
 
-In our models in this chapter so far we have used words as the token of interest. We saw in Section \@ref(casestudyngrams) how n-grams can be used in modeling as well.
+\index{tokenization!subword}In our models in this chapter so far we have used words as the token of interest. We saw in Section \@ref(casestudyngrams) how n-grams can be used in modeling as well.
 One of the reasons why the Kickstarter data set is hard to work with is because the text is quite short so we don't have that many individual tokens to work with in a given blurb.
 Another choice of token is _subwords_, where we split the text into smaller units than words; longer words especially will be broken into multiple subword units. One way to tokenize text into subword units is _byte pair encoding_ [@Gage1994ANA].
 This algorithm has been repurposed to work on text by iteratively merging frequently occurring subword pairs.
@@ -499,7 +499,7 @@ Using a subword tokenizer such as byte pair encoding should let us see the text 
 
 \BeginKnitrBlock{rmdnote}<div class="rmdnote">Character level CNNs have also proven successful in some contexts. They have been explored by @Zhang2015 and work quite well on some shorter texts such as headlines and tweets [@Vosoughi2016].</div>\EndKnitrBlock{rmdnote}
 
-We need to remind ourselves that these models don't contain any linguistic knowledge at all; they only "learn" the morphological patterns of sequences of characters (Section \@ref(morphology)) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.
+We need to remind ourselves that these models don't contain any linguistic knowledge at all; they only "learn" the morphological\index{morphology} patterns of sequences of characters (Section \@ref(morphology)) in the training set. This does not make the models useless, but it should set our expectations about what any given model is capable of.
 
 Since we are using a completely different preprocessing approach, we need to specify a new feature engineering recipe. 
 
@@ -568,7 +568,7 @@ bpe_token_dist %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.png" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
+<img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.svg" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
 <p class="caption">(\#fig:kickstartersubwordlength)Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes</p>
 </div>
 
@@ -663,7 +663,7 @@ bpe_history
 
 The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher detail tokenizer.
 
-The confusion matrix in Figure \@ref(fig:bpeheatmap) also clearly shows that there isn't much bias between the two classes with this new tokenizer.
+The \index{matrix!confusion}confusion matrix in Figure \@ref(fig:bpeheatmap) also clearly shows that there isn't much bias between the two classes with this new tokenizer.
 
 
 ```r
@@ -675,7 +675,7 @@ val_res_bpe %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.png" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
+<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.svg" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
 <p class="caption">(\#fig:bpeheatmap)Confusion matrix for CNN model using byte pair encoding tokenization</p>
 </div>
 
@@ -698,7 +698,7 @@ bpe_rec %>%
 #> [37] "hood"  "hop"   "hor"   "hous"  "house" "how"   "hr"    "hs"    "hu"
 ```
 
-Notice how some of these subword tokens are full words and some are parts of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
+Notice how some of these subword tokens\index{tokenization!subword} are full words and some are parts of words. This is what allows the model to be able to "read" long unknown words by combining many smaller sub words.
 We can also look at common long words.
 
 
@@ -732,7 +732,9 @@ These twenty-five words were common enough to get their own subword token, and h
 
 ## Case study: explainability with LIME {#lime}
 
-We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box" one, is using an algorithm for observation-level variable importance like *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. 
+\index{models!explainability}
+\index{models!interpretability|see {models, explainability}}
+We noted in Section \@ref(dllimitations) that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a "black box"\index{"black box"} one, is using an algorithm for observation-level variable importance like *Local Interpretable Model-Agnostic Explanations* [@ribeiro2016why] algorithm, or **LIME** for short. 
 
 <div class="rmdnote">
 <p>As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.</p>
@@ -781,7 +783,7 @@ our bare hands.  Let's make this a reality!"
 We now load the lime package and pass observations into `lime()` along with the model we are trying to explain and the preprocess function.
 
 <div class="rmdwarning">
-<p>Be sure that the preprocess function <em>matches</em> the preprocessing that was used to train the model.</p>
+<p>Be sure that the preprocessing function <em>matches</em> the preprocessing that was used to train the model.</p>
 </div>
 
 
@@ -836,11 +838,11 @@ plot_features(explanation)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.png" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
+<img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.svg" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
 <p class="caption">(\#fig:limeplotfeatures)Plot of most important features for a CNN model predicting two observations.</p>
 </div>
 
-Figure \@ref(fig:limeplottextexplanations) shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.
+\index{models!explainability}Figure \@ref(fig:limeplottextexplanations) shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.
 
 
 ```r
@@ -886,7 +888,7 @@ plot_text_explanations(explanation)
 <p>The <code>interactive_text_explanations()</code> function can be used to launch an interactive Shiny app where you can explore the model weights.</p>
 </div>
 
-One of the ways a deep learning model is hard to explain is that changes to a part of the input can affect how the input is being used as a whole. Remember that in bag-of-words models adding another token when predicting would just add another unit in the weight; this is not always the case when using deep learning models.
+\index{models!explainability}One of the ways a deep learning model is hard to explain is that changes to a part of the input can affect how the input is being used as a whole. Remember that in bag-of-words models adding another token when predicting would just add another unit in the weight; this is not always the case when using deep learning models.
 The following example shows this effect. We have created two very similar sentences in `fake_sentences`. 
 
 
@@ -953,7 +955,7 @@ plot_text_explanations(explanation)
 <p class="caption">(\#fig:robustlimeplottextexplanations)Feature highlighting of words in two examples explained by a CNN model.</p>
 </div>
 
-It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
+\index{models!explainability}It is these kinds of correlated patterns that can make deep learning models hard to reason about and can deliver surprising results.
 
 <div class="rmdnote">
 <p>The LIME algorithm and <strong>lime</strong> R package are not limited to explaining CNNs. This approach can be used with any of the models we have used in this book, even the ones trained with <strong>parsnip</strong>.</p>
@@ -961,7 +963,7 @@ It is these kinds of correlated patterns that can make deep learning models hard
 
 ## Case study: hyperparameter search {#keras-hyperparameter}
 
-So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Sections \@ref(mlregressionfull) and \@ref(mlclassificationfull) using the **tune** package. We can use the [**tfruns**](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple Keras models and compare the results.
+\index{models!tuning}So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Sections \@ref(mlregressionfull) and \@ref(mlclassificationfull) using the **tune** package. We can use the [**tfruns**](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple Keras models and compare the results.
 
 This workflow will be a little different than what we have seen in the book so far since we will have to create a `.R` file that contains the necessary modeling steps and then use that file to fit multiple models. Such an example file named `cnn-spec.R` used for the following models is available [on GitHub](https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R). The first thing we need to do is specify what hyperparameters we want to vary. By convention, this object is named `FLAGS` and it is created using the `flags()` function. For each parameter we want to tune, we add a corresponding `flag_*()` function, which can be `flag_integer()`, `flag_boolean()`, `flag_numeric()`, or `flag_string()` depending on what we need to tune.
 
@@ -1068,12 +1070,12 @@ runs_results
 #> # A tibble: 6 x 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.00       0.0316           0.993           1.00             0.808
-#> 2 _tuning/20… 1.02       0.036            0.992           1.02             0.804
-#> 3 _tuning/20… 0.971      0.0488           0.987           0.971            0.804
-#> 4 _tuning/20… 0.966      0.0292           0.994           0.966            0.812
-#> 5 _tuning/20… 0.940      0.0313           0.994           0.940            0.810
-#> 6 _tuning/20… 0.958      0.0434           0.989           0.958            0.810
+#> 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
+#> 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
+#> 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
+#> 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
+#> 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
+#> 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1096,15 +1098,15 @@ best_runs
 #> # A tibble: 6 x 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
-#> 1               0.812                 7             1
-#> 2               0.810                 3             1
-#> 3               0.810                 5             1
-#> 4               0.808                 7             2
-#> 5               0.804                 5             2
-#> 6               0.804                 3             2
+#> 1               0.812                 5             1
+#> 2               0.811                 7             1
+#> 3               0.809                 7             2
+#> 4               0.808                 5             2
+#> 5               0.807                 3             1
+#> 6               0.803                 3             2
 ```
 
-There isn't much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.
+There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 
@@ -1262,6 +1264,8 @@ The metrics have little variance just like they did last time, which is reassuri
 
 We've come a long way in this chapter, and looked at the many different modifications to the simple CNN model we started with. Most of the alterations didn't add much so this final model is not going to be much different than what we have seen so far.
 
+\index{models!challenges}
+
 <div class="rmdwarning">
 <p>There are an incredible number of ways to change a deep learning network architecture, but in most realistic situations, the benefit in model performance from such changes is modest.</p>
 </div>
@@ -1269,7 +1273,7 @@ We've come a long way in this chapter, and looked at the many different modifica
 
 ### Preprocess the data {#cnnfullpreprocess}
 
-For this final model, we are not going to use our separate validation data again, so we only need to preprocess the training data.
+For this final model, we are not going to use our separate validation data again, so we only need to \index{preprocess}preprocess the training data.
 
 
 ```r
@@ -1365,11 +1369,11 @@ final_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.png" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.svg" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:cnnfinalroc)ROC curve for final CNN model predictions on testing set of Kickstarter campaign success</p>
 </div>
 
-We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model's performance using a confusion matrix as well, in Figure \@ref(fig:cnnheatmapfinal).
+We have been able to incrementally improve our model by adding to the structure and making good choices about \index{preprocessing}preprocessing. We can visualize this final CNN model's performance using a \index{matrix!confusion}confusion matrix as well, in Figure \@ref(fig:cnnheatmapfinal).
 
 
 ```r
@@ -1379,7 +1383,7 @@ final_res %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.png" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.svg" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">(\#fig:cnnheatmapfinal)Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success</p>
 </div>
 
@@ -1391,7 +1395,7 @@ Notice that this final model performs better then any of the models we have trie
 
 ## Summary {#dlcnnsummary}
 
-CNNs are a type of neural network that can learn local spatial patterns. They essentially perform feature extraction, which can then be used efficiently in later layers of a network. Their simplicity and fast running time, compared to models like LSTMs, makes them excellent candidates for supervised models for text.
+CNNs are a type of neural network that can learn local spatial patterns. They essentially perform feature extraction\index{feature engineering}, which can then be used efficiently in later layers of a network. Their simplicity and fast running time, compared to models like LSTMs, makes them excellent candidates for supervised models for text.
 
 ### In this chapter, you learned:
 

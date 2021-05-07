@@ -107,9 +107,9 @@ negligent about my information."
 balance. My correct balance is XXXX"
 ```
 
-The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII) in this publicly available data set. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII censoring in a data dictionary, but you should always look at the data yourself to verify. 
+The complaint narratives contain many series of capital `"X"`'s. These strings (like "XX/XX" or "XXXX XXXX XXXX XXXX") are used to to protect personally identifiable information (PII)\index{PII}\index{personally identifiable information|see {PII}} in this publicly available data set. This is not a universal censoring mechanism; censoring and PII protection will vary from source to source. Hopefully you will be able to find information on PII\index{PII} censoring\index{censoring} in a data dictionary, but you should always look at the data yourself to verify. 
 
-We also see that monetary amounts are surrounded by curly brackets (like `"{$21.00}"`); this is another text preprocessing step that has been taken care of for us. We could craft a regular expression to extract all the dollar amounts. 
+We also see that monetary amounts are surrounded by curly brackets (like `"{$21.00}"`); this is another text preprocessing\index{preprocessing} step that has been taken care of for us. We could craft a regular expression\index{regex} to extract all the dollar amounts. 
 
 
 ```r
@@ -188,7 +188,7 @@ dim(complaints_test)
 #> [1] 29303    18
 ```
 
-Next we need to preprocess this data to prepare it for modeling; we have text data, and we need to build numeric features for machine learning from that text.
+Next we need to preprocess\index{preprocessing} this data to prepare it for modeling; we have text data, and we need to build numeric features for machine learning from that text.
 
 The **recipes** package, part of tidymodels, allows us to create a specification of preprocessing steps we want to perform. These transformations are estimated (or "trained") on the training set so that they can be applied in the same way on the testing set or new data at prediction time, without data leakage.
 We initialize our set of preprocessing transformations with the `recipe()` function, using a formula expression to specify the variables, our outcome plus our predictor, along with the data set.
@@ -200,7 +200,7 @@ complaints_rec <-
 ```
 
 Now we add steps to process the text of the complaints; we use **textrecipes** to handle the `consumer_complaint_narrative` variable. First we tokenize the text to words with `step_tokenize()`. By default this uses `tokenizers::tokenize_words()`.
-Before we calculate tf-idf we use `step_tokenfilter()` to only keep the 1000 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
+Before we calculate tf-idf\index{tf-idf} we use `step_tokenfilter()` to only keep the 1000 most frequent tokens, to avoid creating too many variables in our first model. To finish, we use `step_tfidf()` to compute tf-idf.
 
 
 ```r
@@ -357,6 +357,9 @@ nb_rs_metrics
 
 The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.6%.
 
+\index{accuracy}
+\index{ROC AUC}
+\index{area under the receiver operator characteristic curve|see {ROC AUC}}
 <div class="rmdnote">
 <p>Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.</p>
 <p>Accuracy is the proportion of the data that are predicted correctly. Be aware that accuracy can be misleading in some situations, such as for imbalanced data sets.</p>
@@ -379,13 +382,13 @@ nb_rs_predictions %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/firstroccurve-1.png" alt="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
+<img src="07_ml_classification_files/figure-html/firstroccurve-1.svg" alt="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">(\#fig:firstroccurve)ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints</p>
 </div>
 
 The area under each of these curves is the `roc_auc` metric we have computed. If the curve was close to the diagonal line, then the model's predictions would be no better than random guessing.
 
-Another way to evaluate our model is to evaluate the confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
+Another way to evaluate our model is to evaluate the \index{matrix!confusion}confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
 The function `conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.
 
 
@@ -395,15 +398,16 @@ conf_mat_resampled(nb_rs, tidy = FALSE) %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/firstheatmap-1.png" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
+<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
 <p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'</p>
 </div>
 
-In Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
+In \index{matrix!confusion}Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
 
 <div class="rmdwarning">
 <p>One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.</p>
 </div>
+\index{matrix!confusion}
 
 This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more "Other" complaints are correctly identified than "Credit" complaints, either for consumers or for policymakers? 
 
@@ -448,7 +452,7 @@ The accuracy and ROC AUC indicate that this null model is, like in the regressio
 
 ## Compare to a lasso classification model {#comparetolasso}
 
-Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani1996], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
+Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a \index{models!in production}workhorse in real-world practice. Here we will use a lasso regularized model [@Tibshirani1996], where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem. 
 
 <div class="rmdnote">
 <p>Using regularization helps us choose a simpler model that we expect to generalize better to new observations, and variable selection helps us identify which features to include in our model.</p>
@@ -550,11 +554,11 @@ lasso_rs_predictions %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/lassoroccurve-1.png" alt="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
+<img src="07_ml_classification_files/figure-html/lassoroccurve-1.svg" alt="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">(\#fig:lassoroccurve)ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints</p>
 </div>
 
-Let's finish this section by generating a confusion matrix, shown in Figure \@ref(fig:lassoheatmap).
+Let's finish this section by generating a confusion matrix\index{matrix!confusion}, shown in Figure \@ref(fig:lassoheatmap).
 Our lasso model is better at separating the classes than the naive Bayes model in Section \@ref(classfirstmodel), and our results are more symmetrical than those for the naive Bayes model in Figure \@ref(fig:firstheatmap).
 
 
@@ -564,14 +568,14 @@ conf_mat_resampled(lasso_rs, tidy = FALSE) %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/lassoheatmap-1.png" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
+<img src="07_ml_classification_files/figure-html/lassoheatmap-1.svg" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
 <p class="caption">(\#fig:lassoheatmap)Confusion matrix for a lasso regularized classifier, with more symmetric results</p>
 </div>
 
 
 ## Tuning lasso hyperparameters {#tunelasso}
 
-The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
+\index{models!tuning}The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
 
 ```r
@@ -671,6 +675,7 @@ tune_rs
 <div class="rmdwarning">
 <p>Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.</p>
 </div>
+\index{computational speed}
 
 Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.
 
@@ -708,7 +713,7 @@ autoplot(tune_rs) +
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintstunevis-1.png" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
+<img src="07_ml_classification_files/figure-html/complaintstunevis-1.svg" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
 <p class="caption">(\#fig:complaintstunevis)We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty.</p>
 </div>
 
@@ -850,7 +855,7 @@ fitted_lasso %>%
 
 ## Case study: sparse encoding {#casestudysparseencoding}
 
-We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
+We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a \index{matrix!sparse}sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
 
 To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package **hardhat** [@R-hardhat].
 
@@ -864,7 +869,7 @@ library(hardhat)
 sparse_bp <- default_recipe_blueprint(composition = "dgCMatrix")
 ```
 
-This "blueprint" lets us specify during modeling how we want our data passed around from the preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type, from the Matrix package [@R-Matrix], used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
+This "blueprint" lets us specify during modeling how we want our data passed around from the \index{preprocessing}preprocessing into the model. The composition `"dgCMatrix"` is the most common sparse matrix type, from the Matrix package [@R-Matrix], used in R for modeling. We can use this `blueprint` argument when we add our recipe to our modeling workflow, to define how the data should be passed into the model.
 
 
 ```r
@@ -984,11 +989,11 @@ sparse_rs %>%
 
 The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 0.00036) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
 
-Importantly, this tuning also took a bit less time to complete. 
+Importantly, this tuning also took a bit less time to complete.\index{computational speed} 
 
-- The _preprocessing_ was not much faster, because tokenization and computing tf-idf take a long time. 
+- The _preprocessing_\index{preprocessing} was not much faster, because tokenization and computing tf-idf take a long time.\index{tf-idf} 
 
-- The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix input than any dense input. 
+- The _model fitting_ was much faster, because for highly sparse data, this implementation of regularized regression is much faster for sparse matrix\index{matrix!sparse} input than any dense input. 
 
 Overall, the whole tuning workflow is about 10% faster using the sparse preprocessing blueprint. Depending on how computationally expensive your preprocessing is relative to your model and how sparse your data is, you may expect to see larger (or smaller) gains from moving to a sparse data representation.
 
@@ -1061,7 +1066,7 @@ multicomplaints_train %>%
 ```
 
 There is significant imbalance between the classes that we must address, with over twenty times more cases of the majority class than there is of the smallest class.
-This kind of imbalance is a common problem with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.
+This kind of imbalance is a common problem\index{classification!challenges} with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.
 
 Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:
 
@@ -1074,7 +1079,7 @@ Compared to binary classification, there are several additional issues to keep i
 When you have multiple classes in your data, it is possible to formulate the multiclass problem in two ways. With one approach, any given observation can belong to multiple classes. With the other approach, an observation can belong to one and only one class. We will be sticking to the second, "one class per observation" model formulation in this section.
 
 There are many different ways to deal with imbalanced data.
-We will demonstrate one of the simplest methods, downsampling, where observations from the majority classes are removed during training to achieve a balanced class distribution.
+We will demonstrate one of the simplest methods, downsampling\index{downsampling}, where observations from the majority classes are removed during training to achieve a balanced class distribution.
 We will be using the **themis** [@R-themis] add-on package for recipes which provides the `step_downsample()` function to perform downsampling.
 
 <div class="rmdpackage">
@@ -1082,7 +1087,7 @@ We will be using the **themis** [@R-themis] add-on package for recipes which pro
 </div>
 
 We have to create a new recipe specification from scratch, since we are dealing with new training data this time.
-The specification `multicomplaints_rec` is similar to what we created in Section \@ref(classfirstattemptlookatdata). The only changes are that different data is passed to the `data` argument in the `recipe()` function (it is now `multicomplaints_train`) and we have added `step_downsample(product)` to the end of the recipe specification to downsample after all the text preprocessing. We want to downsample last so that we still generate features on the full training data set. The downsampling will then _only_ affect the modeling step, not the preprocessing steps, with hopefully better results.
+The specification `multicomplaints_rec` is similar to what we created in Section \@ref(classfirstattemptlookatdata). The only changes are that different data is passed to the `data` argument in the `recipe()` function (it is now `multicomplaints_train`) and we have added `step_downsample(product)` to the end of the recipe specification to downsample after all the text preprocessing. We want to downsample last so that we still generate features on the full training data set. The downsampling\index{downsampling} will then _only_ affect the modeling step, not the preprocessing\index{preprocessing} steps, with hopefully better results.
 
 
 ```r
@@ -1218,7 +1223,7 @@ The accuracy metric naturally extends to multiclass tasks, but even the very bes
 <p>In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.</p>
 </div>
 
-To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure \@ref(fig:multiheatmap).
+To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices\index{matrix!confusion} in Figure \@ref(fig:multiheatmap).
 
 
 ```r
@@ -1233,7 +1238,7 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmap-1.png" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
+<img src="07_ml_classification_files/figure-html/multiheatmap-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
 <p class="caption">(\#fig:multiheatmap)Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal</p>
 </div>
 
@@ -1256,13 +1261,13 @@ multi_lasso_rs %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.png" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
+<img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
 <p class="caption">(\#fig:multiheatmapminusdiag)Confusion matrix for multiclass lasso regularized classifier without diagonal</p>
 </div>
 
-Now we can more clearly see where our model breaks down in Figure \@ref(fig:multiheatmapminusdiag). Some of the most common errors are "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Debt collection" or "Credit card of prepaid card" complaints. Those mistakes by the model are not hard to understand since all deal with credit and debt and do have overlap in vocabulary.
+Now we can more clearly see where our model breaks down in \index{matrix!confusion}Figure \@ref(fig:multiheatmapminusdiag). Some of the most common errors are "Credit reporting, credit repair services, or other personal consumer reports" complaints being wrongly being predicted as "Debt collection" or "Credit card of prepaid card" complaints. Those mistakes by the model are not hard to understand since all deal with credit and debt and do have overlap in vocabulary.
 Knowing what the problem is helps us figure out how to improve our model.
-The next step for improving our model is to revisit the data preprocessing steps and model selection.
+The next step for improving our model is to revisit the data preprocessing\index{preprocessing} steps and model selection.
 We can look at different models or model engines that might be able to more easily separate the classes.
 
 Now that we have an idea of where the model isn't working, we can look more closely at the data and attempt to create features that could distinguish between these classes. In Section \@ref(customfeatures) we will demonstrate how you can create your own custom features.
@@ -1302,7 +1307,7 @@ more_vars_rec <-
          data = complaints_train)
 ```
 
-How should we preprocess the `date_received` variable? We can use the `step_date()` function to extract the month and day of the week (`"dow"`). Then we remove the original date variable and convert the new month and day-of-the-week columns to indicator variables with `step_dummy()`.
+How should we preprocess the `date_received` variable? We can use the `step_date()` function to extract the month and day of the week (`"dow"`). Then we remove the original date variable and convert the new month and day-of-the-week columns to \index{variables!dummy}indicator variables with `step_dummy()`.
 
 <div class="rmdnote">
 <p>Categorical variables like the month can be stored as strings or factors, but for some kinds of models, they must be converted to indicator or dummy variables. These are numeric binary variables for the levels of the original categorical variable. For example, a variable called <code>December</code> would be created that is all zeroes and ones specifying which complaints were submitted in December, plus a variable called <code>November</code>, a variable called <code>October</code>, and so on.</p>
@@ -1316,7 +1321,7 @@ more_vars_rec <- more_vars_rec %>%
   step_dummy(has_role("dates"))
 ```
 
-The `tags` variable has some missing data. We can deal with this by using `step_unknown()`, which adds a new level to this factor variable for cases of missing data. Then we "dummify" (create dummy/indicator variables) the variable with `step_dummy()`
+The `tags` variable has some missing data. We can deal with this by using `step_unknown()`, which adds a new level to this factor variable for cases of missing data. Then we "dummify" (create dummy/indicator variables) the variable with `step_dummy()`.\index{variables!dummy}
 
 
 ```r
@@ -1444,8 +1449,8 @@ In our example here, some of the non-text predictors are included in the model w
 
 ## Case study: data censoring
 
-The complaints data set already has sensitive information (PII) censored or protected using strings such as "XXXX" and "XX".
-This data censoring can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
+The complaints data set already has sensitive information (PII)\index{PII} censored or protected using strings such as "XXXX" and "XX".
+This data censoring\index{censoring} can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
 
 Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training data set.
 
@@ -1468,7 +1473,7 @@ complaints_train %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/censoredtrigram-1.png" alt="Many of the most frequent trigrams feature censored information" width="672" />
+<img src="07_ml_classification_files/figure-html/censoredtrigram-1.svg" alt="Many of the most frequent trigrams feature censored information" width="672" />
 <p class="caption">(\#fig:censoredtrigram)Many of the most frequent trigrams feature censored information</p>
 </div>
 
@@ -1502,13 +1507,13 @@ plot_data %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/trigram25-1.png" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
+<img src="07_ml_classification_files/figure-html/trigram25-1.svg" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
 <p class="caption">(\#fig:trigram25)Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class</p>
 </div>
 
 There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
 Remember that the current tokenization engine strips punctuation before tokenizing. 
-This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.].
+This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored\index{censoring} trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.].
 
 To crudely simulate what the data might look like before it was censored, we can replace all cases of "XX" and "XXXX" with random integers. 
 This isn't quite right since dates will be given values between `00` and `99` and we don't know for sure that only numerals have been censored, but it gives us a place to start.
@@ -1562,7 +1567,7 @@ complaints_train %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.png" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
+<img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.svg" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
 <p class="caption">(\#fig:uncensoredtrigram)Trigrams without numbers float to the top as the uncensored tokens are too spread out</p>
 </div>
 
@@ -1575,21 +1580,21 @@ Censoring the dates in these complaints gives more power to a date as a general 
 <p>What happens when we use these censored dates as a feature in supervised machine learning? We have a higher chance of understanding if dates in the complaint text are important to predicting the class, but we are blinded to the possibility that certain dates and months are more important.</p>
 </div>
 
-Data censoring can be a form of preprocessing in your data pipeline.
-For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
+Data censoring\index{censoring} can be a form of preprocessing in your data pipeline.
+For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII\index{PII} embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
 More importantly, that information can become embedded in your model and begin to leak as demonstrated by @carlini2018secret, @Fredrikson2014, and @Fredrikson2015.
 Both of these issues are important, and one of them could land you in a lot of legal trouble. 
 Exposing such PII to modeling is an example of where we should all stop to ask, "Should we even be doing this?" as we discussed in the foreword to these chapters.
 
 If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the _presence_ of a social security number. 
-Since a social security number has a very specific form, we can easily construct a regular expression (Appendix \@ref(regexp)) to locate them.
+Since a social security number has a very specific form, we can easily construct a \index{regex}regular expression (Appendix \@ref(regexp)) to locate them.
 
 <div class="rmdnote">
 <p>A social security number comes in the form <code>AAA-BB-CCCC</code> where <code>AAA</code> is a number between <code>001</code> and <code>899</code> excluding <code>666</code>, <code>BB</code> is a number between <code>01</code> and <code>99</code> and <code>CCCC</code> is a number between <code>0001</code> and <code>9999</code>. This gives us the following regex:</p>
 <p><code>(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}</code></p>
 </div>
 
-We can use a function to replace each social security number with an indicator that can be detected later by preprocessing steps. 
+We can use a function to replace each social security number with an indicator that can be detected later by \index{preprocessing}preprocessing steps. 
 It's a good idea to use a "word" that won't be accidentally broken up by a tokenizer.
 
 
@@ -1611,7 +1616,7 @@ str_replace_all(string = ssn_text,
 #> [3] "My parents numbers are ssnindicator and ssnindicator"
 ```
 
-This technique isn't useful only for personally identifiable information but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
+This technique isn't useful only for personally identifiable information\index{PII} but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
 
 
 \BeginKnitrBlock{rmdwarning}<div class="rmdwarning">The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as @Sweeney2000, and current best practices to protect against such mining.</div>\EndKnitrBlock{rmdwarning}
@@ -1620,14 +1625,14 @@ This technique isn't useful only for personally identifiable information but can
 ## Case study: custom features {#customfeatures}
 
 Most of what we have looked at so far has boiled down to counting tokens and weighting them in one way or another.
-This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your data set that you should use in feature engineering.
+This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your data set that you should use in feature engineering.\index{feature engineering}
 Your domain knowledge allows you to build more predictive features than the naive search of simple tokens.
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of knowledge about regular expressions pays off.
 
 \BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdpackage}
 
-Your specific domain knowledge may provide specific guidance about feature engineering for text.
+Your specific domain knowledge may provide specific guidance about feature engineering\index{feature engineering} for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
 They can also be more engineered such as the percentage of capitalization, whether the text ends with a hashtag, or whether two people's names are both mentioned in a document.
 
@@ -1645,6 +1650,7 @@ A credit card number is represented as four groups of four capital Xs in this da
 Since the data is fairly well processed we are fairly sure that spacing will not be an issue and all credit cards will be represented as "XXXX XXXX XXXX XXXX". 
 A first naive attempt may be to use `str_detect()` with "XXXX XXXX XXXX XXXX" to find all the credit cards.
 
+\index{regex}
 <div class="rmdnote">
 <p>It is a good idea to create a small example regular expression where you know the answer, and then prototype your function before moving to the main data set.</p>
 </div>
@@ -1684,7 +1690,7 @@ str_detect(credit_cards, "[^X] XXXX XXXX XXXX XXXX [^X]")
 
 Hurray! This fixed the false positive. 
 But it gave us a false negative in return.
-Turns out that this regex doesn't allow the credit card to be followed by a period since it requires a space.
+Turns out that this regex\index{regex} doesn't allow the credit card to be followed by a period since it requires a space.
 We can fix this with an alteration to match for a period or a space and a non-X.
 
 
@@ -1726,11 +1732,12 @@ creditcard_count(credit_cards)
 
 ### Calculate percentage censoring
 
-Some of the complaints contain a high proportion of censoring, and we can build a feature to measure the percentage of the text that is censored.
+Some of the complaints contain a high proportion of censoring\index{censoring}, and we can build a feature to measure the percentage of the text that is censored.
 
 <div class="rmdwarning">
 <p>There are often many ways to get to the same solution when working with regular expressions.</p>
 </div>
+\index{regex}
 
 Let's attack this problem by counting the number of X's in each string, then count the number of alphanumeric characters and divide the two to get a percentage.
 
@@ -1776,7 +1783,7 @@ percent_censoring(credit_cards)
 
 ### Detect monetary amounts
 
-We have already constructed a regular expression that detects the monetary amount from the text in Section \@ref(classfirstattemptlookatdata), so now we can look at how to use this information.
+We have already constructed a \index{regex}regular expression that detects the monetary amount from the text in Section \@ref(classfirstattemptlookatdata), so now we can look at how to use this information.
 Let's start by creating a little example and see what we can extract.
 
 
@@ -1839,7 +1846,7 @@ max_money(dollar_texts)
 #> [1] 20  7  0
 ```
 
-Now that we have created some feature engineering functions, we can use them to (hopefully) make our classification model better.
+Now that we have created some \index{feature engineering}feature engineering functions, we can use them to (hopefully) make our classification model better.
 
 
 ## What evaluation metrics are appropriate?
@@ -1900,7 +1907,7 @@ nb_rs_predictions %>%
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
-The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.
+The \index{matrix!confusion}confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.
 
 
 ```r
@@ -1925,7 +1932,7 @@ It is possible with many data sets to achieve high accuracy just by predicting t
 We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
 We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features\index{feature engineering} we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 
@@ -2087,7 +2094,7 @@ autoplot(tune_rs) +
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.png" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
+<img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.svg" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
 <p class="caption">(\#fig:complaintsfinaltunevis)Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty.</p>
 </div>
 
@@ -2167,7 +2174,7 @@ collect_metrics(final_fitted)
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
 
-The confusion matrix on the testing data in Figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn't any strong bias towards either of the classes. 
+The \index{matrix!confusion}confusion matrix on the testing data in Figure \@ref(fig:finalheatmap) also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn't any strong bias towards either of the classes. 
 
 
 ```r
@@ -2177,7 +2184,7 @@ collect_predictions(final_fitted) %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/finalheatmap-1.png" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
+<img src="07_ml_classification_files/figure-html/finalheatmap-1.svg" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
 <p class="caption">(\#fig:finalheatmap)Confusion matrix on the test set for final lasso regularized classifier</p>
 </div>
 
@@ -2196,7 +2203,7 @@ collect_predictions(final_fitted)  %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/finalroccurve-1.png" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
+<img src="07_ml_classification_files/figure-html/finalroccurve-1.svg" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
 <p class="caption">(\#fig:finalroccurve)ROC curve with the test set for final lasso regularized classifier</p>
 </div>
 
@@ -2236,7 +2243,7 @@ complaints_imp %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/complaintsvip-1.png" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
+<img src="07_ml_classification_files/figure-html/complaintsvip-1.svg" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
 <p class="caption">(\#fig:complaintsvip)Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
 </div>
 
@@ -2303,7 +2310,7 @@ complaints_bind %>%
 #> 10 "I have contacted this company through the credit bureaus multiple times to …
 ```
 
-Again, these are "mistakes" on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.
+Again, these are "mistakes"\index{models!challenges} on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.
 
 ## Summary {#mlclassificationsummary}
 

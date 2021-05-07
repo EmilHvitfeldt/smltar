@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -523,7 +523,7 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 #&gt;  [1] &quot;resting&quot; &quot;place&quot;   &quot;grew&quot;    &quot;a&quot;       &quot;pretty&quot;  &quot;little&quot;  &quot;fir&quot;    
 #&gt;  [8] &quot;tree&quot;    &quot;and&quot;     &quot;yet&quot;     &quot;it&quot;      &quot;was&quot;     &quot;not&quot;     &quot;happy&quot;  
 #&gt; [15] &quot;it&quot;</code></pre>
-<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2020</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this word boundary algorithm<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> work? It can be outlined as follows:</p>
+<p>We see sensible single-word results here; the <code>tokenize_words()</code> function uses the <strong>stringi</strong> package <span class="citation">(<a href="#ref-Gagolewski19" role="doc-biblioref">Gagolewski 2020</a>)</span> and C++ under the hood, making it very fast. Word-level tokenization is done by finding word boundaries according to the specification from the International Components for Unicode (ICU). How does this <a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries">word boundary algorithm</a> work? It can be outlined as follows:</p>
 <ul>
 <li><p>Break at the start and end of text, unless the text is empty.</p></li>
 <li><p>Do not break within CRLF (new line characters).</p></li>
@@ -651,7 +651,7 @@ The <strong>tidytext</strong> package provides functions to transform text to an
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;\U0001f1e8\U0001f1e6&quot; &quot;\U0001f1e6\U0001f1f6&quot; &quot;\U0001f1ea\U0001f1fa&quot;
 #&gt; [4] &quot;\U0001f1ef\U0001f1f5&quot;</code></pre>
-<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
+<p>When tokenizing here we get to see the bare Unicode characters. Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are “REGIONAL INDICATOR SYMBOLS,” <a href="https://codepoints.net/U+1F1E8?lang=en">“C”</a> and <a href="https://codepoints.net/U+1F1E6?lang=en">“A”</a> respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.</p>
 </div>
 <div id="word-tokens" class="section level3" number="2.2.2">
 <h3><span class="header-section-number">2.2.2</span> Word tokens</h3>
@@ -733,7 +733,7 @@ We use Latin prefixes so that a 1-gram is called a unigram, a 2-gram is called a
 <p>Notice how the words in the trigrams overlap so that the word “down” appears in the middle of the first trigram and beginning of the second trigram. N-gram tokenization slides along the text to create overlapping sets of tokens.</p>
 <p>It is important to choose the right value for <code>n</code> when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don’t capture information about word order. Using a higher value for <code>n</code> keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don’t have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure <a href="tokenization.html#fig:ngramtokens">2.2</a> demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams.</p>
 <div class="figure" style="text-align: center"><span id="fig:ngramtokens"></span>
-<img src="02_tokenization_files/figure-html/ngramtokens-1.png" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale." width="672" />
+<img src="02_tokenization_files/figure-html/ngramtokens-1.svg" alt="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale." width="672" />
 <p class="caption">
 FIGURE 2.2: Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale.
 </p>
@@ -836,7 +836,7 @@ To do this we use <code>nest()</code> and <code>map_chr()</code> to create a dat
 <p>Another thing to consider is the degree of compression each type of tokenization provides. The choice of tokenization results in a different pool of possible tokens, and can influence performance. By choosing a method that gives fewer possible tokens you allow later computational tasks to be performed faster. However, that comes with the risk of collapsing together categories of a different meaning. It is also worth noting that the spread of the number of different tokens varies with your choice of tokenizer.</p>
 <p>Figure <a href="tokenization.html#fig:tokendists">2.3</a> illustrates these points. Each of the fairy tales from <strong>hcandersenr</strong> has been tokenized in five different ways and the number of distinct tokens has been plotted along the x-axis (note that the x-axis is logarithmic). We see that the number of distinct tokens decreases if we convert words to lowercase or extract word stems (see Chapter <a href="stemming.html#stemming">4</a> for more on stemming). Second, notice that the distributions of distinct tokens for character tokenizers are quite narrow; these texts use all or most of the letters in the English alphabet.</p>
 <div class="figure" style="text-align: center"><span id="fig:tokendists"></span>
-<img src="02_tokenization_files/figure-html/tokendists-1.png" alt="The number of distinct tokens can vary enormously for different tokenizers" width="672" />
+<img src="02_tokenization_files/figure-html/tokendists-1.svg" alt="The number of distinct tokens can vary enormously for different tokenizers" width="672" />
 <p class="caption">
 FIGURE 2.3: The number of distinct tokens can vary enormously for different tokenizers
 </p>
@@ -1024,11 +1024,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 x 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       74.8ms   77.9ms     12.8     4.59MB     0   
-#&gt; 2 tokenizers   88.6ms     94ms     10.3     1.01MB     1.15
-#&gt; 3 text2vec     75.6ms     77ms     12.9    20.59MB     1.44
-#&gt; 4 quanteda    140.4ms  145.2ms      6.88     8.7MB     1.72
-#&gt; 5 base R      298.7ms  305.2ms      3.26   10.51MB     2.18</code></pre>
+#&gt; 1 corpus       74.3ms   76.1ms     13.1     4.59MB     0   
+#&gt; 2 tokenizers   86.8ms   90.4ms     10.8     1.01MB     1.21
+#&gt; 3 text2vec     78.5ms     80ms     12.3    20.59MB     1.37
+#&gt; 4 quanteda    142.5ms  145.5ms      6.88     8.7MB     1.72
+#&gt; 5 base R      296.6ms  302.4ms      3.24   10.51MB     1.39</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">
@@ -1061,7 +1061,7 @@ Honnibal, Matthew, and Ines Montani. 2017. <span>“<span class="nocase">spaCy 2
 Huang, Weipeng, Xingyi Cheng, Kunlong Chen, Taifeng Wang, and Wei Chu. 2020. <span>“Towards Fast and Accurate Neural <span>C</span>hinese Word Segmentation with Multi-Criteria Learning.”</span> In <em>Proceedings of the 28th International Conference on Computational Linguistics</em>, 2062–2072. Barcelona, Spain (Online): International Committee on Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/2020.coling-main.186">10.18653/v1/2020.coling-main.186</a>.
 </div>
 <div id="ref-R-hcandersenr" class="csl-entry">
-Hvitfeldt, Emil. 2019a. <em>Hcandersenr: H.c. Andersens Fairy Tales</em>. <a href="https://CRAN.R-project.org/package=hcandersenr">https://CRAN.R-project.org/package=hcandersenr</a>.
+Hvitfeldt, Emil. 2019a. <em><span class="nocase">hcandersenr</span>: H.c. Andersens Fairy Tales</em>. <a href="https://CRAN.R-project.org/package=hcandersenr">https://CRAN.R-project.org/package=hcandersenr</a>.
 </div>
 <div id="ref-ma-etal-2018-state" class="csl-entry">
 Ma, Ji, Kuzman Ganchev, and David Weiss. 2018. <span>“State-of-the-Art <span>C</span>hinese Word Segmentation with Bi-<span>LSTM</span>s.”</span> In <em>Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing</em>, 4902–4908. Brussels, Belgium: Association for Computational Linguistics. doi:<a href="https://doi.org/10.18653/v1/D18-1529">10.18653/v1/D18-1529</a>.
@@ -1073,20 +1073,19 @@ Manning, Christopher D., Prabhakar Raghavan, and Hinrich Schütze. 2008. <em>Int
 Mullen, Lincoln A., Kenneth Benoit, Os Keyes, Dmitry Selivanov, and Jeffrey Arnold. 2018. <span>“Fast, Consistent Tokenization of Natural Language Text.”</span> <em>Journal of Open Source Software</em> 3: 655. doi:<a href="https://doi.org/10.21105/joss.00655">10.21105/joss.00655</a>.
 </div>
 <div id="ref-Perry2020" class="csl-entry">
-Perry, Patrick O. 2020. <em>Corpus: Text Corpus Analysis</em>. <a href="https://CRAN.R-project.org/package=corpus">https://CRAN.R-project.org/package=corpus</a>.
+Perry, Patrick O. 2020. <em><span class="nocase">corpus</span>: Text Corpus Analysis</em>. <a href="https://CRAN.R-project.org/package=corpus">https://CRAN.R-project.org/package=corpus</a>.
 </div>
 <div id="ref-Silge16" class="csl-entry">
 Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in <span>R</span>.”</span> <em>JOSS</em> 1 (3). The Open Journal. doi:<a href="https://doi.org/10.21105/joss.00037">10.21105/joss.00037</a>.
 </div>
 <div id="ref-R-jiebaR" class="csl-entry">
-Wenfeng, Qin, and Wu Yanyi. 2019. <em>jiebaR: Chinese Text Segmentation</em>. <a href="https://CRAN.R-project.org/package=jiebaR">https://CRAN.R-project.org/package=jiebaR</a>.
+Wenfeng, Qin, and Wu Yanyi. 2019. <em><span class="nocase">jiebaR</span>: Chinese Text Segmentation</em>. <a href="https://CRAN.R-project.org/package=jiebaR">https://CRAN.R-project.org/package=jiebaR</a>.
 </div>
 </div>
 <div class="footnotes">
 <hr />
 <ol start="3">
-<li id="fn3"><p><a href="https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries" class="uri">https://www.unicode.org/reports/tr29/tr29-35.html#Default_Word_Boundaries</a><a href="tokenization.html#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Full list of emoji modifiers here: <a href="https://unicode.org/emoji/charts/full-emoji-modifiers.html" class="uri">https://unicode.org/emoji/charts/full-emoji-modifiers.html</a><a href="tokenization.html#fnref3" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

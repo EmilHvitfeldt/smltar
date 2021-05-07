@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-02" />
+<meta name="date" content="2021-05-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -455,7 +455,7 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="dlcnn" class="section level1" number="10">
 <h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks</h1>
-<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Y. Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
+<p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on  <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Y. Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
 <p>CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.</p>
 <div class="rmdnote">
 <p>
@@ -538,7 +538,7 @@ The <code>layer_global_max_pooling_1d()</code> layer collapses the remaining CNN
 <p>This might not end up being the best CNN configuration, but it is a good starting point.
 One of the challenges when working with CNNs is to ensure that we manage the dimensionality correctly. The length of the sequence decreases by <code>(kernel_size - 1)</code> for each layer. For this input, we have a sequence of length <code>max_length = 30</code>, which is decreased by <code>(5 - 1) = 4</code> resulting in a sequence of 26, as shown in the printed output of <code>simple_cnn_model</code>. We could create seven layers with <code>kernel_size = 5</code>, since we would end with <code>30 - 4 - 4 - 4 - 4 - 4 - 4 - 4 = 2</code> elements in the resulting sequence. However, we would not be able to do a network with 3 layers of
 <code>kernel_size = 7</code> followed by 3 layers of <code>kernel_size = 5</code> since the resulting sequence would be <code>30 - 6 - 6 - 6 - 4 - 4 - 4 = 0</code> and we must have a positive length for our sequence.
-Remember that <code>kernel_size</code> is not the only argument that will change the length of the resulting sequence.</p>
+Remember that <code>kernel_size</code> is not the only argument that will change the length of the resulting sequence. </p>
 <div class="rmdnote">
 <p>
 Constructing a sequence layer by layer and using Keras’ print method to check the configuration is a great way to make sure your architecture is valid.
@@ -558,6 +558,7 @@ Constructing a sequence layer by layer and using Keras’ print method to check 
 <span id="cb578-11"><a href="dlcnn.html#cb578-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
 <span id="cb578-12"><a href="dlcnn.html#cb578-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
 <span id="cb578-13"><a href="dlcnn.html#cb578-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+
 <div class="rmdnote">
 <p>
 We are using the <code>“adam”</code> optimizer since it performs well for many kinds of models. You may have to experiment to find the optimizer that works best for your model and data.
@@ -595,7 +596,7 @@ We are using the <code>“adam”</code> optimizer since it performs well for ma
 <span id="cb583-2"><a href="dlcnn.html#cb583-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb583-3"><a href="dlcnn.html#cb583-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnheatmap"></span>
-<img src="10_dl_cnn_files/figure-html/cnnheatmap-1.png" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnheatmap-1.svg" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 10.3: Confusion matrix for first CNN model predictions of Kickstarter campaign success
 </p>
@@ -608,7 +609,7 @@ FIGURE 10.3: Confusion matrix for first CNN model predictions of Kickstarter cam
 <span id="cb584-5"><a href="dlcnn.html#cb584-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb584-6"><a href="dlcnn.html#cb584-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnroccurve"></span>
-<img src="10_dl_cnn_files/figure-html/cnnroccurve-1.png" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnroccurve-1.svg" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 10.4: ROC curve for first CNN model predictions of Kickstarter campaign success
 </p>
@@ -821,7 +822,7 @@ This is another parameter you can tinker with when you are designing the network
 <span id="cb599-6"><a href="dlcnn.html#cb599-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb599-7"><a href="dlcnn.html#cb599-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:allcnnroccurve"></span>
-<img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.png" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.svg" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 10.5: ROC curve for three CNN variants’ predictions of Kickstarter campaign success
 </p>
@@ -893,7 +894,7 @@ The <strong>textrecipes</strong> package has a tokenization engine to perform by
 <span id="cb603-5"><a href="dlcnn.html#cb603-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of subwords per campaign blurb&quot;</span>,</span>
 <span id="cb603-6"><a href="dlcnn.html#cb603-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:kickstartersubwordlength"></span>
-<img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.png" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
+<img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.svg" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
 <p class="caption">
 FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes
 </p>
@@ -974,7 +975,7 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 <span id="cb609-4"><a href="dlcnn.html#cb609-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb609-5"><a href="dlcnn.html#cb609-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:bpeheatmap"></span>
-<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.png" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
+<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.svg" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
 <p class="caption">
 FIGURE 10.7: Confusion matrix for CNN model using byte pair encoding tokenization
 </p>
@@ -1016,7 +1017,9 @@ Examining the longest subword tokens gives you a good sense of the data you are 
 </div>
 <div id="lime" class="section level2" number="10.5">
 <h2><span class="header-section-number">10.5</span> Case study: explainability with LIME</h2>
-<p>We noted in Section <a href="dldnn.html#dllimitations">8.7</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using an algorithm for observation-level variable importance like <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short.</p>
+<p>
+
+We noted in Section <a href="dldnn.html#dllimitations">8.7</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using an algorithm for observation-level variable importance like <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short.</p>
 <div class="rmdnote">
 <p>
 As indicated by its name, LIME is an approach to compute local feature importance, or explainability at the individual observation level. It does not offer global feature importance, or explainability for the model as a whole.
@@ -1054,7 +1057,7 @@ our bare hands.  Let&#39;s make this a reality!&quot;</code></pre>
 <p>We now load the lime package and pass observations into <code>lime()</code> along with the model we are trying to explain and the preprocess function.</p>
 <div class="rmdwarning">
 <p>
-Be sure that the preprocess function <em>matches</em> the preprocessing that was used to train the model.
+Be sure that the preprocessing function <em>matches</em> the preprocessing that was used to train the model.
 </p>
 </div>
 <div class="sourceCode" id="cb617"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb617-1"><a href="dlcnn.html#cb617-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lime)</span>
@@ -1064,7 +1067,7 @@ Be sure that the preprocess function <em>matches</em> the preprocessing that was
 <span id="cb617-5"><a href="dlcnn.html#cb617-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
 <span id="cb617-6"><a href="dlcnn.html#cb617-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
 <span id="cb617-7"><a href="dlcnn.html#cb617-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
+<p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a>. We set <code>n_features = 12</code> to return the twelve most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
 <div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
 <span id="cb618-2"><a href="dlcnn.html#cb618-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
 <span id="cb618-3"><a href="dlcnn.html#cb618-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
@@ -1092,7 +1095,7 @@ Be sure that the preprocess function <em>matches</em> the preprocessing that was
 <p>The output comes in a tibble format where <code>feature</code> and <code>feature_weight</code> are included, but fortunately lime contains some functions to visualize these weights. Figure <a href="dlcnn.html#fig:limeplotfeatures">10.8</a> shows the result of using <code>plot_features()</code>, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Bars in the positive direction (darker) indicate that the weights <em>support</em> the prediction and bars in the negative direction (lighter) indicate <em>contradictions</em>. This chart is great for finding the most prominent features in an observation.</p>
 <div class="sourceCode" id="cb620"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb620-1"><a href="dlcnn.html#cb620-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_features</span>(explanation)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:limeplotfeatures"></span>
-<img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.png" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
+<img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.svg" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
 <p class="caption">
 FIGURE 10.8: Plot of most important features for a CNN model predicting two observations.
 </p>
@@ -1271,12 +1274,12 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.00       0.0316           0.993           1.00             0.808
-#&gt; 2 _tuning/20… 1.02       0.036            0.992           1.02             0.804
-#&gt; 3 _tuning/20… 0.971      0.0488           0.987           0.971            0.804
-#&gt; 4 _tuning/20… 0.966      0.0292           0.994           0.966            0.812
-#&gt; 5 _tuning/20… 0.940      0.0313           0.994           0.940            0.810
-#&gt; 6 _tuning/20… 0.958      0.0434           0.989           0.958            0.810
+#&gt; 1 _tuning/20… 0.988      0.0328           0.993           0.988            0.809
+#&gt; 2 _tuning/20… 0.991      0.0351           0.992           0.991            0.808
+#&gt; 3 _tuning/20… 0.953      0.0507           0.987           0.953            0.803
+#&gt; 4 _tuning/20… 0.977      0.0311           0.994           0.977            0.811
+#&gt; 5 _tuning/20… 0.964      0.0322           0.993           0.964            0.812
+#&gt; 6 _tuning/20… 0.940      0.0443           0.989           0.940            0.807
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
@@ -1291,13 +1294,13 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 6 x 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.812                 7             1
-#&gt; 2               0.810                 3             1
-#&gt; 3               0.810                 5             1
-#&gt; 4               0.808                 7             2
-#&gt; 5               0.804                 5             2
-#&gt; 6               0.804                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.812                 5             1
+#&gt; 2               0.811                 7             1
+#&gt; 3               0.809                 7             2
+#&gt; 4               0.808                 5             2
+#&gt; 5               0.807                 3             1
+#&gt; 6               0.803                 3             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
@@ -1416,6 +1419,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <div id="cnnfull" class="section level2" number="10.8">
 <h2><span class="header-section-number">10.8</span> The full game: CNN</h2>
 <p>We’ve come a long way in this chapter, and looked at the many different modifications to the simple CNN model we started with. Most of the alterations didn’t add much so this final model is not going to be much different than what we have seen so far.</p>
+<p></p>
 <div class="rmdwarning">
 <p>
 There are an incredible number of ways to change a deep learning network architecture, but in most realistic situations, the benefit in model performance from such changes is modest.
@@ -1491,7 +1495,7 @@ There are an incredible number of ways to change a deep learning network archite
 <span id="cb648-2"><a href="dlcnn.html#cb648-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
 <span id="cb648-3"><a href="dlcnn.html#cb648-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnfinalroc"></span>
-<img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.png" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.svg" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 10.11: ROC curve for final CNN model predictions on testing set of Kickstarter campaign success
 </p>
@@ -1501,7 +1505,7 @@ FIGURE 10.11: ROC curve for final CNN model predictions on testing set of Kickst
 <span id="cb649-2"><a href="dlcnn.html#cb649-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb649-3"><a href="dlcnn.html#cb649-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:cnnheatmapfinal"></span>
-<img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.png" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
+<img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.svg" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 10.12: Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success
 </p>
@@ -1543,7 +1547,7 @@ Gage, P. 1994. <span>“A New Algorithm for Data Compression.”</span> <em>The 
 Kim, Yoon. 2014. <span>“Convolutional Neural Networks for Sentence Classification.”</span> In <em>Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (<span>EMNLP</span>)</em>, 1746–1751. Doha, Qatar: Association for Computational Linguistics. doi:<a href="https://doi.org/10.3115/v1/D14-1181">10.3115/v1/D14-1181</a>.
 </div>
 <div id="ref-R-lime" class="csl-entry">
-Pedersen, Thomas Lin, and Michaël Benesty. 2021. <em>Lime: Local Interpretable Model-Agnostic Explanations</em>. <a href="https://CRAN.R-project.org/package=lime">https://CRAN.R-project.org/package=lime</a>.
+Pedersen, Thomas Lin, and Michaël Benesty. 2021. <em><span class="nocase">lime</span>: Local Interpretable Model-Agnostic Explanations</em>. <a href="https://CRAN.R-project.org/package=lime">https://CRAN.R-project.org/package=lime</a>.
 </div>
 <div id="ref-ribeiro2016why" class="csl-entry">
 Ribeiro, Marco Tulio, Sameer Singh, and Carlos Guestrin. 2016. <span>“"Why Should i Trust You?": Explaining the Predictions of Any Classifier.”</span> In <em>Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining</em>, 1135–1144. KDD ’16. New York, NY, USA: Association for Computing Machinery. doi:<a href="https://doi.org/10.1145/2939672.2939778">10.1145/2939672.2939778</a>.
@@ -1557,8 +1561,8 @@ Zhang, Xiang, Junbo Zhao, and Yann LeCun. 2015. <span>“Character-Level Convolu
 </div>
 <div class="footnotes">
 <hr />
-<ol start="17">
-<li id="fn17"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref17" class="footnote-back">↩︎</a></p></li>
+<ol start="16">
+<li id="fn16"><p>The explanations of the second label would just be the inverse of the first label. If you have more than two labels, it makes sense to explore some or all of them.<a href="dlcnn.html#fnref16" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
             </section>

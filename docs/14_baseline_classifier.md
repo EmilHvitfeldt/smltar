@@ -267,4 +267,4 @@ show_best(lasso_rs, "accuracy")
 autoplot(lasso_rs)
 ```
 
-<img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" />
+<img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" />
