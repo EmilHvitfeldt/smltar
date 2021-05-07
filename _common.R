@@ -6,6 +6,7 @@ opts_chunk$set(
   cache = TRUE, 
   eval = TRUE,
   tidy = "styler", 
+  dev = "svglite",
   dpi = 105, # this creates 2*105 dpi at 6in, which is 300 dpi at 4.2in
   fig.align = 'center',
   fig.width = 6,
