@@ -86,9 +86,7 @@ columnize <- function(words, ncol = 5) {
   
 }
 
-## control caching
-online <- TRUE
-# online <- FALSE
+julias_computer <- FALSE
 
 sparse_bp <- hardhat::default_recipe_blueprint(composition = "dgCMatrix")
 

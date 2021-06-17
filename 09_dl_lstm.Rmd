@@ -1,6 +1,19 @@
 # Long short-term memory (LSTM) networks  {#dllstm}
 
-```{r include = FALSE}
+```{r include = FALSE, eval = julias_computer}
+library(keras)
+library(tensorflow)
+
+## for Julia's ARM chip
+use_python("~/miniforge3/bin/python")
+use_condaenv("tf_env")
+reticulate::py_discover_config("tensorflow")
+junk <- keras_model_sequential()
+
+tensorflow::tf$random$set_seed(1234)
+``` 
+
+```{r include = FALSE, eval = !julias_computer}
 library(keras)
 tensorflow::tf$random$set_seed(1234)
 ``` 
@@ -56,11 +69,23 @@ Like we discussed in the last chapter, we are using **recipes** and **textrecipe
 
 We could have applied these `prep()` and `bake()` functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
 
+```{r include=FALSE}
+# hacky hacky hack
+data(okc_text, package = "modeldata")
+
+okc_rec <- recipe(~ essay0, data = okc_text) %>%
+  step_tokenize(essay0) %>%
+  step_tokenfilter(essay0, max_tokens = max_words) %>%
+  step_sequence_onehot(essay0, sequence_length = max_length) %>%
+  prep()
+```
+
+
 ```{r}
 kick_prep <- prep(kick_rec)
-kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
 
-dim(kick_matrix)
+dim(kick_train)
 ```
 
 Here we use `composition = "matrix"` because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.
@@ -121,7 +146,7 @@ After the model is compiled, we can fit it. The `fit()` method for Keras models 
 ```{r}
 lstm_history <- lstm_mod %>%
   fit(
-    kick_matrix,
+    kick_train,
     kickstarter_train$state,
     epochs = 10,
     validation_split = 0.25,
@@ -402,7 +427,7 @@ padding_matrix <- bake(padding_prep, new_data = NULL, composition = "matrix")
 dim(padding_matrix)
 ```
 
-This matrix has the same dimensions as `kick_matrix` but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
+This matrix has the same dimensions as `kick_train` but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
 
 ```{r}
 pad_analysis <- bake(padding_prep, new_data = analysis(kick_val$splits[[1]]),
@@ -626,9 +651,9 @@ kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_sequence_onehot(blurb, sequence_length = max_length)
 
 kick_prep <- prep(kick_rec)
-kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
 
-dim(kick_matrix)
+dim(kick_train)
 ```
 
 ### Specify the model {#lstmfullmodel}
@@ -668,7 +693,7 @@ final_mod %>%
 
 final_history <- final_mod %>%
   fit(
-    kick_matrix,
+    kick_train,
     kickstarter_train$state,
     epochs = 10,
     validation_split = 0.1,
@@ -682,9 +707,9 @@ final_history
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
 
 ```{r}
-kick_matrix_test <- bake(kick_prep, new_data = kickstarter_test,
-                         composition = "matrix")
-final_res <- keras_predict(final_mod, kick_matrix_test, kickstarter_test$state)
+kick_test <- bake(kick_prep, new_data = kickstarter_test,
+                  composition = "matrix")
+final_res <- keras_predict(final_mod, kick_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
