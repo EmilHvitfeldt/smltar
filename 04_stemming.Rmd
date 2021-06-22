@@ -339,7 +339,7 @@ fir_tree %>%
   labs(x = "Frequency", y = NULL)
 ```
 
-Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially is we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
+Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially if we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
 
 ```{block, type = "rmdnote"}
 Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book and it takes a lot of computational power. Initializing with `entity = FALSE` will allow lemmatization to run much faster.
