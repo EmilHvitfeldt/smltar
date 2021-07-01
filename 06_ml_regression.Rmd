@@ -548,21 +548,7 @@ Keep in mind that adding n-grams\index{tokenization!n-gram} is computationally e
 
 As we discussed in Section \@ref(lemmatization), we can normalize words to their roots or \index{lemma}**lemmas** based on each word's context and the structure of a language. Table \@ref(tab:lemmatb) shows both the original words and the lemmas for one sentence from a Supreme Court opinion, using lemmatization implemented via the [spaCy](https://spacy.io/) library as made available through the **spacyr** R package [@Benoit19].
 
-```{r lemmatb, echo=FALSE, eval=julias_computer}
-spacyr::spacy_initialize(condaenv = "tf_env", entity = FALSE)
-paste(
-  "However, the Court of Appeals disagreed with the District Court's",
-  "construction of the state statute, concluding that it did authorize",
-  "issuance of the orders to withhold to the Postal Service.") %>%
-spacyr::spacy_parse() %>%
-  select(`original word` = token, lemma) %>%
-  knitr::kable(
-    caption = "Lemmatization of one sentence from a Supreme Court opinion",
-    booktabs = TRUE
-  )
-```
-
-```{r lemmatb, echo=FALSE, eval=!julias_computer}
+```{r lemmatb, echo=FALSE}
 spacyr::spacy_initialize(entity = FALSE)
 paste(
   "However, the Court of Appeals disagreed with the District Court's",
@@ -575,6 +561,8 @@ spacyr::spacy_parse() %>%
     booktabs = TRUE
   )
 ```
+
+
 
 Notice several things about lemmatization\index{lemma} that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
 
