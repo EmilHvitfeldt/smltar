@@ -3,23 +3,23 @@
 ##----------------------------------------------------------
 
 devtools::install_dev_deps()
-devtools::install_github("r-lib/pillar") ## for non-ugly tibble list col printing
 
 ##----------------------------------------------------------
 
+## no longer doing this on ARM:
 ## assume Miniconda installed and R environment exists called `r-reticulate`:
 # reticulate::install_miniconda()
 # reticulate::conda_create('r-reticulate', python_version = "3.6.9")
+# keras::install_keras(tensorflow = '2.2', extra_packages = c('IPython', 'requests', 'certifi', 'urllib3'))
 
-keras::install_keras(tensorflow = '2.2', extra_packages = c('IPython', 'requests', 'certifi', 'urllib3'))
-spacyr::spacy_install(python_version = "3.6.9", envname = "spacy_condaenv", prompt = FALSE)
+spacyr::spacy_install(envname = "tf_env", prompt = FALSE)
 
 ##----------------------------------------------------------
 
 ## double check for unexpected GitHub versions:
 deps <- desc::desc_get_deps()
 pkgs <- sort(deps$package[deps$type == "Imports"])
-sessioninfo::package_info(c(pkgs, "pillar"), dependencies = FALSE)
+sessioninfo::package_info(pkgs, dependencies = FALSE)
 
 ##----------------------------------------------------------
 
