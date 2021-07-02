@@ -56,16 +56,16 @@ kickstarter_folds
 #> # A tibble: 10 x 2
 #>    splits                 id    
 #>    <list>                 <chr> 
-#>  1 <split [181883/20210]> Fold01
-#>  2 <split [181883/20210]> Fold02
-#>  3 <split [181883/20210]> Fold03
-#>  4 <split [181884/20209]> Fold04
-#>  5 <split [181884/20209]> Fold05
-#>  6 <split [181884/20209]> Fold06
-#>  7 <split [181884/20209]> Fold07
-#>  8 <split [181884/20209]> Fold08
-#>  9 <split [181884/20209]> Fold09
-#> 10 <split [181884/20209]> Fold10
+#>  1 <split [181882/20210]> Fold01
+#>  2 <split [181882/20210]> Fold02
+#>  3 <split [181883/20209]> Fold03
+#>  4 <split [181883/20209]> Fold04
+#>  5 <split [181883/20209]> Fold05
+#>  6 <split [181883/20209]> Fold06
+#>  7 <split [181883/20209]> Fold07
+#>  8 <split [181883/20209]> Fold08
+#>  9 <split [181883/20209]> Fold09
+#> 10 <split [181883/20209]> Fold10
 ```
 
 
@@ -217,16 +217,16 @@ lasso_rs
 #> # A tibble: 10 x 4
 #>    splits                 id     .metrics          .notes          
 #>    <list>                 <chr>  <list>            <list>          
-#>  1 <split [181883/20210]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  2 <split [181883/20210]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  3 <split [181883/20210]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  4 <split [181884/20209]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  5 <split [181884/20209]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  6 <split [181884/20209]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  7 <split [181884/20209]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  8 <split [181884/20209]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  9 <split [181884/20209]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
-#> 10 <split [181884/20209]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  1 <split [181882/20210]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  2 <split [181882/20210]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  3 <split [181883/20209]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  4 <split [181883/20209]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  5 <split [181883/20209]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  6 <split [181883/20209]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  7 <split [181883/20209]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  8 <split [181883/20209]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  9 <split [181883/20209]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
+#> 10 <split [181883/20209]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
 ```
 
 What are the best models?
@@ -240,11 +240,11 @@ show_best(lasso_rs, "roc_auc")
 #> # A tibble: 5 x 7
 #>     penalty .metric .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000695  roc_auc binary     0.752    10 0.000856 Preprocessor1_Model08
-#> 2 0.000379  roc_auc binary     0.752    10 0.000889 Preprocessor1_Model07
-#> 3 0.000207  roc_auc binary     0.751    10 0.000903 Preprocessor1_Model06
-#> 4 0.000113  roc_auc binary     0.751    10 0.000914 Preprocessor1_Model05
-#> 5 0.0000616 roc_auc binary     0.751    10 0.000920 Preprocessor1_Model04
+#> 1 0.000695  roc_auc binary     0.753    10 0.000824 Preprocessor1_Model08
+#> 2 0.000379  roc_auc binary     0.753    10 0.000842 Preprocessor1_Model07
+#> 3 0.000207  roc_auc binary     0.752    10 0.000849 Preprocessor1_Model06
+#> 4 0.000113  roc_auc binary     0.752    10 0.000858 Preprocessor1_Model05
+#> 5 0.0000616 roc_auc binary     0.752    10 0.000865 Preprocessor1_Model04
 ```
 
 ```r
@@ -255,11 +255,11 @@ show_best(lasso_rs, "accuracy")
 #> # A tibble: 5 x 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000379  accuracy binary     0.684    10 0.000764 Preprocessor1_Model07
-#> 2 0.000695  accuracy binary     0.684    10 0.000732 Preprocessor1_Model08
-#> 3 0.000207  accuracy binary     0.684    10 0.000905 Preprocessor1_Model06
-#> 4 0.0000616 accuracy binary     0.684    10 0.000909 Preprocessor1_Model04
-#> 5 0.000113  accuracy binary     0.684    10 0.000879 Preprocessor1_Model05
+#> 1 0.000379  accuracy binary     0.686    10 0.00111  Preprocessor1_Model07
+#> 2 0.000695  accuracy binary     0.686    10 0.00112  Preprocessor1_Model08
+#> 3 0.000207  accuracy binary     0.685    10 0.00102  Preprocessor1_Model06
+#> 4 0.000113  accuracy binary     0.685    10 0.000926 Preprocessor1_Model05
+#> 5 0.0000616 accuracy binary     0.685    10 0.000947 Preprocessor1_Model04
 ```
 
 
