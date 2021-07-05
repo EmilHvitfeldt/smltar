@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-06" />
+<meta name="date" content="2021-07-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="stemming.html"/>
 <link rel="next" href="mlforeword.html"/>
-<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -64,6 +64,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -466,18 +467,18 @@ You shall know a word by the company it keeps.<br />
 <div id="motivatingsparse" class="section level2" number="5.1">
 <h2><span class="header-section-number">5.1</span> Motivating embeddings for sparse, high-dimensional data</h2>
 <p>What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyse or build a model for consumer complaints to the <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/">United States Consumer Financial Protection Bureau (CFPB)</a>, described in Section <a href="appendixdata.html#cfpb-complaints">B.3</a>, we would start with straightforward word counts. Let’s create a sparse matrix where the matrix elements are the counts of words in each document.</p>
-<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="embeddings.html#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb112-2"><a href="embeddings.html#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
-<span id="cb112-3"><a href="embeddings.html#cb112-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
-<span id="cb112-4"><a href="embeddings.html#cb112-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb112-5"><a href="embeddings.html#cb112-5" aria-hidden="true" tabindex="-1"></a>complaints <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/complaints.csv.gz&quot;</span>)</span>
-<span id="cb112-6"><a href="embeddings.html#cb112-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb112-7"><a href="embeddings.html#cb112-7" aria-hidden="true" tabindex="-1"></a>complaints <span class="sc">%&gt;%</span></span>
-<span id="cb112-8"><a href="embeddings.html#cb112-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb112-9"><a href="embeddings.html#cb112-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb112-10"><a href="embeddings.html#cb112-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
-<span id="cb112-11"><a href="embeddings.html#cb112-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
-<span id="cb112-12"><a href="embeddings.html#cb112-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span></code></pre></div>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="embeddings.html#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb114-2"><a href="embeddings.html#cb114-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb114-3"><a href="embeddings.html#cb114-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
+<span id="cb114-4"><a href="embeddings.html#cb114-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-5"><a href="embeddings.html#cb114-5" aria-hidden="true" tabindex="-1"></a>complaints <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/complaints.csv.gz&quot;</span>)</span>
+<span id="cb114-6"><a href="embeddings.html#cb114-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-7"><a href="embeddings.html#cb114-7" aria-hidden="true" tabindex="-1"></a>complaints <span class="sc">%&gt;%</span></span>
+<span id="cb114-8"><a href="embeddings.html#cb114-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb114-9"><a href="embeddings.html#cb114-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb114-10"><a href="embeddings.html#cb114-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
+<span id="cb114-11"><a href="embeddings.html#cb114-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
+<span id="cb114-12"><a href="embeddings.html#cb114-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
 
 <div class="rmdwarning">
@@ -490,44 +491,44 @@ A <em>sparse matrix</em> is a matrix where most of the elements are zero. When w
 <p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span>
 
 These two quantities can be combined to calculate a term’s tf-idf (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features.</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="embeddings.html#cb114-1" aria-hidden="true" tabindex="-1"></a>complaints <span class="sc">%&gt;%</span></span>
-<span id="cb114-2"><a href="embeddings.html#cb114-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb114-3"><a href="embeddings.html#cb114-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb114-4"><a href="embeddings.html#cb114-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
-<span id="cb114-5"><a href="embeddings.html#cb114-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
-<span id="cb114-6"><a href="embeddings.html#cb114-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(stem, complaint_id, n) <span class="sc">%&gt;%</span></span>
-<span id="cb114-7"><a href="embeddings.html#cb114-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, tf_idf)</span></code></pre></div>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="embeddings.html#cb116-1" aria-hidden="true" tabindex="-1"></a>complaints <span class="sc">%&gt;%</span></span>
+<span id="cb116-2"><a href="embeddings.html#cb116-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb116-3"><a href="embeddings.html#cb116-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb116-4"><a href="embeddings.html#cb116-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
+<span id="cb116-5"><a href="embeddings.html#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
+<span id="cb116-6"><a href="embeddings.html#cb116-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(stem, complaint_id, n) <span class="sc">%&gt;%</span></span>
+<span id="cb116-7"><a href="embeddings.html#cb116-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(complaint_id, stem, tf_idf)</span></code></pre></div>
 <pre><code>#&gt; Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.</code></pre>
 <p>Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in <strong>glmnet</strong> <span class="citation">(<a href="#ref-Friedman2010" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2010</a>)</span>. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don’t always solve all the problems that come along with big text data sets.</p>
 <p>
 
 As the size of a corpus increases in terms of words or other tokens, both the sparsity and RAM required to hold the corpus in memory increase. Figure <a href="embeddings.html#fig:sparsityram">5.1</a> shows how this works out; as the corpus grows, there are more words used just a few times included in the corpus. The sparsity increases and approaches 100%, but even more notably, the memory required to store the corpus increases with the square of the number of tokens.</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="embeddings.html#cb116-1" aria-hidden="true" tabindex="-1"></a>get_dfm <span class="ot">&lt;-</span> <span class="cf">function</span>(frac) {</span>
-<span id="cb116-2"><a href="embeddings.html#cb116-2" aria-hidden="true" tabindex="-1"></a>  complaints <span class="sc">%&gt;%</span></span>
-<span id="cb116-3"><a href="embeddings.html#cb116-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_frac</span>(frac) <span class="sc">%&gt;%</span></span>
-<span id="cb116-4"><a href="embeddings.html#cb116-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb116-5"><a href="embeddings.html#cb116-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb116-6"><a href="embeddings.html#cb116-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
-<span id="cb116-7"><a href="embeddings.html#cb116-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
-<span id="cb116-8"><a href="embeddings.html#cb116-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span>
-<span id="cb116-9"><a href="embeddings.html#cb116-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb116-10"><a href="embeddings.html#cb116-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-11"><a href="embeddings.html#cb116-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb116-12"><a href="embeddings.html#cb116-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">frac =</span> <span class="dv">2</span> <span class="sc">^</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">16</span>, <span class="sc">-</span><span class="dv">6</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb116-13"><a href="embeddings.html#cb116-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dfm =</span> <span class="fu">map</span>(frac, get_dfm),</span>
-<span id="cb116-14"><a href="embeddings.html#cb116-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">words =</span> <span class="fu">map_dbl</span>(dfm, quanteda<span class="sc">::</span>nfeat),</span>
-<span id="cb116-15"><a href="embeddings.html#cb116-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">sparsity =</span> <span class="fu">map_dbl</span>(dfm, quanteda<span class="sc">::</span>sparsity),</span>
-<span id="cb116-16"><a href="embeddings.html#cb116-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">RAM (in bytes)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">map_dbl</span>(dfm, lobstr<span class="sc">::</span>obj_size)) <span class="sc">%&gt;%</span></span>
-<span id="cb116-17"><a href="embeddings.html#cb116-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(sparsity<span class="sc">:</span><span class="st">`</span><span class="at">RAM (in bytes)</span><span class="st">`</span>, <span class="at">names_to =</span> <span class="st">&quot;measure&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb116-18"><a href="embeddings.html#cb116-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(words, value, <span class="at">color =</span> measure)) <span class="sc">+</span></span>
-<span id="cb116-19"><a href="embeddings.html#cb116-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb116-20"><a href="embeddings.html#cb116-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb116-21"><a href="embeddings.html#cb116-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>measure, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
-<span id="cb116-22"><a href="embeddings.html#cb116-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_comma</span>()) <span class="sc">+</span></span>
-<span id="cb116-23"><a href="embeddings.html#cb116-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_comma</span>()) <span class="sc">+</span></span>
-<span id="cb116-24"><a href="embeddings.html#cb116-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb116-25"><a href="embeddings.html#cb116-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of unique words in corpus (log scale)&quot;</span>,</span>
-<span id="cb116-26"><a href="embeddings.html#cb116-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="embeddings.html#cb118-1" aria-hidden="true" tabindex="-1"></a>get_dfm <span class="ot">&lt;-</span> <span class="cf">function</span>(frac) {</span>
+<span id="cb118-2"><a href="embeddings.html#cb118-2" aria-hidden="true" tabindex="-1"></a>  complaints <span class="sc">%&gt;%</span></span>
+<span id="cb118-3"><a href="embeddings.html#cb118-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_frac</span>(frac) <span class="sc">%&gt;%</span></span>
+<span id="cb118-4"><a href="embeddings.html#cb118-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb118-5"><a href="embeddings.html#cb118-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb118-6"><a href="embeddings.html#cb118-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
+<span id="cb118-7"><a href="embeddings.html#cb118-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(complaint_id, stem) <span class="sc">%&gt;%</span></span>
+<span id="cb118-8"><a href="embeddings.html#cb118-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cast_dfm</span>(complaint_id, stem, n)</span>
+<span id="cb118-9"><a href="embeddings.html#cb118-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb118-10"><a href="embeddings.html#cb118-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-11"><a href="embeddings.html#cb118-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb118-12"><a href="embeddings.html#cb118-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">frac =</span> <span class="dv">2</span> <span class="sc">^</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">16</span>, <span class="sc">-</span><span class="dv">6</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb118-13"><a href="embeddings.html#cb118-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dfm =</span> <span class="fu">map</span>(frac, get_dfm),</span>
+<span id="cb118-14"><a href="embeddings.html#cb118-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">words =</span> <span class="fu">map_dbl</span>(dfm, quanteda<span class="sc">::</span>nfeat),</span>
+<span id="cb118-15"><a href="embeddings.html#cb118-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">sparsity =</span> <span class="fu">map_dbl</span>(dfm, quanteda<span class="sc">::</span>sparsity),</span>
+<span id="cb118-16"><a href="embeddings.html#cb118-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">RAM (in bytes)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">map_dbl</span>(dfm, lobstr<span class="sc">::</span>obj_size)) <span class="sc">%&gt;%</span></span>
+<span id="cb118-17"><a href="embeddings.html#cb118-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(sparsity<span class="sc">:</span><span class="st">`</span><span class="at">RAM (in bytes)</span><span class="st">`</span>, <span class="at">names_to =</span> <span class="st">&quot;measure&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb118-18"><a href="embeddings.html#cb118-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(words, value, <span class="at">color =</span> measure)) <span class="sc">+</span></span>
+<span id="cb118-19"><a href="embeddings.html#cb118-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb118-20"><a href="embeddings.html#cb118-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb118-21"><a href="embeddings.html#cb118-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>measure, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb118-22"><a href="embeddings.html#cb118-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_comma</span>()) <span class="sc">+</span></span>
+<span id="cb118-23"><a href="embeddings.html#cb118-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_comma</span>()) <span class="sc">+</span></span>
+<span id="cb118-24"><a href="embeddings.html#cb118-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb118-25"><a href="embeddings.html#cb118-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of unique words in corpus (log scale)&quot;</span>,</span>
+<span id="cb118-26"><a href="embeddings.html#cb118-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:sparsityram"></span>
 <img src="05_word_embeddings_files/figure-html/sparsityram-1.svg" alt="Memory requirements and sparsity increase with corpus size" width="672" />
 <p class="caption">
@@ -545,17 +546,17 @@ Modern word embeddings are based on a statistical approach to modeling language,
 </p>
 </div>
 <p>We can determine these vectors for a corpus of text using word counts and matrix factorization, as outlined by <span class="citation"><a href="#ref-Moody2017" role="doc-biblioref">Moody</a> (<a href="#ref-Moody2017" role="doc-biblioref">2017</a>)</span>. This approach is valuable because it allows practitioners to find word vectors for their own collections of text (with no need to rely on pre-trained vectors) using familiar techniques that are not difficult to understand. Let’s walk through how to do this using tidy data principles and sparse matrices, on the data set of CFPB complaints. First, let’s filter out words that are used only rarely in this data set and create a nested dataframe, with one row per complaint.</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="embeddings.html#cb117-1" aria-hidden="true" tabindex="-1"></a>tidy_complaints <span class="ot">&lt;-</span> complaints <span class="sc">%&gt;%</span></span>
-<span id="cb117-2"><a href="embeddings.html#cb117-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(complaint_id, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb117-3"><a href="embeddings.html#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb117-4"><a href="embeddings.html#cb117-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(word) <span class="sc">%&gt;%</span></span>
-<span id="cb117-5"><a href="embeddings.html#cb117-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;=</span> <span class="dv">50</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb117-6"><a href="embeddings.html#cb117-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
-<span id="cb117-7"><a href="embeddings.html#cb117-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb117-8"><a href="embeddings.html#cb117-8" aria-hidden="true" tabindex="-1"></a>nested_words <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
-<span id="cb117-9"><a href="embeddings.html#cb117-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>(<span class="at">words =</span> <span class="fu">c</span>(word))</span>
-<span id="cb117-10"><a href="embeddings.html#cb117-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb117-11"><a href="embeddings.html#cb117-11" aria-hidden="true" tabindex="-1"></a>nested_words</span></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="embeddings.html#cb119-1" aria-hidden="true" tabindex="-1"></a>tidy_complaints <span class="ot">&lt;-</span> complaints <span class="sc">%&gt;%</span></span>
+<span id="cb119-2"><a href="embeddings.html#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(complaint_id, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb119-3"><a href="embeddings.html#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb119-4"><a href="embeddings.html#cb119-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(word) <span class="sc">%&gt;%</span></span>
+<span id="cb119-5"><a href="embeddings.html#cb119-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;=</span> <span class="dv">50</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb119-6"><a href="embeddings.html#cb119-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
+<span id="cb119-7"><a href="embeddings.html#cb119-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-8"><a href="embeddings.html#cb119-8" aria-hidden="true" tabindex="-1"></a>nested_words <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
+<span id="cb119-9"><a href="embeddings.html#cb119-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>(<span class="at">words =</span> <span class="fu">c</span>(word))</span>
+<span id="cb119-10"><a href="embeddings.html#cb119-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-11"><a href="embeddings.html#cb119-11" aria-hidden="true" tabindex="-1"></a>nested_words</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 117,170 x 2
 #&gt;    complaint_id words             
 #&gt;           &lt;dbl&gt; &lt;list&gt;            
@@ -572,45 +573,45 @@ Modern word embeddings are based on a statistical approach to modeling language,
 #&gt; # … with 117,160 more rows</code></pre>
 <p>Next, let’s create a <code>slide_windows()</code> function, using the <code>slide()</code> function from the <strong>slider</strong> package <span class="citation">(<a href="#ref-Vaughan2020" role="doc-biblioref">Vaughan 2021a</a>)</span> which implements fast sliding window computations written in C. Our new function identifies skipgram windows in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see <code>word1</code> and <code>word2</code> together within this window? We can calculate probabilities based on when we do or do not.</p>
 <p>One of the arguments to this function is the <code>window_size</code>, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are <span class="citation">(<a href="#ref-Levy2014" role="doc-biblioref">Levy and Goldberg 2014</a>)</span>. A smaller window size is also faster to compute.</p>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="embeddings.html#cb119-1" aria-hidden="true" tabindex="-1"></a>slide_windows <span class="ot">&lt;-</span> <span class="cf">function</span>(tbl, window_size) {</span>
-<span id="cb119-2"><a href="embeddings.html#cb119-2" aria-hidden="true" tabindex="-1"></a>  skipgrams <span class="ot">&lt;-</span> slider<span class="sc">::</span><span class="fu">slide</span>(</span>
-<span id="cb119-3"><a href="embeddings.html#cb119-3" aria-hidden="true" tabindex="-1"></a>    tbl, </span>
-<span id="cb119-4"><a href="embeddings.html#cb119-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span>.x, </span>
-<span id="cb119-5"><a href="embeddings.html#cb119-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after =</span> window_size <span class="sc">-</span> <span class="dv">1</span>, </span>
-<span id="cb119-6"><a href="embeddings.html#cb119-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.step =</span> <span class="dv">1</span>, </span>
-<span id="cb119-7"><a href="embeddings.html#cb119-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
-<span id="cb119-8"><a href="embeddings.html#cb119-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb119-9"><a href="embeddings.html#cb119-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb119-10"><a href="embeddings.html#cb119-10" aria-hidden="true" tabindex="-1"></a>  safe_mutate <span class="ot">&lt;-</span> <span class="fu">safely</span>(mutate)</span>
-<span id="cb119-11"><a href="embeddings.html#cb119-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb119-12"><a href="embeddings.html#cb119-12" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">map2</span>(skipgrams,</span>
-<span id="cb119-13"><a href="embeddings.html#cb119-13" aria-hidden="true" tabindex="-1"></a>              <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(skipgrams),</span>
-<span id="cb119-14"><a href="embeddings.html#cb119-14" aria-hidden="true" tabindex="-1"></a>              <span class="sc">~</span> <span class="fu">safe_mutate</span>(.x, <span class="at">window_id =</span> .y))</span>
-<span id="cb119-15"><a href="embeddings.html#cb119-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb119-16"><a href="embeddings.html#cb119-16" aria-hidden="true" tabindex="-1"></a>  out <span class="sc">%&gt;%</span></span>
-<span id="cb119-17"><a href="embeddings.html#cb119-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transpose</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb119-18"><a href="embeddings.html#cb119-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">&quot;result&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb119-19"><a href="embeddings.html#cb119-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compact</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb119-20"><a href="embeddings.html#cb119-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>()</span>
-<span id="cb119-21"><a href="embeddings.html#cb119-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="embeddings.html#cb121-1" aria-hidden="true" tabindex="-1"></a>slide_windows <span class="ot">&lt;-</span> <span class="cf">function</span>(tbl, window_size) {</span>
+<span id="cb121-2"><a href="embeddings.html#cb121-2" aria-hidden="true" tabindex="-1"></a>  skipgrams <span class="ot">&lt;-</span> slider<span class="sc">::</span><span class="fu">slide</span>(</span>
+<span id="cb121-3"><a href="embeddings.html#cb121-3" aria-hidden="true" tabindex="-1"></a>    tbl, </span>
+<span id="cb121-4"><a href="embeddings.html#cb121-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span>.x, </span>
+<span id="cb121-5"><a href="embeddings.html#cb121-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after =</span> window_size <span class="sc">-</span> <span class="dv">1</span>, </span>
+<span id="cb121-6"><a href="embeddings.html#cb121-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.step =</span> <span class="dv">1</span>, </span>
+<span id="cb121-7"><a href="embeddings.html#cb121-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.complete =</span> <span class="cn">TRUE</span></span>
+<span id="cb121-8"><a href="embeddings.html#cb121-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb121-9"><a href="embeddings.html#cb121-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb121-10"><a href="embeddings.html#cb121-10" aria-hidden="true" tabindex="-1"></a>  safe_mutate <span class="ot">&lt;-</span> <span class="fu">safely</span>(mutate)</span>
+<span id="cb121-11"><a href="embeddings.html#cb121-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb121-12"><a href="embeddings.html#cb121-12" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">map2</span>(skipgrams,</span>
+<span id="cb121-13"><a href="embeddings.html#cb121-13" aria-hidden="true" tabindex="-1"></a>              <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(skipgrams),</span>
+<span id="cb121-14"><a href="embeddings.html#cb121-14" aria-hidden="true" tabindex="-1"></a>              <span class="sc">~</span> <span class="fu">safe_mutate</span>(.x, <span class="at">window_id =</span> .y))</span>
+<span id="cb121-15"><a href="embeddings.html#cb121-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb121-16"><a href="embeddings.html#cb121-16" aria-hidden="true" tabindex="-1"></a>  out <span class="sc">%&gt;%</span></span>
+<span id="cb121-17"><a href="embeddings.html#cb121-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transpose</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb121-18"><a href="embeddings.html#cb121-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">&quot;result&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb121-19"><a href="embeddings.html#cb121-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compact</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb121-20"><a href="embeddings.html#cb121-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>()</span>
+<span id="cb121-21"><a href="embeddings.html#cb121-21" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Now that we can find all the skipgram windows, we can calculate how often words occur on their own, and how often words occur together with other words. We do this using the point-wise mutual information (PMI), a measure of association that measures exactly what we described in the previous sentence; it’s the logarithm of the probability of finding two words together, normalized for the probability of finding each of the words alone. We use PMI to measure which words occur together more often than expected based on how often they occurred on their own.</p>
 <p>For this example, let’s use a window size of <em>four</em>.</p>
 
 <div class="rmdpackage">
 This next step is the computationally expensive part of finding word embeddings with this method, and can take a while to run. Fortunately, we can use the <strong>furrr</strong> package <span class="citation">(<a href="#ref-Vaughan2018" role="doc-biblioref">Vaughan and Dancho 2021</a>)</span> to take advantage of parallel processing because identifying skipgram windows in one document is independent from all the other documents.
 </div>
-<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="embeddings.html#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(widyr)</span>
-<span id="cb120-2"><a href="embeddings.html#cb120-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
-<span id="cb120-3"><a href="embeddings.html#cb120-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-4"><a href="embeddings.html#cb120-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession)  <span class="do">## for parallel processing</span></span>
-<span id="cb120-5"><a href="embeddings.html#cb120-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-6"><a href="embeddings.html#cb120-6" aria-hidden="true" tabindex="-1"></a>tidy_pmi <span class="ot">&lt;-</span> nested_words <span class="sc">%&gt;%</span></span>
-<span id="cb120-7"><a href="embeddings.html#cb120-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">words =</span> <span class="fu">future_map</span>(words, slide_windows, 4L)) <span class="sc">%&gt;%</span></span>
-<span id="cb120-8"><a href="embeddings.html#cb120-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(words) <span class="sc">%&gt;%</span></span>
-<span id="cb120-9"><a href="embeddings.html#cb120-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(window_id, complaint_id, window_id) <span class="sc">%&gt;%</span></span>
-<span id="cb120-10"><a href="embeddings.html#cb120-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairwise_pmi</span>(word, window_id)</span>
-<span id="cb120-11"><a href="embeddings.html#cb120-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-12"><a href="embeddings.html#cb120-12" aria-hidden="true" tabindex="-1"></a>tidy_pmi</span></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="embeddings.html#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(widyr)</span>
+<span id="cb122-2"><a href="embeddings.html#cb122-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(furrr)</span>
+<span id="cb122-3"><a href="embeddings.html#cb122-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-4"><a href="embeddings.html#cb122-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plan</span>(multisession)  <span class="do">## for parallel processing</span></span>
+<span id="cb122-5"><a href="embeddings.html#cb122-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-6"><a href="embeddings.html#cb122-6" aria-hidden="true" tabindex="-1"></a>tidy_pmi <span class="ot">&lt;-</span> nested_words <span class="sc">%&gt;%</span></span>
+<span id="cb122-7"><a href="embeddings.html#cb122-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">words =</span> <span class="fu">future_map</span>(words, slide_windows, 4L)) <span class="sc">%&gt;%</span></span>
+<span id="cb122-8"><a href="embeddings.html#cb122-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(words) <span class="sc">%&gt;%</span></span>
+<span id="cb122-9"><a href="embeddings.html#cb122-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(window_id, complaint_id, window_id) <span class="sc">%&gt;%</span></span>
+<span id="cb122-10"><a href="embeddings.html#cb122-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairwise_pmi</span>(word, window_id)</span>
+<span id="cb122-11"><a href="embeddings.html#cb122-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-12"><a href="embeddings.html#cb122-12" aria-hidden="true" tabindex="-1"></a>tidy_pmi</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4,818,402 x 3
 #&gt;    item1   item2           pmi
 #&gt;    &lt;chr&gt;   &lt;chr&gt;         &lt;dbl&gt;
@@ -635,13 +636,13 @@ The step above used <code>unite()</code>, a function from <strong>tidyr</strong>
 SVD is a method for dimensionality reduction via matrix factorization <span class="citation">(<a href="#ref-Golub1970" role="doc-biblioref">Golub and Reinsch 1970</a>)</span> which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.</p>
 <p>In our application, we will use SVD to factor the PMI matrix into a set of smaller matrices containing the word embeddings with a size we get to choose. The embedding size is typically chosen to be in the low hundreds. Thus we get a matrix of dimension (<code>n_vocabulary * n_dim</code>) instead of dimension (<code>n_vocabulary * n_vocabulary</code>), which can be a vast reduction in size for large vocabularies.
 Let’s use the <code>widely_svd()</code> function in <strong>widyr</strong> <span class="citation">(<a href="#ref-R-widyr" role="doc-biblioref">Robinson 2020</a>)</span>, creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows and calculating PMI.</p>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="embeddings.html#cb122-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="ot">&lt;-</span> tidy_pmi <span class="sc">%&gt;%</span></span>
-<span id="cb122-2"><a href="embeddings.html#cb122-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">widely_svd</span>(</span>
-<span id="cb122-3"><a href="embeddings.html#cb122-3" aria-hidden="true" tabindex="-1"></a>    item1, item2, pmi,</span>
-<span id="cb122-4"><a href="embeddings.html#cb122-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nv =</span> <span class="dv">100</span>, <span class="at">maxit =</span> <span class="dv">1000</span></span>
-<span id="cb122-5"><a href="embeddings.html#cb122-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb122-6"><a href="embeddings.html#cb122-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb122-7"><a href="embeddings.html#cb122-7" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors</span></code></pre></div>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="embeddings.html#cb124-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="ot">&lt;-</span> tidy_pmi <span class="sc">%&gt;%</span></span>
+<span id="cb124-2"><a href="embeddings.html#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">widely_svd</span>(</span>
+<span id="cb124-3"><a href="embeddings.html#cb124-3" aria-hidden="true" tabindex="-1"></a>    item1, item2, pmi,</span>
+<span id="cb124-4"><a href="embeddings.html#cb124-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nv =</span> <span class="dv">100</span>, <span class="at">maxit =</span> <span class="dv">1000</span></span>
+<span id="cb124-5"><a href="embeddings.html#cb124-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb124-6"><a href="embeddings.html#cb124-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb124-7"><a href="embeddings.html#cb124-7" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 747,500 x 3
 #&gt;    item1   dimension   value
 #&gt;    &lt;chr&gt;       &lt;int&gt;   &lt;dbl&gt;
@@ -672,24 +673,24 @@ Each word can be represented as a numeric vector in this new feature space. A si
 </p>
 </div>
 <p>Which words are close to each other in this new feature space of word embeddings? Let’s create a simple function that will find the nearest words to any given example in using our newly created word embeddings.</p>
-<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="embeddings.html#cb124-1" aria-hidden="true" tabindex="-1"></a>nearest_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(df, token) {</span>
-<span id="cb124-2"><a href="embeddings.html#cb124-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
-<span id="cb124-3"><a href="embeddings.html#cb124-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">widely</span>(</span>
-<span id="cb124-4"><a href="embeddings.html#cb124-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
-<span id="cb124-5"><a href="embeddings.html#cb124-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
-<span id="cb124-6"><a href="embeddings.html#cb124-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
-<span id="cb124-7"><a href="embeddings.html#cb124-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
-<span id="cb124-8"><a href="embeddings.html#cb124-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb124-9"><a href="embeddings.html#cb124-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
-<span id="cb124-10"><a href="embeddings.html#cb124-10" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb124-11"><a href="embeddings.html#cb124-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span></span>
-<span id="cb124-12"><a href="embeddings.html#cb124-12" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
-<span id="cb124-13"><a href="embeddings.html#cb124-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
-<span id="cb124-14"><a href="embeddings.html#cb124-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="embeddings.html#cb126-1" aria-hidden="true" tabindex="-1"></a>nearest_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(df, token) {</span>
+<span id="cb126-2"><a href="embeddings.html#cb126-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
+<span id="cb126-3"><a href="embeddings.html#cb126-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">widely</span>(</span>
+<span id="cb126-4"><a href="embeddings.html#cb126-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
+<span id="cb126-5"><a href="embeddings.html#cb126-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
+<span id="cb126-6"><a href="embeddings.html#cb126-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
+<span id="cb126-7"><a href="embeddings.html#cb126-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
+<span id="cb126-8"><a href="embeddings.html#cb126-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb126-9"><a href="embeddings.html#cb126-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
+<span id="cb126-10"><a href="embeddings.html#cb126-10" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb126-11"><a href="embeddings.html#cb126-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span></span>
+<span id="cb126-12"><a href="embeddings.html#cb126-12" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
+<span id="cb126-13"><a href="embeddings.html#cb126-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
+<span id="cb126-14"><a href="embeddings.html#cb126-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and sums to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.</p>
 <p>What words are closest to <code>"error"</code> in the data set of CFPB complaints, as determined by our word embeddings?</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="embeddings.html#cb125-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb125-2"><a href="embeddings.html#cb125-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="embeddings.html#cb127-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb127-2"><a href="embeddings.html#cb127-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 x 2
 #&gt;    item1            value
 #&gt;    &lt;chr&gt;            &lt;dbl&gt;
@@ -706,8 +707,8 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt; # … with 7,465 more rows</code></pre>
 <p>Mistakes, problems, glitches – sounds bad!</p>
 <p>What is closest to the word <code>"month"</code>?</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="embeddings.html#cb127-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb127-2"><a href="embeddings.html#cb127-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="embeddings.html#cb129-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb129-2"><a href="embeddings.html#cb129-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 x 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
@@ -724,8 +725,8 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt; # … with 7,465 more rows</code></pre>
 <p>We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter <a href="stemming.html#stemming">4</a>) but the word embeddings learned that “month,” “months,” and “monthly” belong together.</p>
 <p>What words are closest in this embedding space to <code>"fee"</code>?</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="embeddings.html#cb129-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb129-2"><a href="embeddings.html#cb129-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="embeddings.html#cb131-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 x 2
 #&gt;    item1     value
 #&gt;    &lt;chr&gt;     &lt;dbl&gt;
@@ -741,9 +742,9 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt; 10 28.00     0.624
 #&gt; # … with 7,465 more rows</code></pre>
 <p>We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to “fee.”</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="embeddings.html#cb131-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb131-3"><a href="embeddings.html#cb131-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(item1, <span class="st">&quot;[0-9]*.[0-9]{2}&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="embeddings.html#cb133-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb133-2"><a href="embeddings.html#cb133-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb133-3"><a href="embeddings.html#cb133-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(item1, <span class="st">&quot;[0-9]*.[0-9]{2}&quot;</span>, <span class="at">negate =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,047 x 2
 #&gt;    item1     value
 #&gt;    &lt;chr&gt;     &lt;dbl&gt;
@@ -760,24 +761,24 @@ Each word can be represented as a numeric vector in this new feature space. A si
 #&gt; # … with 7,037 more rows</code></pre>
 <p>We now find words about overdrafts and charges. The top two words are “fee” and “fees”; word embeddings can learn that singular and plural forms of words are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter <a href="stemming.html#stemming">4</a>) but more reliably and less arbitrarily.</p>
 <p>Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each <em>original</em> dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="embeddings.html#cb133-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb133-2"><a href="embeddings.html#cb133-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(dimension <span class="sc">&lt;=</span> <span class="dv">24</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb133-3"><a href="embeddings.html#cb133-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(dimension) <span class="sc">%&gt;%</span></span>
-<span id="cb133-4"><a href="embeddings.html#cb133-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">12</span>, <span class="fu">abs</span>(value)) <span class="sc">%&gt;%</span></span>
-<span id="cb133-5"><a href="embeddings.html#cb133-5" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
-<span id="cb133-6"><a href="embeddings.html#cb133-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">item1 =</span> <span class="fu">reorder_within</span>(item1, value, dimension)) <span class="sc">%&gt;%</span></span>
-<span id="cb133-7"><a href="embeddings.html#cb133-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> dimension)) <span class="sc">+</span></span>
-<span id="cb133-8"><a href="embeddings.html#cb133-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb133-9"><a href="embeddings.html#cb133-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>dimension, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb133-10"><a href="embeddings.html#cb133-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_reordered</span>() <span class="sc">+</span></span>
-<span id="cb133-11"><a href="embeddings.html#cb133-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb133-12"><a href="embeddings.html#cb133-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb133-13"><a href="embeddings.html#cb133-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb133-14"><a href="embeddings.html#cb133-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">&quot;Value&quot;</span>,</span>
-<span id="cb133-15"><a href="embeddings.html#cb133-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">&quot;First 24 principal components for text of CFPB complaints&quot;</span>,</span>
-<span id="cb133-16"><a href="embeddings.html#cb133-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;Top words contributing to the components that explain&quot;</span>,</span>
-<span id="cb133-17"><a href="embeddings.html#cb133-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;the most variation&quot;</span>)</span>
-<span id="cb133-18"><a href="embeddings.html#cb133-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="embeddings.html#cb135-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb135-2"><a href="embeddings.html#cb135-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(dimension <span class="sc">&lt;=</span> <span class="dv">24</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb135-3"><a href="embeddings.html#cb135-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(dimension) <span class="sc">%&gt;%</span></span>
+<span id="cb135-4"><a href="embeddings.html#cb135-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">12</span>, <span class="fu">abs</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb135-5"><a href="embeddings.html#cb135-5" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb135-6"><a href="embeddings.html#cb135-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">item1 =</span> <span class="fu">reorder_within</span>(item1, value, dimension)) <span class="sc">%&gt;%</span></span>
+<span id="cb135-7"><a href="embeddings.html#cb135-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> dimension)) <span class="sc">+</span></span>
+<span id="cb135-8"><a href="embeddings.html#cb135-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb135-9"><a href="embeddings.html#cb135-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>dimension, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb135-10"><a href="embeddings.html#cb135-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_reordered</span>() <span class="sc">+</span></span>
+<span id="cb135-11"><a href="embeddings.html#cb135-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb135-12"><a href="embeddings.html#cb135-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb135-13"><a href="embeddings.html#cb135-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb135-14"><a href="embeddings.html#cb135-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">&quot;Value&quot;</span>,</span>
+<span id="cb135-15"><a href="embeddings.html#cb135-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">&quot;First 24 principal components for text of CFPB complaints&quot;</span>,</span>
+<span id="cb135-16"><a href="embeddings.html#cb135-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;Top words contributing to the components that explain&quot;</span>,</span>
+<span id="cb135-17"><a href="embeddings.html#cb135-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;the most variation&quot;</span>)</span>
+<span id="cb135-18"><a href="embeddings.html#cb135-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:embeddingpca"></span>
 <img src="05_word_embeddings_files/figure-html/embeddingpca-1.svg" alt="Word embeddings for Consumer Finance Protection Bureau complaints" width="768" />
 <p class="caption">
@@ -786,16 +787,16 @@ FIGURE 5.2: Word embeddings for Consumer Finance Protection Bureau complaints
 </div>
 <p>It becomes very clear in Figure <a href="embeddings.html#fig:embeddingpca">5.2</a> that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like <code>"regarding"</code>, <code>"contacted"</code>, and <code>"called"</code>, while component 9 highlights the use of <em>different</em> common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.</p>
 <p>We created word embeddings and can explore them to understand our text data set, but how do we use this vector representation in modeling? The classic and simplest approach is to treat each document as a collection of words and summarize the word embeddings into <em>document embeddings</em>, either using a mean or sum. This approach loses information about word order but is straightforward to implement. Let’s <code>count()</code> to find the sum here in our example.</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="embeddings.html#cb134-1" aria-hidden="true" tabindex="-1"></a>word_matrix <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
-<span id="cb134-2"><a href="embeddings.html#cb134-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, word) <span class="sc">%&gt;%</span></span>
-<span id="cb134-3"><a href="embeddings.html#cb134-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(complaint_id, word, n)</span>
-<span id="cb134-4"><a href="embeddings.html#cb134-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb134-5"><a href="embeddings.html#cb134-5" aria-hidden="true" tabindex="-1"></a>embedding_matrix <span class="ot">&lt;-</span> tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb134-6"><a href="embeddings.html#cb134-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(item1, dimension, value)</span>
-<span id="cb134-7"><a href="embeddings.html#cb134-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb134-8"><a href="embeddings.html#cb134-8" aria-hidden="true" tabindex="-1"></a>doc_matrix <span class="ot">&lt;-</span> word_matrix <span class="sc">%*%</span> embedding_matrix</span>
-<span id="cb134-9"><a href="embeddings.html#cb134-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb134-10"><a href="embeddings.html#cb134-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(doc_matrix)</span></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="embeddings.html#cb136-1" aria-hidden="true" tabindex="-1"></a>word_matrix <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
+<span id="cb136-2"><a href="embeddings.html#cb136-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, word) <span class="sc">%&gt;%</span></span>
+<span id="cb136-3"><a href="embeddings.html#cb136-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(complaint_id, word, n)</span>
+<span id="cb136-4"><a href="embeddings.html#cb136-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb136-5"><a href="embeddings.html#cb136-5" aria-hidden="true" tabindex="-1"></a>embedding_matrix <span class="ot">&lt;-</span> tidy_word_vectors <span class="sc">%&gt;%</span></span>
+<span id="cb136-6"><a href="embeddings.html#cb136-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(item1, dimension, value)</span>
+<span id="cb136-7"><a href="embeddings.html#cb136-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb136-8"><a href="embeddings.html#cb136-8" aria-hidden="true" tabindex="-1"></a>doc_matrix <span class="ot">&lt;-</span> word_matrix <span class="sc">%*%</span> embedding_matrix</span>
+<span id="cb136-9"><a href="embeddings.html#cb136-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb136-10"><a href="embeddings.html#cb136-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(doc_matrix)</span></code></pre></div>
 <pre><code>#&gt; [1] 117170    100</code></pre>
 <p>We have a new matrix here that we can use as the input for modeling. Notice that we still have over 100,000 documents (we did lose a few complaints, compared to our example sparse matrices at the beginning of the chapter, when we filtered out rarely used words) but instead of tens of thousands of features, we have exactly 100 features.</p>
 <div class="rmdnote">
@@ -818,10 +819,10 @@ How small is too small? It is hard to make definitive statements because being a
 </p>
 </div>
 <p>In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to <em>pre-trained</em> word embeddings, such as the GloVe word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the <strong>textdata</strong> package <span class="citation">(<a href="#ref-Hvitfeldt2020" role="doc-biblioref">Hvitfeldt 2020b</a>)</span>. Let’s use <code>dimensions = 100</code>, since we trained 100-dimensional word embeddings in the previous section.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="embeddings.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textdata)</span>
-<span id="cb136-2"><a href="embeddings.html#cb136-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb136-3"><a href="embeddings.html#cb136-3" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">embedding_glove6b</span>(<span class="at">dimensions =</span> <span class="dv">100</span>)</span>
-<span id="cb136-4"><a href="embeddings.html#cb136-4" aria-hidden="true" tabindex="-1"></a>glove6b</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="embeddings.html#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textdata)</span>
+<span id="cb138-2"><a href="embeddings.html#cb138-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb138-3"><a href="embeddings.html#cb138-3" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">embedding_glove6b</span>(<span class="at">dimensions =</span> <span class="dv">100</span>)</span>
+<span id="cb138-4"><a href="embeddings.html#cb138-4" aria-hidden="true" tabindex="-1"></a>glove6b</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 101
 #&gt;    token      d1      d2      d3      d4      d5      d6      d7      d8      d9
 #&gt;    &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
@@ -839,12 +840,12 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt; #   d12 &lt;dbl&gt;, d13 &lt;dbl&gt;, d14 &lt;dbl&gt;, d15 &lt;dbl&gt;, d16 &lt;dbl&gt;, d17 &lt;dbl&gt;,
 #&gt; #   d18 &lt;dbl&gt;, …</code></pre>
 <p>We can transform these word embeddings into a more tidy format, using <code>pivot_longer()</code> from <strong>tidyr</strong>. Let’s also give this tidied version the same column names as <code>tidy_word_vectors</code>, for convenience.</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="embeddings.html#cb138-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="ot">&lt;-</span> glove6b <span class="sc">%&gt;%</span></span>
-<span id="cb138-2"><a href="embeddings.html#cb138-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">contains</span>(<span class="st">&quot;d&quot;</span>),</span>
-<span id="cb138-3"><a href="embeddings.html#cb138-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;dimension&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb138-4"><a href="embeddings.html#cb138-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">item1 =</span> token)</span>
-<span id="cb138-5"><a href="embeddings.html#cb138-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb138-6"><a href="embeddings.html#cb138-6" aria-hidden="true" tabindex="-1"></a>tidy_glove</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="embeddings.html#cb140-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="ot">&lt;-</span> glove6b <span class="sc">%&gt;%</span></span>
+<span id="cb140-2"><a href="embeddings.html#cb140-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">contains</span>(<span class="st">&quot;d&quot;</span>),</span>
+<span id="cb140-3"><a href="embeddings.html#cb140-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;dimension&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb140-4"><a href="embeddings.html#cb140-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">item1 =</span> token)</span>
+<span id="cb140-5"><a href="embeddings.html#cb140-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-6"><a href="embeddings.html#cb140-6" aria-hidden="true" tabindex="-1"></a>tidy_glove</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 40,000,000 x 3
 #&gt;    item1 dimension   value
 #&gt;    &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;
@@ -860,24 +861,24 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt; 10 the   d10        0.0875
 #&gt; # … with 39,999,990 more rows</code></pre>
 <p>We’ve already explored some sets of “synonyms” in the embedding space we determined ourselves from the CPFB complaints. What about this embedding space learned via the GloVe algorithm on a much larger data set? We just need to make one change to our <code>nearest_neighbors()</code> function and add <code>maximum_size = NULL</code>, because the matrices we are multiplying together are much larger this time.</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="embeddings.html#cb140-1" aria-hidden="true" tabindex="-1"></a>nearest_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(df, token) {</span>
-<span id="cb140-2"><a href="embeddings.html#cb140-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
-<span id="cb140-3"><a href="embeddings.html#cb140-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">widely</span>(</span>
-<span id="cb140-4"><a href="embeddings.html#cb140-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
-<span id="cb140-5"><a href="embeddings.html#cb140-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
-<span id="cb140-6"><a href="embeddings.html#cb140-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
-<span id="cb140-7"><a href="embeddings.html#cb140-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
-<span id="cb140-8"><a href="embeddings.html#cb140-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb140-9"><a href="embeddings.html#cb140-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
-<span id="cb140-10"><a href="embeddings.html#cb140-10" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb140-11"><a href="embeddings.html#cb140-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb140-12"><a href="embeddings.html#cb140-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">maximum_size =</span> <span class="cn">NULL</span></span>
-<span id="cb140-13"><a href="embeddings.html#cb140-13" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
-<span id="cb140-14"><a href="embeddings.html#cb140-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
-<span id="cb140-15"><a href="embeddings.html#cb140-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="embeddings.html#cb142-1" aria-hidden="true" tabindex="-1"></a>nearest_neighbors <span class="ot">&lt;-</span> <span class="cf">function</span>(df, token) {</span>
+<span id="cb142-2"><a href="embeddings.html#cb142-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
+<span id="cb142-3"><a href="embeddings.html#cb142-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">widely</span>(</span>
+<span id="cb142-4"><a href="embeddings.html#cb142-4" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> {</span>
+<span id="cb142-5"><a href="embeddings.html#cb142-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
+<span id="cb142-6"><a href="embeddings.html#cb142-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
+<span id="cb142-7"><a href="embeddings.html#cb142-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
+<span id="cb142-8"><a href="embeddings.html#cb142-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-9"><a href="embeddings.html#cb142-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
+<span id="cb142-10"><a href="embeddings.html#cb142-10" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb142-11"><a href="embeddings.html#cb142-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb142-12"><a href="embeddings.html#cb142-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">maximum_size =</span> <span class="cn">NULL</span></span>
+<span id="cb142-13"><a href="embeddings.html#cb142-13" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
+<span id="cb142-14"><a href="embeddings.html#cb142-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
+<span id="cb142-15"><a href="embeddings.html#cb142-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Pre-trained word embeddings are trained on very large, general purpose English language data sets. Commonly used <a href="https://code.google.com/archive/p/word2vec/">word2vec embeddings</a> are based on the Google News data set, and commonly used <a href="https://nlp.stanford.edu/projects/glove/">GloVe embeddings</a> (what we are using here) and <a href="https://fasttext.cc/docs/en/english-vectors.html">FastText embeddings</a> are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to <code>"error"</code> in the GloVe embeddings?</p>
-<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="embeddings.html#cb141-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb141-2"><a href="embeddings.html#cb141-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="embeddings.html#cb143-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
+<span id="cb143-2"><a href="embeddings.html#cb143-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1       value
 #&gt;    &lt;chr&gt;       &lt;dbl&gt;
@@ -894,8 +895,8 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt; # … with 399,990 more rows</code></pre>
 <p>Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word “error.”</p>
 <p>What is closest to the word <code>"month"</code> in these pre-trained GloVe embeddings?</p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="embeddings.html#cb143-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb143-2"><a href="embeddings.html#cb143-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="embeddings.html#cb145-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
+<span id="cb145-2"><a href="embeddings.html#cb145-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1    value
 #&gt;    &lt;chr&gt;    &lt;dbl&gt;
@@ -912,8 +913,8 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt; # … with 399,990 more rows</code></pre>
 <p>Instead of words about payments, the GloVe results here focus on different time periods only.</p>
 <p>What words are closest in the GloVe embedding space to <code>"fee"</code>?</p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb145-1"><a href="embeddings.html#cb145-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb145-2"><a href="embeddings.html#cb145-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="embeddings.html#cb147-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
+<span id="cb147-2"><a href="embeddings.html#cb147-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 x 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
@@ -936,24 +937,24 @@ These examples highlight how pre-trained word embeddings can be useful because o
 </p>
 </div>
 <p>If we do choose to use pre-trained word embeddings, how do we go about integrating them into a modeling workflow? Again, we can create simple document embeddings by treating each document as a collection of words and summarizing the word embeddings. The GloVe embeddings do not contain all the tokens in the CPFB complaints, and vice versa, so let’s use <code>inner_join()</code> to match up our data sets.</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="embeddings.html#cb147-1" aria-hidden="true" tabindex="-1"></a>word_matrix <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
-<span id="cb147-2"><a href="embeddings.html#cb147-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="at">by =</span> <span class="st">&quot;word&quot;</span>,</span>
-<span id="cb147-3"><a href="embeddings.html#cb147-3" aria-hidden="true" tabindex="-1"></a>             tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb147-4"><a href="embeddings.html#cb147-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">distinct</span>(item1) <span class="sc">%&gt;%</span></span>
-<span id="cb147-5"><a href="embeddings.html#cb147-5" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rename</span>(<span class="at">word =</span> item1)) <span class="sc">%&gt;%</span></span>
-<span id="cb147-6"><a href="embeddings.html#cb147-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, word) <span class="sc">%&gt;%</span></span>
-<span id="cb147-7"><a href="embeddings.html#cb147-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(complaint_id, word, n)</span>
-<span id="cb147-8"><a href="embeddings.html#cb147-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-9"><a href="embeddings.html#cb147-9" aria-hidden="true" tabindex="-1"></a>glove_matrix <span class="ot">&lt;-</span> tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb147-10"><a href="embeddings.html#cb147-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="at">by =</span> <span class="st">&quot;item1&quot;</span>,</span>
-<span id="cb147-11"><a href="embeddings.html#cb147-11" aria-hidden="true" tabindex="-1"></a>             tidy_complaints <span class="sc">%&gt;%</span></span>
-<span id="cb147-12"><a href="embeddings.html#cb147-12" aria-hidden="true" tabindex="-1"></a>               <span class="fu">distinct</span>(word) <span class="sc">%&gt;%</span></span>
-<span id="cb147-13"><a href="embeddings.html#cb147-13" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rename</span>(<span class="at">item1 =</span> word)) <span class="sc">%&gt;%</span></span>
-<span id="cb147-14"><a href="embeddings.html#cb147-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(item1, dimension, value)</span>
-<span id="cb147-15"><a href="embeddings.html#cb147-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-16"><a href="embeddings.html#cb147-16" aria-hidden="true" tabindex="-1"></a>doc_matrix <span class="ot">&lt;-</span> word_matrix <span class="sc">%*%</span> glove_matrix</span>
-<span id="cb147-17"><a href="embeddings.html#cb147-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-18"><a href="embeddings.html#cb147-18" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(doc_matrix)</span></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb149-1"><a href="embeddings.html#cb149-1" aria-hidden="true" tabindex="-1"></a>word_matrix <span class="ot">&lt;-</span> tidy_complaints <span class="sc">%&gt;%</span></span>
+<span id="cb149-2"><a href="embeddings.html#cb149-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="at">by =</span> <span class="st">&quot;word&quot;</span>,</span>
+<span id="cb149-3"><a href="embeddings.html#cb149-3" aria-hidden="true" tabindex="-1"></a>             tidy_glove <span class="sc">%&gt;%</span></span>
+<span id="cb149-4"><a href="embeddings.html#cb149-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">distinct</span>(item1) <span class="sc">%&gt;%</span></span>
+<span id="cb149-5"><a href="embeddings.html#cb149-5" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rename</span>(<span class="at">word =</span> item1)) <span class="sc">%&gt;%</span></span>
+<span id="cb149-6"><a href="embeddings.html#cb149-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(complaint_id, word) <span class="sc">%&gt;%</span></span>
+<span id="cb149-7"><a href="embeddings.html#cb149-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(complaint_id, word, n)</span>
+<span id="cb149-8"><a href="embeddings.html#cb149-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-9"><a href="embeddings.html#cb149-9" aria-hidden="true" tabindex="-1"></a>glove_matrix <span class="ot">&lt;-</span> tidy_glove <span class="sc">%&gt;%</span></span>
+<span id="cb149-10"><a href="embeddings.html#cb149-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="at">by =</span> <span class="st">&quot;item1&quot;</span>,</span>
+<span id="cb149-11"><a href="embeddings.html#cb149-11" aria-hidden="true" tabindex="-1"></a>             tidy_complaints <span class="sc">%&gt;%</span></span>
+<span id="cb149-12"><a href="embeddings.html#cb149-12" aria-hidden="true" tabindex="-1"></a>               <span class="fu">distinct</span>(word) <span class="sc">%&gt;%</span></span>
+<span id="cb149-13"><a href="embeddings.html#cb149-13" aria-hidden="true" tabindex="-1"></a>               <span class="fu">rename</span>(<span class="at">item1 =</span> word)) <span class="sc">%&gt;%</span></span>
+<span id="cb149-14"><a href="embeddings.html#cb149-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_sparse</span>(item1, dimension, value)</span>
+<span id="cb149-15"><a href="embeddings.html#cb149-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-16"><a href="embeddings.html#cb149-16" aria-hidden="true" tabindex="-1"></a>doc_matrix <span class="ot">&lt;-</span> word_matrix <span class="sc">%*%</span> glove_matrix</span>
+<span id="cb149-17"><a href="embeddings.html#cb149-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb149-18"><a href="embeddings.html#cb149-18" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(doc_matrix)</span></code></pre></div>
 <pre><code>#&gt; [1] 117163    100</code></pre>
 <p>Since these GloVe embeddings had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents which contain only words not included in the GloVe embeddings.</p>
 
