@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-06" />
+<meta name="date" content="2021-07-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="stopwords.html"/>
 <link rel="next" href="embeddings.html"/>
-<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -64,6 +64,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -798,25 +799,25 @@ NLP practitioners who work with R can use this library via the <strong>spacyr</s
 <p>Section <a href="mlregression.html#mlregressionlemmatization">6.6</a> demonstrates how to use textrecipes with spaCy as an engine and include lemmas as features for modeling. You might also consider using spaCy directly in R Markdown <a href="https://rstudio.github.io/reticulate/articles/r_markdown.html">via its Python engine</a>.</p>
 <p>Let’s briefly walk through how to use spacyr.</p>
 <div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="stemming.html#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spacyr)</span>
-<span id="cb109-2"><a href="stemming.html#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spacy_initialize</span>(<span class="at">entity =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb109-3"><a href="stemming.html#cb109-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb109-4"><a href="stemming.html#cb109-4" aria-hidden="true" tabindex="-1"></a>fir_tree <span class="sc">%&gt;%</span></span>
-<span id="cb109-5"><a href="stemming.html#cb109-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">doc_id =</span> <span class="fu">paste0</span>(<span class="st">&quot;doc&quot;</span>, <span class="fu">row_number</span>())) <span class="sc">%&gt;%</span></span>
-<span id="cb109-6"><a href="stemming.html#cb109-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(doc_id, <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb109-7"><a href="stemming.html#cb109-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spacy_parse</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb109-8"><a href="stemming.html#cb109-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;lemma&quot;</span> <span class="ot">=</span> <span class="st">&quot;word&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb109-9"><a href="stemming.html#cb109-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lemma, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb109-10"><a href="stemming.html#cb109-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, n) <span class="sc">%&gt;%</span></span>
-<span id="cb109-11"><a href="stemming.html#cb109-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">fct_reorder</span>(lemma, n))) <span class="sc">+</span></span>
-<span id="cb109-12"><a href="stemming.html#cb109-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb109-13"><a href="stemming.html#cb109-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Frequency&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<span id="cb109-2"><a href="stemming.html#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spacy_initialize</span>(<span class="at">entity =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>#&gt; NULL</code></pre>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="stemming.html#cb111-1" aria-hidden="true" tabindex="-1"></a>fir_tree <span class="sc">%&gt;%</span></span>
+<span id="cb111-2"><a href="stemming.html#cb111-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">doc_id =</span> <span class="fu">paste0</span>(<span class="st">&quot;doc&quot;</span>, <span class="fu">row_number</span>())) <span class="sc">%&gt;%</span></span>
+<span id="cb111-3"><a href="stemming.html#cb111-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(doc_id, <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb111-4"><a href="stemming.html#cb111-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spacy_parse</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb111-5"><a href="stemming.html#cb111-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(), <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;lemma&quot;</span> <span class="ot">=</span> <span class="st">&quot;word&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb111-6"><a href="stemming.html#cb111-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(lemma, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb111-7"><a href="stemming.html#cb111-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, n) <span class="sc">%&gt;%</span></span>
+<span id="cb111-8"><a href="stemming.html#cb111-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">fct_reorder</span>(lemma, n))) <span class="sc">+</span></span>
+<span id="cb111-9"><a href="stemming.html#cb111-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb111-10"><a href="stemming.html#cb111-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Frequency&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lemmafirtree"></span>
 <img src="04_stemming_files/figure-html/lemmafirtree-1.svg" alt="Results for lemmatization, rather than stemming" width="672" />
 <p class="caption">
 FIGURE 4.3: Results for lemmatization, rather than stemming
 </p>
 </div>
-<p>Figure <a href="stemming.html#fig:lemmafirtree">4.3</a> demonstrates how different lemmatization is from stemming, especially is we compare to Figure <a href="stemming.html#fig:stemmingresults">4.2</a>. Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to <code>-PRON-</code>. We see our familiar friends “tree” and “fir,” but notice that we see the normalized version “say” instead of “said,” “come” instead of “came,” and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.</p>
+<p>Figure <a href="stemming.html#fig:lemmafirtree">4.3</a> demonstrates how different lemmatization is from stemming, especially if we compare to Figure <a href="stemming.html#fig:stemmingresults">4.2</a>. Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to <code>-PRON-</code>. We see our familiar friends “tree” and “fir,” but notice that we see the normalized version “say” instead of “said,” “come” instead of “came,” and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.</p>
 <div class="rmdnote">
 <p>
 Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book and it takes a lot of computational power. Initializing with <code>entity = FALSE</code> will allow lemmatization to run much faster.
@@ -828,12 +829,12 @@ Why did we need to initialize the spaCy library? You may not need to, but spaCy 
 <h2><span class="header-section-number">4.7</span> Stemming and stop words</h2>
 <p>Our deep dive into stemming came <em>after</em> our chapters on tokenization (Chapter <a href="tokenization.html#tokenization">2</a>) and stop words (Chapter <a href="stopwords.html#stopwords">3</a>) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like <code>"themselves"</code> to <code>"themselv"</code>, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.</p>
 <p>A handy trick is to use the following function on your stop word list to return the words that don’t have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.</p>
-<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="stemming.html#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stopwords)</span>
-<span id="cb110-2"><a href="stemming.html#cb110-2" aria-hidden="true" tabindex="-1"></a>not_stemmed_in <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb110-3"><a href="stemming.html#cb110-3" aria-hidden="true" tabindex="-1"></a>  x[<span class="sc">!</span>SnowballC<span class="sc">::</span><span class="fu">wordStem</span>(x) <span class="sc">%in%</span> x]</span>
-<span id="cb110-4"><a href="stemming.html#cb110-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb110-5"><a href="stemming.html#cb110-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb110-6"><a href="stemming.html#cb110-6" aria-hidden="true" tabindex="-1"></a><span class="fu">not_stemmed_in</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="stemming.html#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stopwords)</span>
+<span id="cb112-2"><a href="stemming.html#cb112-2" aria-hidden="true" tabindex="-1"></a>not_stemmed_in <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb112-3"><a href="stemming.html#cb112-3" aria-hidden="true" tabindex="-1"></a>  x[<span class="sc">!</span>SnowballC<span class="sc">::</span><span class="fu">wordStem</span>(x) <span class="sc">%in%</span> x]</span>
+<span id="cb112-4"><a href="stemming.html#cb112-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb112-5"><a href="stemming.html#cb112-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb112-6"><a href="stemming.html#cb112-6" aria-hidden="true" tabindex="-1"></a><span class="fu">not_stemmed_in</span>(<span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt;  [1] &quot;ourselves&quot;  &quot;yourselves&quot; &quot;his&quot;        &quot;they&quot;       &quot;themselves&quot;
 #&gt;  [6] &quot;this&quot;       &quot;are&quot;        &quot;was&quot;        &quot;has&quot;        &quot;does&quot;      
 #&gt; [11] &quot;you&#39;re&quot;     &quot;he&#39;s&quot;       &quot;she&#39;s&quot;      &quot;it&#39;s&quot;       &quot;we&#39;re&quot;     

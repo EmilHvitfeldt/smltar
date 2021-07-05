@@ -480,10 +480,19 @@ Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes wit
 Let's briefly walk through how to use spacyr.
 
 
+
+
+
 ```r
 library(spacyr)
 spacy_initialize(entity = FALSE)
+```
 
+```
+#> NULL
+```
+
+```r
 fir_tree %>%
   mutate(doc_id = paste0("doc", row_number())) %>%
   select(doc_id, everything()) %>%
@@ -501,7 +510,7 @@ fir_tree %>%
 <p class="caption">(\#fig:lemmafirtree)Results for lemmatization, rather than stemming</p>
 </div>
 
-Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially is we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
+Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially if we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
 
 <div class="rmdnote">
 <p>Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book and it takes a lot of computational power. Initializing with <code>entity = FALSE</code> will allow lemmatization to run much faster.</p>
