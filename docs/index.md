@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-07-03"
+date: "2021-07-05"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
