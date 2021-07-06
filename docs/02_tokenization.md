@@ -279,21 +279,9 @@ tokenize_characters(x = the_fir_tree,
 
 The results have more elements because the spaces and punctuation have not been removed.
 
-Sometimes you run into problems where what a "character" is can be ambiguous. Depending on the format you have the data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+Sometimes you run into challenges where what a "character" is can be ambiguous. Newcomers in terms of characters are emojis, and they can be complex.\index{tokenization!emojis} Let's consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. These emojis don't have individual Unicode characters, though, but are represented as a character plus a _modifier_.  The Canadian flag combines "REGIONAL INDICATOR SYMBOLS" ["C"](https://codepoints.net/U+1F1E8?lang=en) and ["A"](https://codepoints.net/U+1F1E6?lang=en). The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers^[Full list of emoji modifiers here: https://unicode.org/emoji/charts/full-emoji-modifiers.html].  
 
-
-```r
-tokenize_characters("ﬂowers")
-```
-
-```
-#> [[1]]
-#> [1] "ﬂ" "o" "w" "e" "r" "s"
-```
-
-We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. \index{tokenization!ligatures}First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures, stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å. In Section \@ref(text-normalization) we will discuss text normalization approaches to deal with ligatures.
-
-Newcomers in terms of characters are emojis.\index{tokenization!emojis} While they do look whimsical, various tricks have been used to more effectively store them in Unicode. Let's first consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. However, they do not have individual Unicode characters. Let's take a look:
+How does the tokenizer we have been using handle flag emojis?
 
 
 
@@ -308,11 +296,24 @@ tokenize_characters(flags)
 
 ```
 #> [[1]]
-#> [1] "\U0001f1e8\U0001f1e6" "\U0001f1e6\U0001f1f6" "\U0001f1ea\U0001f1fa"
-#> [4] "\U0001f1ef\U0001f1f5"
+#> [1] "🇨🇦" "🇦🇶" "🇪🇺" "🇯🇵"
 ```
 
-When tokenizing here we get to see the bare Unicode characters.\index{Unicode} Notice how each flag has two characters. If you were to look up the characters for the Canadian flag you will find that they are "REGIONAL INDICATOR SYMBOLS", ["C"](https://codepoints.net/U+1F1E8?lang=en) and ["A"](https://codepoints.net/U+1F1E6?lang=en) respectively. With this approach, all the flags can be represented using only 26 Unicode symbols. The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers^[Full list of emoji modifiers here: https://unicode.org/emoji/charts/full-emoji-modifiers.html]. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
+In this case, the flag emojis are each treated as one token. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
+
+Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+
+
+```r
+tokenize_characters("ﬂowers")
+```
+
+```
+#> [[1]]
+#> [1] "ﬂ" "o" "w" "e" "r" "s"
+```
+
+We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. \index{tokenization!ligatures}First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures, stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å. In Section \@ref(text-normalization) we will discuss text normalization approaches to deal with ligatures.
 
 ### Word tokens
 
@@ -888,11 +889,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       74.3ms   76.1ms     13.1     4.59MB     0   
-#> 2 tokenizers   86.8ms   90.4ms     10.8     1.01MB     1.21
-#> 3 text2vec     78.5ms     80ms     12.3    20.59MB     1.37
-#> 4 quanteda    142.5ms  145.5ms      6.88     8.7MB     1.72
-#> 5 base R      296.6ms  302.4ms      3.24   10.51MB     1.39
+#> 1 corpus       46.8ms   48.2ms     20.2     4.58MB     2.24
+#> 2 tokenizers   56.6ms   57.8ms     17.3     1.01MB     4.33
+#> 3 text2vec     47.8ms   48.1ms     20.6    19.25MB     0   
+#> 4 quanteda     90.5ms   91.7ms     10.9      8.7MB     1.21
+#> 5 base R      182.4ms    184ms      5.43   10.51MB     1.36
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.
