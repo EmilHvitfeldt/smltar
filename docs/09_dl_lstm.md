@@ -2,6 +2,8 @@
 
 
 
+
+
 In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures\index{network architecture} that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks\index{neural network!long short-term memory} (LSTMs) [@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
@@ -64,7 +66,7 @@ After tokenizing, the preprocessing is different. We use `step_sequence_onehot()
 
 \BeginKnitrBlock{rmdnote}<div class="rmdnote">Using `step_sequence_onehot()` to preprocess text data records and encodes _sequence_ information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters \@ref(mlclassification) and \@ref(mlregression).</div>\EndKnitrBlock{rmdnote}
 
-There are 202,093 blurbs in the training set and 67,364 in the testing set.
+There are 202,092 blurbs in the training set and 67,365 in the testing set.
 
 <div class="rmdpackage">
 <p>Like we discussed in the last chapter, we are using <strong>recipes</strong> and <strong>textrecipes</strong> for preprocessing before modeling. When we <code>prep()</code> a recipe, we compute or estimate statistics from the training set; the output of <code>prep()</code> is a recipe. When we <code>bake()</code> a recipe, we apply the preprocessing to a data set, either the training set that we started with or another set like the testing data or new data. The output of <code>bake()</code> is a data set like a tibble or a matrix.</p>
@@ -73,15 +75,18 @@ There are 202,093 blurbs in the training set and 67,364 in the testing set.
 We could have applied these `prep()` and `bake()` functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
 
 
+
+
+
 ```r
 kick_prep <- prep(kick_rec)
-kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
 
-dim(kick_matrix)
+dim(kick_train)
 ```
 
 ```
-#> [1] 202093     30
+#> [1] 202092     30
 ```
 
 Here we use `composition = "matrix"` because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.
@@ -160,7 +165,7 @@ After the model is compiled, we can fit it. The `fit()` method for Keras models 
 ```r
 lstm_history <- lstm_mod %>%
   fit(
-    kick_matrix,
+    kick_train,
     kickstarter_train$state,
     epochs = 10,
     validation_split = 0.25,
@@ -174,10 +179,10 @@ lstm_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.2636
-#>     accuracy: 0.8776
-#>     val_loss: 0.5831
-#> val_accuracy: 0.7825
+#>         loss: 0.257
+#>     accuracy: 0.8786
+#>     val_loss: 0.7729
+#> val_accuracy: 0.7555
 ```
 
 The loss on the training data (called `loss` here) is much better than the loss on the validation data (`val_loss`), indicating that we are overfitting\index{overfitting} pretty dramatically. We can see this by plotting the history as well in Figure \@ref(fig:firstlstmhistory).
@@ -214,7 +219,7 @@ kick_val
 #> # A tibble: 1 x 2
 #>   splits                 id        
 #>   <list>                 <chr>     
-#> 1 <split [151571/50522]> validation
+#> 1 <split [151568/50524]> validation
 ```
 
 We can access the two data sets specified by this `split` via the functions `analysis()` (the analog to training) and `assessment()` (the analog to testing). We need to apply our prepped preprocessing recipe `kick_prep` to both to transform this data to the appropriate format for our neural network architecture.
@@ -227,7 +232,7 @@ dim(kick_analysis)
 ```
 
 ```
-#> [1] 151571     30
+#> [1] 151568     30
 ```
 
 ```r
@@ -237,7 +242,7 @@ dim(kick_assess)
 ```
 
 ```
-#> [1] 50522    30
+#> [1] 50524    30
 ```
 
 These are each matrices appropriate for a Keras model. We will also need the outcome variables for both sets.
@@ -282,10 +287,10 @@ val_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3811
-#>     accuracy: 0.8201
-#>     val_loss: 0.5968
-#> val_accuracy: 0.7363
+#>         loss: 0.3805
+#>     accuracy: 0.8217
+#>     val_loss: 0.6199
+#> val_accuracy: 0.7326
 ```
 
 The \index{overfitting}overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
@@ -312,15 +317,15 @@ val_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.736
-#> 2 kap         binary         0.470
-#> 3 mn_log_loss binary         0.597
-#> 4 roc_auc     binary         0.807
+#> 1 accuracy    binary         0.733
+#> 2 kap         binary         0.463
+#> 3 mn_log_loss binary         0.620
+#> 4 roc_auc     binary         0.802
 ```
 
 
 
-A regularized linear model trained on this data set achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix \@ref(appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
+A regularized linear model trained on this data set achieved results of accuracy of 0.686 and an AUC for the ROC curve of 0.752 (Appendix \@ref(appendixbaseline)). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure \@ref(fig:lstmvalroc) to evaluate the performance across the range of thresholds. 
 
 
 ```r
@@ -374,10 +379,10 @@ rnn_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.5011
-#>     accuracy: 0.7644
-#>     val_loss: 0.6109
-#> val_accuracy: 0.7058
+#>         loss: 0.4944
+#>     accuracy: 0.7688
+#>     val_loss: 0.6064
+#> val_accuracy: 0.71
 ```
 
 Looks like more \index{overfitting}overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
@@ -439,10 +444,10 @@ bilstm_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3707
-#>     accuracy: 0.827
-#>     val_loss: 0.6151
-#> val_accuracy: 0.7382
+#>         loss: 0.3593
+#>     accuracy: 0.8332
+#>     val_loss: 0.6167
+#> val_accuracy: 0.7363
 ```
 
 The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well. 
@@ -457,13 +462,13 @@ bilstm_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.738
-#> 2 kap         binary         0.475
-#> 3 mn_log_loss binary         0.615
-#> 4 roc_auc     binary         0.808
+#> 1 accuracy    binary         0.736
+#> 2 kap         binary         0.470
+#> 3 mn_log_loss binary         0.617
+#> 4 roc_auc     binary         0.806
 ```
 
-This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736). 
+This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.733). 
 
 ## Case study: stacking LSTM layers
 
@@ -507,10 +512,10 @@ stacked_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3865
-#>     accuracy: 0.8191
-#>     val_loss: 0.5994
-#> val_accuracy: 0.7365
+#>         loss: 0.3775
+#>     accuracy: 0.828
+#>     val_loss: 0.6001
+#> val_accuracy: 0.7374
 ```
 
 Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
@@ -526,9 +531,9 @@ stacked_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.737
-#> 2 kap         binary         0.471
-#> 3 mn_log_loss binary         0.599
-#> 4 roc_auc     binary         0.805
+#> 2 kap         binary         0.474
+#> 3 mn_log_loss binary         0.600
+#> 4 roc_auc     binary         0.804
 ```
 
 We can gradually improve a model by changing and adding to its architecture.
@@ -558,10 +563,10 @@ dim(padding_matrix)
 ```
 
 ```
-#> [1] 202093     30
+#> [1] 202092     30
 ```
 
-This matrix has the same dimensions as `kick_matrix` but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
+This matrix has the same dimensions as `kick_train` but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)
 
 
 ```r
@@ -603,10 +608,10 @@ padding_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4422
-#>     accuracy: 0.779
-#>     val_loss: 0.5969
-#> val_accuracy: 0.7155
+#>         loss: 0.4273
+#>     accuracy: 0.789
+#>     val_loss: 0.6106
+#> val_accuracy: 0.7148
 ```
 
 This padding strategy results in noticeably worse performance than the default option!
@@ -622,12 +627,12 @@ padding_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.715
-#> 2 kap         binary         0.431
-#> 3 mn_log_loss binary         0.597
-#> 4 roc_auc     binary         0.789
+#> 2 kap         binary         0.428
+#> 3 mn_log_loss binary         0.611
+#> 4 roc_auc     binary         0.790
 ```
 
-The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.807; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
+The same model architecture with default padding preprocessing resulted in an accuracy of 0.733 and an AUC of 0.802; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
 
 <div class="rmdwarning">
 <p>Different preprocessing strategies have a huge impact on deep learning results.</p>
@@ -685,10 +690,10 @@ dim(scotus_train_baked)
 ```
 
 ```
-#> [1] 7502 1000
+#> [1] 7498 1000
 ```
 
-We only have 7502 rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has 1000 columns. You are probably starting to guess that we are going to run into problems.
+We only have 7498 rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has 1000 columns. You are probably starting to guess that we are going to run into problems.
 
 Let's create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer (we may want to increase the number of `units` as well, but will leave that out for the time being). Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.
 
@@ -735,9 +740,9 @@ scotus_res %>% metrics(year, .pred)
 #> # A tibble: 3 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 rmse    standard      18.0  
-#> 2 rsq     standard       0.864
-#> 3 mae     standard      13.2
+#> 1 rmse    standard      24.5  
+#> 2 rsq     standard       0.780
+#> 3 mae     standard      18.2
 ```
 
 This is much worse than the final regularized linear model trained in Section \@ref(mlregressionfull), with an RMSE almost a decade worth of years worse. It's possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline. 
@@ -799,10 +804,10 @@ smaller_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4695
-#>     accuracy: 0.7693
-#>     val_loss: 0.5807
-#> val_accuracy: 0.7121
+#>         loss: 0.4719
+#>     accuracy: 0.768
+#>     val_loss: 0.5866
+#> val_accuracy: 0.7049
 ```
 
 How did this smaller model, based on a smaller vocabulary in the model, perform?
@@ -817,13 +822,13 @@ smaller_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 x 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.712
-#> 2 kap         binary         0.423
-#> 3 mn_log_loss binary         0.581
-#> 4 roc_auc     binary         0.784
+#> 1 accuracy    binary         0.705
+#> 2 kap         binary         0.406
+#> 3 mn_log_loss binary         0.587
+#> 4 roc_auc     binary         0.777
 ```
 
-The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.807. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
+The original LSTM model with the larger vocabulary had an accuracy of 0.733 and an AUC of 0.802. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
 
 <div class="rmdnote">
 <p>The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.</p>
@@ -848,13 +853,13 @@ kick_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_sequence_onehot(blurb, sequence_length = max_length)
 
 kick_prep <- prep(kick_rec)
-kick_matrix <- bake(kick_prep, new_data = NULL, composition = "matrix")
+kick_train <- bake(kick_prep, new_data = NULL, composition = "matrix")
 
-dim(kick_matrix)
+dim(kick_train)
 ```
 
 ```
-#> [1] 202093     30
+#> [1] 202092     30
 ```
 
 ### Specify the model {#lstmfullmodel}
@@ -895,7 +900,7 @@ final_mod %>%
 
 final_history <- final_mod %>%
   fit(
-    kick_matrix,
+    kick_train,
     kickstarter_train$state,
     epochs = 10,
     validation_split = 0.1,
@@ -909,19 +914,19 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3335
-#>     accuracy: 0.8509
-#>     val_loss: 0.5248
-#> val_accuracy: 0.7775
+#>         loss: 0.3311
+#>     accuracy: 0.8504
+#>     val_loss: 0.5537
+#> val_accuracy: 0.7745
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
 
 
 ```r
-kick_matrix_test <- bake(kick_prep, new_data = kickstarter_test,
-                         composition = "matrix")
-final_res <- keras_predict(final_mod, kick_matrix_test, kickstarter_test$state)
+kick_test <- bake(kick_prep, new_data = kickstarter_test,
+                  composition = "matrix")
+final_res <- keras_predict(final_mod, kick_test, kickstarter_test$state)
 final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
@@ -930,9 +935,9 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.765
-#> 2 kap         binary         0.529
-#> 3 mn_log_loss binary         0.549
-#> 4 roc_auc     binary         0.832
+#> 2 kap         binary         0.530
+#> 3 mn_log_loss binary         0.566
+#> 4 roc_auc     binary         0.836
 ```
 
 This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).

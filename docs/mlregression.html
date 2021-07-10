@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-06" />
+<meta name="date" content="2021-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="mlforeword.html"/>
 <link rel="next" href="mlclassification.html"/>
-<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -602,15 +602,15 @@ An SVM model can be used for either regression or classification, and linear SVM
 #&gt;    term                  estimate
 #&gt;    &lt;chr&gt;                    &lt;dbl&gt;
 #&gt;  1 Bias                   1920.  
-#&gt;  2 tfidf_text_appeals        1.48
-#&gt;  3 tfidf_text_see            1.45
-#&gt;  4 tfidf_text_later          1.36
-#&gt;  5 tfidf_text_even           1.33
-#&gt;  6 tfidf_text_example        1.30
-#&gt;  7 tfidf_text_noted          1.25
-#&gt;  8 tfidf_text_petitioner     1.25
-#&gt;  9 tfidf_text_based          1.25
-#&gt; 10 tfidf_text_relevant       1.20
+#&gt;  2 tfidf_text_later          1.50
+#&gt;  3 tfidf_text_appeals        1.48
+#&gt;  4 tfidf_text_see            1.39
+#&gt;  5 tfidf_text_noted          1.38
+#&gt;  6 tfidf_text_example        1.27
+#&gt;  7 tfidf_text_petitioner     1.26
+#&gt;  8 tfidf_text_even           1.23
+#&gt;  9 tfidf_text_rather         1.21
+#&gt; 10 tfidf_text_including      1.13
 #&gt; # … with 991 more rows</code></pre>
 <p>The term <code>Bias</code> here means the same thing as an intercept. We see here what terms contribute to a Supreme Court opinion being written more recently, like “appeals” and “petitioner.”</p>
 <p>What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?</p>
@@ -619,18 +619,18 @@ An SVM model can be used for either regression or classification, and linear SVM
 <span id="cb163-3"><a href="mlregression.html#cb163-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb163-4"><a href="mlregression.html#cb163-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(estimate)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1,001 x 2
-#&gt;    term             estimate
-#&gt;    &lt;chr&gt;               &lt;dbl&gt;
-#&gt;  1 tfidf_text_1st      -1.79
-#&gt;  2 tfidf_text_but      -1.73
-#&gt;  3 tfidf_text_the      -1.62
-#&gt;  4 tfidf_text_same     -1.55
-#&gt;  5 tfidf_text_it       -1.44
-#&gt;  6 tfidf_text_this     -1.43
-#&gt;  7 tfidf_text_cause    -1.41
-#&gt;  8 tfidf_text_bound    -1.37
-#&gt;  9 tfidf_text_be       -1.36
-#&gt; 10 tfidf_text_been     -1.35
+#&gt;    term                 estimate
+#&gt;    &lt;chr&gt;                   &lt;dbl&gt;
+#&gt;  1 tfidf_text_ought        -2.77
+#&gt;  2 tfidf_text_1st          -1.94
+#&gt;  3 tfidf_text_but          -1.63
+#&gt;  4 tfidf_text_same         -1.62
+#&gt;  5 tfidf_text_the          -1.57
+#&gt;  6 tfidf_text_therefore    -1.54
+#&gt;  7 tfidf_text_it           -1.46
+#&gt;  8 tfidf_text_which        -1.40
+#&gt;  9 tfidf_text_this         -1.39
+#&gt; 10 tfidf_text_be           -1.33
 #&gt; # … with 991 more rows</code></pre>
 <p>Here we see words like “ought” and “therefore.”</p>
 </div>
@@ -701,9 +701,9 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   15.9      10 0.189   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.892    10 0.00150 Preprocessor1_Model1</code></pre>
-<p>The default performance metrics to be computed for regression models are RMSE (root mean squared error) and <span class="math inline">\(R^2\)</span> (coefficient of determination). RMSE is a metric that is in the same units as the original data, so in units of <em>years</em>, in our case; the RMSE of this first regression model is 15.9 years.</p>
+#&gt; 1 rmse    standard   15.6      10 0.216   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.895    10 0.00244 Preprocessor1_Model1</code></pre>
+<p>The default performance metrics to be computed for regression models are RMSE (root mean squared error) and <span class="math inline">\(R^2\)</span> (coefficient of determination). RMSE is a metric that is in the same units as the original data, so in units of <em>years</em>, in our case; the RMSE of this first regression model is 15.6 years.</p>
 
 
 
@@ -737,7 +737,7 @@ RSME is a measure of the difference between the predicted and observed values; i
 FIGURE 6.2: Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years
 </p>
 </div>
-<p>The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.9 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!</p>
+<p>The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.6 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!</p>
 <div class="rmdwarning">
 <p>
 Hopefully you are convinced that using resampled data sets for measuring performance is the right choice, but it can be computationally expensive. Instead of fitting once, we must fit the model one time for <em>each</em> resample. The resamples are independent of each other, so this is a great fit for parallel processing. The tidymodels framework is designed to work fluently with parallel processing in R, using multiple cores or multiple machines. The implementation details of parallel processing are operating system specific, so <a href="https://tune.tidymodels.org/articles/extras/optimizations.html">look at tidymodels’ documentation for how to get started</a>.
@@ -784,7 +784,7 @@ A null model is a simple, non-informative model that always predicts the largest
 <pre><code>#&gt; # A tibble: 1 x 6
 #&gt;   .metric .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard    48.0    10   0.512 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard    47.9    10   0.294 Preprocessor1_Model1</code></pre>
 <p>The RMSE indicates that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and very little specialized preprocessing) did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.</p>
 </div>
 <div id="comparerf" class="section level2" number="6.3">
@@ -818,8 +818,8 @@ A null model is a simple, non-informative model that always predicts the largest
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   15.0      10 0.487   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.919    10 0.00434 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.919    10 0.00283 Preprocessor1_Model1</code></pre>
 <p>This looks pretty promising, so let’s explore the predictions for this random forest model.</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="mlregression.html#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(rf_rs) <span class="sc">%&gt;%</span></span>
 <span id="cb181-2"><a href="mlregression.html#cb181-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, .pred, <span class="at">color =</span> id)) <span class="sc">+</span></span>
@@ -919,8 +919,8 @@ Models that work best with text tend to be models designed for or otherwise appr
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   16.8      10 0.194   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.880    10 0.00305 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard   17.2      10 0.199   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.876    10 0.00261 Preprocessor1_Model1</code></pre>
 <p>We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure <a href="mlregression.html#fig:snowballrmse">6.4</a>. This plot shows the five best models for each set of stop words, using <code>show_best()</code> applied to each via <code>purrr::map_dfr()</code>.</p>
 <div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb190-1"><a href="mlregression.html#cb190-1" aria-hidden="true" tabindex="-1"></a>word_counts <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">&quot;snowball&quot;</span>, <span class="st">&quot;smart&quot;</span>, <span class="st">&quot;stopwords-iso&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb190-2"><a href="mlregression.html#cb190-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">words =</span> <span class="fu">map_int</span>(name, <span class="sc">~</span><span class="fu">length</span>(stopwords<span class="sc">::</span><span class="fu">stopwords</span>(<span class="at">source =</span> .))))</span>
@@ -951,7 +951,7 @@ FIGURE 6.4: Comparing model performance for predicting the year of Supreme Court
 This result is not generalizable to all data sets and contexts, but the approach outlined in this section <strong>is</strong> generalizable.
 </p>
 </div>
-<p>This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.9 years in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.</p>
+<p>This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.6 years in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.</p>
 <p>When removing stop words does appear to help a model, it’s good to know that removing stop words isn’t computationally slow or difficult so the cost for this improvement is low.</p>
 </div>
 <div id="casestudyngrams" class="section level2" number="6.5">
@@ -1004,8 +1004,8 @@ We could have created this type of small function for trying out different stop 
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   16.0      10 0.191   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.890    10 0.00211 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.892    10 0.00240 Preprocessor1_Model1</code></pre>
 <p>We can compare the performance of these models in terms of RMSE as shown Figure <a href="mlregression.html#fig:ngramrmse">6.5</a>.</p>
 <div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="mlregression.html#cb198-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(<span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> unigram_rs,</span>
 <span id="cb198-2"><a href="mlregression.html#cb198-2" aria-hidden="true" tabindex="-1"></a>     <span class="st">`</span><span class="at">1 and 2</span><span class="st">`</span> <span class="ot">=</span> bigram_rs,</span>
@@ -1225,9 +1225,9 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   14.3      10 0.191   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.913    10 0.00189 Preprocessor1_Model1</code></pre>
-<p>The best value for RMSE at 14.3 shows us that using lemmatization can have a significant benefit for model performance, compared to 15.9 from fitting a non-lemmatized linear SVM model in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>. The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding <code>step_lemma()</code> to our preprocessing increases the overall time to train the workflow by over tenfold.</p>
+#&gt; 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.913    10 0.00304 Preprocessor1_Model1</code></pre>
+<p>The best value for RMSE at 14.2 shows us that using lemmatization can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>. The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding <code>step_lemma()</code> to our preprocessing increases the overall time to train the workflow by over tenfold.</p>
 <div class="rmdnote">
 <p>
 We can use <code>engine = “spacyr”</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.
@@ -1330,15 +1330,15 @@ This feature hashing method is used because of its speed and scalability, not be
 <span id="cb213-3"><a href="mlregression.html#cb213-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code></pre></div>
 <pre><code>#&gt; Rows: 7,500
 #&gt; Columns: 9
-#&gt; $ text_hash001 &lt;dbl&gt; -47, -2, -9, -10, -15, -7, -5, -12, -4, -9, -2, -1, 2, -2…
-#&gt; $ text_hash002 &lt;dbl&gt; 0, -4, -2, 0, 2, -8, 6, 1, 0, 6, -1, 0, 1, 0, 0, 0, -4, -…
-#&gt; $ text_hash003 &lt;dbl&gt; 1, -1, 7, -3, 3, 1, 0, 1, 0, 4, 1, 0, 2, 0, 1, -2, -1, -4…
-#&gt; $ text_hash004 &lt;dbl&gt; -7, 0, 0, -10, -5, 4, 7, -1, 0, -4, 0, 0, 0, 0, -1, 0, -4…
-#&gt; $ text_hash005 &lt;dbl&gt; -1, -4, 1, 0, 2, -2, -1, -17, 0, 0, 0, 0, -1, -1, 0, 0, -…
-#&gt; $ text_hash006 &lt;dbl&gt; 42, 3, 11, 0, 42, 9, 26, 6, 0, 18, 8, -1, 2, 6, 0, 0, 26,…
-#&gt; $ text_hash007 &lt;dbl&gt; -17, -1, -1, 1, -7, 0, 1, -3, 0, -1, 0, 0, 0, 0, 0, 0, -6…
-#&gt; $ text_hash008 &lt;dbl&gt; 15, 1, -2, -1, 3, 5, -1, -2, -1, -1, 5, -2, 1, 1, -1, 4, …
-#&gt; $ text_hash009 &lt;dbl&gt; 6, 0, -4, 0, -30, 0, 0, 0, 0, -3, 0, -1, 0, 0, 0, 0, 0, -…</code></pre>
+#&gt; $ text_hash001 &lt;dbl&gt; -16, -5, -12, -10, -10, -2, -7, -13, -16, -18, -1, -2, -1…
+#&gt; $ text_hash002 &lt;dbl&gt; -1, 1, 3, -2, 0, 0, 5, -1, 1, 6, 0, 2, 0, 0, 0, -3, 1, 2,…
+#&gt; $ text_hash003 &lt;dbl&gt; -2, 0, 4, -1, -1, 1, -5, -2, -2, 0, 0, -1, 1, 6, 0, 0, -3…
+#&gt; $ text_hash004 &lt;dbl&gt; -2, 0, -1, 0, 0, 0, -14, -14, -4, -2, 0, -10, -1, -2, 0, …
+#&gt; $ text_hash005 &lt;dbl&gt; 0, 0, 0, 0, 0, 0, -2, -1, 2, 1, 0, -1, 0, -1, 0, 0, -1, 0…
+#&gt; $ text_hash006 &lt;dbl&gt; 24, 2, 4, 6, 7, 2, 14, 13, 13, 22, 1, 41, 2, 49, 9, 1, 17…
+#&gt; $ text_hash007 &lt;dbl&gt; 13, 1, 1, -3, 0, -6, -2, -4, -8, -1, 0, 0, -4, -11, 0, 0,…
+#&gt; $ text_hash008 &lt;dbl&gt; -8, 3, 1, 1, 1, 0, -19, 0, 1, 0, 1, -1, 1, 1, -2, 1, -8, …
+#&gt; $ text_hash009 &lt;dbl&gt; -2, 0, -1, 1, 0, 0, 0, -1, -1, -1, 0, -1, -1, -1, 0, 0, -…</code></pre>
 <p>By using <code>step_texthash()</code> we can quickly generate machine-ready data with a consistent number of variables.
 This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this <a href="https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/"><strong>textrecipes</strong> blogpost</a>.</p>
 <div id="text-normalization" class="section level3" number="6.7.1">
@@ -1404,7 +1404,7 @@ Representing what should be a single token in multiple ways will split the count
 <pre><code>#&gt; # A tibble: 1 x 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 mape    standard       0.623</code></pre>
+#&gt; 1 mape    standard       0.616</code></pre>
 <p>We can also compute the mean absolute percent error for each resample.</p>
 <div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="mlregression.html#cb235-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
 <span id="cb235-2"><a href="mlregression.html#cb235-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
@@ -1413,16 +1413,16 @@ Representing what should be a single token in multiple ways will split the count
 <pre><code>#&gt; # A tibble: 10 x 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 Fold01 mape    standard       0.620
-#&gt;  2 Fold02 mape    standard       0.613
-#&gt;  3 Fold03 mape    standard       0.646
-#&gt;  4 Fold04 mape    standard       0.607
-#&gt;  5 Fold05 mape    standard       0.609
-#&gt;  6 Fold06 mape    standard       0.631
-#&gt;  7 Fold07 mape    standard       0.619
-#&gt;  8 Fold08 mape    standard       0.616
-#&gt;  9 Fold09 mape    standard       0.632
-#&gt; 10 Fold10 mape    standard       0.640</code></pre>
+#&gt;  1 Fold01 mape    standard       0.603
+#&gt;  2 Fold02 mape    standard       0.660
+#&gt;  3 Fold03 mape    standard       0.596
+#&gt;  4 Fold04 mape    standard       0.639
+#&gt;  5 Fold05 mape    standard       0.618
+#&gt;  6 Fold06 mape    standard       0.611
+#&gt;  7 Fold07 mape    standard       0.618
+#&gt;  8 Fold08 mape    standard       0.602
+#&gt;  9 Fold09 mape    standard       0.604
+#&gt; 10 Fold10 mape    standard       0.605</code></pre>
 <p>Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.</p>
 <div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="mlregression.html#cb237-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
 <span id="cb237-2"><a href="mlregression.html#cb237-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
@@ -1431,16 +1431,16 @@ Representing what should be a single token in multiple ways will split the count
 <pre><code>#&gt; # A tibble: 10 x 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 Fold01 mae     standard        11.9
-#&gt;  2 Fold02 mae     standard        11.7
-#&gt;  3 Fold03 mae     standard        12.4
-#&gt;  4 Fold04 mae     standard        11.7
-#&gt;  5 Fold05 mae     standard        11.6
-#&gt;  6 Fold06 mae     standard        12.1
+#&gt;  1 Fold01 mae     standard        11.5
+#&gt;  2 Fold02 mae     standard        12.6
+#&gt;  3 Fold03 mae     standard        11.4
+#&gt;  4 Fold04 mae     standard        12.2
+#&gt;  5 Fold05 mae     standard        11.8
+#&gt;  6 Fold06 mae     standard        11.7
 #&gt;  7 Fold07 mae     standard        11.9
-#&gt;  8 Fold08 mae     standard        11.8
-#&gt;  9 Fold09 mae     standard        12.1
-#&gt; 10 Fold10 mae     standard        12.3</code></pre>
+#&gt;  8 Fold08 mae     standard        11.5
+#&gt;  9 Fold09 mae     standard        11.6
+#&gt; 10 Fold10 mae     standard        11.6</code></pre>
 <div class="rmdnote">
 <p>
 For the full set of regression metric options, see the <a href="https://yardstick.tidymodels.org/reference/">yardstick documentation</a>.
@@ -1598,7 +1598,7 @@ FIGURE 6.6: Performance improves significantly at about 4000 tokens
 <pre><code>#&gt; # A tibble: 1 x 9
 #&gt;   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #&gt;        &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1       4000 mae     standard    10.1    10   0.118 Preprocessor4_M…  10.0 0.438</code></pre>
+#&gt; 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
 <div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="mlregression.html#cb252-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(tune_wf, chosen_mae)</span>
 <span id="cb252-2"><a href="mlregression.html#cb252-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1633,8 +1633,8 @@ Notice that this is the first time we have used our testing data during this ent
 <pre><code>#&gt; # A tibble: 2 x 4
 #&gt;   .metric .estimator .estimate .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard      13.2   Preprocessor1_Model1
-#&gt; 2 rsq     standard       0.926 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard      13.8   Preprocessor1_Model1
+#&gt; 2 rsq     standard       0.921 Preprocessor1_Model1</code></pre>
 <p>The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.</p>
 <p>The output of <code>last_fit()</code> also contains a fitted model (a <code>workflow</code>, to be more specific), that has been trained on the <em>training</em> data. We can <code>tidy()</code> this final result to understand what the most important variables are in the predictions, shown in Figure <a href="mlregression.html#fig:scotusvip">6.7</a>.</p>
 <div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="mlregression.html#cb256-1" aria-hidden="true" tabindex="-1"></a>scotus_fit <span class="ot">&lt;-</span> <span class="fu">pull_workflow_fit</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]])</span>
@@ -1703,20 +1703,20 @@ FIGURE 6.8: Predicted and true years from a linear SVM regression model with big
 <div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb259-1"><a href="mlregression.html#cb259-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="sc">%&gt;%</span></span>
 <span id="cb259-2"><a href="mlregression.html#cb259-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span></span>
 <span id="cb259-3"><a href="mlregression.html#cb259-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, .pred, case_name, text)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 137 x 4
-#&gt;     year .pred case_name                       text                             
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                           &lt;chr&gt;                            
-#&gt;  1  2008 1982. Sprint Communications Co. v. A… &quot;Supreme Court of United States.…
-#&gt;  2  2004 1978. BedRoc Limited, LLC v. United … &quot;No. 02-1593.\nThe Pittman Under…
-#&gt;  3  2004 1978. Sosa v. Alvarez-Machain         &quot;No. 03-339.\nThe Drug Enforceme…
-#&gt;  4  2002 1954. JPMorgan Chase Bank v. Traffic… &quot;No. 01-651.\nCERTIORARI TO THE …
-#&gt;  5  1996 2021. Bank One Chicago, NA v. Midwes… &quot;No. 94-1175.\n\n        Syllabu…
-#&gt;  6  1995 1959. Johnny Paul Penry v. Texas. No… &quot;Justice SCALIA, Circuit Justice…
-#&gt;  7  1993 1964. Tennessee v. Middlebrooks       &quot;No. 92-989.\nCERTIORARI TO THE …
-#&gt;  8  1992 2021. Martin v. District of Columbia… &quot;Nos. 92-5584, 92-5618.\nReheari…
-#&gt;  9  1992 1966. INS v. Elias-Zacarias           &quot;No. 90-1342.\n\n        Syllabu…
-#&gt; 10  1992 1966. Republic Nat. Bank of Miami v.… &quot;No. 91-767.\nSyllabus*\nThe Gov…
-#&gt; # … with 127 more rows</code></pre>
+<pre><code>#&gt; # A tibble: 168 x 4
+#&gt;     year .pred case_name                 text                                   
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                     &lt;chr&gt;                                  
+#&gt;  1  2009 2055. Nijhawan v. Holder        &quot;Supreme Court of United States.\n*229…
+#&gt;  2  2008 1957. Green v. Johnson          &quot;                 Cite as: 553 U. S. _…
+#&gt;  3  2008 1952. Dalehite v. United States &quot;Supreme Court of United States.\n*16 …
+#&gt;  4  2008 1982. Preston v. Ferrer         &quot;Supreme Court of United States.\n*981…
+#&gt;  5  2007 1876. Quebec Bank of Toronto v… &quot;Supreme Court of United States.\n*179…
+#&gt;  6  2004 2035. Illinois v. Lidster       &quot;No. 02-1060.\nPolice set up a highway…
+#&gt;  7  2002 1969. Borgner v. Florida Board… &quot;No. 02-165.\nCERTIORARI TO THE UNITED…
+#&gt;  8  2000 1974. Ohler v. United States    &quot;OHLERv.UNITED STATES\nCERTIORARI TO T…
+#&gt;  9  2000 1955. Bush v. Palm Beach Count… &quot;No. 00-836\nON WRIT OF CERTIORARI TO …
+#&gt; 10  1999 1964. Dickinson v. Zurko        &quot;No. 98 377\nQ. TODD DICKINSON,  ACTIN…
+#&gt; # … with 158 more rows</code></pre>
 <p>There are some interesting examples here where we can understand why the model would mispredict:</p>
 <ul>
 <li><p><em>BedRoc Limited, LLC v. United States</em> was a case decided in 2004 regarding the 1919 Pittman Act.</p></li>
@@ -1847,7 +1847,7 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": null,
+"download": ["bookdown.pdf"],
 "toc": {
 "collapse": "subsection"
 }
