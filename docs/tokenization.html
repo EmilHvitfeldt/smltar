@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-05" />
+<meta name="date" content="2021-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -64,7 +64,6 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
@@ -1025,11 +1024,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 x 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       46.8ms   48.2ms     20.2     4.58MB     2.24
-#&gt; 2 tokenizers   56.6ms   57.8ms     17.3     1.01MB     4.33
-#&gt; 3 text2vec     47.8ms   48.1ms     20.6    19.25MB     0   
-#&gt; 4 quanteda     90.5ms   91.7ms     10.9      8.7MB     1.21
-#&gt; 5 base R      182.4ms    184ms      5.43   10.51MB     1.36</code></pre>
+#&gt; 1 corpus        102ms    104ms      9.62    4.59MB    0    
+#&gt; 2 tokenizers    125ms    127ms      7.81    1.01MB    0.868
+#&gt; 3 text2vec      104ms    107ms      9.16   20.64MB    1.02 
+#&gt; 4 quanteda      192ms    195ms      5.11     8.7MB    1.28 
+#&gt; 5 base R        413ms    415ms      2.41   10.51MB    1.03</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">
@@ -1134,7 +1133,7 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": null,
+"download": ["bookdown.pdf"],
 "toc": {
 "collapse": "subsection"
 }
