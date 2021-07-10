@@ -207,15 +207,15 @@ svm_fit %>%
 #>    term                  estimate
 #>    <chr>                    <dbl>
 #>  1 Bias                   1920.  
-#>  2 tfidf_text_appeals        1.48
-#>  3 tfidf_text_see            1.45
-#>  4 tfidf_text_later          1.36
-#>  5 tfidf_text_even           1.33
-#>  6 tfidf_text_example        1.30
-#>  7 tfidf_text_noted          1.25
-#>  8 tfidf_text_petitioner     1.25
-#>  9 tfidf_text_based          1.25
-#> 10 tfidf_text_relevant       1.20
+#>  2 tfidf_text_later          1.50
+#>  3 tfidf_text_appeals        1.48
+#>  4 tfidf_text_see            1.39
+#>  5 tfidf_text_noted          1.38
+#>  6 tfidf_text_example        1.27
+#>  7 tfidf_text_petitioner     1.26
+#>  8 tfidf_text_even           1.23
+#>  9 tfidf_text_rather         1.21
+#> 10 tfidf_text_including      1.13
 #> # … with 991 more rows
 ```
 
@@ -233,18 +233,18 @@ svm_fit %>%
 
 ```
 #> # A tibble: 1,001 x 2
-#>    term             estimate
-#>    <chr>               <dbl>
-#>  1 tfidf_text_1st      -1.79
-#>  2 tfidf_text_but      -1.73
-#>  3 tfidf_text_the      -1.62
-#>  4 tfidf_text_same     -1.55
-#>  5 tfidf_text_it       -1.44
-#>  6 tfidf_text_this     -1.43
-#>  7 tfidf_text_cause    -1.41
-#>  8 tfidf_text_bound    -1.37
-#>  9 tfidf_text_be       -1.36
-#> 10 tfidf_text_been     -1.35
+#>    term                 estimate
+#>    <chr>                   <dbl>
+#>  1 tfidf_text_ought        -2.77
+#>  2 tfidf_text_1st          -1.94
+#>  3 tfidf_text_but          -1.63
+#>  4 tfidf_text_same         -1.62
+#>  5 tfidf_text_the          -1.57
+#>  6 tfidf_text_therefore    -1.54
+#>  7 tfidf_text_it           -1.46
+#>  8 tfidf_text_which        -1.40
+#>  9 tfidf_text_this         -1.39
+#> 10 tfidf_text_be           -1.33
 #> # … with 991 more rows
 ```
 
@@ -344,13 +344,13 @@ collect_metrics(svm_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.9      10 0.189   Preprocessor1_Model1
-#> 2 rsq     standard    0.892    10 0.00150 Preprocessor1_Model1
+#> 1 rmse    standard   15.6      10 0.216   Preprocessor1_Model1
+#> 2 rsq     standard    0.895    10 0.00244 Preprocessor1_Model1
 ```
 
 
 
-The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$ (coefficient of determination). RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is 15.9 years.
+The default performance metrics to be computed for regression models are RMSE (root mean squared error) and $R^2$ (coefficient of determination). RMSE is a metric that is in the same units as the original data, so in units of _years_, in our case; the RMSE of this first regression model is 15.6 years.
 
 \index{root mean squared error|see {RMSE}}
 \index{RMSE}
@@ -384,7 +384,7 @@ svm_rs %>%
 <p class="caption">(\#fig:firstregpredict)Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years</p>
 </div>
 
-The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.9 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
+The average spread of points in this plot above and below the dashed line corresponds to RMSE, which is 15.6 years for this model. When RMSE is better (lower), the points will be closer to the dashed line. This first model we have tried did not do a great job for Supreme Court opinions from before 1850, but for opinions after 1850, this looks pretty good!
 
 <div class="rmdwarning">
 <p>Hopefully you are convinced that using resampled data sets for measuring performance is the right choice, but it can be computationally expensive. Instead of fitting once, we must fit the model one time for <em>each</em> resample. The resamples are independent of each other, so this is a great fit for parallel processing. The tidymodels framework is designed to work fluently with parallel processing in R, using multiple cores or multiple machines. The implementation details of parallel processing are operating system specific, so <a href="https://tune.tidymodels.org/articles/extras/optimizations.html">look at tidymodels’ documentation for how to get started</a>.</p>
@@ -442,7 +442,7 @@ collect_metrics(null_rs)
 #> # A tibble: 1 x 6
 #>   .metric .estimator  mean     n std_err .config             
 #>   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard    48.0    10   0.512 Preprocessor1_Model1
+#> 1 rmse    standard    47.9    10   0.294 Preprocessor1_Model1
 ```
 
 The RMSE indicates that this null model is dramatically worse than our first model. Even our first very attempt at a regression model (using only unigrams and very little specialized preprocessing)\index{preprocessing} did much better than the null model; the text of the Supreme Court opinions has enough information in it related to the year the opinions were published that we can build successful models.
@@ -499,8 +499,8 @@ collect_metrics(rf_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.0      10 0.487   Preprocessor1_Model1
-#> 2 rsq     standard    0.919    10 0.00434 Preprocessor1_Model1
+#> 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
+#> 2 rsq     standard    0.919    10 0.00283 Preprocessor1_Model1
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
@@ -644,8 +644,8 @@ collect_metrics(smart_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   16.8      10 0.194   Preprocessor1_Model1
-#> 2 rsq     standard    0.880    10 0.00305 Preprocessor1_Model1
+#> 1 rmse    standard   17.2      10 0.199   Preprocessor1_Model1
+#> 2 rsq     standard    0.876    10 0.00261 Preprocessor1_Model1
 ```
 
 We can explore whether one of these sets of stop words performed better than the others by comparing the performance, for example in terms of RMSE as shown Figure \@ref(fig:snowballrmse). This plot shows the five best models for each set of stop words, using `show_best()` applied to each via `purrr::map_dfr()`.
@@ -682,7 +682,7 @@ The \index{stop word lists!Snowball}Snowball lexicon contains the smallest numbe
 <p>This result is not generalizable to all data sets and contexts, but the approach outlined in this section <strong>is</strong> generalizable.</p>
 </div>
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.9 years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.6 years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
 
 When removing stop words does appear to help a model, it's good to know that removing stop words isn't computationally slow or difficult so the cost for this improvement is low.\index{computational speed}
 
@@ -766,8 +766,8 @@ collect_metrics(bigram_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   16.0      10 0.191   Preprocessor1_Model1
-#> 2 rsq     standard    0.890    10 0.00211 Preprocessor1_Model1
+#> 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
+#> 2 rsq     standard    0.892    10 0.00240 Preprocessor1_Model1
 ```
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse).
@@ -845,6 +845,8 @@ Table: (\#tab:lemmatb)Lemmatization of one sentence from a Supreme Court opinion
 |Service       |Service      |
 |.             |.            |
 
+
+
 Notice several things about lemmatization\index{lemma} that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
 
 - Words are converted to lower case except for proper nouns.
@@ -916,11 +918,11 @@ collect_metrics(lemma_rs)
 #> # A tibble: 2 x 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   14.3      10 0.191   Preprocessor1_Model1
-#> 2 rsq     standard    0.913    10 0.00189 Preprocessor1_Model1
+#> 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
+#> 2 rsq     standard    0.913    10 0.00304 Preprocessor1_Model1
 ```
 
-The best value for RMSE at 14.3 shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to 15.9 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.\index{computational speed}
+The best value for RMSE at 14.2 shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.\index{computational speed}
 
 <div class="rmdnote">
 <p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
@@ -1063,15 +1065,15 @@ scotus_hash %>%
 ```
 #> Rows: 7,500
 #> Columns: 9
-#> $ text_hash001 <dbl> -47, -2, -9, -10, -15, -7, -5, -12, -4, -9, -2, -1, 2, -2…
-#> $ text_hash002 <dbl> 0, -4, -2, 0, 2, -8, 6, 1, 0, 6, -1, 0, 1, 0, 0, 0, -4, -…
-#> $ text_hash003 <dbl> 1, -1, 7, -3, 3, 1, 0, 1, 0, 4, 1, 0, 2, 0, 1, -2, -1, -4…
-#> $ text_hash004 <dbl> -7, 0, 0, -10, -5, 4, 7, -1, 0, -4, 0, 0, 0, 0, -1, 0, -4…
-#> $ text_hash005 <dbl> -1, -4, 1, 0, 2, -2, -1, -17, 0, 0, 0, 0, -1, -1, 0, 0, -…
-#> $ text_hash006 <dbl> 42, 3, 11, 0, 42, 9, 26, 6, 0, 18, 8, -1, 2, 6, 0, 0, 26,…
-#> $ text_hash007 <dbl> -17, -1, -1, 1, -7, 0, 1, -3, 0, -1, 0, 0, 0, 0, 0, 0, -6…
-#> $ text_hash008 <dbl> 15, 1, -2, -1, 3, 5, -1, -2, -1, -1, 5, -2, 1, 1, -1, 4, …
-#> $ text_hash009 <dbl> 6, 0, -4, 0, -30, 0, 0, 0, 0, -3, 0, -1, 0, 0, 0, 0, 0, -…
+#> $ text_hash001 <dbl> -16, -5, -12, -10, -10, -2, -7, -13, -16, -18, -1, -2, -1…
+#> $ text_hash002 <dbl> -1, 1, 3, -2, 0, 0, 5, -1, 1, 6, 0, 2, 0, 0, 0, -3, 1, 2,…
+#> $ text_hash003 <dbl> -2, 0, 4, -1, -1, 1, -5, -2, -2, 0, 0, -1, 1, 6, 0, 0, -3…
+#> $ text_hash004 <dbl> -2, 0, -1, 0, 0, 0, -14, -14, -4, -2, 0, -10, -1, -2, 0, …
+#> $ text_hash005 <dbl> 0, 0, 0, 0, 0, 0, -2, -1, 2, 1, 0, -1, 0, -1, 0, 0, -1, 0…
+#> $ text_hash006 <dbl> 24, 2, 4, 6, 7, 2, 14, 13, 13, 22, 1, 41, 2, 49, 9, 1, 17…
+#> $ text_hash007 <dbl> 13, 1, 1, -3, 0, -6, -2, -4, -8, -1, 0, 0, -4, -11, 0, 0,…
+#> $ text_hash008 <dbl> -8, 3, 1, 1, 1, 0, -19, 0, 1, 0, 1, -1, 1, 1, -2, 1, -8, …
+#> $ text_hash009 <dbl> -2, 0, -1, 1, 0, 0, 0, -1, -1, -1, 0, -1, -1, -1, 0, 0, -…
 ```
 
 By using `step_texthash()` we can quickly generate machine-ready data with a consistent number of variables.
@@ -1214,7 +1216,7 @@ svm_rs %>%
 #> # A tibble: 1 x 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 mape    standard       0.623
+#> 1 mape    standard       0.616
 ```
 
 We can also compute the mean absolute percent error for each resample.
@@ -1231,16 +1233,16 @@ svm_rs %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 mape    standard       0.620
-#>  2 Fold02 mape    standard       0.613
-#>  3 Fold03 mape    standard       0.646
-#>  4 Fold04 mape    standard       0.607
-#>  5 Fold05 mape    standard       0.609
-#>  6 Fold06 mape    standard       0.631
-#>  7 Fold07 mape    standard       0.619
-#>  8 Fold08 mape    standard       0.616
-#>  9 Fold09 mape    standard       0.632
-#> 10 Fold10 mape    standard       0.640
+#>  1 Fold01 mape    standard       0.603
+#>  2 Fold02 mape    standard       0.660
+#>  3 Fold03 mape    standard       0.596
+#>  4 Fold04 mape    standard       0.639
+#>  5 Fold05 mape    standard       0.618
+#>  6 Fold06 mape    standard       0.611
+#>  7 Fold07 mape    standard       0.618
+#>  8 Fold08 mape    standard       0.602
+#>  9 Fold09 mape    standard       0.604
+#> 10 Fold10 mape    standard       0.605
 ```
 
 Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.
@@ -1257,16 +1259,16 @@ svm_rs %>%
 #> # A tibble: 10 x 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 mae     standard        11.9
-#>  2 Fold02 mae     standard        11.7
-#>  3 Fold03 mae     standard        12.4
-#>  4 Fold04 mae     standard        11.7
-#>  5 Fold05 mae     standard        11.6
-#>  6 Fold06 mae     standard        12.1
+#>  1 Fold01 mae     standard        11.5
+#>  2 Fold02 mae     standard        12.6
+#>  3 Fold03 mae     standard        11.4
+#>  4 Fold04 mae     standard        12.2
+#>  5 Fold05 mae     standard        11.8
+#>  6 Fold06 mae     standard        11.7
 #>  7 Fold07 mae     standard        11.9
-#>  8 Fold08 mae     standard        11.8
-#>  9 Fold09 mae     standard        12.1
-#> 10 Fold10 mae     standard        12.3
+#>  8 Fold08 mae     standard        11.5
+#>  9 Fold09 mae     standard        11.6
+#> 10 Fold10 mae     standard        11.6
 ```
 
 
@@ -1483,7 +1485,7 @@ chosen_mae
 #> # A tibble: 1 x 9
 #>   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #>        <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>            <dbl> <dbl>
-#> 1       4000 mae     standard    10.1    10   0.118 Preprocessor4_M…  10.0 0.438
+#> 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -1535,8 +1537,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 x 4
 #>   .metric .estimator .estimate .config             
 #>   <chr>   <chr>          <dbl> <chr>               
-#> 1 rmse    standard      13.2   Preprocessor1_Model1
-#> 2 rsq     standard       0.926 Preprocessor1_Model1
+#> 1 rmse    standard      13.8   Preprocessor1_Model1
+#> 2 rsq     standard       0.921 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -1627,20 +1629,20 @@ scotus_bind %>%
 ```
 
 ```
-#> # A tibble: 137 x 4
-#>     year .pred case_name                       text                             
-#>    <dbl> <dbl> <chr>                           <chr>                            
-#>  1  2008 1982. Sprint Communications Co. v. A… "Supreme Court of United States.…
-#>  2  2004 1978. BedRoc Limited, LLC v. United … "No. 02-1593.\nThe Pittman Under…
-#>  3  2004 1978. Sosa v. Alvarez-Machain         "No. 03-339.\nThe Drug Enforceme…
-#>  4  2002 1954. JPMorgan Chase Bank v. Traffic… "No. 01-651.\nCERTIORARI TO THE …
-#>  5  1996 2021. Bank One Chicago, NA v. Midwes… "No. 94-1175.\n\n        Syllabu…
-#>  6  1995 1959. Johnny Paul Penry v. Texas. No… "Justice SCALIA, Circuit Justice…
-#>  7  1993 1964. Tennessee v. Middlebrooks       "No. 92-989.\nCERTIORARI TO THE …
-#>  8  1992 2021. Martin v. District of Columbia… "Nos. 92-5584, 92-5618.\nReheari…
-#>  9  1992 1966. INS v. Elias-Zacarias           "No. 90-1342.\n\n        Syllabu…
-#> 10  1992 1966. Republic Nat. Bank of Miami v.… "No. 91-767.\nSyllabus*\nThe Gov…
-#> # … with 127 more rows
+#> # A tibble: 168 x 4
+#>     year .pred case_name                 text                                   
+#>    <dbl> <dbl> <chr>                     <chr>                                  
+#>  1  2009 2055. Nijhawan v. Holder        "Supreme Court of United States.\n*229…
+#>  2  2008 1957. Green v. Johnson          "                 Cite as: 553 U. S. _…
+#>  3  2008 1952. Dalehite v. United States "Supreme Court of United States.\n*16 …
+#>  4  2008 1982. Preston v. Ferrer         "Supreme Court of United States.\n*981…
+#>  5  2007 1876. Quebec Bank of Toronto v… "Supreme Court of United States.\n*179…
+#>  6  2004 2035. Illinois v. Lidster       "No. 02-1060.\nPolice set up a highway…
+#>  7  2002 1969. Borgner v. Florida Board… "No. 02-165.\nCERTIORARI TO THE UNITED…
+#>  8  2000 1974. Ohler v. United States    "OHLERv.UNITED STATES\nCERTIORARI TO T…
+#>  9  2000 1955. Bush v. Palm Beach Count… "No. 00-836\nON WRIT OF CERTIORARI TO …
+#> 10  1999 1964. Dickinson v. Zurko        "No. 98 377\nQ. TODD DICKINSON,  ACTIN…
+#> # … with 158 more rows
 ```
 
 There are some interesting examples here where we can understand why the model would mispredict: 

@@ -486,13 +486,7 @@ Let's briefly walk through how to use spacyr.
 ```r
 library(spacyr)
 spacy_initialize(entity = FALSE)
-```
 
-```
-#> NULL
-```
-
-```r
 fir_tree %>%
   mutate(doc_id = paste0("doc", row_number())) %>%
   select(doc_id, everything()) %>%
