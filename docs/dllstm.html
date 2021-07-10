@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-06" />
+<meta name="date" content="2021-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="dldnn.html"/>
 <link rel="next" href="dlcnn.html"/>
-<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -501,7 +501,7 @@ div.csl-indent {
 <div class="rmdnote">
 Using <code>step_sequence_onehot()</code> to preprocess text data records and encodes <em>sequence</em> information, unlike the document-term matrix and/or bag-of-tokens approaches we used in Chapters <a href="mlclassification.html#mlclassification">7</a> and <a href="mlregression.html#mlregression">6</a>.
 </div>
-<p>There are 202,093 blurbs in the training set and 67,364 in the testing set.</p>
+<p>There are 202,092 blurbs in the training set and 67,365 in the testing set.</p>
 <div class="rmdpackage">
 <p>
 Like we discussed in the last chapter, we are using <strong>recipes</strong> and <strong>textrecipes</strong> for preprocessing before modeling. When we <code>prep()</code> a recipe, we compute or estimate statistics from the training set; the output of <code>prep()</code> is a recipe. When we <code>bake()</code> a recipe, we apply the preprocessing to a data set, either the training set that we started with or another set like the testing data or new data. The output of <code>bake()</code> is a data set like a tibble or a matrix.
@@ -509,10 +509,10 @@ Like we discussed in the last chapter, we are using <strong>recipes</strong> and
 </div>
 <p>We could have applied these <code>prep()</code> and <code>bake()</code> functions to any preprocessing recipes throughout this book, but we typically didn’t need to because our modeling workflows automated these steps.</p>
 <div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="dllstm.html#cb517-1" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb517-2"><a href="dllstm.html#cb517-2" aria-hidden="true" tabindex="-1"></a>kick_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb517-2"><a href="dllstm.html#cb517-2" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb517-3"><a href="dllstm.html#cb517-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb517-4"><a href="dllstm.html#cb517-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
-<pre><code>#&gt; [1] 202093     30</code></pre>
+<span id="cb517-4"><a href="dllstm.html#cb517-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
+<pre><code>#&gt; [1] 202092     30</code></pre>
 <p>Here we use <code>composition = "matrix"</code> because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.</p>
 <div id="building-an-lstm" class="section level3" number="9.1.1">
 <h3><span class="header-section-number">9.1.1</span> Building an LSTM</h3>
@@ -574,7 +574,7 @@ As we noted in Chapter <a href="dldnn.html#dldnn">8</a>, the neural network mode
 <p>After the model is compiled, we can fit it. The <code>fit()</code> method for Keras models has an argument <code>validation_split</code> that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the <em>end</em> of each epoch.</p>
 <div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="dllstm.html#cb522-1" aria-hidden="true" tabindex="-1"></a>lstm_history <span class="ot">&lt;-</span> lstm_mod <span class="sc">%&gt;%</span></span>
 <span id="cb522-2"><a href="dllstm.html#cb522-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb522-3"><a href="dllstm.html#cb522-3" aria-hidden="true" tabindex="-1"></a>    kick_matrix,</span>
+<span id="cb522-3"><a href="dllstm.html#cb522-3" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
 <span id="cb522-4"><a href="dllstm.html#cb522-4" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
 <span id="cb522-5"><a href="dllstm.html#cb522-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
 <span id="cb522-6"><a href="dllstm.html#cb522-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.25</span>,</span>
@@ -585,10 +585,10 @@ As we noted in Chapter <a href="dldnn.html#dldnn">8</a>, the neural network mode
 <span id="cb522-11"><a href="dllstm.html#cb522-11" aria-hidden="true" tabindex="-1"></a>lstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.2636
-#&gt;     accuracy: 0.8776
-#&gt;     val_loss: 0.5831
-#&gt; val_accuracy: 0.7825</code></pre>
+#&gt;         loss: 0.257
+#&gt;     accuracy: 0.8786
+#&gt;     val_loss: 0.7729
+#&gt; val_accuracy: 0.7555</code></pre>
 <p>The loss on the training data (called <code>loss</code> here) is much better than the loss on the validation data (<code>val_loss</code>), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:firstlstmhistory">9.2</a>.</p>
 <div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="dllstm.html#cb524-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:firstlstmhistory"></span>
@@ -614,16 +614,16 @@ Remember that lower loss indicates a better fitting model, and higher accuracy (
 #&gt; # A tibble: 1 x 2
 #&gt;   splits                 id        
 #&gt;   &lt;list&gt;                 &lt;chr&gt;     
-#&gt; 1 &lt;split [151571/50522]&gt; validation</code></pre>
+#&gt; 1 &lt;split [151568/50524]&gt; validation</code></pre>
 <p>We can access the two data sets specified by this <code>split</code> via the functions <code>analysis()</code> (the analog to training) and <code>assessment()</code> (the analog to testing). We need to apply our prepped preprocessing recipe <code>kick_prep</code> to both to transform this data to the appropriate format for our neural network architecture.</p>
 <div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="dllstm.html#cb527-1" aria-hidden="true" tabindex="-1"></a>kick_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
 <span id="cb527-2"><a href="dllstm.html#cb527-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb527-3"><a href="dllstm.html#cb527-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_analysis)</span></code></pre></div>
-<pre><code>#&gt; [1] 151571     30</code></pre>
+<pre><code>#&gt; [1] 151568     30</code></pre>
 <div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="dllstm.html#cb529-1" aria-hidden="true" tabindex="-1"></a>kick_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
 <span id="cb529-2"><a href="dllstm.html#cb529-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb529-3"><a href="dllstm.html#cb529-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_assess)</span></code></pre></div>
-<pre><code>#&gt; [1] 50522    30</code></pre>
+<pre><code>#&gt; [1] 50524    30</code></pre>
 <p>These are each matrices appropriate for a Keras model. We will also need the outcome variables for both sets.</p>
 <div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="dllstm.html#cb531-1" aria-hidden="true" tabindex="-1"></a>state_analysis <span class="ot">&lt;-</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
 <span id="cb531-2"><a href="dllstm.html#cb531-2" aria-hidden="true" tabindex="-1"></a>state_assess <span class="ot">&lt;-</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span></code></pre></div>
@@ -657,10 +657,10 @@ When we include some dropout, we temporarily remove some units together with the
 <span id="cb532-23"><a href="dllstm.html#cb532-23" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3811
-#&gt;     accuracy: 0.8201
-#&gt;     val_loss: 0.5968
-#&gt; val_accuracy: 0.7363</code></pre>
+#&gt;         loss: 0.3805
+#&gt;     accuracy: 0.8217
+#&gt;     val_loss: 0.6199
+#&gt; val_accuracy: 0.7326</code></pre>
 <p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.3</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
 <div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="dllstm.html#cb534-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lstmvalhistory"></span>
@@ -675,11 +675,11 @@ FIGURE 9.3: Training and validation metrics for LSTM with dropout
 <pre><code>#&gt; # A tibble: 4 x 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.736
-#&gt; 2 kap         binary         0.470
-#&gt; 3 mn_log_loss binary         0.597
-#&gt; 4 roc_auc     binary         0.807</code></pre>
-<p>A regularized linear model trained on this data set achieved results of accuracy of 0.684 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
+#&gt; 1 accuracy    binary         0.733
+#&gt; 2 kap         binary         0.463
+#&gt; 3 mn_log_loss binary         0.620
+#&gt; 4 roc_auc     binary         0.802</code></pre>
+<p>A regularized linear model trained on this data set achieved results of accuracy of 0.686 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
 <div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="dllstm.html#cb537-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
 <span id="cb537-2"><a href="dllstm.html#cb537-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
 <span id="cb537-3"><a href="dllstm.html#cb537-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
@@ -725,10 +725,10 @@ Simple RNNs can only connect very recent information and structure in sequences,
 <span id="cb538-23"><a href="dllstm.html#cb538-23" aria-hidden="true" tabindex="-1"></a>rnn_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.5011
-#&gt;     accuracy: 0.7644
-#&gt;     val_loss: 0.6109
-#&gt; val_accuracy: 0.7058</code></pre>
+#&gt;         loss: 0.4944
+#&gt;     accuracy: 0.7688
+#&gt;     val_loss: 0.6064
+#&gt; val_accuracy: 0.71</code></pre>
 <p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.5</a>.</p>
 <div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="dllstm.html#cb540-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:rnnhistory"></span>
@@ -776,21 +776,21 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 <span id="cb541-24"><a href="dllstm.html#cb541-24" aria-hidden="true" tabindex="-1"></a>bilstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3707
-#&gt;     accuracy: 0.827
-#&gt;     val_loss: 0.6151
-#&gt; val_accuracy: 0.7382</code></pre>
+#&gt;         loss: 0.3593
+#&gt;     accuracy: 0.8332
+#&gt;     val_loss: 0.6167
+#&gt; val_accuracy: 0.7363</code></pre>
 <p>The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well.</p>
 <div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="dllstm.html#cb543-1" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bilstm_mod, kick_assess, state_assess)</span>
 <span id="cb543-2"><a href="dllstm.html#cb543-2" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 x 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.738
-#&gt; 2 kap         binary         0.475
-#&gt; 3 mn_log_loss binary         0.615
-#&gt; 4 roc_auc     binary         0.808</code></pre>
-<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736).</p>
+#&gt; 1 accuracy    binary         0.736
+#&gt; 2 kap         binary         0.470
+#&gt; 3 mn_log_loss binary         0.617
+#&gt; 4 roc_auc     binary         0.806</code></pre>
+<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.733).</p>
 </div>
 <div id="case-study-stacking-lstm-layers" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Case study: stacking LSTM layers</h2>
@@ -828,10 +828,10 @@ Intermediate layers must be set up to return sequences (with <code>return_sequen
 <span id="cb545-25"><a href="dllstm.html#cb545-25" aria-hidden="true" tabindex="-1"></a>stacked_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3865
-#&gt;     accuracy: 0.8191
-#&gt;     val_loss: 0.5994
-#&gt; val_accuracy: 0.7365</code></pre>
+#&gt;         loss: 0.3775
+#&gt;     accuracy: 0.828
+#&gt;     val_loss: 0.6001
+#&gt; val_accuracy: 0.7374</code></pre>
 <p>Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.</p>
 <div class="sourceCode" id="cb547"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb547-1"><a href="dllstm.html#cb547-1" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(stacked_mod, kick_assess, state_assess)</span>
 <span id="cb547-2"><a href="dllstm.html#cb547-2" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
@@ -839,9 +839,9 @@ Intermediate layers must be set up to return sequences (with <code>return_sequen
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.737
-#&gt; 2 kap         binary         0.471
-#&gt; 3 mn_log_loss binary         0.599
-#&gt; 4 roc_auc     binary         0.805</code></pre>
+#&gt; 2 kap         binary         0.474
+#&gt; 3 mn_log_loss binary         0.600
+#&gt; 4 roc_auc     binary         0.804</code></pre>
 <p>We can gradually improve a model by changing and adding to its architecture.</p>
 </div>
 <div id="lstmpadding" class="section level2" number="9.5">
@@ -862,8 +862,8 @@ It is possible to set up an LSTM network that works with sequences of varied len
 <span id="cb549-6"><a href="dllstm.html#cb549-6" aria-hidden="true" tabindex="-1"></a>padding_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(padding_rec)</span>
 <span id="cb549-7"><a href="dllstm.html#cb549-7" aria-hidden="true" tabindex="-1"></a>padding_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb549-8"><a href="dllstm.html#cb549-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(padding_matrix)</span></code></pre></div>
-<pre><code>#&gt; [1] 202093     30</code></pre>
-<p>This matrix has the same dimensions as <code>kick_matrix</code> but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)</p>
+<pre><code>#&gt; [1] 202092     30</code></pre>
+<p>This matrix has the same dimensions as <code>kick_train</code> but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)</p>
 <div class="sourceCode" id="cb551"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb551-1"><a href="dllstm.html#cb551-1" aria-hidden="true" tabindex="-1"></a>pad_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
 <span id="cb551-2"><a href="dllstm.html#cb551-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb551-3"><a href="dllstm.html#cb551-3" aria-hidden="true" tabindex="-1"></a>pad_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
@@ -894,10 +894,10 @@ It is possible to set up an LSTM network that works with sequences of varied len
 <span id="cb552-23"><a href="dllstm.html#cb552-23" aria-hidden="true" tabindex="-1"></a>padding_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4422
-#&gt;     accuracy: 0.779
-#&gt;     val_loss: 0.5969
-#&gt; val_accuracy: 0.7155</code></pre>
+#&gt;         loss: 0.4273
+#&gt;     accuracy: 0.789
+#&gt;     val_loss: 0.6106
+#&gt; val_accuracy: 0.7148</code></pre>
 <p>This padding strategy results in noticeably worse performance than the default option!</p>
 <div class="sourceCode" id="cb554"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb554-1"><a href="dllstm.html#cb554-1" aria-hidden="true" tabindex="-1"></a>padding_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(padding_mod, pad_assess, state_assess)</span>
 <span id="cb554-2"><a href="dllstm.html#cb554-2" aria-hidden="true" tabindex="-1"></a>padding_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
@@ -905,10 +905,10 @@ It is possible to set up an LSTM network that works with sequences of varied len
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.715
-#&gt; 2 kap         binary         0.431
-#&gt; 3 mn_log_loss binary         0.597
-#&gt; 4 roc_auc     binary         0.789</code></pre>
-<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.807; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
+#&gt; 2 kap         binary         0.428
+#&gt; 3 mn_log_loss binary         0.611
+#&gt; 4 roc_auc     binary         0.790</code></pre>
+<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.733 and an AUC of 0.802; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
 <div class="rmdwarning">
 <p>
 Different preprocessing strategies have a huge impact on deep learning results.
@@ -952,8 +952,8 @@ Notice that we also shifted (subtracted) and scaled (divided) the <code>year</co
 <span id="cb557-15"><a href="dllstm.html#cb557-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
 <p>What does our training data look like now?</p>
 <div class="sourceCode" id="cb558"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb558-1"><a href="dllstm.html#cb558-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_train_baked)</span></code></pre></div>
-<pre><code>#&gt; [1] 7502 1000</code></pre>
-<p>We only have 7502 rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has 1000 columns. You are probably starting to guess that we are going to run into problems.</p>
+<pre><code>#&gt; [1] 7498 1000</code></pre>
+<p>We only have 7498 rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has 1000 columns. You are probably starting to guess that we are going to run into problems.</p>
 <p>Let’s create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer (we may want to increase the number of <code>units</code> as well, but will leave that out for the time being). Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.</p>
 <div class="rmdnote">
 <p>
@@ -989,9 +989,9 @@ A good default loss function for regression is mean squared error, <code>“mse�
 <pre><code>#&gt; # A tibble: 3 x 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 rmse    standard      18.0  
-#&gt; 2 rsq     standard       0.864
-#&gt; 3 mae     standard      13.2</code></pre>
+#&gt; 1 rmse    standard      24.5  
+#&gt; 2 rsq     standard       0.780
+#&gt; 3 mae     standard      18.2</code></pre>
 <p>This is much worse than the final regularized linear model trained in Section <a href="mlregression.html#mlregressionfull">6.9</a>, with an RMSE almost a decade worth of years worse. It’s possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline.</p>
 <div class="rmdwarning">
 <p>
@@ -1041,21 +1041,21 @@ The main problem with this regression model is that there isn’t that much data
 <span id="cb564-23"><a href="dllstm.html#cb564-23" aria-hidden="true" tabindex="-1"></a>smaller_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4695
-#&gt;     accuracy: 0.7693
-#&gt;     val_loss: 0.5807
-#&gt; val_accuracy: 0.7121</code></pre>
+#&gt;         loss: 0.4719
+#&gt;     accuracy: 0.768
+#&gt;     val_loss: 0.5866
+#&gt; val_accuracy: 0.7049</code></pre>
 <p>How did this smaller model, based on a smaller vocabulary in the model, perform?</p>
 <div class="sourceCode" id="cb566"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb566-1"><a href="dllstm.html#cb566-1" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(smaller_mod, kick_assess, state_assess)</span>
 <span id="cb566-2"><a href="dllstm.html#cb566-2" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 x 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.712
-#&gt; 2 kap         binary         0.423
-#&gt; 3 mn_log_loss binary         0.581
-#&gt; 4 roc_auc     binary         0.784</code></pre>
-<p>The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.807. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
+#&gt; 1 accuracy    binary         0.705
+#&gt; 2 kap         binary         0.406
+#&gt; 3 mn_log_loss binary         0.587
+#&gt; 4 roc_auc     binary         0.777</code></pre>
+<p>The original LSTM model with the larger vocabulary had an accuracy of 0.733 and an AUC of 0.802. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
 <div class="rmdnote">
 <p>
 The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.
@@ -1077,10 +1077,10 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb568-7"><a href="dllstm.html#cb568-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
 <span id="cb568-8"><a href="dllstm.html#cb568-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb568-9"><a href="dllstm.html#cb568-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb568-10"><a href="dllstm.html#cb568-10" aria-hidden="true" tabindex="-1"></a>kick_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb568-10"><a href="dllstm.html#cb568-10" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb568-11"><a href="dllstm.html#cb568-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb568-12"><a href="dllstm.html#cb568-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
-<pre><code>#&gt; [1] 202093     30</code></pre>
+<span id="cb568-12"><a href="dllstm.html#cb568-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
+<pre><code>#&gt; [1] 202092     30</code></pre>
 </div>
 <div id="lstmfullmodel" class="section level3" number="9.8.2">
 <h3><span class="header-section-number">9.8.2</span> Specify the model</h3>
@@ -1115,7 +1115,7 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb570-22"><a href="dllstm.html#cb570-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb570-23"><a href="dllstm.html#cb570-23" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
 <span id="cb570-24"><a href="dllstm.html#cb570-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb570-25"><a href="dllstm.html#cb570-25" aria-hidden="true" tabindex="-1"></a>    kick_matrix,</span>
+<span id="cb570-25"><a href="dllstm.html#cb570-25" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
 <span id="cb570-26"><a href="dllstm.html#cb570-26" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
 <span id="cb570-27"><a href="dllstm.html#cb570-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
 <span id="cb570-28"><a href="dllstm.html#cb570-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
@@ -1126,22 +1126,22 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb570-33"><a href="dllstm.html#cb570-33" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3335
-#&gt;     accuracy: 0.8509
-#&gt;     val_loss: 0.5248
-#&gt; val_accuracy: 0.7775</code></pre>
+#&gt;         loss: 0.3311
+#&gt;     accuracy: 0.8504
+#&gt;     val_loss: 0.5537
+#&gt; val_accuracy: 0.7745</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
-<div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb572-1"><a href="dllstm.html#cb572-1" aria-hidden="true" tabindex="-1"></a>kick_matrix_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
-<span id="cb572-2"><a href="dllstm.html#cb572-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb572-3"><a href="dllstm.html#cb572-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_matrix_test, kickstarter_test<span class="sc">$</span>state)</span>
+<div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb572-1"><a href="dllstm.html#cb572-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
+<span id="cb572-2"><a href="dllstm.html#cb572-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb572-3"><a href="dllstm.html#cb572-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_test, kickstarter_test<span class="sc">$</span>state)</span>
 <span id="cb572-4"><a href="dllstm.html#cb572-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 x 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.765
-#&gt; 2 kap         binary         0.529
-#&gt; 3 mn_log_loss binary         0.549
-#&gt; 4 roc_auc     binary         0.832</code></pre>
+#&gt; 2 kap         binary         0.530
+#&gt; 3 mn_log_loss binary         0.566
+#&gt; 4 roc_auc     binary         0.836</code></pre>
 <p>This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.6</a>.</p>
 <div class="sourceCode" id="cb574"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb574-1"><a href="dllstm.html#cb574-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb574-2"><a href="dllstm.html#cb574-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
@@ -1257,7 +1257,7 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": null,
+"download": ["bookdown.pdf"],
 "toc": {
 "collapse": "subsection"
 }

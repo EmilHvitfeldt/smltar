@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-07-05"
+date: "2021-07-09"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
@@ -114,64 +114,64 @@ This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdo
 This version of the book was built with R version 4.1.0 (2021-05-18) and the following packages:
 
 
-|package        |version    |source                                   |
-|:--------------|:----------|:----------------------------------------|
-|bench          |1.1.1      |CRAN (R 4.1.0)                           |
-|bookdown       |0.22       |CRAN (R 4.1.0)                           |
-|broom          |0.7.6      |CRAN (R 4.1.0)                           |
-|corpus         |0.10.2     |CRAN (R 4.1.0)                           |
-|dials          |0.0.9      |CRAN (R 4.1.0)                           |
-|discrim        |0.1.2      |CRAN (R 4.1.0)                           |
-|doParallel     |1.0.16     |CRAN (R 4.1.0)                           |
-|glmnet         |4.1-1      |CRAN (R 4.1.0)                           |
-|gt             |0.3.0      |CRAN (R 4.1.0)                           |
-|hcandersenr    |0.2.0      |CRAN (R 4.1.0)                           |
-|htmltools      |0.5.1.1    |CRAN (R 4.1.0)                           |
-|htmlwidgets    |1.5.3      |CRAN (R 4.1.0)                           |
-|hunspell       |3.0.1      |CRAN (R 4.1.0)                           |
-|irlba          |2.3.3      |CRAN (R 4.1.0)                           |
-|jiebaR         |0.11       |CRAN (R 4.1.0)                           |
-|jsonlite       |1.7.2      |CRAN (R 4.1.0)                           |
-|kableExtra     |1.3.4      |CRAN (R 4.1.0)                           |
-|keras          |2.4.0      |CRAN (R 4.1.0)                           |
-|klaR           |0.6-15     |CRAN (R 4.1.0)                           |
-|LiblineaR      |2.10-12    |CRAN (R 4.1.0)                           |
-|lime           |0.5.2      |CRAN (R 4.1.0)                           |
-|lobstr         |1.1.1      |CRAN (R 4.1.0)                           |
-|naivebayes     |0.9.7      |CRAN (R 4.1.0)                           |
-|parsnip        |0.1.6      |CRAN (R 4.1.0)                           |
-|prismatic      |1.0.0      |CRAN (R 4.1.0)                           |
-|quanteda       |3.0.0      |CRAN (R 4.1.0)                           |
-|ranger         |0.12.1     |CRAN (R 4.1.0)                           |
-|recipes        |0.1.16     |CRAN (R 4.1.0)                           |
-|remotes        |2.4.0      |CRAN (R 4.1.0)                           |
-|reticulate     |1.20       |CRAN (R 4.1.0)                           |
-|rsample        |0.1.0      |CRAN (R 4.1.0)                           |
-|rsparse        |0.4.0      |CRAN (R 4.1.0)                           |
-|scico          |1.2.0      |CRAN (R 4.1.0)                           |
-|scotus         |1.0.0      |Github (EmilHvitfeldt/scotus\@e5ccdea)   |
-|servr          |0.22       |CRAN (R 4.1.0)                           |
-|sessioninfo    |1.1.1      |CRAN (R 4.1.0)                           |
-|slider         |0.2.1      |CRAN (R 4.1.0)                           |
-|SnowballC      |0.7.0      |CRAN (R 4.1.0)                           |
-|spacyr         |1.2.1      |CRAN (R 4.1.0)                           |
-|stopwords      |2.2        |CRAN (R 4.1.0)                           |
-|styler         |1.4.1      |CRAN (R 4.1.0)                           |
-|text2vec       |0.6        |CRAN (R 4.1.0)                           |
-|textdata       |0.4.1      |CRAN (R 4.1.0)                           |
-|textfeatures   |0.3.3      |CRAN (R 4.1.0)                           |
-|textrecipes    |0.4.0.9000 |Github (tidymodels/textrecipes\@a3e93d1) |
-|tfruns         |1.5.0      |CRAN (R 4.1.0)                           |
-|themis         |0.1.3      |CRAN (R 4.1.0)                           |
-|tidymodels     |0.1.3      |CRAN (R 4.1.0)                           |
-|tidytext       |0.3.1      |CRAN (R 4.1.0)                           |
-|tidyverse      |1.3.1      |CRAN (R 4.1.0)                           |
-|tokenizers     |0.2.1      |CRAN (R 4.1.0)                           |
-|tokenizers.bpe |0.1.0      |CRAN (R 4.1.0)                           |
-|tufte          |0.10       |CRAN (R 4.1.0)                           |
-|tune           |0.1.5      |CRAN (R 4.1.0)                           |
-|UpSetR         |1.4.0      |CRAN (R 4.1.0)                           |
-|vip            |0.3.2      |CRAN (R 4.1.0)                           |
-|widyr          |0.1.3      |CRAN (R 4.1.0)                           |
-|workflows      |0.2.2      |CRAN (R 4.1.0)                           |
-|yardstick      |0.0.8      |CRAN (R 4.1.0)                           |
+|package        |version    |source                                      |
+|:--------------|:----------|:-------------------------------------------|
+|bench          |1.1.1      |CRAN (R 4.1.0)                              |
+|bookdown       |0.22       |CRAN (R 4.1.0)                              |
+|broom          |0.7.8      |CRAN (R 4.1.0)                              |
+|corpus         |0.10.2     |CRAN (R 4.1.0)                              |
+|dials          |0.0.9      |CRAN (R 4.1.0)                              |
+|discrim        |0.1.2      |CRAN (R 4.1.0)                              |
+|doParallel     |1.0.16     |CRAN (R 4.1.0)                              |
+|glmnet         |4.1-2      |CRAN (R 4.1.0)                              |
+|gt             |0.3.0      |CRAN (R 4.1.0)                              |
+|hcandersenr    |0.2.0      |CRAN (R 4.1.0)                              |
+|htmltools      |0.5.1.1    |CRAN (R 4.1.0)                              |
+|htmlwidgets    |1.5.3      |CRAN (R 4.1.0)                              |
+|hunspell       |3.0.1      |CRAN (R 4.1.0)                              |
+|irlba          |2.3.3      |CRAN (R 4.1.0)                              |
+|jiebaR         |0.11       |CRAN (R 4.1.0)                              |
+|jsonlite       |1.7.2      |CRAN (R 4.1.0)                              |
+|kableExtra     |1.3.4      |CRAN (R 4.1.0)                              |
+|keras          |2.4.0      |CRAN (R 4.1.0)                              |
+|klaR           |0.6-15     |CRAN (R 4.1.0)                              |
+|LiblineaR      |2.10-12    |CRAN (R 4.1.0)                              |
+|lime           |0.5.2      |CRAN (R 4.1.0)                              |
+|lobstr         |1.1.1      |CRAN (R 4.1.0)                              |
+|naivebayes     |0.9.7      |CRAN (R 4.1.0)                              |
+|parsnip        |0.1.6      |CRAN (R 4.1.0)                              |
+|prismatic      |1.0.0      |CRAN (R 4.1.0)                              |
+|quanteda       |3.0.0      |CRAN (R 4.1.0)                              |
+|ranger         |0.12.1     |CRAN (R 4.1.0)                              |
+|recipes        |0.1.16     |CRAN (R 4.1.0)                              |
+|remotes        |2.4.0      |CRAN (R 4.1.0)                              |
+|reticulate     |1.20       |CRAN (R 4.1.0)                              |
+|rsample        |0.1.0      |CRAN (R 4.1.0)                              |
+|rsparse        |0.4.0      |CRAN (R 4.1.0)                              |
+|scico          |1.2.0      |CRAN (R 4.1.0)                              |
+|scotus         |1.0.0      |Github (EmilHvitfeldt/scotus\@e5ccdea)      |
+|servr          |0.22       |CRAN (R 4.1.0)                              |
+|sessioninfo    |1.1.1      |CRAN (R 4.1.0)                              |
+|slider         |0.2.2      |CRAN (R 4.1.0)                              |
+|SnowballC      |0.7.0      |CRAN (R 4.1.0)                              |
+|spacyr         |1.2.1      |CRAN (R 4.1.0)                              |
+|stopwords      |2.2        |CRAN (R 4.1.0)                              |
+|styler         |1.4.1      |CRAN (R 4.1.0)                              |
+|text2vec       |0.6        |CRAN (R 4.1.0)                              |
+|textdata       |0.4.1      |CRAN (R 4.1.0)                              |
+|textfeatures   |0.3.3      |CRAN (R 4.1.0)                              |
+|textrecipes    |0.4.0.9000 |Github (emilhvitfeldt/textrecipes\@8c04004) |
+|tfruns         |1.5.0      |CRAN (R 4.1.0)                              |
+|themis         |0.1.4      |CRAN (R 4.1.0)                              |
+|tidymodels     |0.1.3      |CRAN (R 4.1.0)                              |
+|tidytext       |0.3.1      |CRAN (R 4.1.0)                              |
+|tidyverse      |1.3.1      |CRAN (R 4.1.0)                              |
+|tokenizers     |0.2.1      |CRAN (R 4.1.0)                              |
+|tokenizers.bpe |0.1.0      |CRAN (R 4.1.0)                              |
+|tufte          |0.10       |CRAN (R 4.1.0)                              |
+|tune           |0.1.5      |CRAN (R 4.1.0)                              |
+|UpSetR         |1.4.0      |CRAN (R 4.1.0)                              |
+|vip            |0.3.2      |CRAN (R 4.1.0)                              |
+|widyr          |0.1.3      |CRAN (R 4.1.0)                              |
+|workflows      |0.2.2      |CRAN (R 4.1.0)                              |
+|yardstick      |0.0.8      |CRAN (R 4.1.0)                              |
