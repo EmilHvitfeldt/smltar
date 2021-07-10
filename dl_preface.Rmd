@@ -4,13 +4,13 @@
 
 \thispagestyle{myheadings}
 
-In Chapters \@ref(mlregression) and \@ref(mlclassification), we use algorithms such as regularized linear models, support vector machines, and naive Bayes models to predict outcomes from predictors including text data. Deep learning models approach the same tasks and have the same goals, but the algorithms involved are different. Deep learning models are "deep" in the sense that they use multiple layers to learn how to map from input features to output outcomes; this is in contrast to the kinds of models we used in the previous two chapters which use a shallow (single) mapping. 
+In Chapters \@ref(mlregression) and \@ref(mlclassification), we use algorithms such as regularized linear models, support vector machines, and naive Bayes models to predict outcomes from predictors including text data. Deep learning models approach the same tasks and have the same goals, but the algorithms involved are different. Deep learning models are "deep" in the sense that they use multiple layers to learn how to map from input features to output outcomes; this is in contrast to the kinds of models we used in the previous two chapters, which use a shallow (single) mapping. 
 
 ```{block, type = "rmdnote"}
 Deep learning models can be effective for text prediction problems because they use these multiple layers to capture complex relationships in language.
 ```
 
-The layers in a deep learning model are connected in a network and these models are called **neural networks**, although they do not work much like a human brain. The layers can be connected in different configurations called network architectures, which sometimes incorporate word embeddings\index{embeddings}, as described in Chapter \@ref(embeddings). We will cover three network architectures\index{network architecture} in the following chapters:
+The layers in a deep learning model are connected in a network, and these models are called **neural networks**, although they do not work much like a human brain. The layers can be connected in different configurations called network architectures, which sometimes incorporate word embeddings\index{embeddings}, as described in Chapter \@ref(embeddings). We will cover three network architectures\index{network architecture} in the following chapters:
 
 - Chapter \@ref(dldnn) starts our exploration of deep learning for text with a densely connected neural network. Think of this more straightforward architecture as a bridge between the "shallow" learning approaches of Chapters \@ref(mlregression) and \@ref(mlclassification) that treated text as a bag of words and the more complex architectures to come.
 
@@ -58,7 +58,7 @@ The training data is available for tasks from model parameter estimation to dete
 
 \thispagestyle{myheadings}
 
-\index{feature engineering}Text data requires extensive processing\index{preprocessing} to be appropriate for modeling, whether via an algorithm like regularized regression or a neural network. Chapters \@ref(language) through \@ref(embeddings) covered several of the most important techniques that are used to transform language into a representation appropriate for computation. This feature engineering part of the modeling process can be intensive for text, sometimes more computationally expensive than the fitting a model algorithm. 
+\index{feature engineering}Text data requires extensive processing\index{preprocessing} to be appropriate for modeling, whether via an algorithm like regularized regression or a neural network. Chapters \@ref(language) through \@ref(embeddings) covered several of the most important techniques that are used to transform language into a representation appropriate for computation. This feature engineering part of the modeling process can be intensive for text, sometimes more computationally expensive than fitting a model algorithm. 
 
 We espouse an approach of implementing feature engineering on training data only, typically using resampled data sets, to avoid obtaining an overly optimistic estimate of model performance. Feature engineering can sometimes be a part of the machine learning process where subtle _data leakage_\index{data leakage} occurs, when practitioners use information (say, to preprocess data or engineer features) that will not be available at prediction time. One example of this is tf-idf, which we introduced in Chapter \@ref(embeddings) and used in both Chapters \@ref(mlregression) and \@ref(mlclassification). As a reminder, the term frequency\index{term frequency} of a word is how frequently a word occurs in a document, and the inverse document frequency\index{inverse document frequency} of a word is a weight, typically defined as:
 
@@ -76,7 +76,7 @@ This specific example focused on tf-idf, but data leakage is a serious challenge
 
 \thispagestyle{myheadings}
 
-Many different kinds of models are appropriate for text data, from more straightforward models like the linear models explored deeply in Chapter \@ref(mlregression) to the neural network models we cover in Chapters  \@ref(dlcnn) and \@ref(dllstm). Some of these models have hyperparameters which cannot be learned from data during fitting, like the regularization parameter of the models in Chapter \@ref(mlregression); these hyperparameters can be tuned using resampled data sets.
+Many different kinds of models are appropriate for text data, from more straightforward models like the linear models explored deeply in Chapter \@ref(mlregression) to the neural network models we cover in Chapters  \@ref(dlcnn) and \@ref(dllstm). Some of these models have hyperparameters that cannot be learned from data during fitting, like the regularization parameter of the models in Chapter \@ref(mlregression); these hyperparameters can be tuned using resampled data sets.
 
 ## Model evaluation {-}
 
@@ -86,6 +86,6 @@ Many different kinds of models are appropriate for text data, from more straight
 
 This outline of the model process depends on us as data practitioners coming prepared for modeling with a healthy understanding of our data sets from exploratory data analysis. @Silge2017 provide a guide for exploratory data analysis for text. 
 
-Also, in practice, the structure of a real modeling project is iterative. After fitting and tuning a first model or set of a models, a practitioner will often return to build more or better features, then refit models, and evaluate in a more detailed way. Notice that we take this approach in each chapter, both for more straightforward machine learning and deep learning; we start with a simpler model and then go back again and again to improve it in several ways. This iterative approach is healthy and appropriate, as long as good practices in data "spending" are observed. The testing set cannot be used during this iterative back-and-forth, and using resampled data sets can set us as practitioners up for more accurate estimates of performance.
+Also, in practice, the structure of a real modeling project is iterative. After fitting and tuning a first model or set of a models, a practitioner will often return to build more or better features, then refit models, and evaluate in a more detailed way. Notice that we take this approach in each chapter, both for more straightforward machine learning and deep learning; we start with a simpler model and then go back again and again to improve it in several ways. This iterative approach is healthy and appropriate, as long as good practices in data "spending" are observed. The testing set cannot be used during this iterative back-and-forth, and using resampled data sets can set us up as practitioners for more accurate estimates of performance.
 
 \thispagestyle{myheadings}
