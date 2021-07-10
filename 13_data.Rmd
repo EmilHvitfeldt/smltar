@@ -6,7 +6,7 @@ These text data sets are not overly difficult to read into memory and prepare fo
 
 ## Hans Christian Andersen fairy tales {#hcandersen}
 
-The **hcandersenr** [@R-hcandersenr] package includes the text of the 157 known fairy tales by the Danish author Hans Christian Andersen (1805 - 1875). 
+The **hcandersenr** [@R-hcandersenr] package includes the text of the 157 known fairy tales by the Danish author Hans Christian Andersen (1805–1875). 
 There are five different languages available, with:
 
 - 156 fairy tales in English,
@@ -21,9 +21,9 @@ There are five different languages available, with:
 
 The package contains a data set for each language with the naming convention `hcandersen_**`,
 where `**` is a country code.
-Each data set comes as a dataframe with two columns, `text` and `book` where the `book` variable has the text divided into strings of up to 80 characters.
+Each data set comes as a dataframe with two columns, `text` and `book`, where the `book` variable has the text divided into strings of up to 80 characters.
 
-The package also makes available a data set called `EK` which includes information about the publication date, language of origin, and names in the different languages.
+The package also makes available a data set called `EK`, which includes information about the publication date, language of origin, and names in the different languages.
 
 This data set is used in Chapters \@ref(tokenization), \@ref(stopwords), and \@ref(stemming).
 
@@ -50,7 +50,7 @@ complaints <- read_csv("data/complaints.csv.gz")
 
 Consumers can submit complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/) about financial products and services; the CFPB sends the complaints to companies for response. 
 
-The data set of consumer complaints used in this book has been filtered to `r scales::comma(nrow(complaints))` complaints submitted to the CFPB after 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text). Each observation has a `complaint_id`, various categorical variables, and a text column `consumer_complaint_narrative` containing the written complaints, for a total of `r scales::comma(ncol(complaints))` columns.
+The data set of consumer complaints used in this book has been filtered to `r scales::comma(nrow(complaints))` complaints submitted to the CFPB after January 1, 2019 that include a consumer complaint narrative (i.e., some submitted text). Each observation has a `complaint_id`, various categorical variables, and a text column `consumer_complaint_narrative` containing the written complaints, for a total of `r scales::comma(ncol(complaints))` columns.
 
 This data set is used in Chapters \@ref(embeddings) and \@ref(mlclassification).
 
