@@ -37,7 +37,7 @@ scotus_filtered %>%
   labs(x = "Year", y = "Number of opinions per decade")
 ```
 
-This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.
+This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the overview to these chapters, and we will need to account for that in choosing a model and understanding our results.
 
 ### Building our first regression model {#firstregression}
 
@@ -1011,7 +1011,7 @@ The tokens (unigrams or bigrams) that contribute in the positive direction, like
 Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
 ```
 
-We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias\index{bias} when models are applied in the real world.
+We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the overview to these chapters; these differences can lead to unfairness and algorithmic bias\index{bias} when models are applied in the real world.
 
 ```{r scotusfinalpredvis, dependson="finalscotusrs", opts.label = "fig.square", fig.cap="Predicted and true years from a linear SVM regression model with bigrams and unigrams"}
 final_fitted %>%
