@@ -90,7 +90,7 @@ tibble::tribble(
 
 ## Full stop, the wildcard
 
-Let's start with the full stop/period/dot, which acts as a "wildcard." This means that this character will match anything in place other then a newline character. 
+Let's start with the full stop/period/dot, which acts as a "wildcard". This means that this character will match anything in place other then a newline character. 
 
 ```{r}
 strings <- c("cat", "cut", "cue")
@@ -130,7 +130,7 @@ str_detect(strings, "[^ac]")
 
 ### Shorthand character classes
 
-Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have even shorter shorthands. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 but it can also be described by `\\d`. Table \@ref(tab:characterclasses) presents these useful predefined character classes.
+Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have even shorter shorthands. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8, and 9 but it can also be described by `\\d`. Table \@ref(tab:characterclasses) presents these useful predefined character classes.
 
 ```{r characterclasses, echo=FALSE}
 tibble::tribble(
@@ -155,11 +155,11 @@ tibble::tribble(
   knitr::kable(caption = "All character classes", booktabs = TRUE)
 ```
 
-Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
+Notice that these shorthands are locale specific. This means that the Danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
 
 ## Quantifiers
 
-We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@levithan2012regular].
+We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}`, and `+` is shorthand for `{1,}` [@levithan2012regular].
 
 ```{r greedyquantifiers, echo=FALSE}
 tibble::tribble(
@@ -188,7 +188,7 @@ sentences <- c("The year was 1776.", "Alexander Hamilton died at 47.")
 str_extract(sentences, "\\d{4}")
 ```
 
-Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in parentheses. In the following example, we want to match all the instances of "NA" in the string. We put `"NA "` inside a set of parentheses and putting `+` after it to make sure we match at least once.
+Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in parentheses. In the following example, we want to match all the instances of "NA" in the string. We put `"NA "` inside a set of parentheses and `+` after to make sure we match at least once.
 
 ```{r}
 batman <- "NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!"
@@ -217,7 +217,7 @@ tibble::tribble(
   knitr::kable(caption = "Lazy quantifiers", booktabs = TRUE)
 ```
 
-Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.
+Comparing greedy and lazy matches gives us 3 and 7 "NA "'s, respectively.
 
 ```{r}
 batman <- "NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!"
@@ -227,7 +227,7 @@ str_extract(batman, "(NA ){3,7}?")
 
 ## Anchors
 
-The meta characters `^` and `$` have special meaning in regular expressions. They force the engine to check the beginning and end of the string respectively, hence the name **anchor**. A mnemonic device to remember this is "First you get the power(`^`) and the you get the money(`\$`)".
+The meta characters `^` and `$` have special meaning in regular expressions. They force the engine to check the beginning and end of the string, respectively, hence the name **anchor**. A mnemonic device to remember this is "First you get the power(`^`) and then you get the money(`\$`)".
 
 ```{r}
 seasons <- c("The summer is hot this year",
