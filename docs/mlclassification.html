@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-05-06" />
+<meta name="date" content="2021-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,7 @@
   
 <link rel="prev" href="mlregression.html"/>
 <link rel="next" href="dlforeword.html"/>
-<script src="libs/header-attrs-2.7.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -584,9 +584,9 @@ Since the split uses random sampling, we set a seed so we can reproduce our resu
 <span id="cb268-14"><a href="mlclassification.html#cb268-14" aria-hidden="true" tabindex="-1"></a>complaints_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(complaints_split)</span></code></pre></div>
 <p>The dimensions of the two splits show that this first step worked as we planned.</p>
 <div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="mlclassification.html#cb269-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(complaints_train)</span></code></pre></div>
-<pre><code>#&gt; [1] 87911    18</code></pre>
+<pre><code>#&gt; [1] 87910    18</code></pre>
 <div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="mlclassification.html#cb271-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(complaints_test)</span></code></pre></div>
-<pre><code>#&gt; [1] 29303    18</code></pre>
+<pre><code>#&gt; [1] 29304    18</code></pre>
 <p>Next we need to preprocess this data to prepare it for modeling; we have text data, and we need to build numeric features for machine learning from that text.</p>
 <p>The <strong>recipes</strong> package, part of tidymodels, allows us to create a specification of preprocessing steps we want to perform. These transformations are estimated (or “trained”) on the training set so that they can be applied in the same way on the testing set or new data at prediction time, without data leakage.
 We initialize our set of preprocessing transformations with the <code>recipe()</code> function, using a formula expression to specify the variables, our outcome plus our predictor, along with the data set.</p>
@@ -638,16 +638,16 @@ In <strong>tidymodels</strong>, the package for creating model specifications is
 #&gt; # A tibble: 10 x 2
 #&gt;    splits               id    
 #&gt;    &lt;list&gt;               &lt;chr&gt; 
-#&gt;  1 &lt;split [79119/8792]&gt; Fold01
-#&gt;  2 &lt;split [79120/8791]&gt; Fold02
-#&gt;  3 &lt;split [79120/8791]&gt; Fold03
-#&gt;  4 &lt;split [79120/8791]&gt; Fold04
-#&gt;  5 &lt;split [79120/8791]&gt; Fold05
-#&gt;  6 &lt;split [79120/8791]&gt; Fold06
-#&gt;  7 &lt;split [79120/8791]&gt; Fold07
-#&gt;  8 &lt;split [79120/8791]&gt; Fold08
-#&gt;  9 &lt;split [79120/8791]&gt; Fold09
-#&gt; 10 &lt;split [79120/8791]&gt; Fold10</code></pre>
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10</code></pre>
 <p>Each of these splits contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.</p>
 <p>For convenience, let’s again use a <code>workflow()</code> for our resampling estimates of performance.</p>
 <div class="rmdwarning">
@@ -687,11 +687,11 @@ Using a <code>workflow()</code> isn’t required (you can fit or tune a model pl
 <p>What results do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb285-1"><a href="mlclassification.html#cb285-1" aria-hidden="true" tabindex="-1"></a>nb_rs_metrics</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 x 6
-#&gt;   .metric  .estimator  mean     n  std_err .config             
-#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary     0.806    10 0.00184  Preprocessor1_Model1
-#&gt; 2 roc_auc  binary     0.878    10 0.000715 Preprocessor1_Model1</code></pre>
-<p>The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.6%.</p>
+#&gt;   .metric  .estimator  mean     n std_err .config             
+#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+#&gt; 1 accuracy binary     0.802    10 0.00434 Preprocessor1_Model1
+#&gt; 2 roc_auc  binary     0.881    10 0.00150 Preprocessor1_Model1</code></pre>
+<p>The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.2%.</p>
 
 
 
@@ -763,7 +763,7 @@ One metric alone cannot give you a complete picture of how well your classificat
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric  .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary     0.526    10 0.00149 Preprocessor1_Model1
+#&gt; 1 accuracy binary     0.526    10 0.00143 Preprocessor1_Model1
 #&gt; 2 roc_auc  binary     0.5      10 0       Preprocessor1_Model1</code></pre>
 <p>The accuracy and ROC AUC indicate that this null model is, like in the regression case, dramatically worse than even our first model. The text of the CFPB complaints is predictive relative to the category we are building models for.</p>
 </div>
@@ -817,8 +817,8 @@ Using regularization helps us choose a simpler model that we expect to generaliz
 <pre><code>#&gt; # A tibble: 2 x 6
 #&gt;   .metric  .estimator  mean     n  std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary     0.868    10 0.000977 Preprocessor1_Model1
-#&gt; 2 roc_auc  binary     0.939    10 0.000849 Preprocessor1_Model1</code></pre>
+#&gt; 1 accuracy binary     0.870    10 0.00124  Preprocessor1_Model1
+#&gt; 2 roc_auc  binary     0.939    10 0.000646 Preprocessor1_Model1</code></pre>
 <p>This looks pretty promising, considering we haven’t yet done any tuning of the lasso hyperparameters.
 Figure <a href="mlclassification.html#fig:lassoroccurve">7.3</a> shows the ROC curves for this regularized model on each of the resampled data sets.</p>
 <div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="mlclassification.html#cb300-1" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="sc">%&gt;%</span></span>
@@ -911,16 +911,16 @@ In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</s
 #&gt; # A tibble: 10 x 5
 #&gt;    splits             id     .metrics        .notes         .predictions        
 #&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,760 × …
-#&gt;  2 &lt;split [79120/879… Fold02 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  3 &lt;split [79120/879… Fold03 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  4 &lt;split [79120/879… Fold04 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  5 &lt;split [79120/879… Fold05 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  6 &lt;split [79120/879… Fold06 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  7 &lt;split [79120/879… Fold07 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  8 &lt;split [79120/879… Fold08 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  9 &lt;split [79120/879… Fold09 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt; 10 &lt;split [79120/879… Fold10 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …</code></pre>
+#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  2 &lt;split [79119/879… Fold02 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  3 &lt;split [79119/879… Fold03 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  4 &lt;split [79119/879… Fold04 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  5 &lt;split [79119/879… Fold05 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  6 &lt;split [79119/879… Fold06 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  7 &lt;split [79119/879… Fold07 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  8 &lt;split [79119/879… Fold08 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt;  9 &lt;split [79119/879… Fold09 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
+#&gt; 10 &lt;split [79119/879… Fold10 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …</code></pre>
 <div class="rmdwarning">
 <p>
 Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.
@@ -932,16 +932,16 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <pre><code>#&gt; # A tibble: 60 x 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt;  1 1   e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model01
-#&gt;  2 1   e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model01
-#&gt;  3 2.21e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model02
-#&gt;  4 2.21e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model02
-#&gt;  5 4.89e-10 accuracy binary     0.890    10 0.00102  Preprocessor1_Model03
-#&gt;  6 4.89e-10 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model03
-#&gt;  7 1.08e- 9 accuracy binary     0.890    10 0.00102  Preprocessor1_Model04
-#&gt;  8 1.08e- 9 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model04
-#&gt;  9 2.40e- 9 accuracy binary     0.890    10 0.00102  Preprocessor1_Model05
-#&gt; 10 2.40e- 9 roc_auc  binary     0.952    10 0.000823 Preprocessor1_Model05
+#&gt;  1 1   e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model01
+#&gt;  2 1   e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model01
+#&gt;  3 2.21e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model02
+#&gt;  4 2.21e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model02
+#&gt;  5 4.89e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model03
+#&gt;  6 4.89e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model03
+#&gt;  7 1.08e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model04
+#&gt;  8 1.08e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model04
+#&gt;  9 2.40e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model05
+#&gt; 10 2.40e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model05
 #&gt; # … with 50 more rows</code></pre>
 <p>Let’s visualize these metrics, accuracy and ROC AUC, in Figure <a href="mlclassification.html#fig:complaintstunevis">7.5</a> to see what the best model is.</p>
 <div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="mlclassification.html#cb310-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tune_rs) <span class="sc">+</span></span>
@@ -961,11 +961,11 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 5 x 7
 #&gt;        penalty .metric .estimator  mean     n  std_err .config              
 #&gt;          &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000356     roc_auc binary     0.953    10 0.000824 Preprocessor1_Model20
-#&gt; 2 0.000788     roc_auc binary     0.953    10 0.000827 Preprocessor1_Model21
-#&gt; 3 0.000161     roc_auc binary     0.953    10 0.000822 Preprocessor1_Model19
-#&gt; 4 0.0000728    roc_auc binary     0.953    10 0.000821 Preprocessor1_Model18
-#&gt; 5 0.0000000001 roc_auc binary     0.952    10 0.000823 Preprocessor1_Model01</code></pre>
+#&gt; 1 0.000788     roc_auc binary     0.953    10 0.000505 Preprocessor1_Model21
+#&gt; 2 0.000356     roc_auc binary     0.953    10 0.000510 Preprocessor1_Model20
+#&gt; 3 0.000161     roc_auc binary     0.953    10 0.000517 Preprocessor1_Model19
+#&gt; 4 0.0000728    roc_auc binary     0.953    10 0.000520 Preprocessor1_Model18
+#&gt; 5 0.0000000001 roc_auc binary     0.953    10 0.000522 Preprocessor1_Model01</code></pre>
 <p>The best value for ROC AUC from this tuning run is 0.953. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with <code>select_best()</code>, or a simpler model with higher regularization with <code>select_by_pct_loss()</code> or <code>select_by_one_std_err()</code> Let’s choose the model with the best ROC AUC within one standard error of the numerically best model <span class="citation">(<a href="#ref-Breiman1984" role="doc-biblioref">Breiman et al. 1984</a>)</span>.</p>
 <div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="mlclassification.html#cb313-1" aria-hidden="true" tabindex="-1"></a>chosen_auc <span class="ot">&lt;-</span> tune_rs <span class="sc">%&gt;%</span></span>
 <span id="cb313-2"><a href="mlclassification.html#cb313-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_one_std_err</span>(<span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>, <span class="sc">-</span>penalty)</span>
@@ -974,7 +974,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 1 x 9
 #&gt;    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;
-#&gt; 1 0.000788 roc_auc binary     0.953    10 0.000827 Preprocessor1_M… 0.953  0.952</code></pre>
+#&gt; 1 0.000788 roc_auc binary     0.953    10 0.000505 Preprocessor1_M… 0.953  0.953</code></pre>
 <p>Next, let’s finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.</p>
 <div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="mlclassification.html#cb315-1" aria-hidden="true" tabindex="-1"></a>final_lasso <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(tune_wf, chosen_auc)</span>
 <span id="cb315-2"><a href="mlclassification.html#cb315-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1008,16 +1008,16 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 1,001 x 3
 #&gt;    term                                         estimate  penalty
 #&gt;    &lt;chr&gt;                                           &lt;dbl&gt;    &lt;dbl&gt;
-#&gt;  1 tfidf_consumer_complaint_narrative_funds         26.5 0.000788
-#&gt;  2 tfidf_consumer_complaint_narrative_appraisal     22.1 0.000788
-#&gt;  3 tfidf_consumer_complaint_narrative_bonus         21.4 0.000788
-#&gt;  4 tfidf_consumer_complaint_narrative_debt          19.9 0.000788
-#&gt;  5 tfidf_consumer_complaint_narrative_escrow        17.8 0.000788
-#&gt;  6 tfidf_consumer_complaint_narrative_customers     17.2 0.000788
-#&gt;  7 tfidf_consumer_complaint_narrative_money         16.5 0.000788
-#&gt;  8 tfidf_consumer_complaint_narrative_emailed       15.9 0.000788
-#&gt;  9 tfidf_consumer_complaint_narrative_fees          15.1 0.000788
-#&gt; 10 tfidf_consumer_complaint_narrative_interest      14.5 0.000788
+#&gt;  1 tfidf_consumer_complaint_narrative_funds         27.6 0.000788
+#&gt;  2 tfidf_consumer_complaint_narrative_appraisal     22.9 0.000788
+#&gt;  3 tfidf_consumer_complaint_narrative_escrow        21.0 0.000788
+#&gt;  4 tfidf_consumer_complaint_narrative_bonus         20.7 0.000788
+#&gt;  5 tfidf_consumer_complaint_narrative_debt          18.5 0.000788
+#&gt;  6 tfidf_consumer_complaint_narrative_emailed       16.4 0.000788
+#&gt;  7 tfidf_consumer_complaint_narrative_money         16.1 0.000788
+#&gt;  8 tfidf_consumer_complaint_narrative_interest      15.7 0.000788
+#&gt;  9 tfidf_consumer_complaint_narrative_afford        15.5 0.000788
+#&gt; 10 tfidf_consumer_complaint_narrative_merchant      14.9 0.000788
 #&gt; # … with 991 more rows</code></pre>
 <p>We see here, for the penalty we chose, what terms contribute the most to a complaint <em>not</em> being about credit. The words are largely about mortgages and other financial products.</p>
 <p>What terms contribute to a complaint being about credit reporting, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.</p>
@@ -1028,16 +1028,16 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 1,001 x 3
 #&gt;    term                                          estimate  penalty
 #&gt;    &lt;chr&gt;                                            &lt;dbl&gt;    &lt;dbl&gt;
-#&gt;  1 tfidf_consumer_complaint_narrative_reseller      -86.4 0.000788
-#&gt;  2 tfidf_consumer_complaint_narrative_experian      -59.2 0.000788
-#&gt;  3 tfidf_consumer_complaint_narrative_transunion    -51.9 0.000788
-#&gt;  4 tfidf_consumer_complaint_narrative_equifax       -48.0 0.000788
-#&gt;  5 tfidf_consumer_complaint_narrative_compliant     -21.8 0.000788
-#&gt;  6 tfidf_consumer_complaint_narrative_reporting     -21.5 0.000788
-#&gt;  7 tfidf_consumer_complaint_narrative_report        -17.1 0.000788
-#&gt;  8 tfidf_consumer_complaint_narrative_freeze        -17.1 0.000788
-#&gt;  9 tfidf_consumer_complaint_narrative_inquiries     -16.9 0.000788
-#&gt; 10 tfidf_consumer_complaint_narrative_method        -16.0 0.000788
+#&gt;  1 tfidf_consumer_complaint_narrative_reseller      -90.9 0.000788
+#&gt;  2 tfidf_consumer_complaint_narrative_experian      -56.9 0.000788
+#&gt;  3 tfidf_consumer_complaint_narrative_transunion    -50.1 0.000788
+#&gt;  4 tfidf_consumer_complaint_narrative_equifax       -48.1 0.000788
+#&gt;  5 tfidf_consumer_complaint_narrative_compliant     -23.7 0.000788
+#&gt;  6 tfidf_consumer_complaint_narrative_reporting     -21.1 0.000788
+#&gt;  7 tfidf_consumer_complaint_narrative_freeze        -20.9 0.000788
+#&gt;  8 tfidf_consumer_complaint_narrative_inquiries     -19.0 0.000788
+#&gt;  9 tfidf_consumer_complaint_narrative_report        -18.6 0.000788
+#&gt; 10 tfidf_consumer_complaint_narrative_method        -16.3 0.000788
 #&gt; # … with 991 more rows</code></pre>
 <div class="rmdnote">
 <p>
@@ -1121,28 +1121,28 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 #&gt; # A tibble: 10 x 4
 #&gt;    splits               id     .metrics          .notes          
 #&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
-#&gt;  1 &lt;split [79119/8792]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  2 &lt;split [79120/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  3 &lt;split [79120/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  4 &lt;split [79120/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  5 &lt;split [79120/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  6 &lt;split [79120/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  7 &lt;split [79120/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  8 &lt;split [79120/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  9 &lt;split [79120/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt; 10 &lt;split [79120/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
 <p>How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of <code>set_engine("glmnet")</code>?</p>
 <div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb329-1"><a href="mlclassification.html#cb329-1" aria-hidden="true" tabindex="-1"></a>sparse_rs <span class="sc">%&gt;%</span></span>
 <span id="cb329-2"><a href="mlclassification.html#cb329-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 x 7
-#&gt;     penalty .metric .estimator  mean     n  std_err .config              
-#&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000695  roc_auc binary     0.953    10 0.000825 Preprocessor1_Model08
-#&gt; 2 0.000379  roc_auc binary     0.953    10 0.000824 Preprocessor1_Model07
-#&gt; 3 0.000207  roc_auc binary     0.953    10 0.000821 Preprocessor1_Model06
-#&gt; 4 0.000113  roc_auc binary     0.953    10 0.000820 Preprocessor1_Model05
-#&gt; 5 0.0000616 roc_auc binary     0.952    10 0.000822 Preprocessor1_Model04</code></pre>
-<p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.00036) but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
+#&gt;    penalty .metric .estimator  mean     n  std_err .config              
+#&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000506 Preprocessor1_Model08
+#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000510 Preprocessor1_Model07
+#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model06
+#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000504 Preprocessor1_Model09
+#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000519 Preprocessor1_Model05</code></pre>
+<p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.00079) but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
 <p>Importantly, this tuning also took a bit less time to complete.</p>
 <ul>
 <li><p>The <em>preprocessing</em> was not much faster, because tokenization and computing tf-idf take a long time.</p></li>
@@ -1188,15 +1188,15 @@ Whatever the reason, in this section we would like to build a multiclass classif
 <pre><code>#&gt; # A tibble: 9 x 2
 #&gt;       n product                                                                 
 #&gt;   &lt;int&gt; &lt;chr&gt;                                                                   
-#&gt; 1 41628 Credit reporting, credit repair services, or other personal consumer re…
-#&gt; 2 16722 Debt collection                                                         
-#&gt; 3  8695 Credit card or prepaid card                                             
+#&gt; 1 41714 Credit reporting, credit repair services, or other personal consumer re…
+#&gt; 2 16784 Debt collection                                                         
+#&gt; 3  8637 Credit card or prepaid card                                             
 #&gt; 4  7067 Mortgage                                                                
-#&gt; 5  5238 Checking or savings account                                             
-#&gt; 6  2960 Student loan                                                            
-#&gt; 7  2028 Vehicle loan or lease                                                   
-#&gt; 8  1926 Money transfer, virtual currency, or money service                      
-#&gt; 9  1647 Payday loan, title loan, or personal loan</code></pre>
+#&gt; 5  5164 Checking or savings account                                             
+#&gt; 6  2932 Student loan                                                            
+#&gt; 7  2014 Vehicle loan or lease                                                   
+#&gt; 8  1942 Money transfer, virtual currency, or money service                      
+#&gt; 9  1656 Payday loan, title loan, or personal loan</code></pre>
 <p>There is significant imbalance between the classes that we must address, with over twenty times more cases of the majority class than there is of the smallest class.
 This kind of imbalance is a common problem with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.</p>
 <p>Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:</p>
@@ -1280,16 +1280,16 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 #&gt; # A tibble: 10 x 5
 #&gt;    splits             id     .metrics        .notes         .predictions        
 #&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,840 × …
-#&gt;  2 &lt;split [79120/879… Fold02 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  3 &lt;split [79120/879… Fold03 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  4 &lt;split [79120/879… Fold04 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  5 &lt;split [79120/879… Fold05 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  6 &lt;split [79120/879… Fold06 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  7 &lt;split [79120/879… Fold07 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  8 &lt;split [79120/879… Fold08 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt;  9 &lt;split [79120/879… Fold09 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt; 10 &lt;split [79120/879… Fold10 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …</code></pre>
+#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  2 &lt;split [79119/879… Fold02 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  3 &lt;split [79119/879… Fold03 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  4 &lt;split [79119/879… Fold04 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  5 &lt;split [79119/879… Fold05 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  6 &lt;split [79119/879… Fold06 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  7 &lt;split [79119/879… Fold07 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  8 &lt;split [79119/879… Fold08 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
+#&gt;  9 &lt;split [79119/879… Fold09 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
+#&gt; 10 &lt;split [79119/879… Fold10 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …</code></pre>
 <p>What do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="mlclassification.html#cb342-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
 <span id="cb342-2"><a href="mlclassification.html#cb342-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
@@ -1298,12 +1298,12 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <pre><code>#&gt; # A tibble: 5 x 7
 #&gt;    penalty .metric  .estimator  mean     n std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.00234  accuracy multiclass 0.753    10 0.00226 Preprocessor1_Model10
-#&gt; 2 0.00428  accuracy multiclass 0.750    10 0.00250 Preprocessor1_Model11
-#&gt; 3 0.00127  accuracy multiclass 0.747    10 0.00278 Preprocessor1_Model09
-#&gt; 4 0.00785  accuracy multiclass 0.739    10 0.00236 Preprocessor1_Model12
-#&gt; 5 0.000695 accuracy multiclass 0.732    10 0.00244 Preprocessor1_Model08</code></pre>
-<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
+#&gt; 1 0.00234  accuracy multiclass 0.754    10 0.00155 Preprocessor1_Model10
+#&gt; 2 0.00428  accuracy multiclass 0.751    10 0.00147 Preprocessor1_Model11
+#&gt; 3 0.00127  accuracy multiclass 0.749    10 0.00150 Preprocessor1_Model09
+#&gt; 4 0.00785  accuracy multiclass 0.741    10 0.00135 Preprocessor1_Model12
+#&gt; 5 0.000695 accuracy multiclass 0.736    10 0.00139 Preprocessor1_Model08</code></pre>
+<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.4%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
 <div class="rmdwarning">
 <p>
 In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.
@@ -1431,13 +1431,13 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb353-1"><a href="mlclassification.html#cb353-1" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="sc">%&gt;%</span></span>
 <span id="cb353-2"><a href="mlclassification.html#cb353-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 x 7
-#&gt;     penalty .metric .estimator  mean     n  std_err .config              
-#&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000695  roc_auc binary     0.953    10 0.000824 Preprocessor1_Model08
-#&gt; 2 0.000379  roc_auc binary     0.953    10 0.000818 Preprocessor1_Model07
-#&gt; 3 0.000207  roc_auc binary     0.953    10 0.000814 Preprocessor1_Model06
-#&gt; 4 0.000113  roc_auc binary     0.953    10 0.000813 Preprocessor1_Model05
-#&gt; 5 0.0000616 roc_auc binary     0.953    10 0.000812 Preprocessor1_Model04</code></pre>
+#&gt;    penalty .metric .estimator  mean     n  std_err .config              
+#&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model08
+#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model07
+#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model06
+#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000511 Preprocessor1_Model09
+#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05</code></pre>
 <p>We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
 <div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb355-1"><a href="mlclassification.html#cb355-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
 <span id="cb355-2"><a href="mlclassification.html#cb355-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
@@ -1450,16 +1450,16 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <pre><code>#&gt; # A tibble: 21 x 4
 #&gt;    term                    estimate  penalty term_rank
 #&gt;    &lt;chr&gt;                      &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-#&gt;  1 date_received_month_Dec -0.319   0.000695       726
-#&gt;  2 (Intercept)              0.256   0.000695       734
-#&gt;  3 date_received_dow_Mon    0.129   0.000695       758
-#&gt;  4 date_received_month_Apr  0.101   0.000695       763
-#&gt;  5 date_received_month_Aug -0.0923  0.000695       768
-#&gt;  6 date_received_dow_Fri    0.0422  0.000695       782
-#&gt;  7 date_received_month_Jul -0.0302  0.000695       785
-#&gt;  8 date_received_month_Feb -0.0270  0.000695       787
-#&gt;  9 tags_Servicemember      -0.0176  0.000695       789
-#&gt; 10 date_received_dow_Wed   -0.00257 0.000695       795
+#&gt;  1 (Intercept)              0.326   0.000695       701
+#&gt;  2 date_received_month_Dec -0.271   0.000695       716
+#&gt;  3 date_received_month_Aug -0.105   0.000695       746
+#&gt;  4 date_received_dow_Mon    0.102   0.000695       748
+#&gt;  5 date_received_month_Apr  0.0763  0.000695       756
+#&gt;  6 date_received_month_Feb -0.0547  0.000695       761
+#&gt;  7 tags_Servicemember      -0.0426  0.000695       765
+#&gt;  8 date_received_dow_Tue    0.0329  0.000695       766
+#&gt;  9 date_received_dow_Fri    0.0147  0.000695       770
+#&gt; 10 date_received_month_May  0.00337 0.000695       774
 #&gt; # … with 11 more rows</code></pre>
 <p>In our example here, some of the non-text predictors are included in the model with non-zero coefficients but ranked down in the 700s of all model terms, with smaller coefficients than many text terms. They are not that important.</p>
 <div class="rmdnote">
@@ -1761,7 +1761,7 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <pre><code>#&gt; # A tibble: 1 x 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 recall  binary         0.722</code></pre>
+#&gt; 1 recall  binary         0.688</code></pre>
 <p>We can also compute the recall for each resample using <code>group_by()</code>.</p>
 <div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="mlclassification.html#cb392-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb392-2"><a href="mlclassification.html#cb392-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
@@ -1769,22 +1769,22 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <pre><code>#&gt; # A tibble: 10 x 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 Fold01 recall  binary         0.791
-#&gt;  2 Fold02 recall  binary         0.690
-#&gt;  3 Fold03 recall  binary         0.674
-#&gt;  4 Fold04 recall  binary         0.8  
-#&gt;  5 Fold05 recall  binary         0.719
-#&gt;  6 Fold06 recall  binary         0.735
-#&gt;  7 Fold07 recall  binary         0.713
-#&gt;  8 Fold08 recall  binary         0.655
-#&gt;  9 Fold09 recall  binary         0.717
-#&gt; 10 Fold10 recall  binary         0.725</code></pre>
+#&gt;  1 Fold01 recall  binary         0.694
+#&gt;  2 Fold02 recall  binary         0.725
+#&gt;  3 Fold03 recall  binary         0.673
+#&gt;  4 Fold04 recall  binary         0.660
+#&gt;  5 Fold05 recall  binary         0.705
+#&gt;  6 Fold06 recall  binary         0.602
+#&gt;  7 Fold07 recall  binary         0.741
+#&gt;  8 Fold08 recall  binary         0.702
+#&gt;  9 Fold09 recall  binary         0.775
+#&gt; 10 Fold10 recall  binary         0.601</code></pre>
 <p>Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates.
 The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.</p>
 <div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="mlclassification.html#cb394-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>#&gt;        Credit  Other
-#&gt; Credit 3009.5  549.1
-#&gt; Other  1157.4 4075.1</code></pre>
+#&gt; Credit 2865.6  440.4
+#&gt; Other  1301.2 4183.8</code></pre>
 <p>It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.</p>
 <div class="rmdnote">
 <p>
@@ -1930,7 +1930,7 @@ FIGURE 7.11: Model performance is similar for the higher token options so we can
 <pre><code>#&gt; # A tibble: 1 x 10
 #&gt;   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #&gt;     &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1 0.00483       1000 accuracy binary     0.882    10 9.44e-4 Prepro… 0.898  1.78</code></pre>
+#&gt; 1 0.00483       1000 accuracy binary     0.882    10 0.00101 Prepro… 0.898  1.75</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
 <div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="mlclassification.html#cb407-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(sparse_wf_v2, choose_acc)</span>
 <span id="cb407-2"><a href="mlclassification.html#cb407-2" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
@@ -1969,7 +1969,7 @@ Notice that this is the first time we have used our testing data during this ent
 <pre><code>#&gt; # A tibble: 2 x 4
 #&gt;   .metric  .estimator .estimate .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary         0.885 Preprocessor1_Model1
+#&gt; 1 accuracy binary         0.882 Preprocessor1_Model1
 #&gt; 2 roc_auc  binary         0.949 Preprocessor1_Model1</code></pre>
 <p>The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.</p>
 <p>The confusion matrix on the testing data in Figure <a href="mlclassification.html#fig:finalheatmap">7.12</a> also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn’t any strong bias towards either of the classes.</p>
@@ -2049,16 +2049,16 @@ The top features we see here are all tokens learned directly from the text. None
 <pre><code>#&gt; # A tibble: 10 x 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
-#&gt;  1 &quot;Spoke with Mr XXXX today at XXXX. Inquired about medical bill and date. Inf…
-#&gt;  2 &quot;I opened a credit card account with GE Financial to finance an air conditio…
-#&gt;  3 &quot;I lost my debit card and had to use my checks until I received my new card.…
-#&gt;  4 &quot;Loan was for {$2500.00} balance is showing {$4200.00} because they included…
-#&gt;  5 &quot;Chase XXXX Reward card was activated in my name without my consent. Card # …
-#&gt;  6 &quot;I have had this service for more the seven years, the more I use them the m…
-#&gt;  7 &quot;Ive had severe issues with the student loan process for at least 10 years. …
-#&gt;  8 &quot;Chase Card Address : XXXX XXXX XXXX City/ State/ Zip : XXXX, DE XXXX Date :…
-#&gt;  9 &quot;I received a notice that stated that I was currently in debt in the amount …
-#&gt; 10 &quot;Hi About 2 months ago ( XXXX ) I received an email from a company represent…</code></pre>
+#&gt;  1 &quot;Bank of America took more than 30 days to send me documents to validate a d…
+#&gt;  2 &quot;My account was on auto pay. Mohela says they stopped taking payments from m…
+#&gt;  3 &quot;Received a cancellation of debt form from Cavalry SPV I LLC. The address li…
+#&gt;  4 &quot;A certified letter was sent to AAS Debt recovery Inc for debt validation. I…
+#&gt;  5 &quot;I have indicated to the credit bureau as well as the creditor the medical b…
+#&gt;  6 &quot;ftc violations was sent to XXXX XXXX and all the credit company please have…
+#&gt;  7 &quot;This was open without my knowledge, I have been trying to get this remove f…
+#&gt;  8 &quot;. They keep on putting this account on my credit report they called many ti…
+#&gt;  9 &quot;I sent a debt validation request letter to XXXX in early XX/XX/2019 about t…
+#&gt; 10 &quot;I had a divorce and my husband kept the home because it was in his name.. h…</code></pre>
 <p>We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.</p>
 <p>What about misclassifications in the other direction, observations in the test set that were <em>not</em> labeled as about credit reporting but that our final model gave a high probability of being about credit reporting?</p>
 <div class="sourceCode" id="cb416"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb416-1"><a href="mlclassification.html#cb416-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
@@ -2068,16 +2068,16 @@ The top features we see here are all tokens learned directly from the text. None
 <pre><code>#&gt; # A tibble: 10 x 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
-#&gt;  1 &quot;Paid in full collections to CBE Group amount of {$360.00} paid in XXXX of 2…
-#&gt;  2 &quot;Back in 2013, my purse was stolen containing all of my personal belongings.…
-#&gt;  3 &quot;I Have contacted Credit Bureaus on numerous occasions to have incorrect or …
-#&gt;  4 &quot;I contacted the company, I reported to police department, sent in police re…
-#&gt;  5 &quot;FCRA states information reporting has to be 100 % verifiable and 100 % accu…
-#&gt;  6 &quot;I have attempted on numerous times to dispute an account that has ERRORS. E…
-#&gt;  7 &quot;XXXX  OF XXXX FLORIDA IS TAKING ADVANTAGE OF THEIR ABILITY TO REPORT TO THE…
-#&gt;  8 &quot;Late payment reported ( {$16.00} ) to my credit report that caused my credi…
-#&gt;  9 &quot;MIDLAND FUNDING XXXX as of XX/XX/2019 reporting for identity fraud, was rep…
-#&gt; 10 &quot;I have contacted this company through the credit bureaus multiple times to …</code></pre>
+#&gt;  1 &quot;Please review the attachment. Remove the inquiries and place an extended fr…
+#&gt;  2 &quot;USAA continue using old accounts that are including and discharged in Chapt…
+#&gt;  3 &quot;To Whom It May Concern, This letter is a formal complaint that Experian is …
+#&gt;  4 &quot;I submitted a dispute through Transunion for a supposed medical debt that I…
+#&gt;  5 &quot;I paid XXXX XXXX XXXX directly and by law, they must recall the account fro…
+#&gt;  6 &quot;Suntrust Bank # XXXX XXXX XXXX # XXXX, and XXXX # XXXX, XXXX XXXX XXXX # XX…
+#&gt;  7 &quot;Billing amount is not accurate - Correct amount XXXX Billing date is not ac…
+#&gt;  8 &quot;In response to a denial of an extension of credit this consumer checked wit…
+#&gt;  9 &quot;Navient Is reporting delinquent history. They are purging which is the same…
+#&gt; 10 &quot;This account is coming from XXXX and it is showing up more then once on my …</code></pre>
 <p>Again, these are “mistakes” on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.</p>
 </div>
 </div>
@@ -2204,7 +2204,7 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": null,
+"download": ["bookdown.pdf"],
 "toc": {
 "collapse": "subsection"
 }

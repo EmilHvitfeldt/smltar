@@ -459,7 +459,7 @@ dense_model
 
 ```
 #> Model
-#> Model: "sequential_1"
+#> Model: "sequential"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -640,9 +640,9 @@ val_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03619
+#>         loss: 0.03612
 #>     accuracy: 0.9917
-#>     val_loss: 1.055
+#>     val_loss: 1.056
 #> val_accuracy: 0.8072
 ```
 
@@ -693,14 +693,14 @@ val_res
 #> # A tibble: 50,524 x 3
 #>         .pred_1 .pred_class state
 #>           <dbl> <fct>       <fct>
-#>  1 0.0230       0           0    
-#>  2 0.00813      0           0    
-#>  3 0.0000998    0           0    
-#>  4 0.0000651    0           0    
+#>  1 0.0225       0           0    
+#>  2 0.00753      0           0    
+#>  3 0.0000775    0           0    
+#>  4 0.0000660    0           0    
 #>  5 1.00         1           1    
 #>  6 0.996        1           1    
-#>  7 0.0000000460 0           0    
-#>  8 0.00153      0           0    
+#>  7 0.0000000455 0           0    
+#>  8 0.00155      0           0    
 #>  9 0.979        1           1    
 #> 10 1.00         1           1    
 #> # … with 50,514 more rows
@@ -827,10 +827,10 @@ bow_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3289
-#>     accuracy: 0.8579
-#>     val_loss: 0.6699
-#> val_accuracy: 0.7229
+#>         loss: 0.3288
+#>     accuracy: 0.8574
+#>     val_loss: 0.6662
+#> val_accuracy: 0.724
 ```
 
 We use `keras_predict()` again to get predictions, and calculate the standard metrics with `metrics()`.
@@ -846,8 +846,8 @@ metrics(bow_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.723
-#> 2 kap      binary         0.444
+#> 1 accuracy binary         0.724
+#> 2 kap      binary         0.446
 ```
 
 This model does not perform as well as the model we used in section \@ref(firstdlclassification). This suggests that a model incorporating more than word counts alone is useful here. This model did outperform a baseline linear model (shown in Appendix \@ref(appendixbaseline)), which achieved an accuracy of 0.686; that linear baseline is a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.
@@ -996,10 +996,10 @@ dense_pte_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.5992
-#>     accuracy: 0.6742
-#>     val_loss: 0.6656
-#> val_accuracy: 0.6149
+#>         loss: 0.5993
+#>     accuracy: 0.6741
+#>     val_loss: 0.6662
+#> val_accuracy: 0.6139
 ```
 
 
@@ -1015,8 +1015,8 @@ metrics(pte_res, state, .pred_class)
 #> # A tibble: 2 x 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
-#> 1 accuracy binary         0.615
-#> 2 kap      binary         0.227
+#> 1 accuracy binary         0.614
+#> 2 kap      binary         0.225
 ```
 
 \index{embeddings!pre-trained}Why did this happen? Part of the training loop for a model like this one typically _adjusts_ the weights in the network. 
@@ -1203,23 +1203,23 @@ cv_fitted %>%
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
 #>  1 <split [161673/40419]> Fold1 accuracy    binary         0.818
 #>  2 <split [161673/40419]> Fold1 kap         binary         0.636
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         1.06 
+#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         1.07 
 #>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.856
 #>  5 <split [161673/40419]> Fold2 accuracy    binary         0.819
-#>  6 <split [161673/40419]> Fold2 kap         binary         0.637
+#>  6 <split [161673/40419]> Fold2 kap         binary         0.638
 #>  7 <split [161673/40419]> Fold2 mn_log_loss binary         1.02 
 #>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.857
 #>  9 <split [161674/40418]> Fold3 accuracy    binary         0.820
 #> 10 <split [161674/40418]> Fold3 kap         binary         0.640
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.976
+#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.983
 #> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.858
-#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.817
+#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.818
 #> 14 <split [161674/40418]> Fold4 kap         binary         0.634
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         1.02 
+#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         1.03 
 #> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.855
 #> 17 <split [161674/40418]> Fold5 accuracy    binary         0.820
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.640
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.993
+#> 18 <split [161674/40418]> Fold5 kap         binary         0.639
+#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         1.00 
 #> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.862
 ```
 
@@ -1241,10 +1241,10 @@ cv_fitted %>%
 #> # A tibble: 4 x 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.819     5 0.000596
-#> 2 kap         0.637     5 0.00121 
-#> 3 mn_log_loss 1.01      5 0.0137  
-#> 4 roc_auc     0.858     5 0.00109
+#> 1 accuracy    0.819     5 0.000523
+#> 2 kap         0.637     5 0.00106 
+#> 3 mn_log_loss 1.02      5 0.0153  
+#> 4 roc_auc     0.858     5 0.00110
 ```
 
 This data set is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
@@ -1282,10 +1282,10 @@ all_dense_model_res %>%
 #>   model                    .metric  .estimator .estimate
 #>   <chr>                    <chr>    <chr>          <dbl>
 #> 1 dense                    accuracy binary         0.807
-#> 2 pte (locked weights)     accuracy binary         0.615
+#> 2 pte (locked weights)     accuracy binary         0.614
 #> 3 pte (not locked weights) accuracy binary         0.764
 #> 4 dense                    kap      binary         0.613
-#> 5 pte (locked weights)     kap      binary         0.227
+#> 5 pte (locked weights)     kap      binary         0.225
 #> 6 pte (not locked weights) kap      binary         0.528
 ```
 
@@ -1331,8 +1331,8 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.807
-#> 2 kap         binary         0.613
-#> 3 mn_log_loss binary         1.04 
+#> 2 kap         binary         0.612
+#> 3 mn_log_loss binary         1.06 
 #> 4 roc_auc     binary         0.848
 ```
 
@@ -1355,16 +1355,16 @@ kickstarter_bind %>%
 #> # A tibble: 10 x 1
 #>    blurb                                                                        
 #>    <chr>                                                                        
-#>  1 "Libby is on edge. A year out of high school, still working at her family's …
+#>  1 "A struggling writer has a chance encounter with a mysterious man whose life…
 #>  2 "Help support Ryan to start his project on healing foods with his trip to Du…
-#>  3 "'Moments of Silence' is noir genre fever dream interspersed with vignettes …
-#>  4 "Seattle-based band The West is making a music video for their song, \"It wa…
-#>  5 "Ghosts run rampant and Inspectre Pickle is our best hope. Hold on, it will …
-#>  6 "Award-winning NYU grads producing a 5-part web series about a country singe…
+#>  3 "A box set of media celebrating EarthBound and the fans who have kept it ali…
+#>  4 "We want to take our music to the next level by recording our two latest sin…
+#>  5 "So far I've only written five reasons, so I'm going to write seven more. Al…
+#>  6 "The prequel episode for Season 2 bridges the events of Season 1. More effec…
 #>  7 "Emmanuel Odhiambo aka huthead is a musician from Kenya, discovered by Peace…
-#>  8 "Think Harry Potter meets Avatar in the center of the ocean with a young gir…
+#>  8 "The stories behind the remaking of New York's most populous borough."       
 #>  9 "More than just an awesome t-shirt: A revolutionary way to support victims o…
-#> 10 "William Dewey's third novel is the first major publication for maybeparade …
+#> 10 "Bring Plasma Frequency magazine back after they faced devastating bank frau…
 ```
 
 What about misclassifications in the other direction, observations in the test set that were *not* successful but that our final model gave a high probability of being successful?
@@ -1381,15 +1381,15 @@ kickstarter_bind %>%
 #> # A tibble: 10 x 1
 #>    blurb                                                                        
 #>    <chr>                                                                        
-#>  1 "A Progressive House and Hip Hop inspired 10-track LP featuring up-and-comin…
+#>  1 "Please help me record my first solo album!! It will blow your mind!  Check …
 #>  2 "We are designing and building a new adaptive housing model for aging Americ…
 #>  3 "Big in Britain--a funny,modern,sexy love-story."                            
-#>  4 "A group of paranormal enthusiasts visit an abandon insane asylum. They quic…
-#>  5 "ClassRealm is a customizable classroom management system built on role play…
-#>  6 "Help us connect amazing players and fans by supporting this compilation and…
-#>  7 "A Kingdom goes topsy-turvy when an overambitious prince applies a new scien…
-#>  8 "A photographic and documentary film odyssey of Che Guevara's secret mission…
-#>  9 "Help Phil and Phil fund their first feature!"                               
+#>  4 "Hope's Wish is the story of Hope Stout who raised over $1MM to grant the wi…
+#>  5 "The third game in the classic The 7th Guest series from Trilobyte Games."   
+#>  6 "Do, It. Do it now. MASTER MIND ALLIANCE PUBLISHING, 2013. DO IT FOO.  :))))…
+#>  7 "Carl The Comet is an educational kids picture book yet also entertainment, …
+#>  8 "Help rehabilitation counselors, John and Jessica Freeborn, develop and publ…
+#>  9 "As the title says, this is a project to destroy iphones in different ways, …
 #> 10 "S.S.U.C drops their second single \"She Bad\" April 2013.  Help us showcase…
 ```
 

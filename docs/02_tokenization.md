@@ -889,11 +889,11 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus       46.8ms   48.2ms     20.2     4.58MB     2.24
-#> 2 tokenizers   56.6ms   57.8ms     17.3     1.01MB     4.33
-#> 3 text2vec     47.8ms   48.1ms     20.6    19.25MB     0   
-#> 4 quanteda     90.5ms   91.7ms     10.9      8.7MB     1.21
-#> 5 base R      182.4ms    184ms      5.43   10.51MB     1.36
+#> 1 corpus        102ms    104ms      9.62    4.59MB    0    
+#> 2 tokenizers    125ms    127ms      7.81    1.01MB    0.868
+#> 3 text2vec      104ms    107ms      9.16   20.64MB    1.02 
+#> 4 quanteda      192ms    195ms      5.11     8.7MB    1.28 
+#> 5 base R        413ms    415ms      2.41   10.51MB    1.03
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.
