@@ -16,7 +16,7 @@ spacyr::spacy_install(envname = "tf_env", prompt = FALSE)
 
 ##----------------------------------------------------------
 
-## double check for unexpected GitHub versions:
+## double check for unexpected GitHub versions (only expect scotus from GH):
 deps <- desc::desc_get_deps()
 pkgs <- sort(deps$package[deps$type == "Imports"])
 sessioninfo::package_info(pkgs, dependencies = FALSE)
