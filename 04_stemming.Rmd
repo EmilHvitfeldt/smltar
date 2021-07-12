@@ -1,5 +1,20 @@
 # Stemming {#stemming}
 
+```{r, include=FALSE}
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+
+
 When we deal with text, often documents contain different versions of one base word, often called a *stem*. "The Fir-Tree", for example, contains more than one version (i.e., inflected form) of the word `"tree"`.
 
 ```{r tidyfirtree}
@@ -121,8 +136,8 @@ tidy_scotus %>%
 
 There are `r scales::comma(n_distinct(tidy_scotus$word))` distinct words in this data set we have created (after removing stopwords) but notice that even in the most common words we see a pair like `"state"` and `"states"`. A common data structure for modeling, and a helpful mental model for thinking about the sparsity of text data, is a matrix.\index{matrix!sparse}  Let's `cast()` this tidy data to a sparse matrix, technically, a document-feature matrix object from the **quanteda** [@R-quanteda] package.
 
-```{r dependson="tidy_scotus", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
-tidy_scotus %>%
+```{r dependson="tidy_scotus", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0), linewidth = 60}
+tidy_scotus %>% 
   count(case_name, word) %>%
   cast_dfm(case_name, word, n)
 ```
@@ -131,8 +146,8 @@ Look at the sparsity of this matrix. It's high! Think of this sparsity as the sp
 
 What if instead we use stemming as a preprocessing step here?
 
-```{r dependson="tidy_hca", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
-tidy_scotus %>%
+```{r dependson="tidy_hca", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0), linewidth = 60}
+tidy_scotus %>%  
   mutate(stem = wordStem(word)) %>%
   count(case_name, stem) %>%
   cast_dfm(case_name, stem, n)
