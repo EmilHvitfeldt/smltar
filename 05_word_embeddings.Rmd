@@ -1,5 +1,19 @@
 # Word Embeddings {#embeddings}
 
+```{r, include=FALSE}
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+
 > You shall know a word by the company it keeps.  
 > `r tufte::quote_footer('--- [John Rupert Firth](https://en.wikiquote.org/wiki/John_Rupert_Firth)')`
 
@@ -9,7 +23,7 @@ So far in our discussion of natural language features, we have discussed \index{
 
 What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyze or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), described in Section \@ref(cfpb-complaints), we would start with straightforward word counts. Let's create a sparse matrix\index{matrix!sparse}, where the matrix elements are the counts of words in each document.
 
-```{r complaints, R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
+```{r complaints, R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0), linewidth = 60}
 library(tidyverse)
 library(tidytext)
 library(SnowballC)
@@ -37,7 +51,7 @@ $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents co
 \index{term frequency-inverse document frequency|see {tf-idf}}
 These two quantities can be combined to calculate a term's \index{tf-idf}tf-idf (the two quantities multiplied together). This statistic measures the frequency of a term adjusted for how rarely it is used, and it is an example of a weighting scheme that can often work better than counts for predictive modeling with text features. 
 
-```{r dependson="complaints", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0)}
+```{r dependson="complaints", R.options=list(quanteda_print_dfm_max_ndoc = 0, quanteda_print_dfm_max_nfeat = 0), linewidth = 60}
 complaints %>%
   unnest_tokens(word, consumer_complaint_narrative) %>%
   anti_join(get_stopwords(), by = "word") %>%
