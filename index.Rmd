@@ -5,8 +5,6 @@ date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
-biblio-style: apalike
-csl: taylor-and-francis-chicago-author-date.csl
 link-citations: yes
 links-as-notes: true
 colorlinks: true
@@ -171,6 +169,7 @@ df <- tibble(
   package = pkgs$package,
   version = pkgs$ondiskversion,
   source = gsub("@", "\\\\@", pkgs$source)
-)
+) %>%
+  mutate(source = str_remove(source, "\\\\@[a-f0-9]*"))
 knitr::kable(df, format = "markdown")
 ```
