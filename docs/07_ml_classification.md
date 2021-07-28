@@ -58,7 +58,7 @@ For our first model, let's build a binary classification model to predict whethe
 <p>This kind of “yes or no” binary classification model is both common and useful in real-world text machine learning problems.</p>
 </div>
 
-The outcome variable `product` contains more categories than this, so we need to transform this variable to only contains the values "Credit reporting, credit repair services, or other personal consumer reports" and "Other".
+The outcome variable `product` contains more categories than this, so we need to transform this variable to only contain the values "Credit reporting, credit repair services, or other personal consumer reports" and "Other".
 
 It is always a good idea to look at your data! Here are the first six complaints:
 
@@ -224,9 +224,7 @@ Let's start with a naive Bayes model [@kim2006; @Kibriya2005; @Eibe2006], which 
 One of the main advantages of a naive Bayes model is its ability to handle a large number of features, such as those we deal with when using word count methods.
 Here we have only kept the 1000 most frequent tokens, but we could have kept more tokens and a naive Bayes model would still be able to handle such predictors well. For now, we will limit the model to a moderate number of tokens.
 
-<div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the package for creating model specifications is <strong>parsnip</strong> <span class="citation">[@R-parsnip]</span>. The <strong>parsnip</strong> package provides the functions for creating all the models we have used so far, but other extra packages provide more. The <strong>discrim</strong> package is an extension package for <strong>parsnip</strong> that contains model definitions for various discriminant analysis models, including naive Bayes.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the package for creating model specifications is **parsnip** [@R-parsnip]. The **parsnip** package provides the functions for creating all the models we have used so far, but other extra packages provide more. The **discrim** package is an extension package for **parsnip** that contains model definitions for various discriminant analysis models, including naive Bayes.</div>\EndKnitrBlock{rmdpackage}
 
 
 ```r
@@ -259,7 +257,7 @@ We have trained our first classification model!
 
 Like we discussed in Section \@ref(firstregressionevaluation), we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use *resampling* methods to evaluate our model.
 
-Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let's create cross 10-fold cross-validation sets, and use these resampled sets for performance estimates.
+Let's use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
 
 ```r
@@ -286,12 +284,12 @@ complaints_folds
 #> 10 <split [79119/8791]> Fold10
 ```
 
-Each of these splits contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold and the other 10% is held out for evaluation.
+Each of these splits contains information about how to create cross-validation folds from the original training data. In this example, 90% of the training data is included in each fold, and the other 10% is held out for evaluation.
 
 For convenience, let's again use a `workflow()` for our resampling estimates of performance. 
 
 <div class="rmdwarning">
-<p>Using a <code>workflow()</code> isn’t required (you can fit or tune a model plus a preprocessor) but it can make your code easier to read and organize.</p>
+<p>Using a <code>workflow()</code> isn’t required (you can fit or tune a model plus a preprocessor), but it can make your code easier to read and organize.</p>
 </div>
 
 
@@ -332,7 +330,7 @@ nb_rs <- fit_resamples(
 )
 ```
 
-We can extract the relevant information using `collect_metrics()` and `collect_predictions()`
+We can extract the relevant information using `collect_metrics()` and `collect_predictions()`.
 
 
 ```r
@@ -362,8 +360,8 @@ The default performance parameters for binary classification are accuracy and RO
 \index{area under the receiver operator characteristic curve|see {ROC AUC}}
 <div class="rmdnote">
 <p>Accuracy and ROC AUC are performance metrics used for classification models. For both, values closer to 1 are better.</p>
-<p>Accuracy is the proportion of the data that are predicted correctly. Be aware that accuracy can be misleading in some situations, such as for imbalanced data sets.</p>
-<p>ROC AUC measures how well a classifier performs at different thresholds. The ROC curve plots the true positive rate against the false positive rate, and AUC closer to 1 indicates a better-performing model while AUC closer to 0.5 indicates a model that does no better than random guessing.</p>
+<p>Accuracy is the proportion of the data that is predicted correctly. Be aware that accuracy can be misleading in some situations, such as for imbalanced data sets.</p>
+<p>ROC AUC measures how well a classifier performs at different thresholds. The ROC curve plots the true positive rate against the false positive rate; AUC closer to 1 indicates a better-performing model, while AUC closer to 0.5 indicates a model that does no better than random guessing.</p>
 </div>
 
 Figure \@ref(fig:firstroccurve) shows the ROC curve, a visualization of how well a classification model can distinguish between classes, for our first classification model on each of the resampled data sets.
@@ -398,11 +396,11 @@ conf_mat_resampled(nb_rs, tidy = FALSE) %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'" width="672" />
-<p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting 'Credit'</p>
+<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting &quot;Credit&quot;" width="672" />
+<p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting "Credit"</p>
 </div>
 
-In \index{matrix!confusion}Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
+In \index{matrix!confusion}Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off-diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
 
 <div class="rmdwarning">
 <p>One metric alone cannot give you a complete picture of how well your classification model is performing. The confusion matrix is a good starting point to get an overview of your model performance, as it includes rich information.</p>
@@ -460,7 +458,7 @@ Regularized linear models are a class of statistical model that can be used in r
 
 Lasso regression or classification learns how much of a _penalty_ to put on some features (sometimes penalizing all the way down to zero) so that we can select only some features out of the high-dimensional space of original possible variables (tokens) for the final model.
 
-Let's create a specification of lasso regularized model. Remember that in tidymodels, specifying a model has three components: the algorithm, the mode, and the computational engine. 
+Let's create a specification of a lasso regularized model. Remember that in tidymodels, specifying a model has three components: the algorithm, the mode, and the computational engine. 
 
 
 ```r
@@ -575,7 +573,7 @@ conf_mat_resampled(lasso_rs, tidy = FALSE) %>%
 
 ## Tuning lasso hyperparameters {#tunelasso}
 
-\index{models!tuning}The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
+\index{models!tuning}The value `penalty = 0.01` for regularization in Section \@ref(comparetolasso) was picked somewhat arbitrarily. How do we know the *right* or *best* regularization parameter penalty? This is a model hyperparameter, and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let's build a new model specification for **model tuning**. 
 
 
 ```r
@@ -855,7 +853,7 @@ fitted_lasso %>%
 
 ## Case study: sparse encoding {#casestudysparseencoding}
 
-We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a \index{matrix!sparse}sparse matrix (Section \@ref(motivatingsparse)), rather than a dense data frame or tibble representation.
+We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used `set_engine("glmnet")`; this computational engine can be more efficient when text data is transformed to a \index{matrix!sparse}sparse matrix (Section \@ref(motivatingsparse)), rather than a dense dataframe or tibble representation.
 
 To keep our text data sparse throughout modeling and use the sparse capabilities of `set_engine("glmnet")`, we need to explicitly set a non-default preprocessing blueprint, using the package **hardhat** [@R-hardhat].
 
@@ -987,7 +985,7 @@ sparse_rs %>%
 #> 5 0.000113 roc_auc binary     0.953    10 0.000519 Preprocessor1_Model05
 ```
 
-The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 0.00079) but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
+The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 0.00079), but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
 
 Importantly, this tuning also took a bit less time to complete.\index{computational speed} 
 
@@ -1001,7 +999,7 @@ Overall, the whole tuning workflow is about 10% faster using the sparse preproce
 <p>Since our model performance is about the same and we see gains in training time, let’s use this sparse representation for the rest of this chapter.</p>
 </div>
 
-## Two class or multiclass? {#mlmulticlass}
+## Two-class or multiclass? {#mlmulticlass}
 
 Most of this chapter focuses on binary classification, where we have two classes in our outcome variable (such as "Credit" and "Other") and each observation can either be one or the other. This is a simple scenario with straightforward evaluation strategies because the results only have a two-by-two contingency matrix.
 However, it is not always possible to limit a modeling question to two classes. Let's explore how to deal with situations where we have more than two classes.
@@ -1065,7 +1063,7 @@ multicomplaints_train %>%
 #> 9  1656 Payday loan, title loan, or personal loan
 ```
 
-There is significant imbalance between the classes that we must address, with over twenty times more cases of the majority class than there is of the smallest class.
+There is significant imbalance between the classes that we must address, with over 20 times more cases of the majority class than there is of the smallest class.
 This kind of imbalance is a common problem\index{classification!challenges} with multiclass classification, with few multiclass data sets in the real world exhibiting balance between classes.
 
 Compared to binary classification, there are several additional issues to keep in mind when working with multiclass classification:
@@ -1220,7 +1218,7 @@ best_acc
 The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.4%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
 
 <div class="rmdwarning">
-<p>In binary classification, there is one right answer and one wrong answer; in this case, there is one right answer and <em>eight</em> wrong answers.</p>
+<p>In binary classification, there is one right answer and one wrong answer; in this multiclass case, there is one right answer and <em>eight</em> wrong answers.</p>
 </div>
 
 To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices\index{matrix!confusion} in Figure \@ref(fig:multiheatmap).
@@ -1243,7 +1241,7 @@ multi_lasso_rs %>%
 </div>
 
 The diagonal is fairly well populated, which is a good sign. This means that the model generally predicted the right class.
-The off-diagonals numbers are all the failures and where we should direct our focus.
+The off-diagonal numbers are all the failures and where we should direct our focus.
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.
 
@@ -1275,7 +1273,7 @@ Now that we have an idea of where the model isn't working, we can look more clos
 ## Case study: including non-text data
 
 We are building a model from a data set that includes more than text data alone. Annotations and labels have been added by the CFPB that we can use during modeling, but we need to ensure that only information that would be available at the time of prediction is included in the model.
-Otherwise we we will be very disappointed once our model is used to predict on new data!
+Otherwise we will be very disappointed once our model is used to predict on new data!
 The variables we identify as available for use as predictors are:
 
 - `date_received`
@@ -1296,7 +1294,7 @@ The variables we identify as available for use as predictors are:
 
 - `submitted_via`
 
-Let's try including `date_received` in our modeling, along with the text variable we have already used `consumer_complaint_narrative` and a new variable `tags`.
+Let's try including `date_received` in our modeling, along with the text variable we have already used, `consumer_complaint_narrative`, and a new variable `tags`.
 The `submitted_via` variable could have been a viable candidate, but all the entries are "web".
 The other variables like ZIP code could be of use too, but they are categorical variables with many values so we will exclude them for now.
 
@@ -1409,7 +1407,7 @@ more_vars_rs %>%
 #> 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05
 ```
 
-We see here that including more predictors did not measurably improve our model performance but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+We see here that including more predictors did not measurably improve our model performance, but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
 
 
 ```r
@@ -1450,7 +1448,7 @@ In our example here, some of the non-text predictors are included in the model w
 ## Case study: data censoring
 
 The complaints data set already has sensitive information (PII)\index{PII} censored or protected using strings such as "XXXX" and "XX".
-This data censoring\index{censoring} can be viewed as data _annotation_; specific account numbers and birthdays are protected but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
+This data censoring\index{censoring} can be viewed as data _annotation_; specific account numbers and birthdays are protected, but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.
 
 Figure \@ref(fig:censoredtrigram) shows the most frequent trigrams (Section \@ref(tokenizingngrams)) in our training data set.
 
@@ -1480,7 +1478,7 @@ complaints_train %>%
 The vast majority of trigrams in Figure \@ref(fig:censoredtrigram) include one or more censored words.
 Not only do the most used trigrams include some kind of censoring, 
 but the censoring itself is informative as it is not used uniformly across the product classes.
-In Figure \@ref(fig:trigram25), we take the top 25 most frequent trigrams that include censoring,
+In Figure \@ref(fig:trigram25), we take the top-25 most frequent trigrams that include censoring,
 and plot the proportions for "Credit" and "Other".
 
 
@@ -1513,10 +1511,10 @@ plot_data %>%
 
 There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
 Remember that the current tokenization engine strips punctuation before tokenizing. 
-This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored\index{censoring} trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored but this one is not, since it is ambiguous. This highlights the real challenge of anonymizing text.].
+This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored\index{censoring} trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored, but this one is not since it is ambiguous. This highlights the real challenge of anonymizing text.].
 
 To crudely simulate what the data might look like before it was censored, we can replace all cases of "XX" and "XXXX" with random integers. 
-This isn't quite right since dates will be given values between `00` and `99` and we don't know for sure that only numerals have been censored, but it gives us a place to start.
+This isn't quite right since dates will be given values between `00` and `99`, and we don't know for sure that only numerals have been censored, but it gives us a place to start.
 Below is a simple function `uncensor_vec()` that locates all instances of `"XX"` and replaces them with a number between 11 and 99.
 We don't need to handle the special case of `XXXX` as it automatically being handled.
 
@@ -1548,7 +1546,7 @@ uncensor_vec("In XX/XX/XXXX I leased a XXXX vehicle")
 #> [1] "In 33/64/4458 I leased a 7595 vehicle"
 ```
 
-Now we can produce the same visualization as Figure \@ref(fig:censoredtrigram) but also applying our uncensoring function to the text before tokenizing.
+Now we can produce the same visualization as Figure \@ref(fig:censoredtrigram) but can also apply our uncensoring function to the text before tokenizing.
 
 
 ```r
@@ -1584,7 +1582,7 @@ Data censoring\index{censoring} can be a form of preprocessing in your data pipe
 For example, it is highly unlikely to be useful (or ethical/legal) to have any specific person's social security number, credit card number, or any other kind of PII\index{PII} embedded into your model. Such values appear rarely and are most likely highly correlated with other known variables in your data set.
 More importantly, that information can become embedded in your model and begin to leak as demonstrated by @carlini2018secret, @Fredrikson2014, and @Fredrikson2015.
 Both of these issues are important, and one of them could land you in a lot of legal trouble. 
-Exposing such PII to modeling is an example of where we should all stop to ask, "Should we even be doing this?" as we discussed in the foreword to these chapters.
+Exposing such PII to modeling is an example of where we should all stop to ask, "Should we even be doing this?" as we discussed in the overview to these chapters.
 
 If you have social security numbers in text data, you should definitely not pass them on to your machine learning model, but you may consider the option of annotating the _presence_ of a social security number. 
 Since a social security number has a very specific form, we can easily construct a \index{regex}regular expression (Appendix \@ref(regexp)) to locate them.
@@ -1619,7 +1617,7 @@ str_replace_all(string = ssn_text,
 This technique isn't useful only for personally identifiable information\index{PII} but can be used anytime you want to gather similar words in the same bucket; hashtags, email addresses, and usernames can sometimes benefit from being annotated in this way.
 
 
-\BeginKnitrBlock{rmdwarning}<div class="rmdwarning">The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII and we encourage readers to familiarize themselves with results such as @Sweeney2000, and current best practices to protect against such mining.</div>\EndKnitrBlock{rmdwarning}
+\BeginKnitrBlock{rmdwarning}<div class="rmdwarning">The practice of data re-identification or de-anonymization, where seemingly or partially "anonymized" data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII, and we encourage readers to familiarize themselves with results such as @Sweeney2000 and current best practices to protect against such mining.</div>\EndKnitrBlock{rmdwarning}
 
 
 ## Case study: custom features {#customfeatures}
@@ -1630,11 +1628,11 @@ Your domain knowledge allows you to build more predictive features than the naiv
 As long as you can reasonably formulate what you are trying to count, chances are you can write a function that can detect it.
 This is where having a little bit of knowledge about regular expressions pays off.
 
-\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdpackage}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **textfeatures** [@R-textfeatures] package includes functions to extract useful features from text, from the number of digits to the number of second-person pronouns and more. These features can be used in textrecipes data preprocessing with the `step_textfeature()` function.</div>\EndKnitrBlock{rmdpackage}
 
 Your specific domain knowledge may provide specific guidance about feature engineering\index{feature engineering} for text.
 Such custom features can be simple such as the number of URLs or the number of punctuation marks.
-They can also be more engineered such as the percentage of capitalization, whether the text ends with a hashtag, or whether two people's names are both mentioned in a document.
+They can also be more engineered, such as the percentage of capitalization, whether the text ends with a hashtag, or whether two people's names are both mentioned in a document.
 
 For our CFPB complaints data, certain patterns may not have adequately been picked up by our model so far, such as the data censoring and the curly bracket annotation for monetary amounts that we saw in Section \@ref(classfirstattemptlookatdata). Let's walk through how to create data preprocessing functions to build the features to:
 
@@ -1851,9 +1849,9 @@ Now that we have created some \index{feature engineering}feature engineering fun
 
 ## What evaluation metrics are appropriate?
 
-We have focused on using accuracy and ROC AUC as metrics for our classification models so far. These are not the only classification metrics available and your choice will often depend on how much you care about false positives compared to false negatives.
+We have focused on using accuracy and ROC AUC as metrics for our classification models so far. These are not the only classification metrics available, and your choice will often depend on how much you care about false positives compared to false negatives.
 
-If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`, that focus not on the overall proportion of observations that are predicted correctly but instead on false positives and false negatives.
+If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to `metric_set()`. Let's set up a tuning grid for two new classification metrics, `recall` and `precision`, that focuses not on the overall proportion of observations that are predicted correctly but instead on false positives and false negatives.
 
 
 ```r
@@ -1929,10 +1927,10 @@ It is possible with many data sets to achieve high accuracy just by predicting t
 
 ## The full game: classification {#mlclassificationfull}
 
-We have come a long way from our first classification model in Section \@ref(classfirstmodel) and it is time to see how we can use what we have learned to improve it.
+We have come a long way from our first classification model in Section \@ref(classfirstmodel), and it is time to see how we can use what we have learned to improve it.
 We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
-For our final model, let's use some of the domain-specific features\index{feature engineering} we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty as well as the number of tokens to include. For this final model we will:
+For our final model, let's use some of the domain-specific features\index{feature engineering} we developed in Section \@ref(customfeatures) along with our lasso regularized classification model and tune both the regularization penalty, as well as the number of tokens to include. For this final model we will:
 
 - train on the same set of cross-validation resamples used throughout this chapter,
 
@@ -2188,7 +2186,7 @@ collect_predictions(final_fitted) %>%
 <p class="caption">(\#fig:finalheatmap)Confusion matrix on the test set for final lasso regularized classifier</p>
 </div>
 
-Figure \@ref(fig:finalroccurve) shows the ROC curve for testing set, to demonstrate how well this final classification model can distinguish between the two classes.
+Figure \@ref(fig:finalroccurve) shows the ROC curve for the testing set, to demonstrate how well this final classification model can distinguish between the two classes.
 
 
 ```r
@@ -2208,7 +2206,7 @@ collect_predictions(final_fitted)  %>%
 </div>
 
 
-The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:complaintsvip).
+The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific) that has been trained on the _training_ data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:complaintsvip).
 
 
 ```r
@@ -2237,8 +2235,8 @@ complaints_imp %>%
   labs(
     y = NULL,
     title = "Variable importance for predicting the topic of a CFPB complaint",
-    subtitle = paste("These features are the most important in predicting",
-                     "whether a complaint is about credit or not")
+    subtitle = paste0("These features are the most important in predicting\n",
+                      "whether a complaint is about credit or not")
   )
 ```
 
@@ -2247,7 +2245,7 @@ complaints_imp %>%
 <p class="caption">(\#fig:complaintsvip)Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability</p>
 </div>
 
-Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "reporting", and "report" and  contribute in this model _toward_ classification as about credit reporting.
+Tokens like "interest", "bank", and "escrow" contribute in this model away from a classification as about credit reporting, while tokens like the names of the credit reporting agencies, "reporting", and "report" contribute in this model _toward_ classification as about credit reporting.
 
 <div class="rmdnote">
 <p>The top features we see here are all tokens learned directly from the text. None of our hand-crafted custom features, like <code>percent_censoring</code> or <code>max_money</code> are top features in terms of variable importance. In many cases, it can be difficult to create features from text that perform better than the tokens themselves.</p>

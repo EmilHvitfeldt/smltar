@@ -1,10 +1,10 @@
 # (PART) Machine Learning Methods {-}
 
-# Foreword {#mlforeword .unnumbered}
+# Overview {#mloverview .unnumbered}
 
 \thispagestyle{myheadings}
 
-It's time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context, to make predictions from text data. In the next two chapters, we will focus putting into practice such machine learning algorithms as:
+It's time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context, to make predictions from text data. In the next two chapters, we will focus on putting into practice such machine learning algorithms as:
 
 - naive Bayes, 
 
@@ -20,14 +20,14 @@ We start in Chapter \@ref(mlregression) with exploring regression models and con
 
 - The main purpose of a **descriptive model** is to describe the properties of the observed data.
 
-Many learning algorithms can be used for multiple of these purposes. Concerns about a model's predictive capacity may be as important for an inferential or descriptive model as for a model designed purely for prediction, and model interpretability and explainability may be important for a solely predictive or descriptive model as well as for an inferential model. We will use the [tidymodels](https://www.tidymodels.org/) framework to address all of these issues, with its consistent approach to resampling, preprocessing, fitting, and evaluation. 
+Many learning algorithms can be used for more than one of these purposes. Concerns about a model's predictive capacity may be as important for an inferential or descriptive model as for a model designed purely for prediction, and model interpretability and explainability may be important for a solely predictive or descriptive model as well as for an inferential model. We will use the [tidymodels](https://www.tidymodels.org/) framework to address all of these issues, with its consistent approach to resampling, preprocessing, fitting, and evaluation. 
 
 \BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The **tidymodels** framework [@R-tidymodels] is a collection of R packages for modeling and machine learning using tidyverse principles [@Wickham2019]. These packages facilitate resampling, preprocessing, modeling, and evaluation. There are core packages that you can load all together via `library(tidymodels)` and then extra packages for more specific tasks.</div>\EndKnitrBlock{rmdpackage}
 
-As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the foreword for the deep learning chapters.
+As you read through these next chapters, notice the modeling _process_ moving through these stages; we'll discuss the structure of this process in more detail in the overview for the deep learning chapters.
 
 Before we starting fitting these models to real data sets, let's consider how to think about algorithmic bias\index{bias} for predictive modeling.
-Rachel Thomas proposed a checklist at [ODSC West 2019](https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/) for algorithmic basic in machine learning.
+Rachel Thomas proposed a checklist at [ODSC West 2019](https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/) for algorithmic bias in machine learning.
 
 ## Should we even be doing this? {-}
 
@@ -49,9 +49,7 @@ In the case of this book, the code and data are all publicly available. You as a
 
 In Section \@ref(mlmulticlass) we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the **yardstick** package makes this task well within the reach of data practitioners.
 
-<div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the <strong>yardstick</strong> package <span class="citation">[@R-yardstick]</span> has functions for model evaluation.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the **yardstick** package [@R-yardstick] has functions for model evaluation.</div>\EndKnitrBlock{rmdpackage}
 
 
 ## What is the accuracy of a simple rule-based alternative? {-}

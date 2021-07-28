@@ -1,12 +1,10 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-07-09"
+date: "2021-07-28"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
-biblio-style: apalike
-csl: taylor-and-francis-chicago-author-date.csl
 link-citations: yes
 links-as-notes: true
 colorlinks: true
@@ -31,6 +29,9 @@ This is the [website](https://smltar.com/) for *Supervised Machine Learning for 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This online work by [Emil Hvitfeldt](https://www.hvitfeldt.me/) and [Julia Silge](http://juliasilge.com/) is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
 
 
+\pagenumbering{roman}
+\setcounter{page}{11}
+
 # Preface {-}
 
 Modeling as a statistical practice can encompass a wide variety of activities. This book focuses on *supervised or predictive modeling for text*, using text data to make predictions about the world around us. We use the [tidymodels](https://www.tidymodels.org/) framework for modeling, a consistent and flexible collection of R packages developed to encourage good statistical practice.
@@ -41,14 +42,14 @@ Supervised machine learning using text data involves building a statistical mode
 <p>Text data is important for many domains, from healthcare to marketing to the digital humanities, but specialized approaches are necessary to create features (predictors) for machine learning from language.</p>
 </div>
 
-Natural language that we as speakers and/or writers use must be dramatically transformed to a machine-readable, numeric representation to be ready for computation. In this book, we explore typical text preprocessing steps from the ground up, and consider the effects of these steps. We also show how to fluently use the **textrecipes** R package [@textrecipes] to prepare text data within a modeling pipeline.
+Natural language that we as speakers and/or writers use must be dramatically transformed to a machine-readable, numeric representation to be ready for computation. In this book, we explore typical text preprocessing steps from the ground up and consider the effects of these steps. We also show how to fluently use the **textrecipes** R package [@textrecipes] to prepare text data within a modeling pipeline.
 
 @Silge2017 provides a practical introduction to text mining with R using tidy data principles, based on the **tidytext** package. If you have already started on the path of gaining insight from your text data, a next step is using that text directly in predictive modeling. Text data contains within it latent information that can be used for insight, understanding, and better decision-making, and predictive modeling with text can bring that information and insight to light. If you have already explored how to analyze text as demonstrated in @Silge2017, this book will move one step further to show you how to *learn and make predictions* from that text data with supervised models. If you are unfamiliar with this previous work, this book will still provide a robust introduction to how text can be represented in useful ways for modeling and a diverse set of supervised modeling approaches for text.
 
 
 ## Outline {-}
 
-The book is divided into three sections. We make a (perhaps arbitrary) distinction between *machine learning methods* and *deep learning methods* by defining deep learning as any kind of multi-layer neural network (LSTM, bi-LSTM, CNN) and machine learning as anything else (regularized regression, naive Bayes, SVM, random forest). We make this distinction both because these different methods use separate software packages and modeling infrastructure, and from a pragmatic point of view, it is helpful to split up the chapters this way. 
+The book is divided into three sections. We make a (perhaps arbitrary) distinction between *machine learning methods* and *deep learning methods* by defining deep learning as any kind of multilayer neural network (LSTM, bi-LSTM, CNN) and machine learning as anything else (regularized regression, naive Bayes, SVM, random forest). We make this distinction both because these different methods use separate software packages and modeling infrastructure, and from a pragmatic point of view, it is helpful to split up the chapters this way. 
 
 - **Natural language features:** How do we transform text data into a representation useful for modeling? In these chapters, we explore the most common preprocessing steps for text, when they are helpful, and when they are not.
 
@@ -75,7 +76,7 @@ Throughout the book, we will demonstrate with examples and build models using a 
 
 ## Topics this book will not cover {-}
 
-This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. \index{CRAN}The [CRAN Task View on Natural Language Processing](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
+This book serves as a thorough introduction to prediction and modeling with text, along with detailed practical examples, but there are many areas of natural language processing we do not cover. \index{CRAN}The [*CRAN Task View on Natural Language Processing*](https://cran.r-project.org/web/views/NaturalLanguageProcessing.html) provides details on other ways to use R for computational linguistics. Specific topics we do not cover include:
 
 - **Reading text data into memory:** Text data may come to a data practitioner in any of a long list of heterogeneous formats. Text data exists in PDFs, databases, plain text files (single or multiple for a given project), websites, APIs, literal paper, and more. The skills needed to access and sometimes wrangle text data sets so that they are in memory and ready for analysis are so varied and extensive that we cannot hope to cover them in this book. We point readers to R packages such as **readr** [@R-readr], **pdftools** [@R-pdftools], and **httr** [@R-httr], which we have found helpful in these tasks.
 
@@ -95,7 +96,7 @@ We assume that the reader is somewhat familiar with R, predictive modeling conce
 
 We don't assume an extensive background in text analysis, but [*Text Mining with R*](https://www.tidytextmining.com/) [@Silge2017], by one of the authors (JS) and David Robinson, provides helpful skills in exploratory data analysis for text that will promote successful text modeling. This book is more advanced than *Text Mining with R* and will help practitioners use their text data in ways not covered in that book.
 
-## Acknowledgements {-}
+## Acknowledgments {-}
 
 We are so thankful for the contributions, help, and perspectives of people who have supported us in this project. There are several we would like to thank in particular.
 
@@ -103,75 +104,75 @@ We would like to thank Max Kuhn and Davis Vaughan for their investment in the **
 
 
 
-This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to the 4 people who contributed via GitHub pull requests (in alphabetical order by username): \@fellennert, Riva Quiroga (\@rivaquiroga), Darrin Speegle (\@speegled), Tanner Stauss (\@tmstauss).
+This book was written in the open, and multiple people contributed via pull requests or issues. Special thanks goes to the four people who contributed via GitHub pull requests (in alphabetical order by username): \@fellennert, Riva Quiroga (\@rivaquiroga), Darrin Speegle (\@speegled), Tanner Stauss (\@tmstauss).
 
-Note box icons by Smashicons from flaticon.com
+Note box icons by Smashicons from flaticon.com.
 
 ## Colophon {-}
 
-This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdown**](https://bookdown.org). The [website](https://smltar.com) is hosted via [GitHub Pages](https://pages.github.com), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) have been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
+This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdown**](https://bookdown.org). The [website](https://smltar.com) is hosted via [GitHub Pages](https://pages.github.com), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) has been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
 This version of the book was built with R version 4.1.0 (2021-05-18) and the following packages:
 
 
-|package        |version    |source                                      |
-|:--------------|:----------|:-------------------------------------------|
-|bench          |1.1.1      |CRAN (R 4.1.0)                              |
-|bookdown       |0.22       |CRAN (R 4.1.0)                              |
-|broom          |0.7.8      |CRAN (R 4.1.0)                              |
-|corpus         |0.10.2     |CRAN (R 4.1.0)                              |
-|dials          |0.0.9      |CRAN (R 4.1.0)                              |
-|discrim        |0.1.2      |CRAN (R 4.1.0)                              |
-|doParallel     |1.0.16     |CRAN (R 4.1.0)                              |
-|glmnet         |4.1-2      |CRAN (R 4.1.0)                              |
-|gt             |0.3.0      |CRAN (R 4.1.0)                              |
-|hcandersenr    |0.2.0      |CRAN (R 4.1.0)                              |
-|htmltools      |0.5.1.1    |CRAN (R 4.1.0)                              |
-|htmlwidgets    |1.5.3      |CRAN (R 4.1.0)                              |
-|hunspell       |3.0.1      |CRAN (R 4.1.0)                              |
-|irlba          |2.3.3      |CRAN (R 4.1.0)                              |
-|jiebaR         |0.11       |CRAN (R 4.1.0)                              |
-|jsonlite       |1.7.2      |CRAN (R 4.1.0)                              |
-|kableExtra     |1.3.4      |CRAN (R 4.1.0)                              |
-|keras          |2.4.0      |CRAN (R 4.1.0)                              |
-|klaR           |0.6-15     |CRAN (R 4.1.0)                              |
-|LiblineaR      |2.10-12    |CRAN (R 4.1.0)                              |
-|lime           |0.5.2      |CRAN (R 4.1.0)                              |
-|lobstr         |1.1.1      |CRAN (R 4.1.0)                              |
-|naivebayes     |0.9.7      |CRAN (R 4.1.0)                              |
-|parsnip        |0.1.6      |CRAN (R 4.1.0)                              |
-|prismatic      |1.0.0      |CRAN (R 4.1.0)                              |
-|quanteda       |3.0.0      |CRAN (R 4.1.0)                              |
-|ranger         |0.12.1     |CRAN (R 4.1.0)                              |
-|recipes        |0.1.16     |CRAN (R 4.1.0)                              |
-|remotes        |2.4.0      |CRAN (R 4.1.0)                              |
-|reticulate     |1.20       |CRAN (R 4.1.0)                              |
-|rsample        |0.1.0      |CRAN (R 4.1.0)                              |
-|rsparse        |0.4.0      |CRAN (R 4.1.0)                              |
-|scico          |1.2.0      |CRAN (R 4.1.0)                              |
-|scotus         |1.0.0      |Github (EmilHvitfeldt/scotus\@e5ccdea)      |
-|servr          |0.22       |CRAN (R 4.1.0)                              |
-|sessioninfo    |1.1.1      |CRAN (R 4.1.0)                              |
-|slider         |0.2.2      |CRAN (R 4.1.0)                              |
-|SnowballC      |0.7.0      |CRAN (R 4.1.0)                              |
-|spacyr         |1.2.1      |CRAN (R 4.1.0)                              |
-|stopwords      |2.2        |CRAN (R 4.1.0)                              |
-|styler         |1.4.1      |CRAN (R 4.1.0)                              |
-|text2vec       |0.6        |CRAN (R 4.1.0)                              |
-|textdata       |0.4.1      |CRAN (R 4.1.0)                              |
-|textfeatures   |0.3.3      |CRAN (R 4.1.0)                              |
-|textrecipes    |0.4.0.9000 |Github (emilhvitfeldt/textrecipes\@8c04004) |
-|tfruns         |1.5.0      |CRAN (R 4.1.0)                              |
-|themis         |0.1.4      |CRAN (R 4.1.0)                              |
-|tidymodels     |0.1.3      |CRAN (R 4.1.0)                              |
-|tidytext       |0.3.1      |CRAN (R 4.1.0)                              |
-|tidyverse      |1.3.1      |CRAN (R 4.1.0)                              |
-|tokenizers     |0.2.1      |CRAN (R 4.1.0)                              |
-|tokenizers.bpe |0.1.0      |CRAN (R 4.1.0)                              |
-|tufte          |0.10       |CRAN (R 4.1.0)                              |
-|tune           |0.1.5      |CRAN (R 4.1.0)                              |
-|UpSetR         |1.4.0      |CRAN (R 4.1.0)                              |
-|vip            |0.3.2      |CRAN (R 4.1.0)                              |
-|widyr          |0.1.3      |CRAN (R 4.1.0)                              |
-|workflows      |0.2.2      |CRAN (R 4.1.0)                              |
-|yardstick      |0.0.8      |CRAN (R 4.1.0)                              |
+|package        |version    |source                        |
+|:--------------|:----------|:-----------------------------|
+|bench          |1.1.1      |CRAN (R 4.1.0)                |
+|bookdown       |0.22       |CRAN (R 4.1.0)                |
+|broom          |0.7.8      |CRAN (R 4.1.0)                |
+|corpus         |0.10.2     |CRAN (R 4.1.0)                |
+|dials          |0.0.9      |CRAN (R 4.1.0)                |
+|discrim        |0.1.2      |CRAN (R 4.1.0)                |
+|doParallel     |1.0.16     |CRAN (R 4.1.0)                |
+|glmnet         |4.1-2      |CRAN (R 4.1.0)                |
+|gt             |0.3.0.9000 |Github (rstudio/gt)           |
+|hcandersenr    |0.2.0      |CRAN (R 4.1.0)                |
+|htmltools      |0.5.1.1    |CRAN (R 4.1.0)                |
+|htmlwidgets    |1.5.3      |CRAN (R 4.1.0)                |
+|hunspell       |3.0.1      |CRAN (R 4.1.0)                |
+|irlba          |2.3.3      |CRAN (R 4.1.0)                |
+|jiebaR         |0.11       |CRAN (R 4.1.0)                |
+|jsonlite       |1.7.2      |CRAN (R 4.1.0)                |
+|kableExtra     |1.3.4      |CRAN (R 4.1.0)                |
+|keras          |2.4.0      |CRAN (R 4.1.0)                |
+|klaR           |0.6-15     |CRAN (R 4.1.0)                |
+|LiblineaR      |2.10-12    |CRAN (R 4.1.0)                |
+|lime           |0.5.2      |CRAN (R 4.1.0)                |
+|lobstr         |1.1.1      |CRAN (R 4.1.0)                |
+|naivebayes     |0.9.7      |CRAN (R 4.1.0)                |
+|parsnip        |0.1.7      |CRAN (R 4.1.0)                |
+|prismatic      |1.0.0      |CRAN (R 4.1.0)                |
+|quanteda       |3.0.0      |CRAN (R 4.1.0)                |
+|ranger         |0.12.1     |CRAN (R 4.1.0)                |
+|recipes        |0.1.16     |CRAN (R 4.1.0)                |
+|remotes        |2.4.0      |CRAN (R 4.1.0)                |
+|reticulate     |1.20       |CRAN (R 4.1.0)                |
+|rsample        |0.1.0      |CRAN (R 4.1.0)                |
+|rsparse        |0.4.0      |CRAN (R 4.1.0)                |
+|scico          |1.2.0      |CRAN (R 4.1.0)                |
+|scotus         |1.0.0      |Github (EmilHvitfeldt/scotus) |
+|servr          |0.22       |CRAN (R 4.1.0)                |
+|sessioninfo    |1.1.1      |CRAN (R 4.1.0)                |
+|slider         |0.2.2      |CRAN (R 4.1.0)                |
+|SnowballC      |0.7.0      |CRAN (R 4.1.0)                |
+|spacyr         |1.2.1      |CRAN (R 4.1.0)                |
+|stopwords      |2.2        |CRAN (R 4.1.0)                |
+|styler         |1.4.1      |CRAN (R 4.1.0)                |
+|text2vec       |0.6        |CRAN (R 4.1.0)                |
+|textdata       |0.4.1      |CRAN (R 4.1.0)                |
+|textfeatures   |0.3.3      |CRAN (R 4.1.0)                |
+|textrecipes    |0.4.1      |CRAN (R 4.1.0)                |
+|tfruns         |1.5.0      |CRAN (R 4.1.0)                |
+|themis         |0.1.4      |CRAN (R 4.1.0)                |
+|tidymodels     |0.1.3      |CRAN (R 4.1.0)                |
+|tidytext       |0.3.1      |CRAN (R 4.1.0)                |
+|tidyverse      |1.3.1      |CRAN (R 4.1.0)                |
+|tokenizers     |0.2.1      |CRAN (R 4.1.0)                |
+|tokenizers.bpe |0.1.0      |CRAN (R 4.1.0)                |
+|tufte          |0.10       |CRAN (R 4.1.0)                |
+|tune           |0.1.5      |CRAN (R 4.1.0)                |
+|UpSetR         |1.4.0      |CRAN (R 4.1.0)                |
+|vip            |0.3.2      |CRAN (R 4.1.0)                |
+|widyr          |0.1.3      |CRAN (R 4.1.0)                |
+|workflows      |0.2.2      |CRAN (R 4.1.0)                |
+|yardstick      |0.0.8      |CRAN (R 4.1.0)                |
