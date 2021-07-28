@@ -7,7 +7,7 @@ To build features for supervised machine learning from natural language, we need
 ## What is a token?
 
 \index{data type!character}In R, text is typically represented with the *character* data type, similar to strings in other languages. Let's explore text from fairy tales written by Hans Christian Andersen, available in the **hcandersenr** package [@R-hcandersenr]. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
-If we look at the first paragraph of one story titled "The Fir Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.\index{vector!character}
+If we look at the first paragraph of one story titled "The Fir-Tree", we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.\index{vector!character}
 
 <div class="rmdpackage">
 <p>The <strong>tidyverse</strong> is a collection of packages for data manipulation, exploration, and visualization.</p>
@@ -59,7 +59,7 @@ In tokenization, we take an input (a string) and a token type (a meaningful unit
 
 Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.\index{language!Non-English}\index{preprocessing!challenges}
 
-To understand the process of tokenization, let's start with a overly simple definition for a word: any selection of alphanumeric (letters and numbers) symbols. \index{regex}Let's use some regular expressions \index{regular expressions|see {regex}}(or regex for short, see Appendix \@ref(regexp)) with `strsplit()` to split the first two lines of "The Fir Tree" by any characters that are not alphanumeric.
+To understand the process of tokenization, let's start with a overly simple definition for a word: any selection of alphanumeric (letters and numbers) symbols. \index{regex}Let's use some regular expressions \index{regular expressions|see {regex}}(or regex for short, see Appendix \@ref(regexp)) with `strsplit()` to split the first two lines of "The Fir-Tree" by any characters that are not alphanumeric.
 
 
 ```r
@@ -108,7 +108,7 @@ We see sensible single-word results here; the `tokenize_words()` function uses t
 
 - Keep horizontal whitespace together.
 
-- Ignore Format and Extend characters, except after sot, CR, LF, and new line.
+- Ignore Format and Extend characters, except after sot, CR, LF, and new lines.
 
 - Do not break between most letters.
 
@@ -257,7 +257,7 @@ head(tft_token_characters) %>%
 #>  $ : chr [1:64] "t" "h" "e" "m" ...
 ```
 
-We don't have to stick with the defaults. We can keep the punctuation and spaces by setting `strip_non_alphanum = FALSE` and now we see that spaces and punctuation are included in the results too.
+We don't have to stick with the defaults. We can keep the punctuation and spaces by setting `strip_non_alphanum = FALSE`, and now we see that spaces and punctuation are included in the results too.
 
 
 ```r
@@ -279,28 +279,6 @@ tokenize_characters(x = the_fir_tree,
 
 The results have more elements because the spaces and punctuation have not been removed.
 
-Sometimes you run into challenges where what a "character" is can be ambiguous. Newcomers in terms of characters are emojis, and they can be complex.\index{tokenization!emojis} Let's consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. These emojis don't have individual Unicode characters, though, but are represented as a character plus a _modifier_.  The Canadian flag combines "REGIONAL INDICATOR SYMBOLS" ["C"](https://codepoints.net/U+1F1E8?lang=en) and ["A"](https://codepoints.net/U+1F1E6?lang=en). The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers^[Full list of emoji modifiers here: https://unicode.org/emoji/charts/full-emoji-modifiers.html].  
-
-How does the tokenizer we have been using handle flag emojis?
-
-
-
-
-
-
-```r
-flags <- "🇨🇦🇦🇶🇪🇺🇯🇵"
-
-tokenize_characters(flags)
-```
-
-```
-#> [[1]]
-#> [1] "🇨🇦" "🇦🇶" "🇪🇺" "🇯🇵"
-```
-
-In this case, the flag emojis are each treated as one token. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
-
 Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
 
 
@@ -313,7 +291,7 @@ tokenize_characters("ﬂowers")
 #> [1] "ﬂ" "o" "w" "e" "r" "s"
 ```
 
-We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. \index{tokenization!ligatures}First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures, stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å. In Section \@ref(text-normalization) we will discuss text normalization approaches to deal with ligatures.
+We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. \index{tokenization!ligatures}First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures: stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the "W" in the Latin alphabet (two "v" or two "u" joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling "aa" instead of å. In Section \@ref(text-normalization) we will discuss text normalization approaches to deal with ligatures.
 
 ### Word tokens
 
@@ -346,9 +324,9 @@ head(tft_token_words) %>%
 #>  $ : chr [1:13] "them" "not" "sometimes" "the" ...
 ```
 
-We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` control whether we remove punctuation and numeric characters respectively. We also have `stopwords = NULL`, which we will talk about in more depth in Chapter \@ref(stopwords).
+We have already seen `lowercase = TRUE`, and `strip_punct = TRUE` and `strip_numeric = FALSE` control whether we remove punctuation and numeric characters, respectively. We also have `stopwords = NULL`, which we will talk about in more depth in Chapter \@ref(stopwords).
 
-Let's create a tibble with two fairy tales, "The Fir Tree" and "The Little Mermaid". Then we can use `unnest_tokens()` together with some **dplyr** verbs to find the most commonly used words in each.
+Let's create a tibble with two fairy tales, "The Fir-Tree" and "The Little Mermaid". Then we can use `unnest_tokens()` together with some **dplyr** verbs to find the most commonly used words in each.
 
 
 ```r
@@ -378,7 +356,7 @@ hcandersen_en %>%
 #> 10 The little mermaid to      199
 ```
 
-The five most common words in each fairy tale are fairly uninformative, with the exception being `"tree"` in the "The Fir Tree". 
+The five most common words in each fairy tale are fairly uninformative, with the exception being `"tree"` in the "The Fir-Tree". 
 
 \BeginKnitrBlock{rmdwarning}<div class="rmdwarning">These uninformative words are called **stop words** and will be explored in-depth in Chapter \@ref(stopwords).
 </div>\EndKnitrBlock{rmdwarning}
@@ -399,7 +377,7 @@ Some example n-grams are:
 
 - **trigram:** "You and I", "please let go", "no time like", "the little mermaid"
 
-The benefit of using n-grams compared to words is that n-grams capture word order which would otherwise be lost. Similarly, when we use character n-grams, we can model the beginning and end of words, because a space will be located at the end of an n-gram for the end of a word and at the beginning of an n-gram of the beginning of a word.
+The benefit of using n-grams compared to words is that n-grams capture word order that would otherwise be lost. Similarly, when we use character n-grams, we can model the beginning and end of words, because a space will be located at the end of an n-gram for the end of a word and at the beginning of an n-gram of the beginning of a word.
 
 To split text into word n-grams, we can use the function `tokenize_ngrams()`. It has a few more arguments, so let's go over them one by one.
 
@@ -416,7 +394,7 @@ tft_token_ngram <- tokenize_ngrams(x = the_fir_tree,
 
 We have seen the arguments `lowercase`, `stopwords`, and `simplify` before; they work the same as for the other tokenizers. We also have `n`, the argument to determine which degree of n-gram to return. Using `n = 1` returns unigrams, `n = 2` bigrams, `n = 3` gives trigrams, and so on. Related to `n` is the `n_min` argument, which specifies the minimum number of n-grams to include. By default both `n` and `n_min` are set to 3 making `tokenize_ngrams()` return only trigrams. By setting `n = 3` and `n_min = 1`, we will get all unigrams, bigrams, and trigrams of a text. Lastly, we have the `ngram_delim` argument, which specifies the separator between words in the n-grams; notice that this defaults to a space. 
 
-Let's look at the result of n-gram tokenization for the first line of "The Fir Tree".
+Let's look at the result of n-gram tokenization for the first line of "The Fir-Tree".
 
 
 ```r
@@ -510,14 +488,13 @@ Now we have 1020 separate paragraphs we can analyze. Similarly, we could go a st
 
 It can be useful to be able to reshape text data to get a different observational unit. As an example, if you wanted to build a sentiment classifier that would classify sentences as hostile or not, then you need to work with and train your model on sentences of text.\index{sentiment classifier} Turning pages or paragraphs into sentences is a necessary step in your workflow.
 
-Let us look at how we can turn `the_fir_tree` from a "one line per element" vector to a "one sentence per element". `the_fir_tree` comes as a vector so we start by using `paste()` to combine the lines back together. We use a space as the separator and then we pass it to the `tokenize_sentences()` function from the tokenizers package which will perform sentence splitting. 
+Let us look at how we can turn `the_fir_tree` from a "one line per element" vector to a "one sentence per element". `the_fir_tree` comes as a vector so we start by using `paste()` to combine the lines back together. We use a space as the separator, and then we pass it to the `tokenize_sentences()` function from the **tokenizers** package, which will perform sentence splitting. 
 
 
 ```r
 the_fir_tree_sentences <- the_fir_tree %>%
   paste(collapse = " ") %>%
   tokenize_sentences()
-
 
 head(the_fir_tree_sentences[[1]])
 ```
@@ -559,9 +536,9 @@ Tokenization will generally be one of the first steps when building a model or a
 
 While the defaults work well in many cases, we encounter situations where we want to impose stricter rules to get better or different tokenized results. Consider the following sentence.
 
-> "Don't forget you owe the bank $1 million for the house." 
+> Don't forget you owe the bank $1 million for the house.
 
-This sentence has several interesting aspects which we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in `"Don't"` which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into `"do"` and `"n't"`. 
+This sentence has several interesting aspects that we need to decide whether to keep or to ignore when tokenizing. The first issue is the contraction in `"Don't"`, which presents us with several possible options. The fastest option is to keep this as one word, but it could also be split up into `"do"` and `"n't"`. 
 
 \index{tokenization!punctuation}The next issue at hand is how to deal with `"$1"`; the dollar sign is an important part of this sentence as it denotes a kind of currency. We could either remove or keep this punctuation symbol, and if we keep the dollar sign, we can choose between keeping one or two tokens, `"$1"` or `"$"` and `"1"`. If we look at the default for `tokenize_words()`, we notice that it defaults to removing most punctuation including \$.
 
@@ -589,9 +566,9 @@ tokenize_words("$1", strip_punct = FALSE)
 
 When dealing with this sentence, we also need to decide whether to keep the final period as a token or not. If we remove it, we will not be able to locate the last word in a sentence using n-grams.
 
-\index{preprocessing!challenges}Information lost to tokenization (especially default tokenization) occurs more frequently in online and more casual text. Multiple spaces, extreme use of exclamation characters, and deliberate use of capitalization can be completely lost depending on our choice of tokenizer and tokenization parameters. At the same time, it is not always worth keeping that kind of information about how text is being used. If we are studying trends in disease epidemics using Twitter data, the style the tweets are written with is likely not nearly as important as what words are used. However, if we are trying to model social groupings, language style and how individuals use language toward each other becomes much more important.
+\index{preprocessing!challenges}Information lost to tokenization (especially default tokenization) occurs more frequently in online and more casual text. Multiple spaces, extreme use of exclamation characters, and deliberate use of capitalization can be completely lost depending on our choice of tokenizer and tokenization parameters. At the same time, it is not always worth keeping that kind of information about how text is being used. If we are studying trends in disease epidemics using Twitter data, the style the tweets are written in is likely not nearly as important as what words are used. However, if we are trying to model social groupings, language style and how individuals use language toward each other becomes much more important.
 
-Another thing to consider is the degree of compression each type of tokenization provides. The choice of tokenization results in a different pool of possible tokens, and can influence performance. By choosing a method that gives fewer possible tokens you allow later computational tasks to be performed faster. However, that comes with the risk of collapsing together categories of a different meaning. It is also worth noting that the spread of the number of different tokens varies with your choice of tokenizer. 
+Another thing to consider is the degree of compression each type of tokenization provides. The choice of tokenization results in a different pool of possible tokens and can influence performance. By choosing a method that gives fewer possible tokens you allow later computational tasks to be performed faster. However, that comes with the risk of collapsing together categories of a different meaning. It is also worth noting that the spread of the number of different tokens varies with your choice of tokenizer. 
 
 Figure \@ref(fig:tokendists) illustrates these points. Each of the fairy tales from **hcandersenr** has been tokenized in five different ways and the number of distinct tokens has been plotted along the x-axis (note that the x-axis is logarithmic). We see that the number of distinct tokens decreases if we convert words to lowercase or extract word stems (see Chapter \@ref(stemming) for more on stemming). Second, notice that the distributions of distinct tokens for character tokenizers are quite narrow; these texts use all or most of the letters in the English alphabet.
 
@@ -613,7 +590,7 @@ The number and complexity of our rules are determined by our desired outcome. We
 
 ### Tokenize to characters, only keeping letters
 
-Here we want to modify what `tokenize_characters()` does such that we only keep letters. There are two main options. We can use `tokenize_characters()` and remove anything that is not a letter, or we can extract the letters one by one. Let's try the latter option. This is an **extract** task and we will use `str_extract_all()` as each string has the possibility of including more than 1 token. Since we want to extract letters we can use the letters character class `[:alpha:]` to match letters and the quantifier `{1}` to only extract the first one. 
+Here we want to modify what `tokenize_characters()` does, such that we only keep letters. There are two main options. We can use `tokenize_characters()` and remove anything that is not a letter, or we can extract the letters one by one. Let's try the latter option. This is an **extract** task, and we will use `str_extract_all()` as each string has the possibility of including more than one token. Since we want to extract letters we can use the letters character class `[:alpha:]` to match letters and the quantifier `{1}` to only extract the first one. 
 
 <div class="rmdnote">
 <p>In this example, leaving out the quantifier yields the same result as including it. However, for more complex regular expressions, specifying the quantifier allows the string handling to run faster.</p>
@@ -667,7 +644,7 @@ str_extract_all(danish_sentence, "[a-zA-Z]")
 
 In our examples so far, we have noticed that the string "fir-tree" is typically split into two tokens. Let's explore two different approaches for how to handle this hyphenated word as one token. First, let's split on white space; this is a decent way to identify words in English and some other languages, and it does not split hyphenated words as the hyphen character isn't considered a white-space. \index{regex}Second, let's find a regex to match words with a hyphen and extract those.
 
-Splitting by white-space is not too difficult because we can use character classes, as shown in Table \@ref(tab:characterclasses). We will use the white space character class `[:space:]` to split our sentence.
+Splitting by white space is not too difficult because we can use character classes, as shown in Table \@ref(tab:characterclasses). We will use the white space character class `[:space:]` to split our sentence.
 
 
 ```r
@@ -694,9 +671,9 @@ str_split("This isn't a sentence with hyphenated-words.", "[:space:]") %>%
 #> [5] "with"             "hyphenated-words"
 ```
 
-This regex used to remove the punctuation is a little complicated so let's discuss it, piece by piece. 
+This regex used to remove the punctuation is a little complicated, so let's discuss it piece by piece. 
 
-- The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`) where it will select one or more (`+`). 
+- The regex `^[:punct:]+` will look at the beginning of the string (`^`) to match any punctuation characters (`[:punct:]`), where it will select one or more (`+`). 
 
 - The other regex `[:punct:]+$` will look for punctuation characters (`[:punct:]`) that appear one or more times (`+`) at the end of the string (`$`). 
 
@@ -737,7 +714,7 @@ str_extract_all(
 #> [5] "hyphenated-words"
 ```
 
-Now we are getting more words, but the ending of `"isn't"` isn't there anymore and we lost the word `"a"`. We can get matches for the whole contraction by expanding the character class `[:alpha:]` to include the character `'`. We do that by using `[[:alpha:]']`.
+Now we are getting more words, but the ending of `"isn't"` is not there anymore and we lost the word `"a"`. We can get matches for the whole contraction by expanding the character class `[:alpha:]` to include the character `'`. We do that by using `[[:alpha:]']`.
 
 
 ```r
@@ -753,7 +730,7 @@ str_extract_all(
 #> [5] "hyphenated-words"
 ```
 
-Next, we need to find out why `"a"` wasn't matched. If we look at the regular expression, we remember that we imposed the restriction that a non-zero number of characters needed to surround the hyphen to avoid matching words that start or end with a hyphen. This means that the smallest possible pattern matched is 2 characters long. We can fix this by using an alternation with `|`. We will keep our previous match on the left-hand side, and include `[:alpha:]{1}` on the right-hand side to match the single length words that won't be picked up by the left-hand side. Notice how we aren't using `[[:alpha:]']` since we are not interested in matching single `'` characters.
+Next, we need to find out why `"a"` wasn't matched. If we look at the regular expression, we remember that we imposed the restriction that a non-zero number of characters needed to surround the hyphen to avoid matching words that start or end with a hyphen. This means that the smallest possible pattern matched is two characters long. We can fix this by using an alternation with `|`. We will keep our previous match on the left-hand side, and include `[:alpha:]{1}` on the right-hand side to match the single length words that won't be picked up by the left-hand side. Notice how we aren't using `[[:alpha:]']` since we are not interested in matching single `'` characters.
 
 
 ```r
@@ -848,7 +825,7 @@ We can use `paste0()` in this function to construct an actual regex\index{regex}
 One of these languages is Chinese where each "word" can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called "word segmentation"\index{word segmentation} and is still an active area of research [@ma-etal-2018-state; @Huang2019].
 
-We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package [@R-jiebaR]. It is conceptually similar to the tokenizers package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
+We are not going to go into depth in this area, but we want to showcase that word segmentation is indeed possible with R as well. We use the **jiebaR** package [@R-jiebaR]. It is conceptually similar to the **tokenizers** package, but we need to create a worker that is passed into `segment()` along with the string we want to segment.
 
 
 ```r
@@ -870,7 +847,7 @@ segment(words, engine1)
 
 ## Tokenization benchmark
 
-Not all tokenization packages are the same. Most open source tokenizers in R are well-designed but they are designed to serve different purposes. Some have a multitude of arguments to allow you to customize your tokenizer for greater flexibility, but this flexibility comes at a price; they tend to have relatively slower performance. 
+Not all tokenization packages are the same. Most open-source tokenizers in R are well-designed, but they are designed to serve different purposes. Some have a multitude of arguments to allow you to customize your tokenizer for greater flexibility, but this flexibility comes at a price; they tend to have relatively slower performance. 
 
 While we can't easily quantify flexibility, it is straightforward to benchmark some of the tokenizers\index{tokenization!package} available in R so you can pick the one that best suits your needs.
 
@@ -889,18 +866,18 @@ bench::mark(check = FALSE, iterations = 10,
 #> # A tibble: 5 x 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus        102ms    104ms      9.62    4.59MB    0    
-#> 2 tokenizers    125ms    127ms      7.81    1.01MB    0.868
-#> 3 text2vec      104ms    107ms      9.16   20.64MB    1.02 
-#> 4 quanteda      192ms    195ms      5.11     8.7MB    1.28 
-#> 5 base R        413ms    415ms      2.41   10.51MB    1.03
+#> 1 corpus        118ms    128ms      7.76    4.59MB    0.863
+#> 2 tokenizers    151ms    154ms      6.48    1.01MB    1.62 
+#> 3 text2vec      130ms    134ms      7.33   20.64MB    0.815
+#> 4 quanteda      241ms    243ms      4.11     8.7MB    2.74 
+#> 5 base R        471ms    499ms      2.02   10.51MB    0.505
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.
 
 ## Summary {#tokensummary}
 
-To build a predictive model, text data needs to be split into meaningful units, called tokens. These tokens range from individual characters to words to n-grams and even more complex structures, and the particular procedure used to identify tokens from text can be important to your results. Fast and consistent tokenizers are available, but understanding how they behave and in what circumstances they work best will set you up for success. It's also possible to build custom tokenizers when necessary. Once text data is tokenized, a common next preprocessing step is to consider how to handle very common words that are not very informative, stop words. Chapter \@ref(stopwords) examines this in detail.
+To build a predictive model, text data needs to be split into meaningful units, called tokens. These tokens range from individual characters to words to n-grams and even more complex structures, and the particular procedure used to identify tokens from text can be important to your results. Fast and consistent tokenizers are available, but understanding how they behave and in what circumstances they work best will set you up for success. It's also possible to build custom tokenizers when necessary. Once text data is tokenized, a common next preprocessing step is to consider how to handle very common words that are not very informative— stop words. Chapter \@ref(stopwords) examines this in detail.
 
 ### In this chapter, you learned:
 

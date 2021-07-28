@@ -1,6 +1,6 @@
 # Baseline linear classifier {#appendixbaseline}
 
-In Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn) we demonstrate in detail how to train and evaluate different kinds of deep learning classifiers for the Kickstarter data set of campaign blurbs and whether each campaign was successful or not. This Appendix shows a baseline linear classification model for this data set using machine learning techniques like those used in Chapters \@ref(mlregression) and \@ref(mlclassification). It serves the purpose of comparison with the deep learning techniques, and also as a succinct summary of a basic supervised machine learning analysis for text.
+In Chapters \@ref(dldnn), \@ref(dllstm), and \@ref(dlcnn) we demonstrate in detail how to train and evaluate different kinds of deep learning classifiers for the Kickstarter data set of campaign blurbs and whether each campaign was successful or not. This appendix shows a baseline linear classification model for this data set using machine learning techniques like those used in Chapters \@ref(mlregression) and \@ref(mlclassification). It serves the purpose of comparison with the deep learning techniques, and also as a succinct summary of a basic supervised machine learning analysis for text.
 
 This machine learning analysis is presented with only minimal narrative; see Chapters \@ref(mlregression) and \@ref(mlclassification) for more explanation and details.
 

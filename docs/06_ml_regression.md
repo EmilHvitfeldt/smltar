@@ -61,11 +61,11 @@ scotus_filtered %>%
 <p class="caption">(\#fig:scotushist)Supreme Court opinions per decade in sample</p>
 </div>
 
-This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the foreword to these chapters, and we will need to account for that in choosing a model and understanding our results.
+This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the overview to these chapters, and we will need to account for that in choosing a model and understanding our results.
 
 ### Building our first regression model {#firstregression}
 
-Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the ranger package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
+Our first step in building a model is to split our data into training and testing sets. We use functions from **tidymodels** for this; we use `initial_split()` to set up *how* to split the data, and then we use the functions `training()` and `testing()` to create the data sets we need. Let's also convert the year to a numeric value since it was originally stored as a character, and remove the `'` character because of its effect on one of the models^[The random forest implementation in the **ranger** package, demonstrated in Section \@ref(comparerf), does not handle special characters in columns names well.] we want to try out.
 
 
 ```r
@@ -255,7 +255,7 @@ Here we see words like "ought" and "therefore".
 One option for evaluating our model is to predict one time on the testing set to measure performance. 
 
 <div class="rmdwarning">
-<p>The testing set is extremely valuable data, however, and in real world situations, we advise that you only use this precious resource one time (or at most, twice).</p>
+<p>The testing set is extremely valuable data, however, and in real-world situations, we advise that you only use this precious resource one time (or at most, twice).</p>
 </div>
 
 The purpose of the testing data is to estimate how your final model will perform on new data; we set aside a proportion of the data available and pretend that it is not available to us for training the model so we can use it to estimate model performance on strictly out-of-sample data. Often during the process of modeling, we want to compare models or different model parameters. If we use the test set for these kinds of tasks, we risk fooling ourselves that we are doing better than we really are.
@@ -268,9 +268,7 @@ What are we to do, then, if we want to train multiple models and find the best o
 
 Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
 
-<div class="rmdpackage">
-<p>In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong> <span class="citation">[@R-rsample]</span>.</p>
-</div>
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the package for data splitting and resampling is **rsample** [@R-rsample].</div>\EndKnitrBlock{rmdpackage}
 
 Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
@@ -358,7 +356,7 @@ The default performance metrics to be computed for regression models are RMSE (r
 <div class="rmdnote">
 <p>RSME and <span class="math inline">\(R^2\)</span> are performance metrics used for regression models.</p>
 <p>RSME is a measure of the difference between the predicted and observed values; if the model fits the data well, RMSE is lower. To compute RMSE, you take the mean values of the squared difference between the predicted and observed values, then take the square root.</p>
-<p><span class="math inline">\(R^2\)</span> is the squared correlation between the predicted and observed values. When the model fits the data well, the predicted and observed values are closer together with a higher correlation between them. The correlation between two variables is bounded between -1 and 1, so the closer <span class="math inline">\(R^2\)</span> is to one, the better.</p>
+<p><span class="math inline">\(R^2\)</span> is the squared correlation between the predicted and observed values. When the model fits the data well, the predicted and observed values are closer together with a higher correlation between them. The correlation between two variables is bounded between −1 and 1, so the closer <span class="math inline">\(R^2\)</span> is to one, the better.</p>
 </div>
 
 These values are quantitative estimates for how well our model performed, and can be compared across different kinds of models. Figure \@ref(fig:firstregpredict) shows the predicted years for these Supreme Court opinions plotted against the true years when they were published, for all the resampled data sets.
@@ -392,9 +390,9 @@ The average spread of points in this plot above and below the dashed line corres
 
 ## Compare to the null model {#regnull}
 
-One way to assess a model like this one is to compare its performance to a "null model."
+One way to assess a model like this one is to compare its performance to a "null model".
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)^[This is sometimes called a "baseline model."].</div>\EndKnitrBlock{rmdnote}
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">A null model is a simple, non-informative model that always predicts the largest class (for classification) or the mean (such as the mean year of Supreme Court opinions, in our specific regression case)^[This is sometimes called a "baseline model".].</div>\EndKnitrBlock{rmdnote}
 
 We can use the same function `fit_resamples()` and the same preprocessing recipe as before, switching out our SVM model specification for the `null_model()` specification.
 
@@ -534,7 +532,7 @@ It is very common to run into problems when using tree-based models like random 
 <p>Models that work best with text tend to be models designed for or otherwise appropriate for sparse data.</p>
 </div>
 
-Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation such as with word embeddings (Chapter \@ref(embeddings)).
+Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation, such as with word embeddings (Chapter \@ref(embeddings)).
 
 ## Case study: removing stop words {#casestudystopwords}
 
@@ -602,9 +600,9 @@ svm_wf
 #> Computational engine: LiblineaR
 ```
 
-Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same linear SVM specification that we used in Section \@ref(firstmlregression) but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
+Notice that for this workflow, there is no preprocessor yet: `Preprocessor: None`. This workflow uses the same linear SVM specification that we used in Section \@ref(firstmlregression), but we are going to combine several different preprocessing recipes with it, one for each stop word lexicon we want to try.
 
-Now we can put this all together and fit these models which include stop word removal. We could create a little helper function for fitting like we did for the recipe, but we have printed out all three calls to `fit_resamples()` for extra clarity. Notice for each one that there are two arguments:
+Now we can put this all together and fit these models that include stop word removal. We could create a little helper function for fitting like we did for the recipe, but we have printed out all three calls to `fit_resamples()` for extra clarity. Notice for each one that there are two arguments:
 
 - A workflow, which consists of the linear SVM model specification and a data preprocessing recipe with stop word removal
 
@@ -682,13 +680,13 @@ The \index{stop word lists!Snowball}Snowball lexicon contains the smallest numbe
 <p>This result is not generalizable to all data sets and contexts, but the approach outlined in this section <strong>is</strong> generalizable.</p>
 </div>
 
-This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results all stop word lexicons are worse than removing no stopwords at all (remember that the RMSE was 15.6 years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
+This approach can be used to compare different lexicons and find the best one for a specific data set and model. Notice how the results for all stop word lexicons are worse than removing no stop words at all (remember that the RMSE was 15.6 years in Section \@ref(firstregressionevaluation)). This indicates that, for this particular data set, removing even a small stop word list is not a great choice.
 
 When removing stop words does appear to help a model, it's good to know that removing stop words isn't computationally slow or difficult so the cost for this improvement is low.\index{computational speed}
 
 ## Case study: varying n-grams {#casestudyngrams}
 
-Each model trained so far in this chapter has involved single words or _unigrams_, but using \index{tokenization!n-gram}n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher order n-grams) capture concepts that span single words, as well as effects from word order, that can be predictive.
+Each model trained so far in this chapter has involved single words or _unigrams_, but using \index{tokenization!n-gram}n-grams (Section \@ref(tokenizingngrams)) can integrate different kinds of information into a model. Bigrams and trigrams (or even higher-order n-grams) capture concepts that span single words, as well as effects from word order, that can be predictive.
 
 This is another part of data preprocessing\index{preprocessing}, so we again define this step as part of our preprocessing recipe. Let's build another small recipe wrapper helper function so we can pass a list of options `ngram_options` to `step_tokenize()`. We'll use it with the same model as the previous section.
 
@@ -849,9 +847,11 @@ Table: (\#tab:lemmatb)Lemmatization of one sentence from a Supreme Court opinion
 
 Notice several things about lemmatization\index{lemma} that are different from the kind of default tokenization (Chapter \@ref(tokenization)) you may be more familiar with.
 
-- Words are converted to lower case except for proper nouns.
+- Words are converted to lowercase except for proper nouns.
 
 - The lemma for pronouns is `-PRON-`.
+
+- Words are converted from their existing form in the text to their canonical roots, like "disagree" and "conclude".
 
 - Irregular verbs are converted to their canonical form ("did" to "do").
 
@@ -922,10 +922,10 @@ collect_metrics(lemma_rs)
 #> 2 rsq     standard    0.913    10 0.00304 Preprocessor1_Model1
 ```
 
-The best value for RMSE at 14.2 shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over tenfold.\index{computational speed}
+The best value for RMSE at 14.2 shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over 10-fold.\index{computational speed}
 
 <div class="rmdnote">
-<p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part-of-speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
+<p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
 </div>
 \index{part of speech}
 
@@ -942,13 +942,13 @@ This method addresses many of the challenges outlined above and is very fast wit
 
 Let's start with the basics of feature hashing.\index{hashing function}
 First proposed by @Weinberger2009, feature hashing was introduced as a dimensionality reduction method with a simple premise.
-We begin with a hashing function which we then apply to our tokens.
+We begin with a hashing function that we then apply to our tokens.
 
 <div class="rmdwarning">
 <p>A hashing function takes input of variable size and maps it to output of a fixed size. Hashing functions are commonly used in cryptography.</p>
 </div>
 
-We will use the `hash()` function from the **rlang** package package to illustrate the behavior of hashing functions.
+We will use the `hash()` function from the **rlang** package to illustrate the behavior of hashing functions.
 The `rlang::hash()` function uses the XXH128 hash algorithm of the xxHash library, which generates a 128-bit hash. This is a more complex hashing function than what is normally used for the hashing trick. The 32-bit version of MurmurHash3 [@appleby2008] is often used for its speed and good properties.
 
 <div class="rmdnote">
@@ -979,7 +979,7 @@ map_int(countries, small_hash)
 #>  [8]  15112074  96146649 192775182
 ```
 
-Our `small_hash()` function uses `7 * 4 = 28` bits, so the number of possible values is `2^28 = 268435456`. This is admittedly not much of an improvement over ten country names.
+Our `small_hash()` function uses `7 * 4 = 28` bits, so the number of possible values is `2^28 = 268435456`. This is admittedly not much of an improvement over 10 country names.
 Let's take the modulo of these big integer values to project them down to a more manageable space.
 
 
@@ -1011,11 +1011,11 @@ Now we can use these values as indices when creating a matrix.\index{matrix!spar
 
 This method is very fast\index{computational speed}; both the hashing and modulo can be performed independently for each input since neither need information about the full corpus.
 Since we are reducing the space, there is a chance that multiple words are hashed to the same value.
-This is called a collision and at first glance, it seems like it would be a big problem for a model.
-However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model and the effect of collisions is quite minor [@Forman2008].
+This is called a collision and, at first glance, it seems like it would be a big problem for a model.
+However, research finds that using feature hashing has roughly the same accuracy as a simple bag-of-words model, and the effect of collisions is quite minor [@Forman2008].
 
 <div class="rmdnote">
-<p>Another step that is taken to avoid the negative effects of hash collisions is to use a <em>second</em> hashing function that returns 1 and -1. This determines if we are adding or subtracting the index we get from the first hashing function. Suppose both the words “outdoor” and “pleasant” hash to the integer value 583. Without the second hashing they would collide to 2. Using signed hashing, we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.</p>
+<p>Another step that is taken to avoid the negative effects of hash collisions is to use a <em>second</em> hashing function that returns 1 and −1. This determines if we are adding or subtracting the index we get from the first hashin function. Suppose both the words “outdoor” and “pleasant” hash to the integer value 583. Without the second hashing they would collide to 2. Using signed hashing, we have a 50% chance that they will cancel each other out, which tries to stop one feature from growing too much.</p>
 </div>
 
 There are downsides to using feature hashing.\index{hashing function}\index{hashing function!challenges} Feature hashing:
@@ -1024,9 +1024,9 @@ There are downsides to using feature hashing.\index{hashing function}\index{hash
 
 - cannot be reversed.
 
-The number of buckets you have correlates with computation speed and collision rate which in turn affects performance. 
+The number of buckets you have correlates with computation speed and collision rate, which in turn affects performance. 
 It is your job to find the output that best suits your needs.
-Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data set which increases model fitting time. 
+Increasing the number of buckets will decrease the collision rate but will, in turn, return a larger output data set, which increases model fitting time. 
 The number of buckets is tunable in tidymodels using the **tune** package.
 
 Perhaps the more important downside to using feature hashing is that the operation can't be reversed. 
@@ -1053,7 +1053,7 @@ dim(scotus_hash)
 #> [1] 7500  513
 ```
 
-There are many columns in the results. Let's take a `glimpse()` at the first ten columns.
+There are many columns in the results. Let's take a `glimpse()` at the first 10 columns.
 
 
 ```r
@@ -1083,10 +1083,10 @@ This typically results in a slight loss of performance compared to using a tradi
 
 \index{preprocessing!challenges}When working with text, you will inevitably run into problems with encodings and related irregularities.
 These kinds of problems have a significant influence on feature hashing\index{hashing function}, as well as other preprocessing steps.
-Consider the German word "schön."\index{language!Non-English}
-The o with an umlaut (two dots over it) is a fairly simple character but it can be represented in a couple of different ways.
+Consider the German word "schön".\index{language!Non-English}
+The o with an umlaut (two dots over it) is a fairly simple character, but it can be represented in a couple of different ways.
 We can either use a single character [\\U00f6](https://www.fileformat.info/info/unicode/char/00f6/index.htm) to represent the letter with an umlaut. 
-Alternatively, we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm)
+Alternatively, we can use two characters, one for the o and one character to denote the presence of two dots over the previous character [\\U0308](https://www.fileformat.info/info/unicode/char/0308/index.htm).
 
 
 ```r
@@ -1124,7 +1124,7 @@ s1 == s2
 #> [1] FALSE
 ```
 
-This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will results in these two words (which should be identical) hashing to completely different values.
+This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will result in these two words (which should be identical) hashing to completely different values.
 
 
 ```r
@@ -1145,7 +1145,7 @@ small_hash(s2)
 
 We can deal with this problem by performing **text normalization** on our text before feeding it into our preprocessing\index{preprocessing} engine.
 One library to perform text normalization is the **stringi** package, which includes many different text normalization methods.
-How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön"\index{language!Non-English} equivalent. We will use `stri_trans_nfc()` for this example, which performs Canonical Decomposition, followed by Canonical Composition, but we could also use `textrecipes::step_text_normalize()` within a tidymodels recipe for the same task.
+How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of "schön"\index{language!Non-English} equivalent. We will use `stri_trans_nfc()` for this example, which performs canonical decomposition, followed by canonical composition, but we could also use `textrecipes::step_text_normalize()` within a tidymodels recipe for the same task.
 
 
 ```r
@@ -1298,7 +1298,7 @@ We will include a much larger number of tokens than before, which should give us
 
 First, let's create the data preprocessing recipe. By setting the tokenization options to `list(n = 2, n_min = 1)`, we will include both unigrams and bigrams in our model. 
 
-When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value. Before we set `max_tokens = 1e3` to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.
+When we set `max_tokens = tune()`, we can train multiple models with different numbers of maximum tokens and then compare these models' performance to choose the best value. Previously, we set `max_tokens = 1e3` to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.
 
 
 ```r
@@ -1581,13 +1581,13 @@ scotus_fit %>%
 <p class="caption">(\#fig:scotusvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
 </div>
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years and those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years; those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
 
 <div class="rmdnote">
 <p>Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.</p>
 </div>
 
-We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the foreword to these chapters; these differences can lead to unfairness and algorithmic bias\index{bias} when models are applied in the real world.
+We can also examine how the true and predicted years compare for the testing set. Figure \@ref(fig:scotusfinalpredvis) shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the overview to these chapters; these differences can lead to unfairness and algorithmic bias\index{bias} when models are applied in the real world.
 
 
 ```r

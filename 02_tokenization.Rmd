@@ -7,7 +7,7 @@ knit_hooks$set(output = function(x, options) {
   if (!is.null(n <- options$linewidth)) {
     x = knitr:::split_lines(x)
     # any lines wider than n should be wrapped
-    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = strwrap(x, width = n)
     x = paste(x, collapse = '\n')
   }
   hook_output(x, options)
@@ -174,28 +174,6 @@ tokenize_characters(x = the_fir_tree,
 ```
 
 The results have more elements because the spaces and punctuation have not been removed.
-
-Sometimes you run into challenges where what a "character" is can be ambiguous. Newcomers in terms of characters are emojis, and they can be complex.\index{tokenization!emojis} Let's consider the flag emoji. As of the time of writing, 261 different flags have emoji representation. These emojis don't have individual Unicode characters, though, but are represented as a character plus a _modifier_.  The Canadian flag combines "REGIONAL INDICATOR SYMBOLS" ["C"](https://codepoints.net/U+1F1E8?lang=en) and ["A"](https://codepoints.net/U+1F1E6?lang=en). The same approach is used with the job emojis and gender modifiers, and general emojis with hairstyle modifiers, hair color modifiers, and skin tone modifiers^[Full list of emoji modifiers here: https://unicode.org/emoji/charts/full-emoji-modifiers.html].  
-
-How does the tokenizer we have been using handle flag emojis?
-
-```{r, eval=!knitr:::is_html_output(), echo=FALSE, out.width="100%"}
-knitr::include_graphics("images/tokenization-emoji.png")
-```
-
-```{r, eval=!knitr:::is_html_output(), echo=FALSE}
-flags <- "🇨🇦🇦🇶🇪🇺🇯🇵"
-
-tokenize_characters(flags)
-```
-
-```{r, eval=knitr:::is_html_output(), echo=knitr:::is_html_output()}
-flags <- "🇨🇦🇦🇶🇪🇺🇯🇵"
-
-tokenize_characters(flags)
-```
-
-In this case, the flag emojis are each treated as one token. There is a lot of information packed into emojis, and it is useful to remember to check that your tokenizer is treating them the way you would expect.
 
 Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
 
@@ -379,7 +357,6 @@ Let us look at how we can turn `the_fir_tree` from a "one line per element" vect
 the_fir_tree_sentences <- the_fir_tree %>%
   paste(collapse = " ") %>%
   tokenize_sentences()
-
 
 head(the_fir_tree_sentences[[1]])
 ```
