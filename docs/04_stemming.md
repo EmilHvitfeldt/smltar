@@ -1,5 +1,8 @@
 # Stemming {#stemming}
 
+
+
+
 When we deal with text, often documents contain different versions of one base word, often called a *stem*. "The Fir-Tree", for example, contains more than one version (i.e., inflected form) of the word `"tree"`.
 
 
@@ -30,7 +33,7 @@ tidy_fir_tree %>%
 #> 3 tree's     1
 ```
 
-Trees, we see once again, are important in this story; the singular form appears 76 times and the plural form appears twelve times. (We'll come back to how we might handle the apostrophe in `"tree's"` later in this chapter.)
+Trees, we see once again, are important in this story; the singular form appears 76 times and the plural form appears 12 times. (We'll come back to how we might handle the apostrophe in `"tree's"` later in this chapter.)
 
 What if we aren't interested in the difference between `"trees"` and `"tree"` \index{singular versus plural}and we want to treat both together? That idea is at the heart of *stemming*, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology\index{morphology}, how words are formed. In this example, `"trees"` would lose its letter `"s"` while `"tree"` stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem `"tree"` (89, if we also find the stem for `"tree's"`).
 
@@ -66,7 +69,7 @@ tidy_fir_tree %>%
 
 Take a look at those stems. Notice that we do now have 88 incidences of `"tree"`. Also notice that some words don't look like they are spelled as real words; this is normal and expected with this stemming algorithm. The Porter algorithm identifies the stem of both `"story"` and `"stories"` as `"stori"`, not a regular English word but instead a special stem object.
 
-\BeginKnitrBlock{rmdnote}<div class="rmdnote">If you want to tokenize *and* stem your text data, you can try out the function `tokenize_word_stems()` from the tokenizers package, which implements Porter stemming just like what we demonstrated here. For more on tokenization, see Chapter \@ref(tokenization).
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">If you want to tokenize *and* stem your text data, you can try out the function `tokenize_word_stems()` from the **tokenizers** package, which implements Porter stemming just as we demonstrated here. For more on tokenization, see Chapter \@ref(tokenization).
 </div>\EndKnitrBlock{rmdnote}
 
 Does Porter stemming\index{stemming algorithm!Porter} only work for English? Far from it! We can use the `language` argument to implement Porter stemming in multiple languages.\index{language!Non-English} First we can tokenize the text and `nest()` into list-columns.
@@ -88,7 +91,7 @@ tidy_by_lang <- hca_fairytales() %>%
   nest(data = word)
 ```
 
-Then we can remove stop words (using `get_stopwords(language = "da")` and similar for each language) and stem with the language-specific Porter algorithm. What are the top 20 stems for "The Fir-Tree" in each of these five languages, after removing the Snowball stop words\index{stop word lists!Snowball} for that language?
+Then we can remove stop words (using `get_stopwords(language = "da")` and similar for each language) and stem with the language-specific Porter algorithm. What are the top-20 stems for "The Fir-Tree" in each of these five languages, after removing the Snowball stop words\index{stop word lists!Snowball} for that language?
 
 
 ```r
@@ -114,7 +117,7 @@ tidy_by_lang %>%
 <p class="caption">(\#fig:porterlanguages)Porter stemming results in five languages</p>
 </div>
 
-Figure \@ref(fig:porterlanguages) demonstrates some of the challenges in working with languages other English\index{preprocessing!challenges}\index{language!Non-English}; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.
+Figure \@ref(fig:porterlanguages) demonstrates some of the challenges in working with languages other than English\index{preprocessing!challenges}\index{language!Non-English}; the stop word lists may not be even from language to language, and tokenization strategies that work for a language like English may struggle for a language like French with more stop word contractions. Given that, we see here words about little fir trees at the top for all languages, in their stemmed forms.
 
 \index{stemming algorithm!Porter}The Porter stemmer is an algorithm that starts with a word and ends up with a single stem, but that's not the only kind of stemmer out there. Another class of stemmer are dictionary-based stemmers. One such stemmer is the stemming algorithm of the [Hunspell](http://hunspell.github.io/) library.\index{stemming algorithm!Hunspell} The "Hun" in Hunspell stands for Hungarian; this set of NLP algorithms was originally written to handle Hungarian but has since been extended to handle many languages with compound words and complicated morphology.\index{language!Non-English} The Hunspell library is used mostly as a spell checker, but as part of identifying correct spellings, this library identifies word stems as well. You can use the Hunspell library from R via the **hunspell** [@R-hunspell] package.
 
@@ -198,7 +201,7 @@ There are 167,879 distinct words in this data set we have created (after removin
 
 
 ```r
-tidy_scotus %>%
+tidy_scotus %>% 
   count(case_name, word) %>%
   cast_dfm(case_name, word, n)
 ```
@@ -213,7 +216,7 @@ What if instead we use stemming as a preprocessing step here?
 
 
 ```r
-tidy_scotus %>%
+tidy_scotus %>%  
   mutate(stem = wordStem(word)) %>%
   count(case_name, stem) %>%
   cast_dfm(case_name, stem, n)
@@ -283,7 +286,7 @@ This algorithm was first published in @Porter80 and is still broadly used; read 
 
 ## Handling punctuation when stemming
 
-Punctuation contains information that can be used in text analysis. Punctuation *is* typically less information-dense than the words themselves and thus it is often removed early in a text mining analysis project, but it's worth thinking through the impact of punctuation specifically on stemming. Think about words like `"they're"` and `"child's"`.
+Punctuation contains information that can be used in text analysis. Punctuation *is* typically less information-dense than the words themselves, and thus it is often removed early in a text mining analysis project, but it's worth thinking through the impact of punctuation specifically on stemming. Think about words like `"they're"` and `"child's"`.
 
 \index{preprocessing!challenges}We've already seen how punctuation and stemming can interact with our small example of "The Fir-Tree"; none of the stemming strategies we've discussed so far have recognized `"tree's"` as belonging to the same stem as `"trees"` and `"tree"`.
 
@@ -358,7 +361,7 @@ Let's compare a few simple stemming algorithms and see what results we end with.
 
 - **Handle plural endings with slightly more complex rules in the "S" stemmer.** The S-removal stemmer or "S" stemmer of @Harman91 is a simple algorithm with only three rules.^[This simple, "weak" stemmer is handy to have in your toolkit for many applications. Notice how we implement it here using `dplyr::case_when()`.]
 
-- **Implement actual Porter stemming.** We can now compare to the most commonly used stemming algorithm in English.\index{stemming algorithm!Porter}
+- **Implement actual Porter stemming.** We can now compare to the most commonly-used stemming algorithm in English.\index{stemming algorithm!Porter}
 
 
 ```r
@@ -400,7 +403,7 @@ stemming %>%
 <p class="caption">(\#fig:stemmingresults)Results for three different stemming strategies</p>
 </div>
 
-\index{stemming algorithm!Porter}Porter stemming is the most different from the other two approaches. In the top twenty words here, we don't see a difference between removing only the letter "s" and taking the slightly more sophisticated "S" stemmer approach to plural endings. In what situations *do* we see a difference?
+\index{stemming algorithm!Porter}Porter stemming is the most different from the other two approaches. In the top-20 words here, we don't see a difference between removing only the letter "s" and taking the slightly more sophisticated "S" stemmer approach to plural endings. In what situations *do* we see a difference?
 
 
 ```r
@@ -504,17 +507,17 @@ fir_tree %>%
 <p class="caption">(\#fig:lemmafirtree)Results for lemmatization, rather than stemming</p>
 </div>
 
-Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially if we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!) and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
+Figure \@ref(fig:lemmafirtree) demonstrates how different lemmatization\index{lemmas} is from stemming, especially if we compare to Figure \@ref(fig:stemmingresults). Punctuation characters are treated as tokens (these punctuation tokens can have predictive power for some modeling questions!), and all pronouns are lemmatized to `-PRON-`. We see our familiar friends "tree" and "fir", but notice that we see the normalized version "say" instead of "said", "come" instead of "came", and similar. This transformation to the canonical or dictionary form of words is the goal of lemmatization.
 
 <div class="rmdnote">
-<p>Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book and it takes a lot of computational power. Initializing with <code>entity = FALSE</code> will allow lemmatization to run much faster.</p>
+<p>Why did we need to initialize the spaCy library? You may not need to, but spaCy is a full-featured NLP pipeline that not only tokenizes and identifies lemmas but also performs entity recognition. We will not use entity recognition in modeling or analysis in this book, and it takes a lot of computational power. Initializing with <code>entity = FALSE</code> will allow lemmatization to run much faster.</p>
 </div>
 
 Implementing lemmatization\index{lemmas} is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision)\index{precision} compared to not using lemmatization, but typically less so than stemming.
 
 ## Stemming and stop words
 
-Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you need to remove stop words before stemming text data. For example, the \index{stemming algorithm!Porter}Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly used stop word lexicons.
+Our deep dive into stemming came *after* our chapters on tokenization (Chapter \@ref(tokenization)) and stop words (Chapter \@ref(stopwords)) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you need to remove stop words before stemming text data. For example, the \index{stemming algorithm!Porter}Porter stemming algorithm transforms words like `"themselves"` to `"themselv"`, so stemming first would leave you without the ability to match up to the commonly-used stop word lexicons.
 
 A handy trick is to use the following function on your stop word list to return the words that don't have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.
 
@@ -545,11 +548,11 @@ Here we see that many of the words that are lost are the contractions.
 
 ## Summary {#stemmingsummary}
 
-In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word using rules and heuristics. Stemming reduces the sparsity of text data which can be helpful when training models, but at the cost of throwing information away. Lemmatization is another way to normalize words to a root, based on language structure and how words are used in their context.
+In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word using rules and heuristics. Stemming reduces the sparsity of text data, which can be helpful when training models, but at the cost of throwing information away. Lemmatization is another way to normalize words to a root, based on language structure and how words are used in their context.
 
 ### In this chapter, you learned:
 
-- about the most broadly used stemming algorithms
+- about the most broadly-used stemming algorithms
 
 - how to implement stemming
 

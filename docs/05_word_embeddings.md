@@ -1,5 +1,7 @@
 # Word Embeddings {#embeddings}
 
+
+
 > You shall know a word by the company it keeps.  
 > <footer>--- [John Rupert Firth](https://en.wikiquote.org/wiki/John_Rupert_Firth)</footer>
 
@@ -7,7 +9,7 @@ So far in our discussion of natural language features, we have discussed \index{
 
 ## Motivating embeddings for sparse, high-dimensional data {#motivatingsparse}
 
-What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyse or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), described in Section \@ref(cfpb-complaints), we would start with straightforward word counts. Let's create a sparse matrix\index{matrix!sparse} where the matrix elements are the counts of words in each document.
+What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyze or build a model for consumer complaints to the [United States Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/), described in Section \@ref(cfpb-complaints), we would start with straightforward word counts. Let's create a sparse matrix\index{matrix!sparse}, where the matrix elements are the counts of words in each document.
 
 
 ```r
@@ -26,7 +28,8 @@ complaints %>%
 ```
 
 ```
-#> Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.
+#> Document-feature matrix of: 117,214 documents, 46,099
+features (99.88% sparse) and 0 docvars.
 ```
 
 \index{matrix!sparse}
@@ -34,9 +37,9 @@ complaints %>%
 <p>A <em>sparse matrix</em> is a matrix where most of the elements are zero. When working with text data, we say our data is “sparse” because most documents do not contain most words, resulting in a representation of mostly zeroes. There are special data structures and algorithms for dealing with sparse data that can take advantage of their structure. For example, an array can more efficiently store the locations and values of only the non-zero elements instead of all elements.</p>
 </div>
 
-The data set of consumer complaints used in this book has been filtered to those submitted to the CFPB since 1 January 2019 that include a consumer complaint narrative (i.e., some submitted text).
+The data set of consumer complaints used in this book has been filtered to those submitted to the CFPB since January 1, 2019 that include a consumer complaint narrative (i.e., some submitted text).
 
-Another way to represent our text data is to create a sparse matrix where the elements are weighted, rather than straightforward counts only. The *term frequency*\index{term frequency} of a word is how frequently a word occurs in a document, and the *inverse document frequency*\index{inverse document frequency} of a word decreases the weight for commonly used words and increases the weight for words that are not used often in a collection of documents. It is typically defined as:
+Another way to represent our text data is to create a sparse matrix where the elements are weighted, rather than straightforward counts only. The *term frequency*\index{term frequency} of a word is how frequently a word occurs in a document, and the *inverse document frequency*\index{inverse document frequency} of a word decreases the weight for commonly-used words and increases the weight for words that are not used often in a collection of documents. It is typically defined as:
 
 $$idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}$$
 \index{term frequency-inverse document frequency|see {tf-idf}}
@@ -54,10 +57,11 @@ complaints %>%
 ```
 
 ```
-#> Document-feature matrix of: 117,214 documents, 46,099 features (99.88% sparse) and 0 docvars.
+#> Document-feature matrix of: 117,214 documents, 46,099
+features (99.88% sparse) and 0 docvars.
 ```
 
-Notice that in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries which implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet** [@Friedman2010]. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
+Notice that, in either case, our final data structure is incredibly sparse and of high dimensionality with a huge number of features. Some modeling algorithms and the libraries that implement them can take advantage of the memory characteristics of sparse matrices for better performance; an example of this is regularized regression implemented in **glmnet** [@Friedman2010]. Some modeling algorithms, including tree-based algorithms, do not perform better with sparse input, and then some libraries are not built to take advantage of sparse data structures, even if it would improve performance for those algorithms. We have some computational tools to take advantage of sparsity, but they don't always solve all the problems that come along with big text data sets.
 
 \index{matrix!sparse}
 \index{corpus}
@@ -142,9 +146,9 @@ nested_words
 #> # … with 117,160 more rows
 ```
 
-Next, let’s create a `slide_windows()` function, using the `slide()` function from the **slider** package [@Vaughan2020] which implements fast sliding window computations written in C. Our new function identifies skipgram windows\index{skipgram windows} in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see `word1` and `word2` together within this window? We can calculate probabilities based on when we do or do not.
+Next, let’s create a `slide_windows()` function, using the `slide()` function from the **slider** package [@Vaughan2020] that implements fast sliding window computations written in C. Our new function identifies skipgram windows\index{skipgram windows} in order to calculate the skipgram probabilities, how often we find each word near each other word. We do this by defining a fixed-size moving window that centers around each word. Do we see `word1` and `word2` together within this window? We can calculate probabilities based on when we do or do not.
 
-One of the arguments to this function is the `window_size`, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like ten, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are [@Levy2014]. A smaller window size is also faster to compute.
+One of the arguments to this function is the `window_size`, which determines the size of the sliding window that moves through the text, counting up words that we find within the window. The best choice for this window size depends on your analytical question because it determines what kind of semantic meaning the embeddings capture. A smaller window size, like three or four, focuses on how the word is used and learns what other words are functionally similar. A larger window size, like 10, captures more information about the domain or topic of each word, not constrained by how functionally similar the words are [@Levy2014]. A smaller window size is also faster to compute.
 
 
 ```r
@@ -211,14 +215,14 @@ tidy_pmi
 #> # … with 4,818,392 more rows
 ```
 
-When PMI is high, the two words are associated with each other, likely to occur together. When PMI is low, the two words are not associated with each other, unlikely to occur together.
+When PMI is high, the two words are associated with each other, i.e., likely to occur together. When PMI is low, the two words are not associated with each other, unlikely to occur together.
 
 <div class="rmdwarning">
 <p>The step above used <code>unite()</code>, a function from <strong>tidyr</strong> that pastes multiple columns into one, to make a new column for <code>window_id</code> from the old <code>window_id</code> plus the <code>complaint_id</code>. This new column tells us which combination of window and complaint each word belongs to.</p>
 </div>
 
 We can next determine the word vectors from the PMI values using singular value decomposition (SVD). 
-SVD\index{SVD}\index{singular value decomposition|see {SVD}} is a method for dimensionality reduction via \index{matrix factorization}matrix factorization [@Golub1970] which works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.
+SVD\index{SVD}\index{singular value decomposition|see {SVD}} is a method for dimensionality reduction via \index{matrix factorization}matrix factorization [@Golub1970] that works by taking our data and decomposing it onto special orthogonal axes. The first axis is chosen to capture as much of the variance as possible. Keeping that first axis fixed, the remaining orthogonal axes are rotated to maximize the variance in the second. This is repeated for all the remaining axes.
 
 In our application, we will use SVD to factor the PMI matrix into a set of smaller matrices containing the word embeddings with a size we get to choose. The embedding size is typically chosen to be in the low hundreds. Thus we get a matrix of dimension (`n_vocabulary * n_dim`) instead of dimension (`n_vocabulary * n_vocabulary`), which can be a vast reduction in size for large vocabularies.
 Let's use the `widely_svd()` function in **widyr** [@R-widyr], creating 100-dimensional word embeddings. This matrix factorization is much faster than the previous step of identifying the skipgram windows\index{skipgram windows} and calculating PMI.
@@ -259,7 +263,7 @@ We have now successfully found word embeddings, with clear and understandable co
 
 ## Exploring CFPB word embeddings
 
-Now that we have determined word embeddings for the data set of CFPB complaints, let's explore them and talk about they are used in modeling. We have projected the sparse, high-dimensional set of word features into a more dense, 100-dimensional set of features. 
+Now that we have determined word embeddings for the data set of CFPB complaints, let's explore them and talk about how they are used in modeling. We have projected the sparse, high-dimensional set of word features into a more dense, 100-dimensional set of features. 
 
 <div class="rmdwarn">
 <p>Each word can be represented as a numeric vector in this new feature space. A single word is mapped to only one vector, so be aware that all senses of a word are conflated in word embeddings. Because of this, word embeddings are limited for understanding lexical semantics.</p>
@@ -339,7 +343,7 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
-We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter \@ref(stemming)) but the word embeddings learned that "month", "months", and "monthly" belong together.
+We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter \@ref(stemming)), but the word embeddings learned that "month", "months", and "monthly" belong together.
 
 What words are closest in this embedding space to `"fee"`?
 
@@ -463,7 +467,7 @@ This is a straightforward method for finding and using word embeddings, based on
 \index{embeddings!pre-trained}If your data set is too small, you typically cannot train reliable word embeddings. 
 
 <div class="rmdwarning">
-<p>How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of <em>how</em> words are used in any given data set. However, it may be unreasonable to expect good results with data sets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e. the vocabulary size, but instead about that many observations in the text data.)</p>
+<p>How small is too small? It is hard to make definitive statements because being able to determine useful word embeddings depends on the semantic and pragmatic details of <em>how</em> words are used in any given data set. However, it may be unreasonable to expect good results with data sets smaller than about a million words or tokens. (Here, we do not mean about a million unique tokens, i.e., the vocabulary size, but instead about that many observations in the text data.)</p>
 </div>
 
 In such situations, we can still use word embeddings for feature creation in modeling, just not embeddings that we determine ourselves from our own data set. Instead, we can turn to *pre-trained* word embeddings, such as the GloVe\index{embeddings!GloVe} word vectors trained on six billion tokens from Wikipedia and news sources. Several pre-trained GloVe vector representations are available in R via the **textdata** package [@Hvitfeldt2020]. Let's use `dimensions = 100`, since we trained 100-dimensional word embeddings in the previous section.
@@ -545,7 +549,7 @@ nearest_neighbors <- function(df, token) {
 }
 ```
 
-\index{embeddings!pre-trained}Pre-trained word embeddings are trained on very large, general purpose English language data sets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) \index{embeddings!word2vec}are based on the Google News data set, and commonly used\index{embeddings!GloVe} [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) (what we are using here) and\index{embeddings!FastText} [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to `"error"` in the GloVe embeddings?
+\index{embeddings!pre-trained}Pre-trained word embeddings are trained on very large, general purpose English language data sets. Commonly used [word2vec embeddings](https://code.google.com/archive/p/word2vec/) \index{embeddings!word2vec}are based on the Google News data set, and \index{embeddings!GloVe} [GloVe embeddings](https://nlp.stanford.edu/projects/glove/) (what we are using here) and\index{embeddings!FastText} [FastText embeddings](https://fasttext.cc/docs/en/english-vectors.html) are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to `"error"` in the GloVe embeddings?
 
 
 ```r
@@ -570,7 +574,7 @@ tidy_glove %>%
 #> # … with 399,990 more rows
 ```
 
-Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
+Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
 
 What is closest to the word `"month"` in these pre-trained \index{embeddings!GloVe}GloVe embeddings?\index{embeddings!pre-trained}
 
@@ -660,7 +664,7 @@ dim(doc_matrix)
 #> [1] 117163    100
 ```
 
-Since these GloVe embeddings\index{embeddings!GloVe} had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents which contain only words not included in the GloVe embeddings.
+Since these GloVe embeddings\index{embeddings!GloVe} had the same number of dimensions as the word embeddings we found ourselves (100), we end up with the same number of columns as before but with slightly fewer documents in the data set. We have lost documents that contain only words not included in the GloVe embeddings.
 
 \BeginKnitrBlock{rmdpackage}<div class="rmdpackage">The package **wordsalad** [@R-wordsalad] provides a unified interface for finding different kinds of word vectors from text using pre-trained embeddings. The options include fastText, GloVe, and word2vec.</div>\EndKnitrBlock{rmdpackage}
 
@@ -677,7 +681,7 @@ Perhaps more than any of the other preprocessing steps this book has covered so 
 <p>Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings.</p>
 </div>
 
-This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data) but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
+This is true of all machine learning to some extent (models learn, reproduce, and often amplify whatever biases exist in training data), but this is literally, concretely true of word embeddings. @Caliskan2016 show how the GloVe word embeddings (the same embeddings we used in Section \@ref(glove)) replicate human-like semantic biases.
 
 - Typically Black first names are associated with more unpleasant feelings than typically white first names.
 
@@ -685,7 +689,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 
 - Terms associated with women are more associated with the arts and terms associated with men are more associated with science.
 
-\index{preprocessing!challenges}Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/) but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034). @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
+\index{preprocessing!challenges}Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/), but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034). @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
 Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of Wikipedia, but Wikipedia [itself has problems with, for example, gender bias]((https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia)). Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
@@ -697,11 +701,11 @@ Remember that word embeddings are *learned* or trained from some large data set 
 
 When embeddings with these kinds of stereotypes are used as a preprocessing step in training a predictive model, the final model can exhibit racist, sexist, or otherwise biased characteristics. @Speer2017 demonstrated how using pre-trained word embeddings\index{embeddings, pre-trained} to train a straightforward sentiment analysis model can result in text such as 
 
-> "Let's go get Italian food"
+> Let's go get Italian food
 
 being scored much more positively than text such as\index{preprocessing!challenges}\index{bias}
 
-> "Let's go get Mexican food"
+> Let's go get Mexican food
 
 because of characteristics of the text the word embeddings were trained on.
 
@@ -709,9 +713,9 @@ because of characteristics of the text the word embeddings were trained on.
 
 Given these profound and fundamental challenges with word embeddings, what options are out there? First, consider not using word embeddings when building a text model. Depending on the particular analytical question you are trying to answer, another numerical representation of text data (such as word frequencies or tf-idf\index{tf-idf} of single words or n-grams) may be more appropriate. Consider this option even more seriously if the model you want to train is already entangled with issues of bias, such as the sentiment analysis example in Section \@ref(fairnessembeddings).
 
-Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings\index{embeddings!pre-trained} created using an algorithm such as GloVe\index{embeddings!GloVe} or word2vec\index{embeddings!word2vec}, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is *specific* rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. 
+Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings\index{embeddings!pre-trained} created using an algorithm like GloVe\index{embeddings!GloVe} or word2vec\index{embeddings!word2vec}, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is *specific* rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&A site, or legal documents. 
 
-Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, a million tokens) but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language data sets.
+Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, a million tokens), but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of *adding* historic, systemic prejudice from general purpose language data sets.
 
 <div class="rmdnote">
 <p>You can use the same approaches discussed in this chapter to check any new embeddings for dangerous biases such as racism or sexism.</p>
@@ -729,7 +733,7 @@ Mapping words (or other tokens) to an embedding in a special vector space is a p
 
 ### In this chapter, you learned:
 
-- what a word embedding is and why we use them
+- what word embeddings are and why we use them
 
 - how to determine word embeddings from a text data set
 
