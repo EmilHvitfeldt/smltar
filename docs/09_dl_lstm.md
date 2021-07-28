@@ -4,7 +4,7 @@
 
 
 
-In Chapter \@ref(dldnn), we trained our first deep learning models, with straightforward dense network architectures\index{network architecture} that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks\index{neural network!long short-term memory} (LSTMs) [@Hochreiter1997].
+In Chapter \@ref(dldnn), we trained our first deep learning models with straightforward dense network architectures\index{network architecture} that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters \@ref(mlregression) and \@ref(mlclassification), but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of **long short-term memory** networks\index{neural network!long short-term memory} (LSTMs) [@Hochreiter1997].
 
 ## A first LSTM model {#firstlstm}
 
@@ -69,7 +69,7 @@ After tokenizing, the preprocessing is different. We use `step_sequence_onehot()
 There are 202,092 blurbs in the training set and 67,365 in the testing set.
 
 <div class="rmdpackage">
-<p>Like we discussed in the last chapter, we are using <strong>recipes</strong> and <strong>textrecipes</strong> for preprocessing before modeling. When we <code>prep()</code> a recipe, we compute or estimate statistics from the training set; the output of <code>prep()</code> is a recipe. When we <code>bake()</code> a recipe, we apply the preprocessing to a data set, either the training set that we started with or another set like the testing data or new data. The output of <code>bake()</code> is a data set like a tibble or a matrix.</p>
+<p>Like we discussed in the last chapter, we are using <strong>recipes</strong> and <strong>text-recipes</strong> for preprocessing before modeling. When we <code>prep()</code> a recipe, we compute or estimate statistics from the training set; the output of <code>prep()</code> is a recipe. When we <code>bake()</code> a recipe, we apply the preprocessing to a data set, either the training set that we started with or another set like the testing data or new data. The output of <code>bake()</code> is a data set like a tibble or a matrix.</p>
 </div>
 
 We could have applied these `prep()` and `bake()` functions to any preprocessing recipes throughout this book, but we typically didn't need to because our modeling workflows automated these steps.
@@ -105,7 +105,7 @@ Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a
 
 The exact shape and function of network $A$ are beyond the reach of this book. For further study, Christopher Olah's blog post ["Understanding LSTM Networks"](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) gives a more technical overview of how LSTM networks work.
 
-The Keras library has convenient functions for broadly used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
+The Keras library has convenient functions for broadly-used architectures like LSTMs so we don't have to build it from scratch using layers; we can instead use `layer_lstm()`. This comes _after_ an embedding layer that makes dense vectors from our word sequences and _before_ a densely-connected layer for output. 
 
 
 ```r
@@ -143,9 +143,7 @@ Because we are training a binary classification model, we use `activation = "sig
 
 Next we `compile()` the model, which configures the model for training with a specific optimizer and set of metrics. 
 
-<div class="rmdnote">
-<p>A good default optimizer for many problems is <code>"adam"</code> <span class="citation">[@kingma2017adam]</span>, and a good loss function for binary classification is <code>"binary_crossentropy"</code>.</p>
-</div>
+\BeginKnitrBlock{rmdnote}<div class="rmdnote">A good default optimizer for many problems is `"adam"` [@kingma2017adam], and a good loss function for binary classification is `"binary_crossentropy"`.</div>\EndKnitrBlock{rmdnote}
 
 
 ```r
@@ -399,7 +397,7 @@ plot(rnn_history)
 
 These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don't work well compared to simpler deep learning architectures like the dense network introduced in Section \@ref(firstdlclassification) [@Minaee2020], or even other machine learning approaches like regularized linear models with good preprocessing. 
 
-Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better performing models.
+Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better-performing models.
 
 ## Case study: bidirectional LSTM {#bilstm}
 
@@ -540,7 +538,7 @@ We can gradually improve a model by changing and adding to its architecture.
 
 ## Case study: padding {#lstmpadding}
 
-\index{preprocessing!impact}One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
+\index{preprocessing!impact}One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are _padded_ for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like in the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit. 
 
 Either way, the sequences that are too long must be truncated and the sequences that are too short must be padded, typically with zeroes. This does literally mean that words or tokens are thrown away for the long documents and zeroes are added to the shorter documents, with the goal of creating a rectangular matrix that can be used for computation. 
 
@@ -658,7 +656,7 @@ scotus_test <- testing(scotus_split)
 ```
 
 <div class="rmdwarning">
-<p>Notice that we also shifted (subtracted) and scaled (divided) the <code>year</code> outcome by constant factors so all the values are centered around zero and not too large. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between -1 and 1.</p>
+<p>Notice that we also shifted (subtracted) and scaled (divided) the <code>year</code> outcome by constant factors so all the values are centered around zero and not too large. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between −1 and 1.</p>
 </div>
 
 Next, let's build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let's try keeping the size of our vocabulary the same (`max_words`) but we will need to increase the sequence length information we store (`max_length`) by a great deal.
@@ -940,7 +938,7 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> 4 roc_auc     binary         0.836
 ```
 
-This is our best performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).
+This is our best-performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:lstmfinalroc).
 
 
 ```r

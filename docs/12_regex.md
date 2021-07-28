@@ -101,7 +101,7 @@ If we tried to use the plus sign without escaping it, like `"+"`, we would get a
 The complete list of meta characters is displayed in Table \@ref(tab:metacharacters) [@levithan2012regular].
 
 
-Table: (\#tab:metacharacters)All meta characters
+Table: (\#tab:metacharacters)\textbf{TABLE A.1:} All meta characters
 
 |Description            |Character |
 |:----------------------|:---------|
@@ -122,7 +122,7 @@ Table: (\#tab:metacharacters)All meta characters
 
 ## Full stop, the wildcard
 
-Let's start with the full stop/period/dot, which acts as a "wildcard." This means that this character will match anything in place other then a newline character. 
+Let's start with the full stop/period/dot, which acts as a "wildcard". This means that this character will match anything in place other then a newline character. 
 
 
 ```r
@@ -200,10 +200,10 @@ str_detect(strings, "[^ac]")
 
 ### Shorthand character classes
 
-Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have even shorter shorthands. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9 but it can also be described by `\\d`. Table \@ref(tab:characterclasses) presents these useful predefined character classes.
+Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have even shorter shorthands. The class `[:digit:]` denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8, and 9 but it can also be described by `\\d`. Table \@ref(tab:characterclasses) presents these useful predefined character classes.
 
 
-Table: (\#tab:characterclasses)All character classes
+Table: (\#tab:characterclasses)\textbf{TABLE A.2:} All character classes
 
 |Description                                                   |Class              |
 |:-------------------------------------------------------------|:------------------|
@@ -224,14 +224,14 @@ Table: (\#tab:characterclasses)All character classes
 |Non-word characters [^A-z0-9_]                                |\\\\W              |
 |Non-digits [^0-9]                                             |\\\\D              |
 
-Notice that these short-hands are locale specific. This means that the danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
+Notice that these shorthands are locale specific. This means that the Danish character ø will be picked up in class `[:lower:]` but not in the class `[a-z]` as the character isn't located between a and z.
 
 ## Quantifiers
 
-We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}` and `+` is shorthand for `{1,}` [@levithan2012regular].
+We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don't have to write `[:digit:][:digit:][:digit:][:digit:]`. Table \@ref(tab:greedyquantifiers) shows how to specify repetitions. Notice that `?` is shorthand for `{0,1}`, `*` is shorthand for `{0,}`, and `+` is shorthand for `{1,}` [@levithan2012regular].
 
 
-Table: (\#tab:greedyquantifiers)Regular expression quantifiers
+Table: (\#tab:greedyquantifiers)\textbf{TABLE A.3:} Regular expression quantifiers
 
 |Regex |Matches               |
 |:-----|:---------------------|
@@ -266,7 +266,7 @@ str_extract(sentences, "\\d{4}")
 #> [1] "1776" NA
 ```
 
-Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in parentheses. In the following example, we want to match all the instances of "NA" in the string. We put `"NA "` inside a set of parentheses and putting `+` after it to make sure we match at least once.
+Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in parentheses. In the following example, we want to match all the instances of "NA" in the string. We put `"NA "` inside a set of parentheses and `+` after to make sure we match at least once.
 
 
 ```r
@@ -293,7 +293,7 @@ str_extract(batman, "(NA )*(NA){1}")
 By default these matches are "greedy", meaning that they will try to match the longest string possible. We can instead make them "lazy" by placing a `?` after, as shown in Table \@ref(tab:lazyquantifiers). This will make the regular expressions try to match the shortest string possible instead of the longest.
 
 
-Table: (\#tab:lazyquantifiers)Lazy quantifiers
+Table: (\#tab:lazyquantifiers)\textbf{TABLE A.4:} Lazy quantifiers
 
 |regex  |matches                                                              |
 |:------|:--------------------------------------------------------------------|
@@ -304,7 +304,7 @@ Table: (\#tab:lazyquantifiers)Lazy quantifiers
 |{n,}?  |at least n times, match as few times as possible                     |
 |{n,m}? |between n and m times, match as few times as possible but at least n |
 
-Comparing greedy and lazy matches gives us 3 and 7 "NA "'s respectively.
+Comparing greedy and lazy matches gives us 3 and 7 "NA "'s, respectively.
 
 
 ```r
@@ -326,7 +326,7 @@ str_extract(batman, "(NA ){3,7}?")
 
 ## Anchors
 
-The meta characters `^` and `$` have special meaning in regular expressions. They force the engine to check the beginning and end of the string respectively, hence the name **anchor**. A mnemonic device to remember this is "First you get the power(`^`) and the you get the money(`\$`)".
+The meta characters `^` and `$` have special meaning in regular expressions. They force the engine to check the beginning and end of the string, respectively, hence the name **anchor**. A mnemonic device to remember this is "First you get the power(`^`) and then you get the money(`\$`)".
 
 
 ```r

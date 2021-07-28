@@ -4,7 +4,7 @@
 
 
 
-Like we discussed in the previous foreword, these three chapters on deep learning for text are organized by \index{network architecture}network architecture, rather than by outcome type as we did in Chapters \@ref(mlregression) and \@ref(mlclassification).
+Like we discussed in the previous overview, these three chapters on deep learning for text are organized by \index{network architecture}network architecture, rather than by outcome type as we did in Chapters \@ref(mlregression) and \@ref(mlclassification).
 We'll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python\index{Python} and, via reticulate [@R-reticulate], R.
 Keras provides an extensive, high-level API for creating and training many kinds of neural networks, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks. 
 
@@ -14,7 +14,7 @@ Keras provides an extensive, high-level API for creating and training many kinds
 
 This chapter explores one of the most straightforward configurations for a deep learning model, a \index{neural network!densely connected}**densely connected neural network**. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. We can also use this type of network architecture\index{network architecture} as a bridge between the bag-of-words approaches we explored in detail in Chapters \@ref(mlregression) and \@ref(mlclassification) to the approaches beyond bag-of-words we will use in Chapters \@ref(dllstm) and \@ref(dlcnn). Deep learning allows us to incorporate not just word counts but also word sequences and positions.
 
-Figure \@ref(fig:dnndiag) depicts a densely connected neural network architecture \index{neural network!feed forward}*feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The numbers of layers and nodes within each layer are variable and are hyperparameters of the model selected by the practitioner.
+Figure \@ref(fig:dnndiag) depicts a densely-connected neural network architecture \index{neural network!feed forward}*feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The numbers of layers and nodes within each layer are variable and are hyperparameters of the model selected by the practitioner.
 
 <div class="figure" style="text-align: center">
 <img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
@@ -25,7 +25,7 @@ Figure \@ref(fig:dnndiag) depicts a densely connected neural network architectur
 
 ## Kickstarter data {#kickstarter}
 
-For all our chapters on deep learning, we will build binary classification models, much like we did in Chapter \@ref(mlclassification), but we will use neural networks instead of shallow learning models. As we discussed in the foreword to these deep learning chapters, much of the overall model process will look the same, but we will use a different kind of algorithm. We will use a data set of descriptions or "blurbs" for campaigns from the crowdfunding platform [Kickstarter](https://www.kickstarter.com/).
+For all our chapters on deep learning, we will build binary classification models, much like we did in Chapter \@ref(mlclassification), but we will use neural networks instead of shallow learning models. As we discussed in the overview to these deep learning chapters, much of the overall model process will look the same, but we will use a different kind of algorithm. We will use a data set of descriptions or "blurbs" for campaigns from the crowdfunding platform [Kickstarter](https://www.kickstarter.com/).
 
 
 ```r
@@ -211,9 +211,9 @@ There are 202,092 blurbs in the training set and 67,365 in the testing set.
 
 ### Preprocessing for deep learning {#dnnrecipe}
 
-\index{preprocessing}Preprocessing for deep learning models is different than preprocessing for most other text models. These neural networks model _sequences_, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away) and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model and we need to select this value such that we don't: 
+\index{preprocessing}Preprocessing for deep learning models is different from preprocessing for most other text models. These neural networks model _sequences_, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away), and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model, and we need to select this value such that we don't: 
 
-- overshoot and introduce a lot of padded zeroes which would make the model hard to train, or 
+- overshoot and introduce a lot of padded zeroes, which would make the model hard to train, or 
 
 - undershoot and cut off too much informative text from our documents.
 
@@ -274,7 +274,7 @@ This \index{preprocessing}preprocessing recipe tokenizes our text (Chapter \@ref
 
 ### One-hot sequence embedding of text {#onehotsequence}
 
-The function `step_sequence_onehot()` transforms tokens into a numeric format appropriate for modeling, like `step_tf()` and `step_tfidf()`. However, it is different in that it takes into account the order of the tokens, unlike `step_tf()` and `step_tfidf()` which do not take order into account. 
+The function `step_sequence_onehot()` transforms tokens into a numeric format appropriate for modeling, like `step_tf()` and `step_tfidf()`. However, it is different in that it takes into account the order of the tokens, unlike `step_tf()` and `step_tfidf()`, which do not take order into account. 
 
 <div class="rmdnote">
 <p>Steps like <code>step_tf()</code> and <code>step_tfidf()</code> are used for approaches called “bag of words”, meaning the words are treated like they are just thrown in a bag without attention paid to their order.</p>
@@ -317,10 +317,10 @@ prep(small_spec)
 ```
 
 <div class="rmdwarning">
-<p>What does the function <code>prep()</code> do? Before when we have used recipes, we put them in a <code>workflow()</code> which handles low-level processing. The <code>prep()</code> function will compute or estimate statistics from the training set; the output of <code>prep()</code> is a prepped recipe.</p>
+<p>What does the function <code>prep()</code> do? Before when we have used recipes, we put them in a <code>workflow()</code> that handles low-level processing. The <code>prep()</code> function will compute or estimate statistics from the training set; the output of <code>prep()</code> is a prepped recipe.</p>
 </div>
 
-Once we have the prepped recipe, we can `tidy()` it to extract the vocabulary, represented in the `vocabulary` and `token` columns^[The `terms` column refers to the column we have applied `step_sequence_onehot()` to and `id` is its unique identifier. Note that **textrecipes** allows `step_sequence_onehot()` to be applied to multiple text variables independently and they will have their own vocabularies.].
+Once we have the prepped recipe, we can `tidy()` it to extract the vocabulary, represented in the `vocabulary` and `token` columns^[The `terms` column refers to the column we have applied `step_sequence_onehot()` to and `id` is its unique identifier. Note that **textrecipes** allows `step_sequence_onehot()` to be applied to multiple text variables independently, and they will have their own vocabularies.].
 
 
 ```r
@@ -420,7 +420,7 @@ recipe(~ text, data = small_data) %>%
 #> [4,]      11       6       7      10      12       2
 ```
 
-Now we have that all digits representing the first characters neatly aligned in the first column.
+Now we have all digits representing the first characters neatly aligned in the first column.
 
 Let's now prepare and apply our feature engineering recipe `kick_rec` so we can use it in for our deep learning model.
 
@@ -483,7 +483,7 @@ Let us step through this model specification one layer at a time.
 
 - Our first `layer_embedding()` is equipped to handle the preprocessed data we have in `kick_train`. It will take each observation/row in `kick_train` and make dense vectors from our word sequences. This turns each observation into an `embedding_dim` $\times$ `sequence_length` matrix, 12 $\times$ 30 matrix in our case. In total, we will create a `number_of_observations` $\times$ `embedding_dim` $\times$ `sequence_length` data cube.
 
-- The next `layer_flatten()` layer takes the matrix for each observation and flattens them down into one dimension. This will create a `30 * 12 = 360` long vector for each observation. 
+- The next `layer_flatten()` layer takes the matrix for each observation and flattens them into one dimension. This will create a `30 * 12 = 360` long vector for each observation. 
 
 - Lastly, we have 2 densely connected layers. The last layer has a sigmoid activation function to give us an output between 0 and 1, since we want to model a probability for a binary classification problem.
 
@@ -496,12 +496,12 @@ When the neural network finishes passing a batch of data through the network, it
 </div>
 \index{optimization algorithm}
 
-During training a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras^[https://keras.io/api/losses/]. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are. 
+During training of a neural network, there must be some quantity that we want to have minimized; this is called the loss function. Again, many loss functions are available within Keras^[https://keras.io/api/losses/]. These loss functions typically have two arguments, the true value and the predicted value, and return a measure of how close they are. 
 Since we are working on a binary classification task and the final layer of the network returns a probability, binary cross-entropy\index{binary cross-entropy} is an appropriate loss function. Binary cross-entropy does well at dealing with probabilities because it measures the "distance" between probability distributions. In our case, this would be the ground-truth distribution and the predictions.
 
 We can also add any number of metrics^[https://keras.io/api/metrics/] to be calculated and reported during training. These metrics will not affect the training loop, which is controlled by the optimizer and loss function. The metrics' only job is to report back a single number that will inform you how well the model is performing. We will select accuracy\index{accuracy} as a reported metric for now. 
 
-Let's set these 3 options (`optimizer`, `loss`, and `metrics`) using the `compile()` function:
+Let's set these three options (`optimizer`, `loss`, and `metrics`) using the `compile()` function:
 
 
 ```r
@@ -513,7 +513,7 @@ dense_model %>% compile(
 ```
 
 <div class="rmdnote">
-<p>Notice how the <code>compile()</code> function modifies the model <em>in place</em>. This is different than how objects are conventionally handled in R so be vigilant about model definition and modification in your code. This is a <a href="https://keras.rstudio.com/articles/faq.html#why-are-keras-objects-modified-in-place-">conscious decision</a> that was made when creating the <strong>keras</strong> R package to match the data structures and behavior of the underlying Keras library.</p>
+<p>Notice how the <code>compile()</code> function modifies the model <em>in place</em>. This is different from how objects are conventionally handled in R so be vigilant about model definition and modification in your code. This is a <a href="https://keras.rstudio.com/articles/faq.html#why-are-keras-objects-modified-in-place-">conscious decision</a> that was made when creating the <strong>keras</strong> R package to match the data structures and behavior of the underlying Keras library.</p>
 </div>
 
 Finally, we can fit this model! We need to supply the data for training as a matrix of predictors `x` and a numeric vector of labels `y`.
@@ -646,7 +646,7 @@ val_history
 #> val_accuracy: 0.8072
 ```
 
-Figure \@ref(fig:valhistoryplot) still shows that significant overfitting at 10 epochs.
+Figure \@ref(fig:valhistoryplot) still shows significant overfitting at 10 epochs.
 
 
 ```r
@@ -659,7 +659,7 @@ plot(val_history)
 </div>
 
 Using our own validation set also allows us to flexibly measure performance using tidymodels functions from the **yardstick** package. We do need to set up a few transformations between Keras and tidymodels to make this work.
-The following function `keras_predict()` creates a little bridge between the two frameworks, combining a Keras model with baked (i.e. preprocessed) data and returning the predictions in a tibble format.
+The following function `keras_predict()` creates a little bridge between the two frameworks, combining a Keras model with baked (i.e., preprocessed) data and returning the predictions in a tibble format.
 
 
 ```r
@@ -774,7 +774,7 @@ kick_bow_rec <- recipe(~ blurb, data = kickstarter_train) %>%
   step_tf(blurb)
 ```
 
-We will `prep()` and `bake()` this recipe to get out our processed data. The result will be quite sparse, since the blurbs are short and we are counting only the most frequent 1000 tokens after removing the Snowball stop word list.\index{stop word lists!Snowball} 
+We will `prep()` and `bake()` this recipe to get out our processed data. The result will be quite sparse, since the blurbs are short, and we are counting only the most frequent 1000 tokens after removing the Snowball stop word list.\index{stop word lists!Snowball} 
 
 
 ```r
@@ -789,7 +789,7 @@ kick_bow_assess <- bake(kick_bow_prep,
                         composition = "matrix")
 ```
 
-Now that we have the analysis and assessment data sets calculated, we can define the \index{network architecture}neural network architecture. We won't be using an embedding layer this time; we will input the word count data directly into the first dense layer. This dense layer is followed by another hidden layer and then a final layer with a sigmoid activation to leave us with a value between 0 and 1 which we treat as the probability.
+Now that we have the analysis and assessment data sets calculated, we can define the \index{network architecture}neural network architecture. We won't be using an embedding layer this time; we will input the word count data directly into the first dense layer. This dense layer is followed by another hidden layer and then a final layer with a sigmoid activation to leave us with a value between 0 and 1 that we treat as the probability.
 
 
 ```r
@@ -805,7 +805,7 @@ bow_model %>% compile(
 )
 ```
 
-In many ways, this model architecture is not that different than the model we used in section \@ref(firstdlclassification). The main difference here is the \index{preprocessing}*preprocessing*; the shape and information of the data from `kick_bow_prep` are different than what we saw before since the matrix elements represent counts (something that Keras can handle directly) and not indicators for words in the vocabulary. Keras handles the indicators with `layer_embedding()`, by mapping them through an embedding layer.
+In many ways, this model architecture is not that different from the model we used in Section \@ref(firstdlclassification). The main difference here is the \index{preprocessing}*preprocessing*; the shape and information of the data from `kick_bow_prep` are different from what we saw before since the matrix elements represent counts (something that Keras can handle directly) and not indicators for words in the vocabulary. Keras handles the indicators with `layer_embedding()`, by mapping them through an embedding layer.
 
 The fitting procedure remains unchanged.
 
@@ -850,7 +850,7 @@ metrics(bow_res, state, .pred_class)
 #> 2 kap      binary         0.446
 ```
 
-This model does not perform as well as the model we used in section \@ref(firstdlclassification). This suggests that a model incorporating more than word counts alone is useful here. This model did outperform a baseline linear model (shown in Appendix \@ref(appendixbaseline)), which achieved an accuracy of 0.686; that linear baseline is a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.
+This model does not perform as well as the model we used in Section \@ref(firstdlclassification). This suggests that a model incorporating more than word counts alone is useful here. This model did outperform a baseline linear model (shown in Appendix \@ref(appendixbaseline)), which achieved an accuracy of 0.686; that linear baseline is a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.
 
 This simpler model does not outperform our initial model in this chapter, but it is typically worthwhile to investigate if a simpler model can rival or beat a model we are working with.
 
@@ -943,7 +943,7 @@ glove6b_matrix <- tidy(kick_prep, 3) %>%
   rbind(0, .)
 ```
 
-We'll keep the model architecture itself as unchanged as possible. The `output_dim` argument is set equal to`ncol(glove6b_matrix)` to make sure that all the dimensions line up correctly, but everything else stays the same.
+We'll keep the model architecture itself as unchanged as possible. The `output_dim` argument is set equal to `ncol(glove6b_matrix)` to make sure that all the dimensions line up correctly, but everything else stays the same.
 
 
 ```r
@@ -1029,7 +1029,7 @@ These Kickstarter blurbs are very short, lack punctuation, stop words, narrative
 Perhaps it should not surprise us that these word embeddings don't perform well in this model, since the text used to train the embeddings is so different from the text is it being applied to (Section \@ref(glove)).
 
 <div class="rmdwarning">
-<p>Although this approach didn’t work well with our data set didn’t, that doesn’t mean that using pre-trained word embeddings is always a bad idea.</p>
+<p>Although this approach didn’t work well with our data set, that doesn’t mean that using pre-trained word embeddings is always a bad idea.</p>
 </div>
 
 The key point is how well the \index{embeddings!pre-trained}embeddings match the data you are modeling.
@@ -1049,7 +1049,7 @@ dense_model_pte2 <- keras_model_sequential() %>%
   layer_dense(units = 1, activation = "sigmoid")
 ```
 
-Now, we set the weights with `set_weights()` but we _don't_ freeze them.
+Now, we set the weights with `set_weights()`, but we _don't_ freeze them.
 
 
 ```r
@@ -1167,7 +1167,7 @@ fit_split <- function(split, prepped_rec) {
 }
 ```
 
-We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on five folds.
+We can `map()` this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on 5 folds.
 
 
 ```r
@@ -1247,7 +1247,7 @@ cv_fitted %>%
 #> 4 roc_auc     0.858     5 0.00110
 ```
 
-This data set is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
+This data set is large enough that we probably wouldn't need to take this approach, and the fold-to-fold metrics have little variance. However, resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.
 
 \index{models!challenges}\index{computational speed}
 <div class="rmdnote">
@@ -1406,19 +1406,19 @@ Notice that although some steps for model fitting are different now that we are 
 This means that practitioners who work in fields where interpretability is vital, such as some parts of health care, shy away from deep learning models since they are hard to understand and interpret.
 
 Another limitation of deep learning models is that they do not facilitate a comprehensive theoretical understanding or learning of their inner organization [@shwartzziv2017opening].
-These two points together lead to deep learning models often being called "black box"\index{"black box"} models [@shrikumar2019learning], models where is it hard to peek into the inner workings to understand what they are doing.
+These two points together lead to deep learning models often being called "black box"\index{black box} models [@shrikumar2019learning], models where is it hard to peek into the inner workings to understand what they are doing.
 Not being able to reason about the inner workings of a model means that we will have a hard time explaining why a model is working well. It also means it will be hard to remedy a biased model that performs well in some settings but badly in other settings.
-This is a problem since it can hide biases\index{bias} from the training set which may lead to unfair, wrong, or even illegal decisions based on protected classes [@guidotti2018survey].
+This is a problem since it can hide biases\index{bias} from the training set that may lead to unfair, wrong, or even illegal decisions based on protected classes [@guidotti2018survey].
 
-Practitioners have built approaches to understand local feature importance for deep learning models which we demonstrate in Section \@ref(lime), but these are limited tools compared to the interpretability of other kinds of models.
-Lastly, deep learning models tend to require more training data than traditional statistical machine learning methods. This means that that it can be hard to train a deep learning model if you have a very small data set [@lampinen2018oneshot].
+Practitioners have built approaches to understand local feature importance for deep learning models, which we demonstrate in Section \@ref(lime), but these are limited tools compared to the interpretability of other kinds of models.
+Lastly, deep learning models tend to require more training data than traditional statistical machine learning methods. This means that it can be hard to train a deep learning model if you have a very small data set [@lampinen2018oneshot].
 
 ## Summary {#dldnnsummary}
 
 You can use deep learning to build classification models to predict labels or categorical variables from a data set, including data sets that include text.
 Dense neural networks are the most straightforward network architecture that can be used to fit classification models for text features and are a good bridge for understanding the more complex model architectures that are used more often in practice for text modeling.
 These models have many parameters compared to the models we trained in earlier chapters, and require different \index{preprocessing}preprocessing than those models.
-We can tokenize and create features for modeling that capture the order of the tokens in the original text. Doing this can allow a model to learn from patterns in sequences and order, something not possible in the models we saw in \@ref(mlregression) and Chapters \@ref(mlclassification).
+We can tokenize and create features for modeling that capture the order of the tokens in the original text. Doing this can allow a model to learn from patterns in sequences and order, something not possible in the models we saw in Chapters \@ref(mlregression) and \@ref(mlclassification).
 We gave up some of the fine control over feature engineering\index{feature engineering}, such as hand-crafting features using domain knowledge, in the hope that the network could learn important features on its own.
 However, feature engineering is not completely out of our hands as practitioners, since we still make decisions about tokenization and normalization before the tokens are passed into the network.
 
