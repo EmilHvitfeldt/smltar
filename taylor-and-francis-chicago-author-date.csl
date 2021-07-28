@@ -89,7 +89,7 @@
   <macro name="contributors">
     <group delimiter=". ">
       <names variable="author">
-        <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+        <name and="text" name-as-sort-order="all" initialize="true"  initialize-with=". " sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
         <label form="short" prefix=", "/>
         <substitute>
           <names variable="editor"/>
@@ -103,7 +103,7 @@
   </macro>
   <macro name="contributors-short">
     <names variable="author">
-      <name form="short" and="text" delimiter=", " initialize-with=". "/>
+      <name form="short" and="text" delimiter=", "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -148,14 +148,8 @@
       </choose>
       <choose>
         <if type="legal_case" match="none">
-          <choose>
-            <if variable="DOI">
-              <text variable="DOI" prefix="doi:"/>
-            </if>
-            <else>
-              <text variable="URL"/>
-            </else>
-          </choose>
+           <text variable="note"/>
+           <text variable="URL"/>
         </if>
       </choose>
     </group>

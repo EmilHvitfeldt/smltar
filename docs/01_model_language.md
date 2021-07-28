@@ -1,3 +1,7 @@
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
 # (PART) Natural Language Features {-}
 
 # Language and modeling {#language}
@@ -62,9 +66,11 @@ Written text is typically less creative and further from the primary language th
 
 \index{morphology}How can a deeper knowledge of how language works inform text modeling? Let's focus on **morphology**, the study of words' internal structures and how they are formed, to illustrate this. Words are medium to small in length in English; English has a moderately low ratio of morphemes (the smallest unit of language with meaning) to words while other languages like Turkish and Russian have a higher ratio of morphemes to words [@Bender13]. Related to this, languages can be either more analytic (like Mandarin or modern English, breaking up concepts into separate words) or synthetic (like Hungarian or Swahili, combining concepts into one word). 
 
-Morphology focuses on how morphemes such as prefixes, suffixes, and root words come together to form words. Some languages, like Danish, use many compound words. Danish words such as "brandbil" (fire truck), "politibil" (police car), and "lastbil" (truck) all contain the morpheme "bil" (car) and start with prefixes denoting the type of car. Because of these compound words, some nouns seem more descriptive than their English counterpart; "vaskebjørn" (raccoon) splits into the morphemes "vaske" and "bjørn", literally meaning "washing bear"^[The English word "raccoon" derives from an Algonquin word meaning, "scratches with his hands!"]. When working with Danish and other languages with compound words, such as German, compound splitting to extract more information can be beneficial [@Sugisaki2018]. However, even the very question of what a word is turns out to be difficult, and not only for languages other than English. Compound words in English like "real estate" and "dining room" represent one concept but contain whitespace. 
+Morphology focuses on how morphemes such as prefixes, suffixes, and root words come together to form words. Some languages, like Danish, use many compound words. Danish words such as "brandbil" (fire truck), "politibil" (police car), and "lastbil" (truck) all contain the morpheme "bil" (car) and start with prefixes denoting the type of car. Because of these compound words, some nouns seem more descriptive than their English counterpart; "vaskebjørn" (raccoon) splits into the morphemes "vaske" and "bjørn", literally meaning "washing bear"^[The English word "raccoon" derives from an Algonquin word meaning, "scratches with his hands"!]. When working with Danish and other languages with compound words, such as German, compound splitting to extract more information can be beneficial [@Sugisaki2018]. However, even the very question of what a word is turns out to be difficult, and not only for languages other than English. Compound words in English like "real estate" and "dining room" represent one concept but contain whitespace. 
 
 The morphological characteristics of a text data set are deeply connected to preprocessing steps like tokenization (Chapter \@ref(tokenization)), removing stop words (Chapter \@ref(stopwords)), and even stemming (Chapter \@ref(stemming)). These preprocessing steps for creating natural language features, in turn, can have significant effects on model predictions or interpretation.
+
+\newpage
 
 ## Different languages
 
@@ -80,7 +86,7 @@ This idea is simple (acknowledge that the models we build are typically language
 
 The concept of differences in language is relevant for modeling beyond only the broadest language level (for example, English vs. Danish vs. German vs. Farsi). Language from a specific dialect often cannot be handled well with a model trained on data from the same language but not inclusive of that dialect.\index{models!sensitivity} One dialect used in the United States is \index{dialects!African American Vernacular English}African American Vernacular English (AAVE). Models trained to detect toxic or hate speech are more likely to falsely identify AAVE as hate speech [@Sap19]; this is deeply troubling not only because the model is less accurate than it should be, but because it amplifies harm against an already marginalized group.
 
-Language is also changing over time. This is a known characteristic of language; if you notice the evolution of your own language, don't be depressed or angry, because it means that people are using it! Teenage girls are especially effective at language innovation, and have been for centuries [@McCulloch15]; innovations spread from groups such as young women to other parts of society. This is another difference that impacts modeling.
+Language is also changing over time. This is a known characteristic of language; if you notice the evolution of your own language, don't be depressed or angry, because it means that people are using it! Teenage girls are especially effective at language innovation and have been for centuries [@McCulloch15]; innovations spread from groups such as young women to other parts of society. This is another difference that impacts modeling.
 
 <div class="rmdwarning">
 <p>Differences in language relevant for models also include the use of slang, and even the context or medium of that text.</p>
@@ -89,6 +95,8 @@ Language is also changing over time. This is a known characteristic of language;
 Consider two bodies of text, both mostly standard written English, but one made up of tweets and one made up of medical documents. If an NLP practitioner trains a model on the data set of tweets to predict some characteristics of the text, it is very possible (in fact, likely, in our experience) that the model will perform poorly if applied to the data set of medical documents[^mednote]. Like machine learning in general, text modeling is exquisitely sensitive to the data used for training. This is why we are somewhat skeptical of AI products such as sentiment analysis APIs, not because they *never* work well, but because they work well only when the text you need to predict from is a good match to the text such a product was trained on.
 
 [^mednote]: Practitioners have built specialized computational resources for medical text [@Johnson1999].
+
+\newpage
 
 ## Summary {#languagesummary}
 
