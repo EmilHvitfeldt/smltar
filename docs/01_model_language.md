@@ -21,32 +21,38 @@ Throughout the course of this book, we will discuss creating predictors or featu
 \index{semantics}
 \index{pragmatics}
 
+\begin{table}
 
-Table: (\#tab:lingsubfields)Some subfields of linguistics, moving from smaller structures to broader structures
-
-|Linguistics subfield |What does it focus on?                    |
-|:--------------------|:-----------------------------------------|
-|Phonetics            |Sounds that people use in language        |
-|Phonology            |Systems of sounds in particular languages |
-|Morphology           |How words are formed                      |
-|Syntax               |How sentences are formed from words       |
-|Semantics            |What sentences mean                       |
-|Pragmatics           |How language is used in context           |
+\caption{(\#tab:lingsubfields)Some subfields of linguistics, moving from smaller structures to broader structures}
+\centering
+\begin{tabular}[t]{ll}
+\toprule
+Linguistics subfield & What does it focus on?\\
+\midrule
+Phonetics & Sounds that people use in language\\
+Phonology & Systems of sounds in particular languages\\
+Morphology & How words are formed\\
+Syntax & How sentences are formed from words\\
+Semantics & What sentences mean\\
+Pragmatics & How language is used in context\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 These fields each study a different level at which language exhibits organization. When we build supervised machine learning models for text data, we use these levels of organization to create _natural language features_, i.e., predictors or inputs for our models. These features often depend on the morphological characteristics of language, such as when text is broken into sequences of characters for a recurrent neural network deep learning model\index{neural network!recurrent}. Sometimes these features depend on the syntactic characteristics of language, such as when models use part-of-speech information. These roughly hierarchical levels of organization are key to the process of transforming unstructured language to a mathematical representation that can be used in modeling.
 
 At the same time, \index{linguistics}this organization and the rules of language can be ambiguous; our ability to create text features for machine learning is constrained by the very nature of language. Beatrice Santorini, a linguist at the University of Pennsylvania, compiles examples of linguistic ambiguity from [news headlines](https://www.ling.upenn.edu/~beatrice/humor/headlines.html):
 
 
-> Include Your Children When Baking Cookies
-
-> March Planned For Next August
-
-> Enraged Cow Injures Farmer with Ax
-
-> Wives Kill Most Spouses In Chicago
 
 
+- Include Your Children When Baking Cookies
+
+- March Planned For Next August
+
+- Enraged Cow Injures Farmer with Ax
+
+- Wives Kill Most Spouses In Chicago
 
 
 
@@ -54,9 +60,10 @@ If you don't have knowledge about what linguists study and what they know about 
 
 Notice also that the first two subfields on this list are about sounds, i.e., speech.\index{speech} Most linguists view speech as primary, and writing down language as text as a technological step.
 
-<div class="rmdnote">
-<p>Remember that some language is signed, not spoken, so the description laid out here is itself limited.</p>
-</div>
+\begin{rmdnote}
+Remember that some language is signed, not spoken, so the description
+laid out here is itself limited.
+\end{rmdnote}
 \index{language!signed}
 
 Written text is typically less creative and further from the primary language than we would wish. This points out how fundamentally limited modeling from written text is. Imagine that the abstract language data we want exists in some high-dimensional latent space; we would like to extract that information using the text somehow, but it just isn't completely possible. Any features we create or model we build are inherently limited.
@@ -88,9 +95,10 @@ The concept of differences in language is relevant for modeling beyond only the 
 
 Language is also changing over time. This is a known characteristic of language; if you notice the evolution of your own language, don't be depressed or angry, because it means that people are using it! Teenage girls are especially effective at language innovation and have been for centuries [@McCulloch15]; innovations spread from groups such as young women to other parts of society. This is another difference that impacts modeling.
 
-<div class="rmdwarning">
-<p>Differences in language relevant for models also include the use of slang, and even the context or medium of that text.</p>
-</div>
+\begin{rmdwarning}
+Differences in language relevant for models also include the use of
+slang, and even the context or medium of that text.
+\end{rmdwarning}
 
 Consider two bodies of text, both mostly standard written English, but one made up of tweets and one made up of medical documents. If an NLP practitioner trains a model on the data set of tweets to predict some characteristics of the text, it is very possible (in fact, likely, in our experience) that the model will perform poorly if applied to the data set of medical documents[^mednote]. Like machine learning in general, text modeling is exquisitely sensitive to the data used for training. This is why we are somewhat skeptical of AI products such as sentiment analysis APIs, not because they *never* work well, but because they work well only when the text you need to predict from is a good match to the text such a product was trained on.
 
