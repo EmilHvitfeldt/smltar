@@ -57,7 +57,7 @@ Figure \@ref(fig:cnn-architecture) illustrates a typical CNN architecture.
 A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small data cube that we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
 
 ```{r cnn-architecture, echo= FALSE, fig.cap="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value.", out.width="100%"}
-knitr::include_graphics("diagram-files/cnn-architecture.png")
+knitr::include_graphics("diagram-files/cnn-architecture.pdf")
 ```
 
 This figure isn't entirely accurate because we technically don't feed characters into a CNN, but instead use one-hot sequence encoding (Section \@ref(onehotsequence)) with a possible word embedding.
@@ -76,7 +76,7 @@ The most prominent hyperparameter is the kernel size.
 The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels can capture local information similarly to how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as shown in Figure \@ref(fig:cnn-kernel-size).
 
 ```{r cnn-kernel-size, echo= FALSE, fig.cap="The kernel size affects the size of the output. A kernel size of 3 uses the information from 3 values to compute 1 value.", out.width="100%"}
-knitr::include_graphics("diagram-files/cnn-kernel-size.png")
+knitr::include_graphics("diagram-files/cnn-kernel-size.pdf")
 ```
 
 Larger kernels learn larger and less frequent patterns, while smaller kernels will find fine-grained features. 
@@ -571,7 +571,7 @@ Let's select a couple of training observations to explain.
 
 ```{r, linewidth=80}
 sentence_to_explain <- kickstarter_train %>%
-  slice(c(1, 2)) %>%
+  slice(c(1, 5)) %>%
   pull(blurb)
 
 sentence_to_explain
@@ -704,8 +704,6 @@ if (knitr:::is_html_output()) {
 The LIME algorithm and **lime** R package are not limited to explaining CNNs. This approach can be used with any of the models we have used in this book, even the ones trained with **parsnip**.
 ```
 
-\newpage
-
 ## Case study: hyperparameter search {#keras-hyperparameter}
 
 \index{models!tuning}So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Sections \@ref(mlregressionfull) and \@ref(mlclassificationfull) using the **tune** package. We can use the [**tfruns**](https://tensorflow.rstudio.com/tools/tfruns/overview/) package to run multiple Keras models and compare the results.
@@ -786,7 +784,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 
 Now we have everything we need for hyperparameter searching. Load up **tfruns** and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
 
-```{r, results='hide', cache=FALSE}
+```{r, results='hide', cache=FALSE, message=FALSE}
 library(tfruns)
 runs <- tuning_run(
   file = "cnn-spec.R",

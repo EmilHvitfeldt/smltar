@@ -10,7 +10,8 @@ opts_chunk$set(
   dpi = 105, # this creates 2*105 dpi at 6in, which is 300 dpi at 4.2in
   fig.align = 'center',
   fig.width = 6,
-  fig.asp = 0.618  # 1 / phi
+  fig.asp = 0.618, # 1 / phi
+  dev.args = list(pdf = list(colormodel = 'cmyk', useDingats = TRUE))
 )
 
 opts_template$set(
