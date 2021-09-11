@@ -239,7 +239,7 @@ The area under each of these curves is the `roc_auc` metric we have computed. If
 Another way to evaluate our model is to evaluate the \index{matrix!confusion}confusion matrix. A confusion matrix tabulates a model's false positives and false negatives for each class.
 The function `conf_mat_resampled()` computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.
 
-```{r firstheatmap, dependson="nbrs", fig.cap='Confusion matrix for naive Bayes classifier, showing some bias towards predicting "Credit"'}
+```{r firstheatmap, dependson="nbrs", fig.cap='Confusion matrix for naive Bayes classifier, showing some bias toward predicting the credit category'}
 conf_mat_resampled(nb_rs, tidy = FALSE) %>%
   autoplot(type = "heatmap")
 ```
@@ -309,7 +309,7 @@ lasso_wf <- workflow() %>%
   add_recipe(complaints_rec) %>%
   add_model(lasso_spec)
 
-lasso_spec
+lasso_wf
 ```
 
 Now we estimate the performance of this first lasso classification model with `fit_resamples()`.
@@ -825,7 +825,7 @@ more_vars_rs %>%
   show_best("roc_auc")
 ```
 
-We see here that including more predictors did not measurably improve our model performance, but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of `r collect_metrics(sparse_rs) %>% dplyr::filter(.metric == "roc_auc") %>% pull(mean) %>% max() %>% round(3)`, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was `r select_best(sparse_rs, "roc_auc") %>% pull(penalty) %>% round(5) %>% format(scientific = FALSE)` but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of `r collect_metrics(sparse_rs) %>% dplyr::filter(.metric == "roc_auc") %>% pull(mean) %>% max() %>% round(3)`, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was `r select_best(sparse_rs, "roc_auc") %>% pull(penalty) %>% round(5) %>% format(scientific = FALSE)` and is about the same here. We can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
 
 ```{r dependson="morevarsrs"}
 finalize_workflow(more_vars_wf, 
@@ -897,7 +897,7 @@ plot_data %>%
   geom_col(position = "fill")
 ```
 
-There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
+There is a difference in these proportions across classes. Tokens like "on xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
 Remember that the current tokenization engine strips punctuation before tokenizing. 
 This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored\index{censoring} trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored, but this one is not since it is ambiguous. This highlights the real challenge of anonymizing text.].
 

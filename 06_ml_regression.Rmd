@@ -174,7 +174,7 @@ What are we to do, then, if we want to train multiple models and find the best o
 Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
 
 ```{block2, type = "rmdpackage"}
-In **tidymodels**, the package for data splitting and resampling is \mbox{**rsample**} [@R-rsample].
+In **tidymodels**, the package for data splitting and resampling is **\mbox{rsample}** [@R-rsample].
 ```
 
 Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
@@ -344,8 +344,6 @@ Models that work best with text tend to be models designed for or otherwise appr
 ```
 
 Algorithms that work well with sparse data are less important when text has been transformed to a non-sparse representation, such as with word embeddings (Chapter \@ref(embeddings)).
-
-\newpage
 
 ## Case study: removing stop words {#casestudystopwords}
 
@@ -824,12 +822,9 @@ svm_rs %>%
   mae(year, .pred)
 ```
 
-
 ```{block, type = "rmdnote"}
 For the full set of regression metric options, see the [yardstick documentation](https://yardstick.tidymodels.org/reference/).
 ```
-
-\newpage
 
 ## The full game: regression {#mlregressionfull}
 
@@ -1008,7 +1003,7 @@ scotus_fit %>%
   )
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years; those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.
 
 ```{block, type = "rmdnote"}
 Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
@@ -1047,11 +1042,11 @@ scotus_bind %>%
   select(year, .pred, case_name, text)
 ```
 
-There are some interesting examples here where we can understand why the model would mispredict: 
+There are some interesting examples here where we can understand why the model would mispredict:
 
-- _BedRoc Limited, LLC v. United States_ was a case decided in 2004 regarding the 1919 Pittman Act.
+- *Dalehite v. United States* was a case about a fertilizer explosion that is mislabeled in our dataset; it was decided in 1953, not 2008 as we see in our data, and we predict a year of 1952, very close to the true decision date.
 
-- The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.
+- *Bush v. Palm Beach County Canvassing Board* in 2000 was part of the fallout of the 2000 presidential election and dealt with historical issues like the due process clause of the U.S. Constitution; these “old” textual elements push its prediction much earlier than its true date.
 
 ```{block, type = "rmdwarning"}
 Looking at examples that your model does not perform well for is well worth your time, for similar reasons that exploratory data analysis is valuable before you begin training your model.

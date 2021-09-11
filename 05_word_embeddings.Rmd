@@ -324,8 +324,6 @@ This is a straightforward method for finding and using word embeddings, based on
 \index{embeddings!word2vec}
 \index{embeddings!FastText}
 
-\newpage
-
 ## Use pre-trained word embeddings {#glove}
 
 \index{embeddings!pre-trained}If your data set is too small, you typically cannot train reliable word embeddings. 
@@ -364,7 +362,6 @@ nearest_neighbors <- function(df, token) {
         y <- .[rep(token, nrow(.)), ]
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
-
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
         },
       sort = TRUE,
@@ -459,7 +456,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 
 \index{preprocessing!challenges}Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/), but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034). @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
-Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of Wikipedia, but Wikipedia [itself has problems with, for example, gender bias]((https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia)). Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
+Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of Wikipedia, but Wikipedia [itself has problems with, for example, gender bias](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia). Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
 ```{block, type = "rmdnote"}
 It's safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.

@@ -44,7 +44,7 @@ These elements don't contain any metadata or information to tell us which charac
 In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input into pieces (tokens) that correspond to the type [@Manning:2008:IIR:1394399]. Figure \@ref(fig:tokenizationdiag) outlines this process.\index{tokenization!definition}
 
 ```{r tokenizationdiag, echo= FALSE, fig.cap="A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.", out.width="90%"}
-knitr::include_graphics("diagram-files/tokenization-black-box.png")
+knitr::include_graphics("diagram-files/tokenization-black-box.pdf")
 ```
 
 Most commonly, the meaningful unit or type of token that we want to split text into units of is a **word**. However, it is difficult to clearly define what a word is, for many or even most languages. Many languages, such as Chinese, do not use white space between words at all. Even languages that do use white space, including English, often have particular examples that are ambiguous [@Bender13]. Romance languages like Italian and French use pronouns and negation words that may better be considered prefixes with a space, and English contractions like "didn't" may more accurately be considered two words with no space.\index{language!Non-English}\index{preprocessing!challenges}
@@ -108,7 +108,7 @@ Thinking of a token as a word is a useful way to start understanding tokenizatio
 
 - paragraphs, and
 
-- n-grams.
+- n-grams
 
 In the following sections, we will explore how to tokenize text using the **tokenizers** package. These functions take a character vector as the input and return lists of character vectors as output. This same tokenization can also be done using the **tidytext** [@Silge16] package, for workflows using tidy data principles where the input and output are both in a dataframe.
 
@@ -175,7 +175,7 @@ tokenize_characters(x = the_fir_tree,
 
 The results have more elements because the spaces and punctuation have not been removed.
 
-Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "f" and "f" into "ff". When we apply normal tokenization rules the ligatures will not be split up.
 
 ```{r}
 tokenize_characters("ﬂowers")
