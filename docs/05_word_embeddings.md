@@ -130,7 +130,7 @@ nested_words
 ```
 
 ```
-#> # A tibble: 117,170 x 2
+#> # A tibble: 117,170 × 2
 #>    complaint_id words             
 #>           <dbl> <list>            
 #>  1      3384392 <tibble [18 × 1]> 
@@ -199,7 +199,7 @@ tidy_pmi
 
 
 ```
-#> # A tibble: 4,818,402 x 3
+#> # A tibble: 4,818,402 × 3
 #>    item1   item2           pmi
 #>    <chr>   <chr>         <dbl>
 #>  1 systems transworld  7.09   
@@ -239,7 +239,7 @@ tidy_word_vectors
 ```
 
 ```
-#> # A tibble: 747,500 x 3
+#> # A tibble: 747,500 × 3
 #>    item1   dimension   value
 #>    <chr>       <int>   <dbl>
 #>  1 systems         1 0.0165 
@@ -300,7 +300,7 @@ tidy_word_vectors %>%
 ```
 
 ```
-#> # A tibble: 7,475 x 2
+#> # A tibble: 7,475 × 2
 #>    item1            value
 #>    <chr>            <dbl>
 #>  1 error            1    
@@ -327,7 +327,7 @@ tidy_word_vectors %>%
 ```
 
 ```
-#> # A tibble: 7,475 x 2
+#> # A tibble: 7,475 × 2
 #>    item1        value
 #>    <chr>        <dbl>
 #>  1 month        1    
@@ -354,7 +354,7 @@ tidy_word_vectors %>%
 ```
 
 ```
-#> # A tibble: 7,475 x 2
+#> # A tibble: 7,475 × 2
 #>    item1     value
 #>    <chr>     <dbl>
 #>  1 fee       1    
@@ -380,7 +380,7 @@ tidy_word_vectors %>%
 ```
 
 ```
-#> # A tibble: 7,047 x 2
+#> # A tibble: 7,047 × 2
 #>    item1     value
 #>    <chr>     <dbl>
 #>  1 fee       1    
@@ -481,7 +481,7 @@ glove6b
 ```
 
 ```
-#> # A tibble: 400,000 x 101
+#> # A tibble: 400,000 × 101
 #>    token      d1      d2      d3      d4      d5      d6      d7      d8      d9
 #>    <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
 #>  1 "the" -0.0382 -0.245   0.728  -0.400   0.0832  0.0440 -0.391   0.334  -0.575 
@@ -512,7 +512,7 @@ tidy_glove
 ```
 
 ```
-#> # A tibble: 40,000,000 x 3
+#> # A tibble: 40,000,000 × 3
 #>    item1 dimension   value
 #>    <chr> <chr>       <dbl>
 #>  1 the   d1        -0.0382
@@ -539,7 +539,6 @@ nearest_neighbors <- function(df, token) {
         y <- .[rep(token, nrow(.)), ]
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
-
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
         },
       sort = TRUE,
@@ -558,7 +557,7 @@ tidy_glove %>%
 ```
 
 ```
-#> # A tibble: 400,000 x 2
+#> # A tibble: 400,000 × 2
 #>    item1       value
 #>    <chr>       <dbl>
 #>  1 error       1    
@@ -585,7 +584,7 @@ tidy_glove %>%
 ```
 
 ```
-#> # A tibble: 400,000 x 2
+#> # A tibble: 400,000 × 2
 #>    item1    value
 #>    <chr>    <dbl>
 #>  1 month    1    
@@ -612,7 +611,7 @@ tidy_glove %>%
 ```
 
 ```
-#> # A tibble: 400,000 x 2
+#> # A tibble: 400,000 × 2
 #>    item1        value
 #>    <chr>        <dbl>
 #>  1 fee          1    
@@ -691,7 +690,7 @@ This is true of all machine learning to some extent (models learn, reproduce, an
 
 \index{preprocessing!challenges}Results like these have been confirmed over and over again, such as when @Bolukbasi2016 demonstrated gender stereotypes in how word embeddings encode professions or when Google Translate [exhibited apparently sexist behavior when translating text from languages with no gendered pronouns](https://twitter.com/seyyedreza/status/935291317252493312). Google has since [worked to correct this problem](https://www.blog.google/products/translate/reducing-gender-bias-google-translate/), but in 2021 the problem [still exists for some languages](https://twitter.com/doravargha/status/1373211762108076034). @Garg2018 even used the way bias and stereotypes can be found in word embeddings to quantify how social attitudes towards women and minorities have changed over time. 
 
-Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of Wikipedia, but Wikipedia [itself has problems with, for example, gender bias]((https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia)). Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
+Remember that word embeddings are *learned* or trained from some large data set of text; this training data is the source of the biases we observe when applying word embeddings to NLP tasks. @Bender2021 outline how the very large data sets used in large language models do not mean that such models reflect representative or diverse viewpoints, or even can respond to changing social views. As one concrete example, a common data set used to train large embedding models is the text of Wikipedia, but Wikipedia [itself has problems with, for example, gender bias](https://en.wikipedia.org/wiki/Gender_bias_on_Wikipedia). Some of the gender discrepancies on Wikipedia can be attributed to social and historical factors, but some can be attributed to the site mechanics of Wikipedia itself [@Wagner2016].
 
 <div class="rmdnote">
 <p>It’s safe to assume that any large corpus of language will contain latent structure reflecting the biases of the people who generated that language.</p>

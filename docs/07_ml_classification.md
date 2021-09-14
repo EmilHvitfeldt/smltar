@@ -269,7 +269,7 @@ complaints_folds
 
 ```
 #> #  10-fold cross-validation 
-#> # A tibble: 10 x 2
+#> # A tibble: 10 × 2
 #>    splits               id    
 #>    <list>               <chr> 
 #>  1 <split [79119/8791]> Fold01
@@ -346,7 +346,7 @@ nb_rs_metrics
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n std_err .config             
 #>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
 #> 1 accuracy binary     0.802    10 0.00434 Preprocessor1_Model1
@@ -396,8 +396,8 @@ conf_mat_resampled(nb_rs, tidy = FALSE) %>%
 ```
 
 <div class="figure" style="text-align: center">
-<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting &quot;Credit&quot;" width="672" />
-<p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias towards predicting "Credit"</p>
+<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias toward predicting the credit category" width="672" />
+<p class="caption">(\#fig:firstheatmap)Confusion matrix for naive Bayes classifier, showing some bias toward predicting the credit category</p>
 </div>
 
 In \index{matrix!confusion}Figure \@ref(fig:firstheatmap), the squares for "Credit"/"Credit" and "Other"/"Other" have a darker shade than the off-diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the "Credit" class are being mispredicted as "Other".
@@ -438,7 +438,7 @@ null_rs %>%
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n std_err .config             
 #>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
 #> 1 accuracy binary     0.526    10 0.00143 Preprocessor1_Model1
@@ -487,10 +487,22 @@ lasso_wf <- workflow() %>%
   add_recipe(complaints_rec) %>%
   add_model(lasso_spec)
 
-lasso_spec
+lasso_wf
 ```
 
 ```
+#> ══ Workflow ════════════════════════════════════════════════════════════════════
+#> Preprocessor: Recipe
+#> Model: logistic_reg()
+#> 
+#> ── Preprocessor ────────────────────────────────────────────────────────────────
+#> 3 Recipe Steps
+#> 
+#> • step_tokenize()
+#> • step_tokenfilter()
+#> • step_tfidf()
+#> 
+#> ── Model ───────────────────────────────────────────────────────────────────────
 #> Logistic Regression Model Specification (classification)
 #> 
 #> Main Arguments:
@@ -528,7 +540,7 @@ lasso_rs_metrics
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n  std_err .config             
 #>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
 #> 1 accuracy binary     0.870    10 0.00124  Preprocessor1_Model1
@@ -609,7 +621,7 @@ lambda_grid
 ```
 
 ```
-#> # A tibble: 30 x 1
+#> # A tibble: 30 × 1
 #>     penalty
 #>       <dbl>
 #>  1 1   e-10
@@ -655,19 +667,19 @@ tune_rs
 ```
 #> # Tuning results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 5
-#>    splits             id     .metrics        .notes         .predictions        
-#>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  2 <split [79119/879… Fold02 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  3 <split [79119/879… Fold03 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  4 <split [79119/879… Fold04 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  5 <split [79119/879… Fold05 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  6 <split [79119/879… Fold06 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  7 <split [79119/879… Fold07 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  8 <split [79119/879… Fold08 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#>  9 <split [79119/879… Fold09 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
-#> 10 <split [79119/879… Fold10 <tibble [60 × … <tibble [0 × … <tibble [263,730 × …
+#> # A tibble: 10 × 5
+#>    splits               id     .metrics          .notes           .predictions  
+#>    <list>               <chr>  <list>            <list>           <list>        
+#>  1 <split [79119/8791]> Fold01 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  2 <split [79119/8791]> Fold02 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  3 <split [79119/8791]> Fold03 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  4 <split [79119/8791]> Fold04 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  5 <split [79119/8791]> Fold05 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  6 <split [79119/8791]> Fold06 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  7 <split [79119/8791]> Fold07 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  8 <split [79119/8791]> Fold08 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>  9 <split [79119/8791]> Fold09 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#> 10 <split [79119/8791]> Fold10 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
 ```
 
 <div class="rmdwarning">
@@ -683,7 +695,7 @@ collect_metrics(tune_rs)
 ```
 
 ```
-#> # A tibble: 60 x 7
+#> # A tibble: 60 × 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
 #>  1 1   e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model01
@@ -724,7 +736,7 @@ tune_rs %>%
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>        penalty .metric .estimator  mean     n  std_err .config              
 #>          <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
 #> 1 0.000788     roc_auc binary     0.953    10 0.000505 Preprocessor1_Model21
@@ -747,7 +759,7 @@ chosen_auc
 ```
 
 ```
-#> # A tibble: 1 x 9
+#> # A tibble: 1 × 9
 #>    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>            <dbl>  <dbl>
 #> 1 0.000788 roc_auc binary     0.953    10 0.000505 Preprocessor1_M… 0.953  0.953
@@ -802,7 +814,7 @@ fitted_lasso %>%
 ```
 
 ```
-#> # A tibble: 1,001 x 3
+#> # A tibble: 1,001 × 3
 #>    term                                         estimate  penalty
 #>    <chr>                                           <dbl>    <dbl>
 #>  1 tfidf_consumer_complaint_narrative_funds         27.6 0.000788
@@ -831,7 +843,7 @@ fitted_lasso %>%
 ```
 
 ```
-#> # A tibble: 1,001 x 3
+#> # A tibble: 1,001 × 3
 #>    term                                          estimate  penalty
 #>    <chr>                                            <dbl>    <dbl>
 #>  1 tfidf_consumer_complaint_narrative_reseller      -90.9 0.000788
@@ -909,7 +921,7 @@ smaller_lambda
 ```
 
 ```
-#> # A tibble: 20 x 1
+#> # A tibble: 20 × 1
 #>      penalty
 #>        <dbl>
 #>  1 0.00001  
@@ -951,7 +963,7 @@ sparse_rs
 ```
 #> # Tuning results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    splits               id     .metrics          .notes          
 #>    <list>               <chr>  <list>            <list>          
 #>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
@@ -975,7 +987,7 @@ sparse_rs %>%
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>    penalty .metric .estimator  mean     n  std_err .config              
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
 #> 1 0.000695 roc_auc binary     0.953    10 0.000506 Preprocessor1_Model08
@@ -1049,7 +1061,7 @@ multicomplaints_train %>%
 ```
 
 ```
-#> # A tibble: 9 x 2
+#> # A tibble: 9 × 2
 #>       n product                                                                 
 #>   <int> <chr>                                                                   
 #> 1 41714 Credit reporting, credit repair services, or other personal consumer re…
@@ -1179,19 +1191,19 @@ multi_lasso_rs
 ```
 #> # Tuning results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 5
-#>    splits             id     .metrics        .notes         .predictions        
-#>    <list>             <chr>  <list>          <list>         <list>              
-#>  1 <split [79119/879… Fold01 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  2 <split [79119/879… Fold02 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  3 <split [79119/879… Fold03 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  4 <split [79119/879… Fold04 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  5 <split [79119/879… Fold05 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  6 <split [79119/879… Fold06 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  7 <split [79119/879… Fold07 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  8 <split [79119/879… Fold08 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
-#>  9 <split [79119/879… Fold09 <tibble [40 × … <tibble [1 × … <tibble [175,820 × …
-#> 10 <split [79119/879… Fold10 <tibble [40 × … <tibble [0 × … <tibble [175,820 × …
+#> # A tibble: 10 × 5
+#>    splits               id     .metrics          .notes           .predictions  
+#>    <list>               <chr>  <list>            <list>           <list>        
+#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
+#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [1 × 1]> <tibble [175,…
+#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
 ```
 
 What do we see, in terms of performance metrics?
@@ -1205,7 +1217,7 @@ best_acc
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>    penalty .metric  .estimator  mean     n std_err .config              
 #>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
 #> 1 0.00234  accuracy multiclass 0.754    10 0.00155 Preprocessor1_Model10
@@ -1397,7 +1409,7 @@ more_vars_rs %>%
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>    penalty .metric .estimator  mean     n  std_err .config              
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
 #> 1 0.000695 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model08
@@ -1407,7 +1419,7 @@ more_vars_rs %>%
 #> 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05
 ```
 
-We see here that including more predictors did not measurably improve our model performance, but it did change the regularization a bit. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
+We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 and is about the same here. We can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
 
 
 ```r
@@ -1422,7 +1434,7 @@ finalize_workflow(more_vars_wf,
 ```
 
 ```
-#> # A tibble: 21 x 4
+#> # A tibble: 21 × 4
 #>    term                    estimate  penalty term_rank
 #>    <chr>                      <dbl>    <dbl>     <int>
 #>  1 (Intercept)              0.326   0.000695       701
@@ -1509,7 +1521,7 @@ plot_data %>%
 <p class="caption">(\#fig:trigram25)Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class</p>
 </div>
 
-There is a difference in these proportions across classes. Tokens like "on xx xx" and "of xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
+There is a difference in these proportions across classes. Tokens like "on xx xx" are used when referencing a date, e.g., "we had a problem on 06/25/2018".
 Remember that the current tokenization engine strips punctuation before tokenizing. 
 This means that the above example will be turned into "we had a problem on 06 25 2018" before creating n-grams^[The censored\index{censoring} trigrams that include "oh" seem mysterious but upon closer examination, they come from censored addresses, with "oh" representing the US state of Ohio. Most two-letter state abbreviations are censored, but this one is not since it is ambiguous. This highlights the real challenge of anonymizing text.].
 
@@ -1873,7 +1885,7 @@ nb_rs_predictions %>%
 ```
 
 ```
-#> # A tibble: 1 x 3
+#> # A tibble: 1 × 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
 #> 1 recall  binary         0.688
@@ -1889,7 +1901,7 @@ nb_rs_predictions %>%
 ```
 
 ```
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
 #>  1 Fold01 recall  binary         0.694
@@ -2044,7 +2056,7 @@ final_grid
 ```
 
 ```
-#> # A tibble: 60 x 2
+#> # A tibble: 60 × 2
 #>     penalty max_tokens
 #>       <dbl>      <int>
 #>  1 0.0001         1000
@@ -2107,7 +2119,7 @@ choose_acc
 ```
 
 ```
-#> # A tibble: 1 x 10
+#> # A tibble: 1 × 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
 #> 1 0.00483       1000 accuracy binary     0.882    10 0.00101 Prepro… 0.898  1.75
@@ -2163,7 +2175,7 @@ collect_metrics(final_fitted)
 ```
 
 ```
-#> # A tibble: 2 x 4
+#> # A tibble: 2 × 4
 #>   .metric  .estimator .estimate .config             
 #>   <chr>    <chr>          <dbl> <chr>               
 #> 1 accuracy binary         0.882 Preprocessor1_Model1
@@ -2265,7 +2277,7 @@ complaints_bind %>%
 ```
 
 ```
-#> # A tibble: 10 x 1
+#> # A tibble: 10 × 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
 #>  1 "Bank of America took more than 30 days to send me documents to validate a d…
@@ -2293,7 +2305,7 @@ complaints_bind %>%
 ```
 
 ```
-#> # A tibble: 10 x 1
+#> # A tibble: 10 × 1
 #>    consumer_complaint_narrative                                                 
 #>    <chr>                                                                        
 #>  1 "Please review the attachment. Remove the inquiries and place an extended fr…

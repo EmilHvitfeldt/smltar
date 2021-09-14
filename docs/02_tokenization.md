@@ -53,7 +53,7 @@ These elements don't contain any metadata or information to tell us which charac
 In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input into pieces (tokens) that correspond to the type [@Manning:2008:IIR:1394399]. Figure \@ref(fig:tokenizationdiag) outlines this process.\index{tokenization!definition}
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/tokenization-black-box.png" alt="A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split." width="90%" />
+<img src="diagram-files/tokenization-black-box.pdf" alt="A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split." width="90%" />
 <p class="caption">(\#fig:tokenizationdiag)A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.</p>
 </div>
 
@@ -142,7 +142,7 @@ Thinking of a token as a word is a useful way to start understanding tokenizatio
 
 - paragraphs, and
 
-- n-grams.
+- n-grams
 
 In the following sections, we will explore how to tokenize text using the **tokenizers** package. These functions take a character vector as the input and return lists of character vectors as output. This same tokenization can also be done using the **tidytext** [@Silge16] package, for workflows using tidy data principles where the input and output are both in a dataframe.
 
@@ -181,7 +181,7 @@ sample_tibble %>%
 ```
 
 ```
-#> # A tibble: 11 x 1
+#> # A tibble: 11 × 1
 #>    word  
 #>    <chr> 
 #>  1 far   
@@ -210,7 +210,7 @@ sample_tibble %>%
 ```
 
 ```
-#> # A tibble: 12 x 1
+#> # A tibble: 12 × 1
 #>    word  
 #>    <chr> 
 #>  1 far   
@@ -279,7 +279,7 @@ tokenize_characters(x = the_fir_tree,
 
 The results have more elements because the spaces and punctuation have not been removed.
 
-Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "s" and "t" into "ﬆ". When we apply normal tokenization rules the ligatures will not be split up.
+Depending on the format you have your text data in, it might contain ligatures.\index{tokenization!ligatures} Ligatures are when multiple graphemes or letters are combined as a single character The graphemes "f" and "l" are combined into "ﬂ", or "f" and "f" into "ff". When we apply normal tokenization rules the ligatures will not be split up.
 
 
 ```r
@@ -340,7 +340,7 @@ hcandersen_en %>%
 ```
 
 ```
-#> # A tibble: 10 x 3
+#> # A tibble: 10 × 3
 #> # Groups:   book [2]
 #>    book               word      n
 #>    <chr>              <chr> <int>
@@ -863,14 +863,14 @@ bench::mark(check = FALSE, iterations = 10,
 ```
 
 ```
-#> # A tibble: 5 x 6
+#> # A tibble: 5 × 6
 #>   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #>   <bch:expr> <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl>
-#> 1 corpus        118ms    128ms      7.76    4.59MB    0.863
-#> 2 tokenizers    151ms    154ms      6.48    1.01MB    1.62 
-#> 3 text2vec      130ms    134ms      7.33   20.64MB    0.815
-#> 4 quanteda      241ms    243ms      4.11     8.7MB    2.74 
-#> 5 base R        471ms    499ms      2.02   10.51MB    0.505
+#> 1 corpus       77.1ms   85.6ms     11.3     4.58MB     1.26
+#> 2 tokenizers   96.7ms  100.1ms      9.80    1.01MB     1.09
+#> 3 text2vec     79.5ms   81.1ms     11.9    20.64MB     1.32
+#> 4 quanteda    157.2ms  164.4ms      6.07     8.7MB     1.52
+#> 5 base R      325.7ms  332.3ms      3.00   10.51MB     2.00
 ```
 
 The corpus package [@Perry2020] offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="mlregression.html"/>
 <link rel="next" href="dloverview.html"/>
-<script src="libs/header-attrs-2.9.4/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -635,7 +635,7 @@ In <strong>tidymodels</strong>, the package for creating model specifications is
 <span id="cb277-3"><a href="mlclassification.html#cb277-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb277-4"><a href="mlclassification.html#cb277-4" aria-hidden="true" tabindex="-1"></a>complaints_folds</span></code></pre></div>
 <pre><code>#&gt; #  10-fold cross-validation 
-#&gt; # A tibble: 10 x 2
+#&gt; # A tibble: 10 × 2
 #&gt;    splits               id    
 #&gt;    &lt;list&gt;               &lt;chr&gt; 
 #&gt;  1 &lt;split [79119/8791]&gt; Fold01
@@ -686,7 +686,7 @@ Using a <code>workflow()</code> isn’t required (you can fit or tune a model pl
 <span id="cb282-2"><a href="mlclassification.html#cb282-2" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(nb_rs)</span></code></pre></div>
 <p>What results do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb283-1"><a href="mlclassification.html#cb283-1" aria-hidden="true" tabindex="-1"></a>nb_rs_metrics</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric  .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 accuracy binary     0.802    10 0.00434 Preprocessor1_Model1
@@ -716,7 +716,7 @@ ROC AUC measures how well a classifier performs at different thresholds. The ROC
 <span id="cb285-7"><a href="mlclassification.html#cb285-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;ROC curve for US Consumer Finance Complaints&quot;</span>,</span>
 <span id="cb285-8"><a href="mlclassification.html#cb285-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each resample fold is shown in a different color&quot;</span></span>
 <span id="cb285-9"><a href="mlclassification.html#cb285-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:firstroccurve"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:firstroccurve"></span>
 <img src="07_ml_classification_files/figure-html/firstroccurve-1.svg" alt="ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">
 FIGURE 7.1: ROC curve for naive Bayes classifier with resamples of US Consumer Finance Bureau complaints
@@ -727,10 +727,10 @@ FIGURE 7.1: ROC curve for naive Bayes classifier with resamples of US Consumer F
 The function <code>conf_mat_resampled()</code> computes a separate confusion matrix for each resample and takes the average of the cell counts. This allows us to visualize an overall confusion matrix rather than needing to examine each resample individually.</p>
 <div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="mlclassification.html#cb286-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb286-2"><a href="mlclassification.html#cb286-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:firstheatmap"></span>
-<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias towards predicting &quot;Credit&quot;" width="672" />
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:firstheatmap"></span>
+<img src="07_ml_classification_files/figure-html/firstheatmap-1.svg" alt="Confusion matrix for naive Bayes classifier, showing some bias toward predicting the credit category" width="672" />
 <p class="caption">
-FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias towards predicting “Credit”
+FIGURE 7.2: Confusion matrix for naive Bayes classifier, showing some bias toward predicting the credit category
 </p>
 </div>
 <p>In Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>, the squares for “Credit”/“Credit” and “Other”/“Other” have a darker shade than the off-diagonal squares. This is a good sign, meaning that our model is right more often than not! However, this first model is struggling somewhat since many observations from the “Credit” class are being mispredicted as “Other.”</p>
@@ -760,7 +760,7 @@ One metric alone cannot give you a complete picture of how well your classificat
 <p>What results do we obtain from the null model, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="mlclassification.html#cb288-1" aria-hidden="true" tabindex="-1"></a>null_rs <span class="sc">%&gt;%</span></span>
 <span id="cb288-2"><a href="mlclassification.html#cb288-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric  .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 accuracy binary     0.526    10 0.00143 Preprocessor1_Model1
@@ -794,8 +794,20 @@ Using regularization helps us choose a simpler model that we expect to generaliz
 <span id="cb292-2"><a href="mlclassification.html#cb292-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(complaints_rec) <span class="sc">%&gt;%</span></span>
 <span id="cb292-3"><a href="mlclassification.html#cb292-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
 <span id="cb292-4"><a href="mlclassification.html#cb292-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb292-5"><a href="mlclassification.html#cb292-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
-<pre><code>#&gt; Logistic Regression Model Specification (classification)
+<span id="cb292-5"><a href="mlclassification.html#cb292-5" aria-hidden="true" tabindex="-1"></a>lasso_wf</span></code></pre></div>
+<pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
+#&gt; Preprocessor: Recipe
+#&gt; Model: logistic_reg()
+#&gt; 
+#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────
+#&gt; 3 Recipe Steps
+#&gt; 
+#&gt; • step_tokenize()
+#&gt; • step_tokenfilter()
+#&gt; • step_tfidf()
+#&gt; 
+#&gt; ── Model ───────────────────────────────────────────────────────────────────────
+#&gt; Logistic Regression Model Specification (classification)
 #&gt; 
 #&gt; Main Arguments:
 #&gt;   penalty = 0.01
@@ -814,7 +826,7 @@ Using regularization helps us choose a simpler model that we expect to generaliz
 <span id="cb295-2"><a href="mlclassification.html#cb295-2" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(lasso_rs)</span></code></pre></div>
 <p>Now we can see that <code>lasso_rs_metrics</code> contains the same default performance metrics we have been using so far in this chapter.</p>
 <div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="mlclassification.html#cb296-1" aria-hidden="true" tabindex="-1"></a>lasso_rs_metrics</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric  .estimator  mean     n  std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 accuracy binary     0.870    10 0.00124  Preprocessor1_Model1
@@ -830,7 +842,7 @@ Figure <a href="mlclassification.html#fig:lassoroccurve">7.3</a> shows the ROC c
 <span id="cb298-7"><a href="mlclassification.html#cb298-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;ROC curve for US Consumer Finance Complaints&quot;</span>,</span>
 <span id="cb298-8"><a href="mlclassification.html#cb298-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each resample fold is shown in a different color&quot;</span></span>
 <span id="cb298-9"><a href="mlclassification.html#cb298-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:lassoroccurve"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:lassoroccurve"></span>
 <img src="07_ml_classification_files/figure-html/lassoroccurve-1.svg" alt="ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints" width="672" />
 <p class="caption">
 FIGURE 7.3: ROC curve for lasso regularized classifier with resamples of US Consumer Finance Bureau complaints
@@ -840,7 +852,7 @@ FIGURE 7.3: ROC curve for lasso regularized classifier with resamples of US Cons
 Our lasso model is better at separating the classes than the naive Bayes model in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, and our results are more symmetrical than those for the naive Bayes model in Figure <a href="mlclassification.html#fig:firstheatmap">7.2</a>.</p>
 <div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="mlclassification.html#cb299-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(lasso_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb299-2"><a href="mlclassification.html#cb299-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:lassoheatmap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:lassoheatmap"></span>
 <img src="07_ml_classification_files/figure-html/lassoheatmap-1.svg" alt="Confusion matrix for a lasso regularized classifier, with more symmetric results" width="672" />
 <p class="caption">
 FIGURE 7.4: Confusion matrix for a lasso regularized classifier, with more symmetric results
@@ -871,7 +883,7 @@ Think of <code>tune()</code> here as a placeholder for the regularization penalt
 <p>We can create a regular grid of values to try, using a convenience function for <code>penalty()</code>.</p>
 <div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="mlclassification.html#cb302-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(), <span class="at">levels =</span> <span class="dv">30</span>)</span>
 <span id="cb302-2"><a href="mlclassification.html#cb302-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 30 x 1
+<pre><code>#&gt; # A tibble: 30 × 1
 #&gt;     penalty
 #&gt;       &lt;dbl&gt;
 #&gt;  1 1   e-10
@@ -908,19 +920,19 @@ In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</s
 <span id="cb304-13"><a href="mlclassification.html#cb304-13" aria-hidden="true" tabindex="-1"></a>tune_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 5
-#&gt;    splits             id     .metrics        .notes         .predictions        
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  2 &lt;split [79119/879… Fold02 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  3 &lt;split [79119/879… Fold03 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  4 &lt;split [79119/879… Fold04 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  5 &lt;split [79119/879… Fold05 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  6 &lt;split [79119/879… Fold06 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  7 &lt;split [79119/879… Fold07 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  8 &lt;split [79119/879… Fold08 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt;  9 &lt;split [79119/879… Fold09 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …
-#&gt; 10 &lt;split [79119/879… Fold10 &lt;tibble [60 × … &lt;tibble [0 × … &lt;tibble [263,730 × …</code></pre>
+#&gt; # A tibble: 10 × 5
+#&gt;    splits               id     .metrics          .notes           .predictions  
+#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;        
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…</code></pre>
 <div class="rmdwarning">
 <p>
 Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.
@@ -929,7 +941,7 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <p></p>
 <p>Now, instead of one set of metrics, we have a set of metrics for each value of the regularization penalty.</p>
 <div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="mlclassification.html#cb306-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(tune_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 60 x 7
+<pre><code>#&gt; # A tibble: 60 × 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
 #&gt;  1 1   e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model01
@@ -949,7 +961,7 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <span id="cb308-3"><a href="mlclassification.html#cb308-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Lasso model performance across regularization penalties&quot;</span>,</span>
 <span id="cb308-4"><a href="mlclassification.html#cb308-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance metrics can be used to identity the best penalty&quot;</span></span>
 <span id="cb308-5"><a href="mlclassification.html#cb308-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:complaintstunevis"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaintstunevis"></span>
 <img src="07_ml_classification_files/figure-html/complaintstunevis-1.svg" alt="We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty." width="672" />
 <p class="caption">
 FIGURE 7.5: We can identify the best regularization penalty from model performance metrics, for example, at the highest ROC AUC. Note the logarithmic scale for the regularization penalty.
@@ -958,7 +970,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <p>We can view the best results with <code>show_best()</code> and a choice for the metric, such as ROC AUC.</p>
 <div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="mlclassification.html#cb309-1" aria-hidden="true" tabindex="-1"></a>tune_rs <span class="sc">%&gt;%</span></span>
 <span id="cb309-2"><a href="mlclassification.html#cb309-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 x 7
+<pre><code>#&gt; # A tibble: 5 × 7
 #&gt;        penalty .metric .estimator  mean     n  std_err .config              
 #&gt;          &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
 #&gt; 1 0.000788     roc_auc binary     0.953    10 0.000505 Preprocessor1_Model21
@@ -971,7 +983,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <span id="cb311-2"><a href="mlclassification.html#cb311-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_one_std_err</span>(<span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>, <span class="sc">-</span>penalty)</span>
 <span id="cb311-3"><a href="mlclassification.html#cb311-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb311-4"><a href="mlclassification.html#cb311-4" aria-hidden="true" tabindex="-1"></a>chosen_auc</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 9
+<pre><code>#&gt; # A tibble: 1 × 9
 #&gt;    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;
 #&gt; 1 0.000788 roc_auc binary     0.953    10 0.000505 Preprocessor1_M… 0.953  0.953</code></pre>
@@ -1005,7 +1017,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <span id="cb316-2"><a href="mlclassification.html#cb316-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb316-3"><a href="mlclassification.html#cb316-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb316-4"><a href="mlclassification.html#cb316-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,001 x 3
+<pre><code>#&gt; # A tibble: 1,001 × 3
 #&gt;    term                                         estimate  penalty
 #&gt;    &lt;chr&gt;                                           &lt;dbl&gt;    &lt;dbl&gt;
 #&gt;  1 tfidf_consumer_complaint_narrative_funds         27.6 0.000788
@@ -1025,7 +1037,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <span id="cb318-2"><a href="mlclassification.html#cb318-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb318-3"><a href="mlclassification.html#cb318-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb318-4"><a href="mlclassification.html#cb318-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(estimate)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,001 x 3
+<pre><code>#&gt; # A tibble: 1,001 × 3
 #&gt;    term                                          estimate  penalty
 #&gt;    &lt;chr&gt;                                            &lt;dbl&gt;    &lt;dbl&gt;
 #&gt;  1 tfidf_consumer_complaint_narrative_reseller      -90.9 0.000788
@@ -1084,7 +1096,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 <p>The last time we tuned a lasso model, we used the defaults for the penalty parameter and 30 levels. Let’s restrict the values this time using the <code>range</code> argument, so we don’t test out as small values for regularization, and only try 20 levels.</p>
 <div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="mlclassification.html#cb323-1" aria-hidden="true" tabindex="-1"></a>smaller_lambda <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
 <span id="cb323-2"><a href="mlclassification.html#cb323-2" aria-hidden="true" tabindex="-1"></a>smaller_lambda</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 20 x 1
+<pre><code>#&gt; # A tibble: 20 × 1
 #&gt;      penalty
 #&gt;        &lt;dbl&gt;
 #&gt;  1 0.00001  
@@ -1118,7 +1130,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 <span id="cb325-8"><a href="mlclassification.html#cb325-8" aria-hidden="true" tabindex="-1"></a>sparse_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 4
+#&gt; # A tibble: 10 × 4
 #&gt;    splits               id     .metrics          .notes          
 #&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
 #&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
@@ -1134,7 +1146,7 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 <p>How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of <code>set_engine("glmnet")</code>?</p>
 <div class="sourceCode" id="cb327"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb327-1"><a href="mlclassification.html#cb327-1" aria-hidden="true" tabindex="-1"></a>sparse_rs <span class="sc">%&gt;%</span></span>
 <span id="cb327-2"><a href="mlclassification.html#cb327-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 x 7
+<pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
 #&gt; 1 0.000695 roc_auc binary     0.953    10 0.000506 Preprocessor1_Model08
@@ -1185,7 +1197,7 @@ Whatever the reason, in this section we would like to build a multiclass classif
 <div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb330-1"><a href="mlclassification.html#cb330-1" aria-hidden="true" tabindex="-1"></a>multicomplaints_train <span class="sc">%&gt;%</span></span>
 <span id="cb330-2"><a href="mlclassification.html#cb330-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(product, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb330-3"><a href="mlclassification.html#cb330-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(n, product)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 9 x 2
+<pre><code>#&gt; # A tibble: 9 × 2
 #&gt;       n product                                                                 
 #&gt;   &lt;int&gt; &lt;chr&gt;                                                                   
 #&gt; 1 41714 Credit reporting, credit repair services, or other personal consumer re…
@@ -1277,25 +1289,25 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <span id="cb338-8"><a href="mlclassification.html#cb338-8" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 5
-#&gt;    splits             id     .metrics        .notes         .predictions        
-#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;          &lt;list&gt;         &lt;list&gt;              
-#&gt;  1 &lt;split [79119/879… Fold01 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  2 &lt;split [79119/879… Fold02 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  3 &lt;split [79119/879… Fold03 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  4 &lt;split [79119/879… Fold04 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  5 &lt;split [79119/879… Fold05 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  6 &lt;split [79119/879… Fold06 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  7 &lt;split [79119/879… Fold07 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  8 &lt;split [79119/879… Fold08 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …
-#&gt;  9 &lt;split [79119/879… Fold09 &lt;tibble [40 × … &lt;tibble [1 × … &lt;tibble [175,820 × …
-#&gt; 10 &lt;split [79119/879… Fold10 &lt;tibble [40 × … &lt;tibble [0 × … &lt;tibble [175,820 × …</code></pre>
+#&gt; # A tibble: 10 × 5
+#&gt;    splits               id     .metrics          .notes           .predictions  
+#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;        
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 1]&gt; &lt;tibble [175,…
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…</code></pre>
 <p>What do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="mlclassification.html#cb340-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
 <span id="cb340-2"><a href="mlclassification.html#cb340-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
 <span id="cb340-3"><a href="mlclassification.html#cb340-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb340-4"><a href="mlclassification.html#cb340-4" aria-hidden="true" tabindex="-1"></a>best_acc</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 x 7
+<pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric  .estimator  mean     n std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
 #&gt; 1 0.00234  accuracy multiclass 0.754    10 0.00155 Preprocessor1_Model10
@@ -1318,7 +1330,7 @@ In binary classification, there is one right answer and one wrong answer; in thi
 <span id="cb342-6"><a href="mlclassification.html#cb342-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
 <span id="cb342-7"><a href="mlclassification.html#cb342-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
 <span id="cb342-8"><a href="mlclassification.html#cb342-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:multiheatmap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:multiheatmap"></span>
 <img src="07_ml_classification_files/figure-html/multiheatmap-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
 <p class="caption">
 FIGURE 7.6: Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal
@@ -1337,7 +1349,7 @@ A trick to deal with this problem is to remove all the correctly predicted obser
 <span id="cb343-7"><a href="mlclassification.html#cb343-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
 <span id="cb343-8"><a href="mlclassification.html#cb343-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
 <span id="cb343-9"><a href="mlclassification.html#cb343-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:multiheatmapminusdiag"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:multiheatmapminusdiag"></span>
 <img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
 <p class="caption">
 FIGURE 7.7: Confusion matrix for multiclass lasso regularized classifier without diagonal
@@ -1430,7 +1442,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <p>We can extract the metrics for the best-performing regularization penalties from these results with <code>show_best()</code> with an option like <code>"roc_auc"</code> or <code>"accuracy"</code> if we prefer. How did our chosen performance metric turn out for our model that included more than just the text data?</p>
 <div class="sourceCode" id="cb351"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb351-1"><a href="mlclassification.html#cb351-1" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="sc">%&gt;%</span></span>
 <span id="cb351-2"><a href="mlclassification.html#cb351-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 5 x 7
+<pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
 #&gt; 1 0.000695 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model08
@@ -1438,7 +1450,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 #&gt; 3 0.000207 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model06
 #&gt; 4 0.00127  roc_auc binary     0.953    10 0.000511 Preprocessor1_Model09
 #&gt; 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05</code></pre>
-<p>We see here that including more predictors did not measurably improve our model performance, but it did change the regularization a bit. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 but here it is a bit higher, indicating that our model learned to regularize more strongly once we added these extra features. This makes sense, and we can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
+<p>We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 and is about the same here. We can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
 <div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb353-1"><a href="mlclassification.html#cb353-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
 <span id="cb353-2"><a href="mlclassification.html#cb353-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb353-3"><a href="mlclassification.html#cb353-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(complaints_train) <span class="sc">%&gt;%</span></span>
@@ -1447,7 +1459,7 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <span id="cb353-6"><a href="mlclassification.html#cb353-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span><span class="fu">abs</span>(estimate)) <span class="sc">%&gt;%</span> </span>
 <span id="cb353-7"><a href="mlclassification.html#cb353-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
 <span id="cb353-8"><a href="mlclassification.html#cb353-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">&quot;tfidf&quot;</span>))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 21 x 4
+<pre><code>#&gt; # A tibble: 21 × 4
 #&gt;    term                    estimate  penalty term_rank
 #&gt;    &lt;chr&gt;                      &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
 #&gt;  1 (Intercept)              0.326   0.000695       701
@@ -1487,7 +1499,7 @@ This data censoring can be viewed as data <em>annotation</em>; specific account 
 <span id="cb355-12"><a href="mlclassification.html#cb355-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb355-13"><a href="mlclassification.html#cb355-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb355-14"><a href="mlclassification.html#cb355-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:censoredtrigram"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:censoredtrigram"></span>
 <img src="07_ml_classification_files/figure-html/censoredtrigram-1.svg" alt="Many of the most frequent trigrams feature censored information" width="672" />
 <p class="caption">
 FIGURE 7.8: Many of the most frequent trigrams feature censored information
@@ -1517,13 +1529,13 @@ and plot the proportions for “Credit” and “Other.”</p>
 <span id="cb356-17"><a href="mlclassification.html#cb356-17" aria-hidden="true" tabindex="-1"></a>plot_data <span class="sc">%&gt;%</span></span>
 <span id="cb356-18"><a href="mlclassification.html#cb356-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, trigrams, <span class="at">fill =</span> product)) <span class="sc">+</span></span>
 <span id="cb356-19"><a href="mlclassification.html#cb356-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;fill&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:trigram25"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:trigram25"></span>
 <img src="07_ml_classification_files/figure-html/trigram25-1.svg" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
 <p class="caption">
 FIGURE 7.9: Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class
 </p>
 </div>
-<p>There is a difference in these proportions across classes. Tokens like “on xx xx” and “of xx xx” are used when referencing a date, e.g., “we had a problem on 06/25/2018.”
+<p>There is a difference in these proportions across classes. Tokens like “on xx xx” are used when referencing a date, e.g., “we had a problem on 06/25/2018.”
 Remember that the current tokenization engine strips punctuation before tokenizing.
 This means that the above example will be turned into “we had a problem on 06 25 2018” before creating n-grams<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.</p>
 <p>To crudely simulate what the data might look like before it was censored, we can replace all cases of “XX” and “XXXX” with random integers.
@@ -1559,7 +1571,7 @@ We don’t need to handle the special case of <code>XXXX</code> as it automatica
 <span id="cb360-10"><a href="mlclassification.html#cb360-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb360-11"><a href="mlclassification.html#cb360-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
 <span id="cb360-12"><a href="mlclassification.html#cb360-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:uncensoredtrigram"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:uncensoredtrigram"></span>
 <img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.svg" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
 <p class="caption">
 FIGURE 7.10: Trigrams without numbers float to the top as the uncensored tokens are too spread out
@@ -1758,7 +1770,7 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <p>Let’s go back to the naive Bayes model we tuned in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, with predictions stored in <code>nb_rs_predictions</code>. We can compute the overall recall.</p>
 <div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="mlclassification.html#cb388-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb388-2"><a href="mlclassification.html#cb388-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 3
+<pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 recall  binary         0.688</code></pre>
@@ -1766,7 +1778,7 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="mlclassification.html#cb390-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb390-2"><a href="mlclassification.html#cb390-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
 <span id="cb390-3"><a href="mlclassification.html#cb390-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 4
+<pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt;  1 Fold01 recall  binary         0.694
@@ -1879,7 +1891,7 @@ There are <em>two</em> tunable parameters in this model, the regularization para
 <span id="cb399-5"><a href="mlclassification.html#cb399-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb399-6"><a href="mlclassification.html#cb399-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb399-7"><a href="mlclassification.html#cb399-7" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 60 x 2
+<pre><code>#&gt; # A tibble: 60 × 2
 #&gt;     penalty max_tokens
 #&gt;       &lt;dbl&gt;      &lt;int&gt;
 #&gt;  1 0.0001         1000
@@ -1916,7 +1928,7 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb402-4"><a href="mlclassification.html#cb402-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance across regularization penalties and tokens&quot;</span>,</span>
 <span id="cb402-5"><a href="mlclassification.html#cb402-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
 <span id="cb402-6"><a href="mlclassification.html#cb402-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:complaintsfinaltunevis"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaintsfinaltunevis"></span>
 <img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.svg" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
 <p class="caption">
 FIGURE 7.11: Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty.
@@ -1927,7 +1939,7 @@ FIGURE 7.11: Model performance is similar for the higher token options so we can
 <span id="cb403-2"><a href="mlclassification.html#cb403-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;accuracy&quot;</span>, <span class="sc">-</span>penalty)</span>
 <span id="cb403-3"><a href="mlclassification.html#cb403-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb403-4"><a href="mlclassification.html#cb403-4" aria-hidden="true" tabindex="-1"></a>choose_acc</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 10
+<pre><code>#&gt; # A tibble: 1 × 10
 #&gt;   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #&gt;     &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1 0.00483       1000 accuracy binary     0.882    10 0.00101 Prepro… 0.898  1.75</code></pre>
@@ -1966,7 +1978,7 @@ Notice that this is the first time we have used our testing data during this ent
 <div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="mlclassification.html#cb407-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, complaints_split)</span>
 <span id="cb407-2"><a href="mlclassification.html#cb407-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb407-3"><a href="mlclassification.html#cb407-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 4
+<pre><code>#&gt; # A tibble: 2 × 4
 #&gt;   .metric  .estimator .estimate .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 accuracy binary         0.882 Preprocessor1_Model1
@@ -1976,7 +1988,7 @@ Notice that this is the first time we have used our testing data during this ent
 <div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="mlclassification.html#cb409-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
 <span id="cb409-2"><a href="mlclassification.html#cb409-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> product, <span class="at">estimate =</span> .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb409-3"><a href="mlclassification.html#cb409-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:finalheatmap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:finalheatmap"></span>
 <img src="07_ml_classification_files/figure-html/finalheatmap-1.svg" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
 FIGURE 7.12: Confusion matrix on the test set for final lasso regularized classifier
@@ -1991,7 +2003,7 @@ FIGURE 7.12: Confusion matrix on the test set for final lasso regularized classi
 <span id="cb410-6"><a href="mlclassification.html#cb410-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;ROC curve for US Consumer Finance Complaints&quot;</span>,</span>
 <span id="cb410-7"><a href="mlclassification.html#cb410-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;With final tuned lasso regularized classifier on the test set&quot;</span></span>
 <span id="cb410-8"><a href="mlclassification.html#cb410-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:finalroccurve"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:finalroccurve"></span>
 <img src="07_ml_classification_files/figure-html/finalroccurve-1.svg" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
 FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
@@ -2026,7 +2038,7 @@ FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 <span id="cb411-26"><a href="mlclassification.html#cb411-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">&quot;These features are the most important in predicting</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
 <span id="cb411-27"><a href="mlclassification.html#cb411-27" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;whether a complaint is about credit or not&quot;</span>)</span>
 <span id="cb411-28"><a href="mlclassification.html#cb411-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:complaintsvip"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaintsvip"></span>
 <img src="07_ml_classification_files/figure-html/complaintsvip-1.svg" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
 <p class="caption">
 FIGURE 7.14: Some words increase a CFPB complaint’s probability of being about credit reporting while some decrease that probability
@@ -2046,7 +2058,7 @@ The top features we see here are all tokens learned directly from the text. None
 <span id="cb412-5"><a href="mlclassification.html#cb412-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Credit&quot;</span>, .pred_Credit <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb412-6"><a href="mlclassification.html#cb412-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
 <span id="cb412-7"><a href="mlclassification.html#cb412-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 1
+<pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
 #&gt;  1 &quot;Bank of America took more than 30 days to send me documents to validate a d…
@@ -2065,7 +2077,7 @@ The top features we see here are all tokens learned directly from the text. None
 <span id="cb414-2"><a href="mlclassification.html#cb414-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Other&quot;</span>, .pred_Credit <span class="sc">&gt;</span> <span class="fl">0.8</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb414-3"><a href="mlclassification.html#cb414-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
 <span id="cb414-4"><a href="mlclassification.html#cb414-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 1
+<pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
 #&gt;  1 &quot;Please review the attachment. Remove the inquiries and place an extended fr…
@@ -2205,6 +2217,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }

@@ -17,7 +17,7 @@ This chapter explores one of the most straightforward configurations for a deep 
 Figure \@ref(fig:dnndiag) depicts a densely-connected neural network architecture \index{neural network!feed forward}*feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The numbers of layers and nodes within each layer are variable and are hyperparameters of the model selected by the practitioner.
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
+<img src="diagram-files/dnn-architecture.pdf" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
 <p class="caption">(\#fig:dnndiag)A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.</p>
 </div>
 
@@ -36,7 +36,7 @@ kickstarter
 ```
 
 ```
-#> # A tibble: 269,790 x 3
+#> # A tibble: 269,790 × 3
 #>    blurb                                                        state created_at
 #>    <chr>                                                        <dbl> <date>    
 #>  1 Exploring paint and its place in a digital world.                0 2015-03-17
@@ -79,15 +79,15 @@ kickstarter %>%
 ```
 
 ```
-#> # A tibble: 151 x 2
+#> # A tibble: 151 × 2
 #>    `nchar(blurb)`     n
 #>             <int> <int>
 #>  1            135 26827
 #>  2            134 18726
 #>  3            133 14913
 #>  4            132 13559
-#>  5            131 11322
-#>  6            130 10083
+#>  5            131 11320
+#>  6            130 10085
 #>  7            129  8786
 #>  8            128  7874
 #>  9            127  7239
@@ -176,7 +176,7 @@ kickstarter %>%
 ```
 
 ```
-#> # A tibble: 1 x 1
+#> # A tibble: 1 × 1
 #>   `max(created_at)`
 #>   <date>           
 #> 1 2010-10-20
@@ -329,7 +329,7 @@ prep(small_spec) %>%
 ```
 
 ```
-#> # A tibble: 14 x 4
+#> # A tibble: 14 × 4
 #>    terms vocabulary token       id                   
 #>    <chr>      <int> <chr>       <chr>                
 #>  1 text           1 adventure   sequence_onehot_9p9uj
@@ -564,7 +564,7 @@ kick_val
 
 ```
 #> # Validation Set Split (0.75/0.25)  using stratification 
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>   splits                 id        
 #>   <list>                 <chr>     
 #> 1 <split [151568/50524]> validation
@@ -690,7 +690,7 @@ val_res
 ```
 
 ```
-#> # A tibble: 50,524 x 3
+#> # A tibble: 50,524 × 3
 #>         .pred_1 .pred_class state
 #>           <dbl> <fct>       <fct>
 #>  1 0.0225       0           0    
@@ -714,7 +714,7 @@ metrics(val_res, state, .pred_class)
 ```
 
 ```
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
 #> 1 accuracy binary         0.807
@@ -843,7 +843,7 @@ metrics(bow_res, state, .pred_class)
 ```
 
 ```
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
 #> 1 accuracy binary         0.724
@@ -873,7 +873,7 @@ glove6b
 ```
 
 ```
-#> # A tibble: 400,000 x 13
+#> # A tibble: 400,000 × 13
 #>    token     d1      d2     d3      d4     d5      d6     d7      d8        d9
 #>    <chr>  <dbl>   <dbl>  <dbl>   <dbl>  <dbl>   <dbl>  <dbl>   <dbl>     <dbl>
 #>  1 "the" 0.418   0.250  -0.412  0.122  0.345  -0.0445 -0.497 -0.179  -0.000660
@@ -898,7 +898,7 @@ tidy(kick_prep)
 ```
 
 ```
-#> # A tibble: 3 x 6
+#> # A tibble: 3 × 6
 #>   number operation type            trained skip  id                   
 #>    <int> <chr>     <chr>           <lgl>   <lgl> <chr>                
 #> 1      1 step      tokenize        TRUE    FALSE tokenize_nHrhX       
@@ -914,7 +914,7 @@ tidy(kick_prep, number = 3)
 ```
 
 ```
-#> # A tibble: 20,000 x 4
+#> # A tibble: 20,000 × 4
 #>    terms vocabulary token id                   
 #>    <chr>      <int> <chr> <chr>                
 #>  1 blurb          1 0     sequence_onehot_H16cB
@@ -1012,7 +1012,7 @@ metrics(pte_res, state, .pred_class)
 ```
 
 ```
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
 #> 1 accuracy binary         0.614
@@ -1087,7 +1087,7 @@ metrics(pte2_res, state, .pred_class)
 ```
 
 ```
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   .metric  .estimator .estimate
 #>   <chr>    <chr>          <dbl>
 #> 1 accuracy binary         0.764
@@ -1111,7 +1111,7 @@ kick_folds
 
 ```
 #> #  5-fold cross-validation 
-#> # A tibble: 5 x 2
+#> # A tibble: 5 × 2
 #>   splits                 id   
 #>   <list>                 <chr>
 #> 1 <split [161673/40419]> Fold1
@@ -1179,7 +1179,7 @@ cv_fitted
 
 ```
 #> #  5-fold cross-validation 
-#> # A tibble: 5 x 3
+#> # A tibble: 5 × 3
 #>   splits                 id    validation      
 #>   <list>                 <chr> <list>          
 #> 1 <split [161673/40419]> Fold1 <tibble [4 × 3]>
@@ -1198,7 +1198,7 @@ cv_fitted %>%
 ```
 
 ```
-#> # A tibble: 20 x 5
+#> # A tibble: 20 × 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
 #>  1 <split [161673/40419]> Fold1 accuracy    binary         0.818
@@ -1238,7 +1238,7 @@ cv_fitted %>%
 ```
 
 ```
-#> # A tibble: 4 x 4
+#> # A tibble: 4 × 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
 #> 1 accuracy    0.819     5 0.000523
@@ -1278,7 +1278,7 @@ all_dense_model_res %>%
 ```
 
 ```
-#> # A tibble: 6 x 4
+#> # A tibble: 6 × 4
 #>   model                    .metric  .estimator .estimate
 #>   <chr>                    <chr>    <chr>          <dbl>
 #> 1 dense                    accuracy binary         0.807
@@ -1327,7 +1327,7 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 ```
 
 ```
-#> # A tibble: 4 x 3
+#> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.807
@@ -1352,7 +1352,7 @@ kickstarter_bind %>%
 ```
 
 ```
-#> # A tibble: 10 x 1
+#> # A tibble: 10 × 1
 #>    blurb                                                                        
 #>    <chr>                                                                        
 #>  1 "A struggling writer has a chance encounter with a mysterious man whose life…
@@ -1378,7 +1378,7 @@ kickstarter_bind %>%
 ```
 
 ```
-#> # A tibble: 10 x 1
+#> # A tibble: 10 × 1
 #>    blurb                                                                        
 #>    <chr>                                                                        
 #>  1 "Please help me record my first solo album!! It will blow your mind!  Check …
