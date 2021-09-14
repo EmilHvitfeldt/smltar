@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="mloverview.html"/>
 <link rel="next" href="mlclassification.html"/>
-<script src="libs/header-attrs-2.9.4/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -462,7 +462,7 @@ div.csl-indent {
 <span id="cb147-3"><a href="mlregression.html#cb147-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb147-4"><a href="mlregression.html#cb147-4" aria-hidden="true" tabindex="-1"></a>scotus_filtered <span class="sc">%&gt;%</span></span>
 <span id="cb147-5"><a href="mlregression.html#cb147-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10,000 x 5
+<pre><code>#&gt; # A tibble: 10,000 × 5
 #&gt;    year  case_name                  docket_number     id text                   
 #&gt;    &lt;chr&gt; &lt;chr&gt;                      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;                  
 #&gt;  1 1903  Clara Perry, Plff. In Err… 16             80304 &quot;No. 16.\n State Repor…
@@ -497,7 +497,7 @@ If we want to build a model to predict which court opinions were written in whic
 <span id="cb149-5"><a href="mlregression.html#cb149-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, n)) <span class="sc">+</span></span>
 <span id="cb149-6"><a href="mlregression.html#cb149-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb149-7"><a href="mlregression.html#cb149-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Number of opinions per decade&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:scotushist"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotushist"></span>
 <img src="06_ml_regression_files/figure-html/scotushist-1.svg" alt="Supreme Court opinions per decade in sample" width="672" />
 <p class="caption">
 FIGURE 6.1: Supreme Court opinions per decade in sample
@@ -599,7 +599,7 @@ An SVM model can be used for either regression or classification, and linear SVM
 <span id="cb159-2"><a href="mlregression.html#cb159-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb159-3"><a href="mlregression.html#cb159-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb159-4"><a href="mlregression.html#cb159-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,001 x 2
+<pre><code>#&gt; # A tibble: 1,001 × 2
 #&gt;    term                  estimate
 #&gt;    &lt;chr&gt;                    &lt;dbl&gt;
 #&gt;  1 Bias                   1920.  
@@ -619,7 +619,7 @@ An SVM model can be used for either regression or classification, and linear SVM
 <span id="cb161-2"><a href="mlregression.html#cb161-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb161-3"><a href="mlregression.html#cb161-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb161-4"><a href="mlregression.html#cb161-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(estimate)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,001 x 2
+<pre><code>#&gt; # A tibble: 1,001 × 2
 #&gt;    term                 estimate
 #&gt;    &lt;chr&gt;                   &lt;dbl&gt;
 #&gt;  1 tfidf_text_ought        -2.77
@@ -650,7 +650,7 @@ The testing set is extremely valuable data, however, and in real-world situation
 <p>Let’s estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set.</p>
 
 <div class="rmdpackage">
-In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong>rsample</strong> <span class="citation">(<a href="#ref-R-rsample" role="doc-biblioref">Silge et al. 2021</a>)</span>.
+In <strong>tidymodels</strong>, the package for data splitting and resampling is <strong></strong> <span class="citation">(<a href="#ref-R-rsample" role="doc-biblioref">Silge et al. 2021</a>)</span>.
 </div>
 <p>Let’s create 10-fold cross-validation sets, and use these resampled sets for performance estimates.</p>
 <div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb163-1"><a href="mlregression.html#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
@@ -658,7 +658,7 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 <span id="cb163-3"><a href="mlregression.html#cb163-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb163-4"><a href="mlregression.html#cb163-4" aria-hidden="true" tabindex="-1"></a>scotus_folds</span></code></pre></div>
 <pre><code>#&gt; #  10-fold cross-validation 
-#&gt; # A tibble: 10 x 2
+#&gt; # A tibble: 10 × 2
 #&gt;    splits             id    
 #&gt;    &lt;list&gt;             &lt;chr&gt; 
 #&gt;  1 &lt;split [6750/750]&gt; Fold01
@@ -683,7 +683,7 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 <span id="cb165-8"><a href="mlregression.html#cb165-8" aria-hidden="true" tabindex="-1"></a>svm_rs</span></code></pre></div>
 <pre><code>#&gt; # Resampling results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 5
+#&gt; # A tibble: 10 × 5
 #&gt;    splits             id     .metrics         .notes           .predictions     
 #&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;           &lt;list&gt;           
 #&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…
@@ -698,7 +698,7 @@ In <strong>tidymodels</strong>, the package for data splitting and resampling is
 #&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [750 × 4…</code></pre>
 <p>These results look a lot like the resamples, but they have some additional columns, like the <code>.metrics</code> that we can use to measure how well this model performed and the <code>.predictions</code> we can use to explore that performance more deeply. What results do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb167-1"><a href="mlregression.html#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(svm_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   15.6      10 0.216   Preprocessor1_Model1
@@ -731,7 +731,7 @@ RSME is a measure of the difference between the predicted and observed values; i
 <span id="cb169-10"><a href="mlregression.html#cb169-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Predicted and true years for Supreme Court opinions&quot;</span>,</span>
 <span id="cb169-11"><a href="mlregression.html#cb169-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each cross-validation fold is shown in a different color&quot;</span></span>
 <span id="cb169-12"><a href="mlregression.html#cb169-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:firstregpredict"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:firstregpredict"></span>
 <img src="06_ml_regression_files/figure-html/firstregpredict-1.svg" alt="Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years" width="672" />
 <p class="caption">
 FIGURE 6.2: Most Supreme Court opinions are near the dashed line, indicating good agreement between our SVM regression predictions and the real years
@@ -766,7 +766,7 @@ A null model is a simple, non-informative model that always predicts the largest
 <span id="cb170-11"><a href="mlregression.html#cb170-11" aria-hidden="true" tabindex="-1"></a>null_rs</span></code></pre></div>
 <pre><code>#&gt; # Resampling results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 4
+#&gt; # A tibble: 10 × 4
 #&gt;    splits             id     .metrics         .notes          
 #&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          
 #&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;
@@ -781,7 +781,7 @@ A null model is a simple, non-informative model that always predicts the largest
 #&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble [1 × 4]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
 <p>What results do we obtain from the null model, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="mlregression.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(null_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 6
+<pre><code>#&gt; # A tibble: 1 × 6
 #&gt;   .metric .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard    47.9    10   0.294 Preprocessor1_Model1</code></pre>
@@ -815,7 +815,7 @@ A null model is a simple, non-informative model that always predicts the largest
 <span id="cb176-5"><a href="mlregression.html#cb176-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can use <code>collect_metrics()</code> to obtain and format the performance metrics for this random forest model.</p>
 <div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="mlregression.html#cb177-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(rf_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
@@ -833,7 +833,7 @@ A null model is a simple, non-informative model that always predicts the largest
 <span id="cb179-10"><a href="mlregression.html#cb179-10" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;a random forest model&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>),</span>
 <span id="cb179-11"><a href="mlregression.html#cb179-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Each cross-validation fold is shown in a different color&quot;</span></span>
 <span id="cb179-12"><a href="mlregression.html#cb179-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:rfpredict"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:rfpredict"></span>
 <img src="06_ml_regression_files/figure-html/rfpredict-1.svg" alt="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model" width="672" />
 <p class="caption">
 FIGURE 6.3: The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model
@@ -916,7 +916,7 @@ Models that work best with text tend to be models designed for or otherwise appr
 <span id="cb185-17"><a href="mlregression.html#cb185-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>After fitting models to each of the cross-validation folds, these sets of results contain metrics computed for removing that set of stop words.</p>
 <div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="mlregression.html#cb186-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(smart_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   17.2      10 0.199   Preprocessor1_Model1
@@ -939,7 +939,7 @@ Models that work best with text tend to be models designed for or otherwise appr
 <span id="cb188-15"><a href="mlregression.html#cb188-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
 <span id="cb188-16"><a href="mlregression.html#cb188-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Model performance for three stop word lexicons&quot;</span>,</span>
 <span id="cb188-17"><a href="mlregression.html#cb188-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">&quot;For this data set, the Snowball lexicon performed best&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:snowballrmse"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:snowballrmse"></span>
 <img src="06_ml_regression_files/figure-html/snowballrmse-1.svg" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons" width="672" />
 <p class="caption">
 FIGURE 6.4: Comparing model performance for predicting the year of Supreme Court opinions with three different stop word lexicons
@@ -1001,7 +1001,7 @@ We could have created this type of small function for trying out different stop 
 <span id="cb193-8"><a href="mlregression.html#cb193-8" aria-hidden="true" tabindex="-1"></a>trigram_rs <span class="ot">&lt;-</span> <span class="fu">fit_ngram</span>(<span class="fu">list</span>(<span class="at">n =</span> <span class="dv">3</span>, <span class="at">n_min =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p>These sets of results contain metrics computed for the model with that tokenization strategy.</p>
 <div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="mlregression.html#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(bigram_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
@@ -1020,10 +1020,9 @@ We could have created this type of small function for trying out different stop 
 <span id="cb196-11"><a href="mlregression.html#cb196-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Degree of n-grams&quot;</span>,</span>
 <span id="cb196-12"><a href="mlregression.html#cb196-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
 <span id="cb196-13"><a href="mlregression.html#cb196-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance for different degrees of n-gram tokenization&quot;</span>,</span>
-<span id="cb196-14"><a href="mlregression.html#cb196-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;For the same number of tokens,&quot;</span>,</span>
-<span id="cb196-15"><a href="mlregression.html#cb196-15" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;bigrams plus unigrams performed best&quot;</span>)</span>
-<span id="cb196-16"><a href="mlregression.html#cb196-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:ngramrmse"></span>
+<span id="cb196-14"><a href="mlregression.html#cb196-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;For the same number of tokens, unigrams performed best&quot;</span></span>
+<span id="cb196-15"><a href="mlregression.html#cb196-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:ngramrmse"></span>
 <img src="06_ml_regression_files/figure-html/ngramrmse-1.svg" alt="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams" width="672" />
 <p class="caption">
 FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams
@@ -1223,7 +1222,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 <span id="cb201-4"><a href="mlregression.html#cb201-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>How did this model perform?</p>
 <div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="mlregression.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(lemma_rs)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 6
+<pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
@@ -1402,7 +1401,7 @@ Representing what should be a single token in multiple ways will split the count
 <div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="mlregression.html#cb231-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
 <span id="cb231-2"><a href="mlregression.html#cb231-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb231-3"><a href="mlregression.html#cb231-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 3
+<pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 mape    standard       0.616</code></pre>
@@ -1411,7 +1410,7 @@ Representing what should be a single token in multiple ways will split the count
 <span id="cb233-2"><a href="mlregression.html#cb233-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb233-3"><a href="mlregression.html#cb233-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
 <span id="cb233-4"><a href="mlregression.html#cb233-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 4
+<pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt;  1 Fold01 mape    standard       0.603
@@ -1429,7 +1428,7 @@ Representing what should be a single token in multiple ways will split the count
 <span id="cb235-2"><a href="mlregression.html#cb235-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb235-3"><a href="mlregression.html#cb235-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
 <span id="cb235-4"><a href="mlregression.html#cb235-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mae</span>(year, .pred)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 4
+<pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt;  1 Fold01 mae     standard        11.5
@@ -1533,7 +1532,7 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <span id="cb243-3"><a href="mlregression.html#cb243-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="dv">6</span></span>
 <span id="cb243-4"><a href="mlregression.html#cb243-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb243-5"><a href="mlregression.html#cb243-5" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 6 x 1
+<pre><code>#&gt; # A tibble: 6 × 1
 #&gt;   max_tokens
 #&gt;        &lt;int&gt;
 #&gt; 1       1000
@@ -1554,19 +1553,19 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <span id="cb245-9"><a href="mlregression.html#cb245-9" aria-hidden="true" tabindex="-1"></a>final_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 x 5
-#&gt;    splits            id     .metrics         .notes          .predictions       
-#&gt;    &lt;list&gt;            &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          &lt;list&gt;             
-#&gt;  1 &lt;split [6750/750… Fold01 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  2 &lt;split [6750/750… Fold02 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  3 &lt;split [6750/750… Fold03 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  4 &lt;split [6750/750… Fold04 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  5 &lt;split [6750/750… Fold05 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  6 &lt;split [6750/750… Fold06 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  7 &lt;split [6750/750… Fold07 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  8 &lt;split [6750/750… Fold08 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt;  9 &lt;split [6750/750… Fold09 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…
-#&gt; 10 &lt;split [6750/750… Fold10 &lt;tibble [18 × 5… &lt;tibble [0 × 1… &lt;tibble [4,500 × 5…</code></pre>
+#&gt; # A tibble: 10 × 5
+#&gt;    splits             id     .metrics          .notes           .predictions    
+#&gt;    &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;          
+#&gt;  1 &lt;split [6750/750]&gt; Fold01 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  2 &lt;split [6750/750]&gt; Fold02 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  3 &lt;split [6750/750]&gt; Fold03 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  4 &lt;split [6750/750]&gt; Fold04 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  5 &lt;split [6750/750]&gt; Fold05 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  6 &lt;split [6750/750]&gt; Fold06 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  7 &lt;split [6750/750]&gt; Fold07 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  8 &lt;split [6750/750]&gt; Fold08 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt;  9 &lt;split [6750/750]&gt; Fold09 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …
+#&gt; 10 &lt;split [6750/750]&gt; Fold10 &lt;tibble [18 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [4,500 …</code></pre>
 <p>We trained all these models!</p>
 </div>
 <div id="regression-final-evaluation" class="section level3" number="6.9.4">
@@ -1584,7 +1583,7 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <span id="cb247-10"><a href="mlregression.html#cb247-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Linear SVM performance across number of tokens&quot;</span>,</span>
 <span id="cb247-11"><a href="mlregression.html#cb247-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance improves as we include more tokens&quot;</span></span>
 <span id="cb247-12"><a href="mlregression.html#cb247-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:scotusfinaltunevis"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusfinaltunevis"></span>
 <img src="06_ml_regression_files/figure-html/scotusfinaltunevis-1.svg" alt="Performance improves significantly at about 4000 tokens" width="672" />
 <p class="caption">
 FIGURE 6.6: Performance improves significantly at about 4000 tokens
@@ -1596,7 +1595,7 @@ FIGURE 6.6: Performance improves significantly at about 4000 tokens
 <span id="cb248-2"><a href="mlregression.html#cb248-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;mae&quot;</span>, max_tokens)</span>
 <span id="cb248-3"><a href="mlregression.html#cb248-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb248-4"><a href="mlregression.html#cb248-4" aria-hidden="true" tabindex="-1"></a>chosen_mae</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 9
+<pre><code>#&gt; # A tibble: 1 × 9
 #&gt;   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #&gt;        &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795</code></pre>
@@ -1631,7 +1630,7 @@ Notice that this is the first time we have used our testing data during this ent
 <div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="mlregression.html#cb252-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, scotus_split)</span>
 <span id="cb252-2"><a href="mlregression.html#cb252-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb252-3"><a href="mlregression.html#cb252-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 4
+<pre><code>#&gt; # A tibble: 2 × 4
 #&gt;   .metric .estimator .estimate .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
 #&gt; 1 rmse    standard      13.8   Preprocessor1_Model1
@@ -1665,13 +1664,13 @@ Notice that this is the first time we have used our testing data during this ent
 <span id="cb254-25"><a href="mlregression.html#cb254-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;These features are the most importance&quot;</span>,</span>
 <span id="cb254-26"><a href="mlregression.html#cb254-26" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;in predicting the year of an opinion&quot;</span>)</span>
 <span id="cb254-27"><a href="mlregression.html#cb254-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:scotusvip"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusvip"></span>
 <img src="06_ml_regression_files/figure-html/scotusvip-1.svg" alt="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier" width="672" />
 <p class="caption">
 FIGURE 6.7: Some words or bigrams increase a Supreme Court opinion’s probability of being written later (more recently) while some increase its probability of being written earlier
 </p>
 </div>
-<p>The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “testified,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “consequently,” are associated with lower, earlier years for these Supreme Court opinions.</p>
+<p>The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.</p>
 <div class="rmdnote">
 <p>
 Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
@@ -1690,7 +1689,7 @@ Some of these features are unigrams and some are bigrams, and stop words are inc
 <span id="cb255-10"><a href="mlregression.html#cb255-10" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Supreme Court opinions&quot;</span>),</span>
 <span id="cb255-11"><a href="mlregression.html#cb255-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;For the testing set, predictions are more reliable after 1850&quot;</span></span>
 <span id="cb255-12"><a href="mlregression.html#cb255-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:scotusfinalpredvis"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusfinalpredvis"></span>
 <img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.svg" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams" width="672" />
 <p class="caption">
 FIGURE 6.8: Predicted and true years from a linear SVM regression model with bigrams and unigrams
@@ -1704,24 +1703,24 @@ FIGURE 6.8: Predicted and true years from a linear SVM regression model with big
 <div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="mlregression.html#cb257-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="sc">%&gt;%</span></span>
 <span id="cb257-2"><a href="mlregression.html#cb257-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span></span>
 <span id="cb257-3"><a href="mlregression.html#cb257-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, .pred, case_name, text)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 168 x 4
-#&gt;     year .pred case_name                 text                                   
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                     &lt;chr&gt;                                  
-#&gt;  1  2009 2055. Nijhawan v. Holder        &quot;Supreme Court of United States.\n*229…
-#&gt;  2  2008 1957. Green v. Johnson          &quot;                 Cite as: 553 U. S. _…
-#&gt;  3  2008 1952. Dalehite v. United States &quot;Supreme Court of United States.\n*16 …
-#&gt;  4  2008 1982. Preston v. Ferrer         &quot;Supreme Court of United States.\n*981…
-#&gt;  5  2007 1876. Quebec Bank of Toronto v… &quot;Supreme Court of United States.\n*179…
-#&gt;  6  2004 2035. Illinois v. Lidster       &quot;No. 02-1060.\nPolice set up a highway…
-#&gt;  7  2002 1969. Borgner v. Florida Board… &quot;No. 02-165.\nCERTIORARI TO THE UNITED…
-#&gt;  8  2000 1974. Ohler v. United States    &quot;OHLERv.UNITED STATES\nCERTIORARI TO T…
-#&gt;  9  2000 1955. Bush v. Palm Beach Count… &quot;No. 00-836\nON WRIT OF CERTIORARI TO …
-#&gt; 10  1999 1964. Dickinson v. Zurko        &quot;No. 98 377\nQ. TODD DICKINSON,  ACTIN…
+<pre><code>#&gt; # A tibble: 168 × 4
+#&gt;     year .pred case_name                                text                    
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                                    &lt;chr&gt;                   
+#&gt;  1  2009 2055. Nijhawan v. Holder                       &quot;Supreme Court of Unite…
+#&gt;  2  2008 1957. Green v. Johnson                         &quot;                 Cite …
+#&gt;  3  2008 1952. Dalehite v. United States                &quot;Supreme Court of Unite…
+#&gt;  4  2008 1982. Preston v. Ferrer                        &quot;Supreme Court of Unite…
+#&gt;  5  2007 1876. Quebec Bank of Toronto v. Hellman        &quot;Supreme Court of Unite…
+#&gt;  6  2004 2035. Illinois v. Lidster                      &quot;No. 02-1060.\nPolice s…
+#&gt;  7  2002 1969. Borgner v. Florida Board of Dentistry    &quot;No. 02-165.\nCERTIORAR…
+#&gt;  8  2000 1974. Ohler v. United States                   &quot;OHLERv.UNITED STATES\n…
+#&gt;  9  2000 1955. Bush v. Palm Beach County Canvassing Bd. &quot;No. 00-836\nON WRIT OF…
+#&gt; 10  1999 1964. Dickinson v. Zurko                       &quot;No. 98 377\nQ. TODD DI…
 #&gt; # … with 158 more rows</code></pre>
 <p>There are some interesting examples here where we can understand why the model would mispredict:</p>
 <ul>
-<li><p><em>BedRoc Limited, LLC v. United States</em> was a case decided in 2004 regarding the 1919 Pittman Act.</p></li>
-<li><p>The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.</p></li>
+<li><p><em>Dalehite v. United States</em> was a case about a fertilizer explosion that is mislabeled in our dataset; it was decided in 1953, not 2008 as we see in our data, and we predict a year of 1952, very close to the true decision date.</p></li>
+<li><p><em>Bush v. Palm Beach County Canvassing Board</em> in 2000 was part of the fallout of the 2000 presidential election and dealt with historical issues like the due process clause of the U.S. Constitution; these “old” textual elements push its prediction much earlier than its true date.</p></li>
 </ul>
 <div class="rmdwarning">
 <p>
@@ -1849,6 +1848,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }

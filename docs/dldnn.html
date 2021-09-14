@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="dloverview.html"/>
 <link rel="next" href="dllstm.html"/>
-<script src="libs/header-attrs-2.9.4/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -466,8 +466,8 @@ The <strong>tidymodels</strong> framework of R packages is modular, so we can us
 </div>
 <p>This chapter explores one of the most straightforward configurations for a deep learning model, a <strong>densely connected neural network</strong>. This is typically not a model that will achieve the highest performance on text data, but it is a good place to start to understand the process of building and evaluating deep learning models for text. We can also use this type of network architecture as a bridge between the bag-of-words approaches we explored in detail in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> to the approaches beyond bag-of-words we will use in Chapters <a href="dllstm.html#dllstm">9</a> and <a href="dlcnn.html#dlcnn">10</a>. Deep learning allows us to incorporate not just word counts but also word sequences and positions.</p>
 <p>Figure <a href="dldnn.html#fig:dnndiag">8.1</a> depicts a densely-connected neural network architecture <em>feed-forward</em>. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is “hidden” in the sense that it doesn’t connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The numbers of layers and nodes within each layer are variable and are hyperparameters of the model selected by the practitioner.</p>
-<div class="figure" style="text-align: center"><span id="fig:dnndiag"></span>
-<img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:dnndiag"></span>
+<img src="diagram-files/dnn-architecture.pdf" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
 <p class="caption">
 FIGURE 8.1: A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.
 </p>
@@ -480,7 +480,7 @@ FIGURE 8.1: A high-level diagram of a feed-forward neural network. The lines con
 <span id="cb416-2"><a href="dldnn.html#cb416-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb416-3"><a href="dldnn.html#cb416-3" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>)</span>
 <span id="cb416-4"><a href="dldnn.html#cb416-4" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 269,790 x 3
+<pre><code>#&gt; # A tibble: 269,790 × 3
 #&gt;    blurb                                                        state created_at
 #&gt;    &lt;chr&gt;                                                        &lt;dbl&gt; &lt;date&gt;    
 #&gt;  1 Exploring paint and its place in a digital world.                0 2015-03-17
@@ -500,7 +500,7 @@ FIGURE 8.1: A high-level diagram of a feed-forward neural network. The lines con
 <span id="cb418-3"><a href="dldnn.html#cb418-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb418-4"><a href="dldnn.html#cb418-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of characters per campaign blurb&quot;</span>,</span>
 <span id="cb418-5"><a href="dldnn.html#cb418-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:kickstartercharhist"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:kickstartercharhist"></span>
 <img src="08_dl_dnn_files/figure-html/kickstartercharhist-1.svg" alt="Distribution of character count for Kickstarter campaign blurbs" width="672" />
 <p class="caption">
 FIGURE 8.2: Distribution of character count for Kickstarter campaign blurbs
@@ -510,15 +510,15 @@ FIGURE 8.2: Distribution of character count for Kickstarter campaign blurbs
 <p>We can use <code>count()</code> to find the most common blurb length.</p>
 <div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb419-1"><a href="dldnn.html#cb419-1" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="sc">%&gt;%</span></span>
 <span id="cb419-2"><a href="dldnn.html#cb419-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="fu">nchar</span>(blurb), <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 151 x 2
+<pre><code>#&gt; # A tibble: 151 × 2
 #&gt;    `nchar(blurb)`     n
 #&gt;             &lt;int&gt; &lt;int&gt;
 #&gt;  1            135 26827
 #&gt;  2            134 18726
 #&gt;  3            133 14913
 #&gt;  4            132 13559
-#&gt;  5            131 11322
-#&gt;  6            130 10083
+#&gt;  5            131 11320
+#&gt;  6            130 10085
 #&gt;  7            129  8786
 #&gt;  8            128  7874
 #&gt;  9            127  7239
@@ -567,7 +567,7 @@ programs!&quot;</code></pre>
 <span id="cb425-3"><a href="dldnn.html#cb425-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bin2d</span>() <span class="sc">+</span></span>
 <span id="cb425-4"><a href="dldnn.html#cb425-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
 <span id="cb425-5"><a href="dldnn.html#cb425-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of characters per campaign blurb&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:kickstarterheatmap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:kickstarterheatmap"></span>
 <img src="08_dl_dnn_files/figure-html/kickstarterheatmap-1.svg" alt="Distribution of character count for Kickstarter campaign blurbs over time" width="672" />
 <p class="caption">
 FIGURE 8.3: Distribution of character count for Kickstarter campaign blurbs over time
@@ -577,7 +577,7 @@ FIGURE 8.3: Distribution of character count for Kickstarter campaign blurbs over
 <div class="sourceCode" id="cb426"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb426-1"><a href="dldnn.html#cb426-1" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="sc">%&gt;%</span></span>
 <span id="cb426-2"><a href="dldnn.html#cb426-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;</span> <span class="dv">135</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb426-3"><a href="dldnn.html#cb426-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">max</span>(created_at))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 1
+<pre><code>#&gt; # A tibble: 1 × 1
 #&gt;   `max(created_at)`
 #&gt;   &lt;date&gt;           
 #&gt; 1 2010-10-20</code></pre>
@@ -616,7 +616,7 @@ It is very easy to overfit deep learning models, so an unbiased estimate of futu
 <span id="cb429-4"><a href="dldnn.html#cb429-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
 <span id="cb429-5"><a href="dldnn.html#cb429-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of words per campaign blurb&quot;</span>,</span>
 <span id="cb429-6"><a href="dldnn.html#cb429-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:kickstarterwordlength"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:kickstarterwordlength"></span>
 <img src="08_dl_dnn_files/figure-html/kickstarterwordlength-1.svg" alt="Distribution of word count for Kickstarter campaign blurbs" width="672" />
 <p class="caption">
 FIGURE 8.4: Distribution of word count for Kickstarter campaign blurbs
@@ -697,7 +697,7 @@ What does the function <code>prep()</code> do? Before when we have used recipes,
 <p>Once we have the prepped recipe, we can <code>tidy()</code> it to extract the vocabulary, represented in the <code>vocabulary</code> and <code>token</code> columns<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>.</p>
 <div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="dldnn.html#cb434-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prep</span>(small_spec) <span class="sc">%&gt;%</span></span>
 <span id="cb434-2"><a href="dldnn.html#cb434-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">2</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 14 x 4
+<pre><code>#&gt; # A tibble: 14 × 4
 #&gt;    terms vocabulary token       id                   
 #&gt;    &lt;chr&gt;      &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;                
 #&gt;  1 text           1 adventure   sequence_onehot_9p9uj
@@ -841,7 +841,7 @@ This is sufficient information to get started training the model, but we are goi
 <span id="cb447-9"><a href="dldnn.html#cb447-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <p>We can visualize the results of the training loop by plotting the <code>dense_history</code> in Figure <a href="dldnn.html#fig:densemodelhistoryplot">8.5</a>.</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="dldnn.html#cb448-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dense_history)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:densemodelhistoryplot"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:densemodelhistoryplot"></span>
 <img src="08_dl_dnn_files/figure-html/densemodelhistoryplot-1.svg" alt="Training and validation metrics for dense network" width="672" />
 <p class="caption">
 FIGURE 8.5: Training and validation metrics for dense network
@@ -861,7 +861,7 @@ We have dealt with accuracy in other chapters; remember that a higher value (a v
 <span id="cb449-2"><a href="dldnn.html#cb449-2" aria-hidden="true" tabindex="-1"></a>kick_val <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(kickstarter_train, <span class="at">strata =</span> state)</span>
 <span id="cb449-3"><a href="dldnn.html#cb449-3" aria-hidden="true" tabindex="-1"></a>kick_val</span></code></pre></div>
 <pre><code>#&gt; # Validation Set Split (0.75/0.25)  using stratification 
-#&gt; # A tibble: 1 x 2
+#&gt; # A tibble: 1 × 2
 #&gt;   splits                 id        
 #&gt;   &lt;list&gt;                 &lt;chr&gt;     
 #&gt; 1 &lt;split [151568/50524]&gt; validation</code></pre>
@@ -911,7 +911,7 @@ We have dealt with accuracy in other chapters; remember that a higher value (a v
 #&gt; val_accuracy: 0.8072</code></pre>
 <p>Figure <a href="dldnn.html#fig:valhistoryplot">8.6</a> still shows significant overfitting at 10 epochs.</p>
 <div class="sourceCode" id="cb459"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb459-1"><a href="dldnn.html#cb459-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:valhistoryplot"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:valhistoryplot"></span>
 <img src="08_dl_dnn_files/figure-html/valhistoryplot-1.svg" alt="Training and validation metrics for dense network with validation set" width="672" />
 <p class="caption">
 FIGURE 8.6: Training and validation metrics for dense network with validation set
@@ -939,7 +939,7 @@ This function only works with binary classification models that take a preproces
 <p>This function creates prediction results that seamlessly connect with tidymodels and <strong>yardstick</strong> functions.</p>
 <div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="dldnn.html#cb461-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(dense_model, kick_assess, state_assess)</span>
 <span id="cb461-2"><a href="dldnn.html#cb461-2" aria-hidden="true" tabindex="-1"></a>val_res</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 50,524 x 3
+<pre><code>#&gt; # A tibble: 50,524 × 3
 #&gt;         .pred_1 .pred_class state
 #&gt;           &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
 #&gt;  1 0.0225       0           0    
@@ -955,7 +955,7 @@ This function only works with binary classification models that take a preproces
 #&gt; # … with 50,514 more rows</code></pre>
 <p>We can calculate the standard metrics with <code>metrics()</code>.</p>
 <div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb463-1"><a href="dldnn.html#cb463-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res, state, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 3
+<pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy binary         0.807
@@ -966,7 +966,7 @@ The heatmap in Figure <a href="dldnn.html#fig:dnnheatmap">8.7</a> shows that the
 <div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb465-1"><a href="dldnn.html#cb465-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
 <span id="cb465-2"><a href="dldnn.html#cb465-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
 <span id="cb465-3"><a href="dldnn.html#cb465-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:dnnheatmap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:dnnheatmap"></span>
 <img src="08_dl_dnn_files/figure-html/dnnheatmap-1.svg" alt="Confusion matrix for first DNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.7: Confusion matrix for first DNN model predictions of Kickstarter campaign success
@@ -979,7 +979,7 @@ FIGURE 8.7: Confusion matrix for first DNN model predictions of Kickstarter camp
 <span id="cb466-4"><a href="dldnn.html#cb466-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb466-5"><a href="dldnn.html#cb466-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb466-6"><a href="dldnn.html#cb466-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:dnnroccurve"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:dnnroccurve"></span>
 <img src="08_dl_dnn_files/figure-html/dnnroccurve-1.svg" alt="ROC curve for first DNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.8: ROC curve for first DNN model predictions of Kickstarter campaign success
@@ -1045,7 +1045,7 @@ The objects in this chapter are named using <code>bow</code> to indicate that th
 <div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="dldnn.html#cb472-1" aria-hidden="true" tabindex="-1"></a>bow_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bow_model, kick_bow_assess, state_assess)</span>
 <span id="cb472-2"><a href="dldnn.html#cb472-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb472-3"><a href="dldnn.html#cb472-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(bow_res, state, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 3
+<pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy binary         0.724
@@ -1066,7 +1066,7 @@ This section serves to show how to use pre-trained word embeddings, but in most 
 <span id="cb474-2"><a href="dldnn.html#cb474-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb474-3"><a href="dldnn.html#cb474-3" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">embedding_glove6b</span>(<span class="at">dimensions =</span> <span class="dv">50</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">13</span>)</span>
 <span id="cb474-4"><a href="dldnn.html#cb474-4" aria-hidden="true" tabindex="-1"></a>glove6b</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 400,000 x 13
+<pre><code>#&gt; # A tibble: 400,000 × 13
 #&gt;    token     d1      d2     d3      d4     d5      d6     d7      d8        d9
 #&gt;    &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
 #&gt;  1 &quot;the&quot; 0.418   0.250  -0.412  0.122  0.345  -0.0445 -0.497 -0.179  -0.000660
@@ -1083,7 +1083,7 @@ This section serves to show how to use pre-trained word embeddings, but in most 
 #&gt; #   d12 &lt;dbl&gt;</code></pre>
 <p>The <code>embedding_glove6b()</code> function returns a tibble; this isn’t the right format for Keras. Also, notice how many rows are present in this embedding, far more than what the trained recipe is expecting. The vocabulary can be extracted from the trained recipe using <code>tidy()</code>. Let’s apply <code>tidy()</code> to <code>kick_prep</code> to get the list of steps that the recipe contains.</p>
 <div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb476-1"><a href="dldnn.html#cb476-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(kick_prep)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 6
+<pre><code>#&gt; # A tibble: 3 × 6
 #&gt;   number operation type            trained skip  id                   
 #&gt;    &lt;int&gt; &lt;chr&gt;     &lt;chr&gt;           &lt;lgl&gt;   &lt;lgl&gt; &lt;chr&gt;                
 #&gt; 1      1 step      tokenize        TRUE    FALSE tokenize_nHrhX       
@@ -1091,7 +1091,7 @@ This section serves to show how to use pre-trained word embeddings, but in most 
 #&gt; 3      3 step      sequence_onehot TRUE    FALSE sequence_onehot_H16cB</code></pre>
 <p>We see that the third step is the <code>sequence_onehot</code> step, so by setting <code>number = 3</code> we can extract the embedding vocabulary.</p>
 <div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb478-1"><a href="dldnn.html#cb478-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(kick_prep, <span class="at">number =</span> <span class="dv">3</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 20,000 x 4
+<pre><code>#&gt; # A tibble: 20,000 × 4
 #&gt;    terms vocabulary token id                   
 #&gt;    &lt;chr&gt;      &lt;int&gt; &lt;chr&gt; &lt;chr&gt;                
 #&gt;  1 blurb          1 0     sequence_onehot_H16cB
@@ -1158,7 +1158,7 @@ Freezing the weights stops them from being updated during the training loop.
 <p>This model is not performing well at all! We can confirm by computing metrics on our validation set.</p>
 <div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="dldnn.html#cb485-1" aria-hidden="true" tabindex="-1"></a>pte_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(dense_model_pte, kick_assess, state_assess)</span>
 <span id="cb485-2"><a href="dldnn.html#cb485-2" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(pte_res, state, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 3
+<pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy binary         0.614
@@ -1209,7 +1209,7 @@ This allows the model to adjust the weights to better fit the data. The intentio
 <p>How did this version of using pre-trained embeddings do?</p>
 <div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="dldnn.html#cb490-1" aria-hidden="true" tabindex="-1"></a>pte2_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(dense_model_pte2, kick_assess, state_assess)</span>
 <span id="cb490-2"><a href="dldnn.html#cb490-2" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(pte2_res, state, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 2 x 3
+<pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy binary         0.764
@@ -1227,7 +1227,7 @@ If you have enough text data in the field you are working in, then it is worth c
 <span id="cb492-2"><a href="dldnn.html#cb492-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
 <span id="cb492-3"><a href="dldnn.html#cb492-3" aria-hidden="true" tabindex="-1"></a>kick_folds</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
-#&gt; # A tibble: 5 x 2
+#&gt; # A tibble: 5 × 2
 #&gt;   splits                 id   
 #&gt;   &lt;list&gt;                 &lt;chr&gt;
 #&gt; 1 &lt;split [161673/40419]&gt; Fold1
@@ -1281,7 +1281,7 @@ If you have enough text data in the field you are working in, then it is worth c
 <span id="cb495-3"><a href="dldnn.html#cb495-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb495-4"><a href="dldnn.html#cb495-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
-#&gt; # A tibble: 5 x 3
+#&gt; # A tibble: 5 × 3
 #&gt;   splits                 id    validation      
 #&gt;   &lt;list&gt;                 &lt;chr&gt; &lt;list&gt;          
 #&gt; 1 &lt;split [161673/40419]&gt; Fold1 &lt;tibble [4 × 3]&gt;
@@ -1292,7 +1292,7 @@ If you have enough text data in the field you are working in, then it is worth c
 <p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
 <div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="dldnn.html#cb497-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
 <span id="cb497-2"><a href="dldnn.html#cb497-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 20 x 5
+<pre><code>#&gt; # A tibble: 20 × 5
 #&gt;    splits                 id    .metric     .estimator .estimate
 #&gt;    &lt;list&gt;                 &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt;  1 &lt;split [161673/40419]&gt; Fold1 accuracy    binary         0.818
@@ -1324,7 +1324,7 @@ If you have enough text data in the field you are working in, then it is worth c
 <span id="cb499-6"><a href="dldnn.html#cb499-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
 <span id="cb499-7"><a href="dldnn.html#cb499-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_err =</span> <span class="fu">sd</span>(.estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
 <span id="cb499-8"><a href="dldnn.html#cb499-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 4 x 4
+<pre><code>#&gt; # A tibble: 4 × 4
 #&gt;   .metric      mean     n  std_err
 #&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
 #&gt; 1 accuracy    0.819     5 0.000523
@@ -1351,7 +1351,7 @@ Training deep learning models typically takes more time than other kinds of mach
 <div class="sourceCode" id="cb502"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb502-1"><a href="dldnn.html#cb502-1" aria-hidden="true" tabindex="-1"></a>all_dense_model_res <span class="sc">%&gt;%</span></span>
 <span id="cb502-2"><a href="dldnn.html#cb502-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
 <span id="cb502-3"><a href="dldnn.html#cb502-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(state, .pred_class)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 6 x 4
+<pre><code>#&gt; # A tibble: 6 × 4
 #&gt;   model                    .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;                    &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 dense                    accuracy binary         0.807
@@ -1368,7 +1368,7 @@ Training deep learning models typically takes more time than other kinds of mach
 <span id="cb504-5"><a href="dldnn.html#cb504-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
 <span id="cb504-6"><a href="dldnn.html#cb504-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
 <span id="cb504-7"><a href="dldnn.html#cb504-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:alldnnroccurve"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:alldnnroccurve"></span>
 <img src="08_dl_dnn_files/figure-html/alldnnroccurve-1.svg" alt="ROC curve for all DNN models' predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
 FIGURE 8.9: ROC curve for all DNN models’ predictions of Kickstarter campaign success
@@ -1389,7 +1389,7 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 <span id="cb505-2"><a href="dldnn.html#cb505-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
 <span id="cb505-3"><a href="dldnn.html#cb505-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(dense_model, kick_test, kickstarter_test<span class="sc">$</span>state)</span>
 <span id="cb505-4"><a href="dldnn.html#cb505-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 4 x 3
+<pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.807
@@ -1405,7 +1405,7 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 <span id="cb507-5"><a href="dldnn.html#cb507-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="dv">1</span>, .pred_1 <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb507-6"><a href="dldnn.html#cb507-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(blurb) <span class="sc">%&gt;%</span></span>
 <span id="cb507-7"><a href="dldnn.html#cb507-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 1
+<pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    blurb                                                                        
 #&gt;    &lt;chr&gt;                                                                        
 #&gt;  1 &quot;A struggling writer has a chance encounter with a mysterious man whose life…
@@ -1423,7 +1423,7 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 <span id="cb509-2"><a href="dldnn.html#cb509-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="dv">0</span>, .pred_1 <span class="sc">&gt;</span> <span class="fl">0.8</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb509-3"><a href="dldnn.html#cb509-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(blurb) <span class="sc">%&gt;%</span></span>
 <span id="cb509-4"><a href="dldnn.html#cb509-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 10 x 1
+<pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    blurb                                                                        
 #&gt;    &lt;chr&gt;                                                                        
 #&gt;  1 &quot;Please help me record my first solo album!! It will blow your mind!  Check …
@@ -1553,6 +1553,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }

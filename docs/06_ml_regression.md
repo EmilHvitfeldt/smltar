@@ -12,7 +12,7 @@ scotus_filtered %>%
 ```
 
 ```
-#> # A tibble: 10,000 x 5
+#> # A tibble: 10,000 × 5
 #>    year  case_name                  docket_number     id text                   
 #>    <chr> <chr>                      <chr>          <dbl> <chr>                  
 #>  1 1903  Clara Perry, Plff. In Err… 16             80304 "No. 16.\n State Repor…
@@ -203,7 +203,7 @@ svm_fit %>%
 ```
 
 ```
-#> # A tibble: 1,001 x 2
+#> # A tibble: 1,001 × 2
 #>    term                  estimate
 #>    <chr>                    <dbl>
 #>  1 Bias                   1920.  
@@ -232,7 +232,7 @@ svm_fit %>%
 ```
 
 ```
-#> # A tibble: 1,001 x 2
+#> # A tibble: 1,001 × 2
 #>    term                 estimate
 #>    <chr>                   <dbl>
 #>  1 tfidf_text_ought        -2.77
@@ -268,7 +268,7 @@ What are we to do, then, if we want to train multiple models and find the best o
 
 Let's estimate the performance of the linear SVM regression model we just fit. We can do this using resampled data sets built from the training set. 
 
-\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the package for data splitting and resampling is **rsample** [@R-rsample].</div>\EndKnitrBlock{rmdpackage}
+\BeginKnitrBlock{rmdpackage}<div class="rmdpackage">In **tidymodels**, the package for data splitting and resampling is **\mbox{rsample}** [@R-rsample].</div>\EndKnitrBlock{rmdpackage}
 
 Let's create 10-fold cross-validation sets, and use these resampled sets for performance estimates.
 
@@ -282,7 +282,7 @@ scotus_folds
 
 ```
 #> #  10-fold cross-validation 
-#> # A tibble: 10 x 2
+#> # A tibble: 10 × 2
 #>    splits             id    
 #>    <list>             <chr> 
 #>  1 <split [6750/750]> Fold01
@@ -316,7 +316,7 @@ svm_rs
 ```
 #> # Resampling results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 5
+#> # A tibble: 10 × 5
 #>    splits             id     .metrics         .notes           .predictions     
 #>    <list>             <chr>  <list>           <list>           <list>           
 #>  1 <split [6750/750]> Fold01 <tibble [2 × 4]> <tibble [0 × 1]> <tibble [750 × 4…
@@ -339,7 +339,7 @@ collect_metrics(svm_rs)
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard   15.6      10 0.216   Preprocessor1_Model1
@@ -414,7 +414,7 @@ null_rs
 ```
 #> # Resampling results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    splits             id     .metrics         .notes          
 #>    <list>             <chr>  <list>           <list>          
 #>  1 <split [6750/750]> Fold01 <tibble [1 × 4]> <tibble [0 × 1]>
@@ -437,7 +437,7 @@ collect_metrics(null_rs)
 ```
 
 ```
-#> # A tibble: 1 x 6
+#> # A tibble: 1 × 6
 #>   .metric .estimator  mean     n std_err .config             
 #>   <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard    47.9    10   0.294 Preprocessor1_Model1
@@ -494,7 +494,7 @@ collect_metrics(rf_rs)
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
@@ -639,7 +639,7 @@ collect_metrics(smart_rs)
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard   17.2      10 0.199   Preprocessor1_Model1
@@ -761,7 +761,7 @@ collect_metrics(bigram_rs)
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
@@ -785,8 +785,7 @@ list(`1` = unigram_rs,
     x = "Degree of n-grams",
     y = "RMSE",
     title = "Model performance for different degrees of n-gram tokenization",
-    subtitle = paste("For the same number of tokens,",
-                     "bigrams plus unigrams performed best")
+    subtitle = "For the same number of tokens, unigrams performed best"
   )
 ```
 
@@ -915,7 +914,7 @@ collect_metrics(lemma_rs)
 ```
 
 ```
-#> # A tibble: 2 x 6
+#> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
 #> 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
@@ -1213,7 +1212,7 @@ svm_rs %>%
 ```
 
 ```
-#> # A tibble: 1 x 3
+#> # A tibble: 1 × 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
 #> 1 mape    standard       0.616
@@ -1230,7 +1229,7 @@ svm_rs %>%
 ```
 
 ```
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
 #>  1 Fold01 mape    standard       0.603
@@ -1256,7 +1255,7 @@ svm_rs %>%
 ```
 
 ```
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
 #>  1 Fold01 mae     standard        11.5
@@ -1271,12 +1270,9 @@ svm_rs %>%
 #> 10 Fold10 mae     standard        11.6
 ```
 
-
 <div class="rmdnote">
 <p>For the full set of regression metric options, see the <a href="https://yardstick.tidymodels.org/reference/">yardstick documentation</a>.</p>
 </div>
-
-
 
 ## The full game: regression {#mlregressionfull}
 
@@ -1398,7 +1394,7 @@ final_grid
 ```
 
 ```
-#> # A tibble: 6 x 1
+#> # A tibble: 6 × 1
 #>   max_tokens
 #>        <int>
 #> 1       1000
@@ -1427,19 +1423,19 @@ final_rs
 ```
 #> # Tuning results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 5
-#>    splits            id     .metrics         .notes          .predictions       
-#>    <list>            <chr>  <list>           <list>          <list>             
-#>  1 <split [6750/750… Fold01 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  2 <split [6750/750… Fold02 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  3 <split [6750/750… Fold03 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  4 <split [6750/750… Fold04 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  5 <split [6750/750… Fold05 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  6 <split [6750/750… Fold06 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  7 <split [6750/750… Fold07 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  8 <split [6750/750… Fold08 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#>  9 <split [6750/750… Fold09 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
-#> 10 <split [6750/750… Fold10 <tibble [18 × 5… <tibble [0 × 1… <tibble [4,500 × 5…
+#> # A tibble: 10 × 5
+#>    splits             id     .metrics          .notes           .predictions    
+#>    <list>             <chr>  <list>            <list>           <list>          
+#>  1 <split [6750/750]> Fold01 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  2 <split [6750/750]> Fold02 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  3 <split [6750/750]> Fold03 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  4 <split [6750/750]> Fold04 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  5 <split [6750/750]> Fold05 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  6 <split [6750/750]> Fold06 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  7 <split [6750/750]> Fold07 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  8 <split [6750/750]> Fold08 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#>  9 <split [6750/750]> Fold09 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
+#> 10 <split [6750/750]> Fold10 <tibble [18 × 5]> <tibble [0 × 1]> <tibble [4,500 …
 ```
 
 We trained all these models!
@@ -1482,7 +1478,7 @@ chosen_mae
 ```
 
 ```
-#> # A tibble: 1 x 9
+#> # A tibble: 1 × 9
 #>   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #>        <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>            <dbl> <dbl>
 #> 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795
@@ -1534,7 +1530,7 @@ collect_metrics(final_fitted)
 ```
 
 ```
-#> # A tibble: 2 x 4
+#> # A tibble: 2 × 4
 #>   .metric .estimator .estimate .config             
 #>   <chr>   <chr>          <dbl> <chr>               
 #> 1 rmse    standard      13.8   Preprocessor1_Model1
@@ -1581,7 +1577,7 @@ scotus_fit %>%
 <p class="caption">(\#fig:scotusvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
 </div>
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "testified", are associated with higher, later years; those that contribute in the negative direction, like "ought" and "consequently", are associated with lower, earlier years for these Supreme Court opinions. 
+The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.
 
 <div class="rmdnote">
 <p>Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.</p>
@@ -1629,27 +1625,27 @@ scotus_bind %>%
 ```
 
 ```
-#> # A tibble: 168 x 4
-#>     year .pred case_name                 text                                   
-#>    <dbl> <dbl> <chr>                     <chr>                                  
-#>  1  2009 2055. Nijhawan v. Holder        "Supreme Court of United States.\n*229…
-#>  2  2008 1957. Green v. Johnson          "                 Cite as: 553 U. S. _…
-#>  3  2008 1952. Dalehite v. United States "Supreme Court of United States.\n*16 …
-#>  4  2008 1982. Preston v. Ferrer         "Supreme Court of United States.\n*981…
-#>  5  2007 1876. Quebec Bank of Toronto v… "Supreme Court of United States.\n*179…
-#>  6  2004 2035. Illinois v. Lidster       "No. 02-1060.\nPolice set up a highway…
-#>  7  2002 1969. Borgner v. Florida Board… "No. 02-165.\nCERTIORARI TO THE UNITED…
-#>  8  2000 1974. Ohler v. United States    "OHLERv.UNITED STATES\nCERTIORARI TO T…
-#>  9  2000 1955. Bush v. Palm Beach Count… "No. 00-836\nON WRIT OF CERTIORARI TO …
-#> 10  1999 1964. Dickinson v. Zurko        "No. 98 377\nQ. TODD DICKINSON,  ACTIN…
+#> # A tibble: 168 × 4
+#>     year .pred case_name                                text                    
+#>    <dbl> <dbl> <chr>                                    <chr>                   
+#>  1  2009 2055. Nijhawan v. Holder                       "Supreme Court of Unite…
+#>  2  2008 1957. Green v. Johnson                         "                 Cite …
+#>  3  2008 1952. Dalehite v. United States                "Supreme Court of Unite…
+#>  4  2008 1982. Preston v. Ferrer                        "Supreme Court of Unite…
+#>  5  2007 1876. Quebec Bank of Toronto v. Hellman        "Supreme Court of Unite…
+#>  6  2004 2035. Illinois v. Lidster                      "No. 02-1060.\nPolice s…
+#>  7  2002 1969. Borgner v. Florida Board of Dentistry    "No. 02-165.\nCERTIORAR…
+#>  8  2000 1974. Ohler v. United States                   "OHLERv.UNITED STATES\n…
+#>  9  2000 1955. Bush v. Palm Beach County Canvassing Bd. "No. 00-836\nON WRIT OF…
+#> 10  1999 1964. Dickinson v. Zurko                       "No. 98 377\nQ. TODD DI…
 #> # … with 158 more rows
 ```
 
-There are some interesting examples here where we can understand why the model would mispredict: 
+There are some interesting examples here where we can understand why the model would mispredict:
 
-- _BedRoc Limited, LLC v. United States_ was a case decided in 2004 regarding the 1919 Pittman Act.
+- *Dalehite v. United States* was a case about a fertilizer explosion that is mislabeled in our dataset; it was decided in 1953, not 2008 as we see in our data, and we predict a year of 1952, very close to the true decision date.
 
-- The case written by Antonin Scalia functioning as a circuit justice during his time on the Supreme Court is confusing, given that he served as a federal judge on the D.C. Circuit Court of Appeals earlier and appears in the training set as such.
+- *Bush v. Palm Beach County Canvassing Board* in 2000 was part of the fallout of the 2000 presidential election and dealt with historical issues like the due process clause of the U.S. Constitution; these “old” textual elements push its prediction much earlier than its true date.
 
 <div class="rmdwarning">
 <p>Looking at examples that your model does not perform well for is well worth your time, for similar reasons that exploratory data analysis is valuable before you begin training your model.</p>

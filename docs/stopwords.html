@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 3 Stop words | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="tokenization.html"/>
 <link rel="next" href="stemming.html"/>
-<script src="libs/header-attrs-2.9.4/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -490,7 +490,7 @@ The <strong>stopwords</strong> package contains a comprehensive collection of st
 <p>
 
 </p>
-<div class="figure" style="text-align: center"><span id="fig:stopwordoverlap"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:stopwordoverlap"></span>
 <img src="03_stopwords_files/figure-html/stopwordoverlap-1.svg" alt="Set intersections for three common stop word lists visualized as an UpSet plot" width="672" />
 <p class="caption">
 FIGURE 3.1: Set intersections for three common stop word lists visualized as an UpSet plot
@@ -536,7 +536,7 @@ It is perfectly acceptable to start with a premade word list and remove or appen
 <p>Let’s use the Snowball stop word list as an example. Since the stop words return from this function as a vector, we will use <code>filter()</code>.</p>
 <div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="stopwords.html#cb74-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb74-2"><a href="stopwords.html#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(word <span class="sc">%in%</span> <span class="fu">stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>)))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,547 x 3
+<pre><code>#&gt; # A tibble: 1,547 × 3
 #&gt;    book         language word   
 #&gt;    &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;  
 #&gt;  1 The fir tree English  far    
@@ -553,7 +553,7 @@ It is perfectly acceptable to start with a premade word list and remove or appen
 <p>If we use the <code>get_stopwords()</code> function from <strong>tidytext</strong> instead, then we can use the <code>anti_join()</code> function.</p>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="stopwords.html#cb76-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb76-2"><a href="stopwords.html#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(<span class="fu">get_stopwords</span>(<span class="at">source =</span> <span class="st">&quot;snowball&quot;</span>))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1,547 x 3
+<pre><code>#&gt; # A tibble: 1,547 × 3
 #&gt;    book         language word   
 #&gt;    &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt;  
 #&gt;  1 The fir tree English  far    
@@ -573,6 +573,7 @@ It is perfectly acceptable to start with a premade word list and remove or appen
 <div id="homemadestopwords" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> Creating your own stop words list</h2>
 <p>Another way to get a stop word list is to create one yourself. Let’s explore a few different ways to find appropriate words to use. We will use the tokenized data from “The Fir-Tree” as a first example. Let’s take the words and rank them by their count or frequency.</p>
+
 <div style="column-count:5;font-size:11pt;line-height:11.5pt">
 <p>1: the</p>
 <p>2: and</p>
@@ -833,7 +834,7 @@ This bias can be minimized by removing words we would expect to be over-represen
 </div>
 <p>Easy examples are to include the complements to the words in the list if they are not already present. Include “big” if “small” is present, “old” if “young” is present. This example list has words associated with women often listed lower in rank than words associated with men. With <code>"man"</code> being at rank 79 but <code>"woman"</code> at rank 179, choosing a threshold of 100 would lead to only one of these words being included. Depending on how important you think such nouns are going to be in your texts, consider either adding <code>"woman"</code> or deleting <code>"man"</code>.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <p>Figure <a href="stopwords.html#fig:genderrank">3.2</a> shows how the words associated with men have a higher rank than the words associated with women. By using a single threshold to create a stop word list, you would likely only include one form of such words.</p>
-<div class="figure" style="text-align: center"><span id="fig:genderrank"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:genderrank"></span>
 <img src="03_stopwords_files/figure-html/genderrank-1.svg" alt="Tokens ranked according to total occurrences, with rank 1 having the most occurrences" width="768" />
 <p class="caption">
 FIGURE 3.2: Tokens ranked according to total occurrences, with rank 1 having the most occurrences
@@ -841,8 +842,8 @@ FIGURE 3.2: Tokens ranked according to total occurrences, with rank 1 having the
 </div>
 <p>Imagine now we would like to create a stop word list that spans multiple different genres, in such a way that the subject-specific stop words don’t overlap. For this case, we would like words to be denoted as a stop word only if it is a stop word in all the genres. You could find the words individually in each genre and use the right intersections. However, that approach might take a substantial amount of time.</p>
 <p>Below is a bad approach where we try to create a multi-language list of stop words. To accomplish this we calculate the <a href="https://www.tidytextmining.com/tfidf.html"><em>inverse document frequency</em></a> (IDF) of each word. The IDF of a word is a quantity that is low for commonly-used words in a collection of documents and high for words not used often in a collection of documents. It is typically defined as</p>
-<p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span>
-If the word “dog” appears in 4 out of 100 documents then it would have an <code>idf("dog") = log(100/4) = 3.22</code>, and if the word “cat” appears in 99 out of 100 documents then it would have an <code>idf("cat") = log(100/99) = 0.01</code>. Notice how the idf values goes to zero (as a matter of fact when a term appears in all the documents then the idf of that word is 0 <code>log(100/100) = log(1) = 0</code>), the more documents it is contained in.
+<p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span></p>
+<p>If the word “dog” appears in 4 out of 100 documents then it would have an <code>idf("dog") = log(100/4) = 3.22</code>, and if the word “cat” appears in 99 out of 100 documents then it would have an <code>idf("cat") = log(100/99) = 0.01</code>. Notice how the idf values goes to zero (as a matter of fact when a term appears in all the documents then the idf of that word is 0 <code>log(100/100) = log(1) = 0</code>), the more documents it is contained in.
 What happens if we create a stop word list based on words with the lowest IDF? The following function takes a tokenized dataframe and returns a dataframe with a column for each word and a column for the IDF.</p>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="stopwords.html#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
 <span id="cb78-2"><a href="stopwords.html#cb78-2" aria-hidden="true" tabindex="-1"></a>calc_idf <span class="ot">&lt;-</span> <span class="cf">function</span>(df, word, document) {</span>
@@ -1123,7 +1124,7 @@ This didn’t work very well because there is very little overlap between common
 <div id="what-happens-when-you-remove-stop-words" class="section level2" number="3.4">
 <h2><span class="header-section-number">3.4</span> What happens when you remove stop words</h2>
 <p>We have discussed different ways of finding and removing stop words; now let’s see what happens once you do remove them. First, let’s explore the impact of the number of words that are included in the list. Figure <a href="stopwords.html#fig:stopwordresults">3.3</a> shows what percentage of words are removed as a function of the number of words in a text. The different colors represent the three different stop word lists we have considered in this chapter.</p>
-<div class="figure" style="text-align: center"><span id="fig:stopwordresults"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:stopwordresults"></span>
 <img src="03_stopwords_files/figure-html/stopwordresults-1.svg" alt="Proportion of words removed for different stop word lists and different document lengths" width="672" />
 <p class="caption">
 FIGURE 3.3: Proportion of words removed for different stop word lists and different document lengths
@@ -1144,12 +1145,12 @@ Most premade stop word lists assume that all the words are spelled correctly.
 <h2><span class="header-section-number">3.5</span> Stop words in languages other than English</h2>
 <p>So far in this chapter, we have focused on English stop words, but English is not representative of every language. The notion of “short” and “long” lists we have used so far are specific to English as a language. You should expect different languages to have a different number of “uninformative” words, and for this number to depend on the morphological richness of a language; lists that contain all possible morphological variants of each stop word could become quite large.</p>
 <p>Different languages have different numbers of words in each class of words. An example is how the grammatical case influences the articles used in German. The following tables show the use of <a href="https://deutsch.lingolia.com/en/grammar/nouns-and-articles/articles-noun-markers">definite and indefinite articles in German</a>. Notice how German nouns have three genders (masculine, feminine, and neuter), which are not uncommon in languages around the world. Articles are almost always considered to be stop words in English as they carry very little information. However, German articles give some indication of the case, which can be used when selecting a list of stop words in German.</p>
-<div id="copovsccsc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ardpegawcu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#copovsccsc .gt_table {
+#ardpegawcu .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1174,7 +1175,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-left-color: #D3D3D3;
 }
 
-#copovsccsc .gt_heading {
+#ardpegawcu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1186,7 +1187,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#copovsccsc .gt_title {
+#ardpegawcu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1196,23 +1197,23 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-bottom-width: 0;
 }
 
-#copovsccsc .gt_subtitle {
+#ardpegawcu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
   padding-top: 0;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
 
-#copovsccsc .gt_bottom_border {
+#ardpegawcu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#copovsccsc .gt_col_headings {
+#ardpegawcu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1227,7 +1228,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#copovsccsc .gt_col_heading {
+#ardpegawcu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1247,7 +1248,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   overflow-x: hidden;
 }
 
-#copovsccsc .gt_column_spanner_outer {
+#ardpegawcu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1259,27 +1260,27 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 4px;
 }
 
-#copovsccsc .gt_column_spanner_outer:first-child {
+#ardpegawcu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#copovsccsc .gt_column_spanner_outer:last-child {
+#ardpegawcu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#copovsccsc .gt_column_spanner {
+#ardpegawcu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   vertical-align: bottom;
   padding-top: 5px;
-  padding-bottom: 6px;
+  padding-bottom: 5px;
   overflow-x: hidden;
   display: inline-block;
   width: 100%;
 }
 
-#copovsccsc .gt_group_heading {
+#ardpegawcu .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1301,7 +1302,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   vertical-align: middle;
 }
 
-#copovsccsc .gt_empty_group_heading {
+#ardpegawcu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1316,15 +1317,15 @@ Most premade stop word lists assume that all the words are spelled correctly.
   vertical-align: middle;
 }
 
-#copovsccsc .gt_from_md > :first-child {
+#ardpegawcu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#copovsccsc .gt_from_md > :last-child {
+#ardpegawcu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#copovsccsc .gt_row {
+#ardpegawcu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1343,7 +1344,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   overflow-x: hidden;
 }
 
-#copovsccsc .gt_stub {
+#ardpegawcu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1355,7 +1356,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-left: 12px;
 }
 
-#copovsccsc .gt_summary_row {
+#ardpegawcu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1365,7 +1366,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 5px;
 }
 
-#copovsccsc .gt_first_summary_row {
+#ardpegawcu .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1375,7 +1376,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-top-color: #D3D3D3;
 }
 
-#copovsccsc .gt_grand_summary_row {
+#ardpegawcu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1385,7 +1386,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 5px;
 }
 
-#copovsccsc .gt_first_grand_summary_row {
+#ardpegawcu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1395,11 +1396,11 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-top-color: #D3D3D3;
 }
 
-#copovsccsc .gt_striped {
+#ardpegawcu .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#copovsccsc .gt_table_body {
+#ardpegawcu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1408,7 +1409,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-bottom-color: #D3D3D3;
 }
 
-#copovsccsc .gt_footnotes {
+#ardpegawcu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1422,13 +1423,13 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#copovsccsc .gt_footnote {
+#ardpegawcu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#copovsccsc .gt_sourcenotes {
+#ardpegawcu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1442,41 +1443,41 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#copovsccsc .gt_sourcenote {
+#ardpegawcu .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#copovsccsc .gt_left {
+#ardpegawcu .gt_left {
   text-align: left;
 }
 
-#copovsccsc .gt_center {
+#ardpegawcu .gt_center {
   text-align: center;
 }
 
-#copovsccsc .gt_right {
+#ardpegawcu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#copovsccsc .gt_font_normal {
+#ardpegawcu .gt_font_normal {
   font-weight: normal;
 }
 
-#copovsccsc .gt_font_bold {
+#ardpegawcu .gt_font_bold {
   font-weight: bold;
 }
 
-#copovsccsc .gt_font_italic {
+#ardpegawcu .gt_font_italic {
   font-style: italic;
 }
 
-#copovsccsc .gt_super {
+#ardpegawcu .gt_super {
   font-size: 65%;
 }
 
-#copovsccsc .gt_footnote_marks {
+#ardpegawcu .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -1524,12 +1525,12 @@ Most premade stop word lists assume that all the words are spelled correctly.
   
 </table>
 </div>
-<div id="htjfwctttx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="sndhldzzsk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#htjfwctttx .gt_table {
+#sndhldzzsk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1554,7 +1555,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-left-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_heading {
+#sndhldzzsk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1566,7 +1567,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_title {
+#sndhldzzsk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1576,23 +1577,23 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-bottom-width: 0;
 }
 
-#htjfwctttx .gt_subtitle {
+#sndhldzzsk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
   padding-top: 0;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
 
-#htjfwctttx .gt_bottom_border {
+#sndhldzzsk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_col_headings {
+#sndhldzzsk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1607,7 +1608,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_col_heading {
+#sndhldzzsk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1627,7 +1628,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   overflow-x: hidden;
 }
 
-#htjfwctttx .gt_column_spanner_outer {
+#sndhldzzsk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1639,27 +1640,27 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 4px;
 }
 
-#htjfwctttx .gt_column_spanner_outer:first-child {
+#sndhldzzsk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#htjfwctttx .gt_column_spanner_outer:last-child {
+#sndhldzzsk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#htjfwctttx .gt_column_spanner {
+#sndhldzzsk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
   vertical-align: bottom;
   padding-top: 5px;
-  padding-bottom: 6px;
+  padding-bottom: 5px;
   overflow-x: hidden;
   display: inline-block;
   width: 100%;
 }
 
-#htjfwctttx .gt_group_heading {
+#sndhldzzsk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1681,7 +1682,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   vertical-align: middle;
 }
 
-#htjfwctttx .gt_empty_group_heading {
+#sndhldzzsk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1696,15 +1697,15 @@ Most premade stop word lists assume that all the words are spelled correctly.
   vertical-align: middle;
 }
 
-#htjfwctttx .gt_from_md > :first-child {
+#sndhldzzsk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#htjfwctttx .gt_from_md > :last-child {
+#sndhldzzsk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#htjfwctttx .gt_row {
+#sndhldzzsk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1723,7 +1724,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   overflow-x: hidden;
 }
 
-#htjfwctttx .gt_stub {
+#sndhldzzsk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1735,7 +1736,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-left: 12px;
 }
 
-#htjfwctttx .gt_summary_row {
+#sndhldzzsk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1745,7 +1746,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 5px;
 }
 
-#htjfwctttx .gt_first_summary_row {
+#sndhldzzsk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1755,7 +1756,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-top-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_grand_summary_row {
+#sndhldzzsk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1765,7 +1766,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   padding-right: 5px;
 }
 
-#htjfwctttx .gt_first_grand_summary_row {
+#sndhldzzsk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1775,11 +1776,11 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-top-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_striped {
+#sndhldzzsk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#htjfwctttx .gt_table_body {
+#sndhldzzsk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1788,7 +1789,7 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-bottom-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_footnotes {
+#sndhldzzsk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1802,13 +1803,13 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_footnote {
+#sndhldzzsk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#htjfwctttx .gt_sourcenotes {
+#sndhldzzsk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1822,41 +1823,41 @@ Most premade stop word lists assume that all the words are spelled correctly.
   border-right-color: #D3D3D3;
 }
 
-#htjfwctttx .gt_sourcenote {
+#sndhldzzsk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#htjfwctttx .gt_left {
+#sndhldzzsk .gt_left {
   text-align: left;
 }
 
-#htjfwctttx .gt_center {
+#sndhldzzsk .gt_center {
   text-align: center;
 }
 
-#htjfwctttx .gt_right {
+#sndhldzzsk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#htjfwctttx .gt_font_normal {
+#sndhldzzsk .gt_font_normal {
   font-weight: normal;
 }
 
-#htjfwctttx .gt_font_bold {
+#sndhldzzsk .gt_font_bold {
   font-weight: bold;
 }
 
-#htjfwctttx .gt_font_italic {
+#sndhldzzsk .gt_font_italic {
   font-style: italic;
 }
 
-#htjfwctttx .gt_super {
+#sndhldzzsk .gt_super {
   font-size: 65%;
 }
 
-#htjfwctttx .gt_footnote_marks {
+#sndhldzzsk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2014,6 +2015,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }

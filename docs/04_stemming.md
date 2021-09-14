@@ -25,7 +25,7 @@ tidy_fir_tree %>%
 ```
 
 ```
-#> # A tibble: 3 x 2
+#> # A tibble: 3 × 2
 #>   word       n
 #>   <chr>  <int>
 #> 1 tree      76
@@ -51,7 +51,7 @@ tidy_fir_tree %>%
 ```
 
 ```
-#> # A tibble: 570 x 2
+#> # A tibble: 570 × 2
 #>    stem        n
 #>    <chr>   <int>
 #>  1 tree       88
@@ -132,7 +132,7 @@ tidy_fir_tree %>%
 ```
 
 ```
-#> # A tibble: 595 x 2
+#> # A tibble: 595 × 2
 #>    stem       n
 #>    <chr>  <int>
 #>  1 tree      89
@@ -181,7 +181,7 @@ tidy_scotus %>%
 ```
 
 ```
-#> # A tibble: 167,879 x 2
+#> # A tibble: 167,879 × 2
 #>    word        n
 #>    <chr>   <int>
 #>  1 court  286448
@@ -207,7 +207,8 @@ tidy_scotus %>%
 ```
 
 ```
-#> Document-feature matrix of: 9,642 documents, 167,879 features (99.49% sparse) and 0 docvars.
+#> Document-feature matrix of: 9,642 documents, 167,879
+features (99.49% sparse) and 0 docvars.
 ```
 
 Look at the sparsity of this matrix. It's high! Think of this sparsity as the sparsity of data that we will want to use to build a supervised machine learning model.
@@ -223,7 +224,8 @@ tidy_scotus %>%
 ```
 
 ```
-#> Document-feature matrix of: 9,642 documents, 135,570 features (99.48% sparse) and 0 docvars.
+#> Document-feature matrix of: 9,642 documents, 135,570
+features (99.48% sparse) and 0 docvars.
 ```
 
 We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, *assuming that we haven't lost any important information by stemming*.
@@ -298,7 +300,7 @@ tidy_fir_tree %>%
 ```
 
 ```
-#> # A tibble: 3 x 2
+#> # A tibble: 3 × 2
 #>   word       n
 #>   <chr>  <int>
 #> 1 tree      76
@@ -320,7 +322,7 @@ fir_tree_counts
 ```
 
 ```
-#> # A tibble: 572 x 2
+#> # A tibble: 572 × 2
 #>    stem        n
 #>    <chr>   <int>
 #>  1 tree       89
@@ -345,7 +347,7 @@ fir_tree_counts %>%
 ```
 
 ```
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>   stem      n
 #>   <chr> <int>
 #> 1 tree     89
@@ -413,7 +415,7 @@ stemming %>%
 ```
 
 ```
-#> # A tibble: 13 x 4
+#> # A tibble: 13 × 4
 #>    `Original word` `Remove S`  `Plural endings` `Porter stemming`
 #>    <chr>           <chr>       <chr>            <chr>            
 #>  1 raspberries     raspberrie  raspberry        raspberri        
@@ -442,7 +444,7 @@ stemming %>%
 ```
 
 ```
-#> # A tibble: 9 x 3
+#> # A tibble: 9 × 3
 #>   `Original word` Type            Result
 #>   <chr>           <chr>           <chr> 
 #> 1 come            Remove S        come  

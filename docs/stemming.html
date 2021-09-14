@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-07-28" />
+<meta name="date" content="2021-09-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,8 @@
   
 <link rel="prev" href="stopwords.html"/>
 <link rel="next" href="embeddings.html"/>
-<script src="libs/header-attrs-2.9.4/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -472,7 +472,7 @@ div.csl-indent {
 <span id="cb79-13"><a href="stemming.html#cb79-13" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb79-14"><a href="stemming.html#cb79-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb79-15"><a href="stemming.html#cb79-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(word, <span class="st">&quot;^tree&quot;</span>))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 2
+<pre><code>#&gt; # A tibble: 3 × 2
 #&gt;   word       n
 #&gt;   &lt;chr&gt;  &lt;int&gt;
 #&gt; 1 tree      76
@@ -488,7 +488,7 @@ div.csl-indent {
 <span id="cb81-3"><a href="stemming.html#cb81-3" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb81-4"><a href="stemming.html#cb81-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
 <span id="cb81-5"><a href="stemming.html#cb81-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(stem, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 570 x 2
+<pre><code>#&gt; # A tibble: 570 × 2
 #&gt;    stem        n
 #&gt;    &lt;chr&gt;   &lt;int&gt;
 #&gt;  1 tree       88
@@ -537,7 +537,7 @@ div.csl-indent {
 <span id="cb84-13"><a href="stemming.html#cb84-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
 <span id="cb84-14"><a href="stemming.html#cb84-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>language, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb84-15"><a href="stemming.html#cb84-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Frequency&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:porterlanguages"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:porterlanguages"></span>
 <img src="04_stemming_files/figure-html/porterlanguages-1.svg" alt="Porter stemming results in five languages" width="672" />
 <p class="caption">
 FIGURE 4.1: Porter stemming results in five languages
@@ -551,7 +551,7 @@ FIGURE 4.1: Porter stemming results in five languages
 <span id="cb85-4"><a href="stemming.html#cb85-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">hunspell_stem</span>(word)) <span class="sc">%&gt;%</span></span>
 <span id="cb85-5"><a href="stemming.html#cb85-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(stem) <span class="sc">%&gt;%</span></span>
 <span id="cb85-6"><a href="stemming.html#cb85-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(stem, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 595 x 2
+<pre><code>#&gt; # A tibble: 595 × 2
 #&gt;    stem       n
 #&gt;    &lt;chr&gt;  &lt;int&gt;
 #&gt;  1 tree      89
@@ -583,7 +583,7 @@ FIGURE 4.1: Porter stemming results in five languages
 <span id="cb89-6"><a href="stemming.html#cb89-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb89-7"><a href="stemming.html#cb89-7" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span></span>
 <span id="cb89-8"><a href="stemming.html#cb89-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 167,879 x 2
+<pre><code>#&gt; # A tibble: 167,879 × 2
 #&gt;    word        n
 #&gt;    &lt;chr&gt;   &lt;int&gt;
 #&gt;  1 court  286448
@@ -601,14 +601,16 @@ FIGURE 4.1: Porter stemming results in five languages
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="stemming.html#cb91-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span> </span>
 <span id="cb91-2"><a href="stemming.html#cb91-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, word) <span class="sc">%&gt;%</span></span>
 <span id="cb91-3"><a href="stemming.html#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, word, n)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 167,879 features (99.49% sparse) and 0 docvars.</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 167,879
+features (99.49% sparse) and 0 docvars.</code></pre>
 <p>Look at the sparsity of this matrix. It’s high! Think of this sparsity as the sparsity of data that we will want to use to build a supervised machine learning model.</p>
 <p>What if instead we use stemming as a preprocessing step here?</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="stemming.html#cb93-1" aria-hidden="true" tabindex="-1"></a>tidy_scotus <span class="sc">%&gt;%</span>  </span>
 <span id="cb93-2"><a href="stemming.html#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stem =</span> <span class="fu">wordStem</span>(word)) <span class="sc">%&gt;%</span></span>
 <span id="cb93-3"><a href="stemming.html#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(case_name, stem) <span class="sc">%&gt;%</span></span>
 <span id="cb93-4"><a href="stemming.html#cb93-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dfm</span>(case_name, stem, n)</span></code></pre></div>
-<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 135,570 features (99.48% sparse) and 0 docvars.</code></pre>
+<pre><code>#&gt; Document-feature matrix of: 9,642 documents, 135,570
+features (99.48% sparse) and 0 docvars.</code></pre>
 <p>We reduced the number of word features by many thousands, although the sparsity did not change much. Why is it possibly helpful to reduce the number of features? Common sense says that reducing the number of word features in our data set so dramatically will improve the performance of any machine learning model we train with it, <em>assuming that we haven’t lost any important information by stemming</em>.</p>
 <p>There is a growing body of academic research demonstrating that stemming can be counterproductive for text modeling. For example, <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> and related work explore how choices around stemming and other preprocessing steps don’t help and can actually hurt performance when training topic models for text. From <span class="citation"><a href="#ref-Schofield16" role="doc-biblioref">Schofield and Mimno</a> (<a href="#ref-Schofield16" role="doc-biblioref">2016</a>)</span> specifically,</p>
 <blockquote>
@@ -660,7 +662,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="stemming.html#cb95-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
 <span id="cb95-2"><a href="stemming.html#cb95-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(word, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb95-3"><a href="stemming.html#cb95-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(word, <span class="st">&quot;^tree&quot;</span>))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 3 x 2
+<pre><code>#&gt; # A tibble: 3 × 2
 #&gt;   word       n
 #&gt;   &lt;chr&gt;  &lt;int&gt;
 #&gt; 1 tree      76
@@ -674,7 +676,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <span id="cb97-5"><a href="stemming.html#cb97-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(stem, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb97-6"><a href="stemming.html#cb97-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb97-7"><a href="stemming.html#cb97-7" aria-hidden="true" tabindex="-1"></a>fir_tree_counts</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 572 x 2
+<pre><code>#&gt; # A tibble: 572 × 2
 #&gt;    stem        n
 #&gt;    &lt;chr&gt;   &lt;int&gt;
 #&gt;  1 tree       89
@@ -691,7 +693,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <p>Now we are able to put all these related words together, having identified them with the same stem.</p>
 <div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="stemming.html#cb99-1" aria-hidden="true" tabindex="-1"></a>fir_tree_counts <span class="sc">%&gt;%</span></span>
 <span id="cb99-2"><a href="stemming.html#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(stem, <span class="st">&quot;^tree&quot;</span>))</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 1 x 2
+<pre><code>#&gt; # A tibble: 1 × 2
 #&gt;   stem      n
 #&gt;   &lt;chr&gt; &lt;int&gt;
 #&gt; 1 tree     89</code></pre>
@@ -731,7 +733,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <span id="cb102-11"><a href="stemming.html#cb102-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Type, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
 <span id="cb102-12"><a href="stemming.html#cb102-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb102-13"><a href="stemming.html#cb102-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;Frequency&quot;</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:stemmingresults"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:stemmingresults"></span>
 <img src="04_stemming_files/figure-html/stemmingresults-1.svg" alt="Results for three different stemming strategies" width="672" />
 <p class="caption">
 FIGURE 4.2: Results for three different stemming strategies
@@ -741,7 +743,7 @@ FIGURE 4.2: Results for three different stemming strategies
 <div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="stemming.html#cb103-1" aria-hidden="true" tabindex="-1"></a>stemming <span class="sc">%&gt;%</span></span>
 <span id="cb103-2"><a href="stemming.html#cb103-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Remove S</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">`</span><span class="at">Plural endings</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb103-3"><a href="stemming.html#cb103-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Remove S</span><span class="st">`</span>, <span class="st">`</span><span class="at">Plural endings</span><span class="st">`</span>, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 13 x 4
+<pre><code>#&gt; # A tibble: 13 × 4
 #&gt;    `Original word` `Remove S`  `Plural endings` `Porter stemming`
 #&gt;    &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;            
 #&gt;  1 raspberries     raspberrie  raspberry        raspberri        
@@ -762,7 +764,7 @@ FIGURE 4.2: Results for three different stemming strategies
 <span id="cb105-2"><a href="stemming.html#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(Type, Result, <span class="st">`</span><span class="at">Remove S</span><span class="st">`</span><span class="sc">:</span><span class="st">`</span><span class="at">Porter stemming</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb105-3"><a href="stemming.html#cb105-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Result <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;come&quot;</span>, <span class="st">&quot;coming&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb105-4"><a href="stemming.html#cb105-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(<span class="st">`</span><span class="at">Original word</span><span class="st">`</span>, Type, Result)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 9 x 3
+<pre><code>#&gt; # A tibble: 9 × 3
 #&gt;   `Original word` Type            Result
 #&gt;   &lt;chr&gt;           &lt;chr&gt;           &lt;chr&gt; 
 #&gt; 1 come            Remove S        come  
@@ -811,7 +813,7 @@ NLP practitioners who work with R can use this library via the <strong>spacyr</s
 <span id="cb107-11"><a href="stemming.html#cb107-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">fct_reorder</span>(lemma, n))) <span class="sc">+</span></span>
 <span id="cb107-12"><a href="stemming.html#cb107-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
 <span id="cb107-13"><a href="stemming.html#cb107-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Frequency&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:lemmafirtree"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:lemmafirtree"></span>
 <img src="04_stemming_files/figure-html/lemmafirtree-1.svg" alt="Results for lemmatization, rather than stemming" width="672" />
 <p class="caption">
 FIGURE 4.3: Results for lemmatization, rather than stemming
@@ -959,6 +961,10 @@ gitbook.start({
 "text": null
 },
 "download": null,
+"search": {
+"engine": "lunr",
+"options": null
+},
 "toc": {
 "collapse": "subsection"
 }

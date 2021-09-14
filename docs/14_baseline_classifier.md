@@ -17,7 +17,7 @@ kickstarter
 ```
 
 ```
-#> # A tibble: 269,790 x 3
+#> # A tibble: 269,790 × 3
 #>    blurb                                                        state created_at
 #>    <chr>                                                        <fct> <date>    
 #>  1 Exploring paint and its place in a digital world.            0     2015-03-17
@@ -53,7 +53,7 @@ kickstarter_folds
 
 ```
 #> #  10-fold cross-validation 
-#> # A tibble: 10 x 2
+#> # A tibble: 10 × 2
 #>    splits                 id    
 #>    <list>                 <chr> 
 #>  1 <split [181882/20210]> Fold01
@@ -139,7 +139,7 @@ lambda_grid
 ```
 
 ```
-#> # A tibble: 20 x 1
+#> # A tibble: 20 × 1
 #>      penalty
 #>        <dbl>
 #>  1 0.00001  
@@ -214,7 +214,7 @@ lasso_rs
 ```
 #> # Tuning results
 #> # 10-fold cross-validation 
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #>    splits                 id     .metrics          .notes          
 #>    <list>                 <chr>  <list>            <list>          
 #>  1 <split [181882/20210]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
@@ -237,7 +237,7 @@ show_best(lasso_rs, "roc_auc")
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>     penalty .metric .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
 #> 1 0.000695  roc_auc binary     0.753    10 0.000824 Preprocessor1_Model08
@@ -252,7 +252,7 @@ show_best(lasso_rs, "accuracy")
 ```
 
 ```
-#> # A tibble: 5 x 7
+#> # A tibble: 5 × 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
 #> 1 0.000379  accuracy binary     0.686    10 0.00111  Preprocessor1_Model07
