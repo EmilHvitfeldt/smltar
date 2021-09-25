@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-09-13" />
+<meta name="date" content="2021-09-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -468,16 +468,16 @@ Some people, when confronted with a problem, think: “I know, I’ll use regula
 <div id="literal-characters" class="section level2" number="11.1">
 <h2><span class="header-section-number">A.1</span> Literal characters</h2>
 <p>The most basic regular expression consists of only a single character. Here let’s detect if each of the following strings in the character vector <code>animals</code> contains the letter “j.”</p>
-<div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="regexp.html#cb644-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb644-2"><a href="regexp.html#cb644-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb644-3"><a href="regexp.html#cb644-3" aria-hidden="true" tabindex="-1"></a>animals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;jaguar&quot;</span>, <span class="st">&quot;jay&quot;</span>, <span class="st">&quot;bat&quot;</span>)</span>
-<span id="cb644-4"><a href="regexp.html#cb644-4" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="regexp.html#cb648-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb648-2"><a href="regexp.html#cb648-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb648-3"><a href="regexp.html#cb648-3" aria-hidden="true" tabindex="-1"></a>animals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;jaguar&quot;</span>, <span class="st">&quot;jay&quot;</span>, <span class="st">&quot;bat&quot;</span>)</span>
+<span id="cb648-4"><a href="regexp.html#cb648-4" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE</code></pre>
 <p>We are also able to <em>extract</em> the match with <code>str_extract</code>. This may not seem too useful right now, but it becomes very helpful once we use more advanced regular expressions.</p>
-<div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="regexp.html#cb646-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="regexp.html#cb650-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;j&quot; &quot;j&quot; NA</code></pre>
 <p>Lastly we are able to <em>locate</em> the position of a match using <code>str_locate</code>.</p>
-<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="regexp.html#cb648-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_locate</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="regexp.html#cb652-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_locate</span>(animals, <span class="st">&quot;j&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt;      start end
 #&gt; [1,]     1   1
 #&gt; [2,]     1   1
@@ -488,19 +488,19 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 </p>
 </div>
 <p>We can also match multiple characters in a row.</p>
-<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="regexp.html#cb650-1" aria-hidden="true" tabindex="-1"></a>animals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;jaguar&quot;</span>, <span class="st">&quot;jay&quot;</span>, <span class="st">&quot;bat&quot;</span>)</span>
-<span id="cb650-2"><a href="regexp.html#cb650-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(animals, <span class="st">&quot;jag&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb654"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb654-1"><a href="regexp.html#cb654-1" aria-hidden="true" tabindex="-1"></a>animals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;jaguar&quot;</span>, <span class="st">&quot;jay&quot;</span>, <span class="st">&quot;bat&quot;</span>)</span>
+<span id="cb654-2"><a href="regexp.html#cb654-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(animals, <span class="st">&quot;jag&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE FALSE</code></pre>
 <p>Notice how these characters are case sensitive.</p>
-<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="regexp.html#cb652-1" aria-hidden="true" tabindex="-1"></a>wows <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;wow&quot;</span>, <span class="st">&quot;WoW&quot;</span>, <span class="st">&quot;WOW&quot;</span>)</span>
-<span id="cb652-2"><a href="regexp.html#cb652-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(wows, <span class="st">&quot;wow&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="regexp.html#cb656-1" aria-hidden="true" tabindex="-1"></a>wows <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;wow&quot;</span>, <span class="st">&quot;WoW&quot;</span>, <span class="st">&quot;WOW&quot;</span>)</span>
+<span id="cb656-2"><a href="regexp.html#cb656-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(wows, <span class="st">&quot;wow&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE FALSE</code></pre>
 <div id="meta-characters" class="section level3" number="11.1.1">
 <h3><span class="header-section-number">A.1.1</span> Meta characters</h3>
 <p>There are 14 meta characters that carry special meaning inside regular expressions. We need to “escape” them with a backslash if we want to match the literal character (and backslashes need to be doubled in R). Think of “escaping” as stripping the character of its special meaning.</p>
 <p>The plus symbol <code>+</code> is one of the special meta characters for regular expressions.</p>
-<div class="sourceCode" id="cb654"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb654-1"><a href="regexp.html#cb654-1" aria-hidden="true" tabindex="-1"></a>math <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1 + 2&quot;</span>, <span class="st">&quot;14 + 5&quot;</span>, <span class="st">&quot;3 - 5&quot;</span>)</span>
-<span id="cb654-2"><a href="regexp.html#cb654-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(math, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb658"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb658-1"><a href="regexp.html#cb658-1" aria-hidden="true" tabindex="-1"></a>math <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1 + 2&quot;</span>, <span class="st">&quot;14 + 5&quot;</span>, <span class="st">&quot;3 - 5&quot;</span>)</span>
+<span id="cb658-2"><a href="regexp.html#cb658-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(math, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE</code></pre>
 <p>If we tried to use the plus sign without escaping it, like <code>"+"</code>, we would get an error and this line of code would not run.</p>
 <p>The complete list of meta characters is displayed in Table <a href="regexp.html#tab:metacharacters">A.1</a> <span class="citation">(<a href="#ref-levithan2012regular" role="doc-biblioref">Levithan 2012</a>)</span>.</p>
@@ -576,17 +576,17 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 <div id="full-stop-the-wildcard" class="section level2" number="11.2">
 <h2><span class="header-section-number">A.2</span> Full stop, the wildcard</h2>
 <p>Let’s start with the full stop/period/dot, which acts as a “wildcard.” This means that this character will match anything in place other then a newline character.</p>
-<div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="regexp.html#cb656-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;cat&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cue&quot;</span>)</span>
-<span id="cb656-2"><a href="regexp.html#cb656-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb660"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb660-1"><a href="regexp.html#cb660-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;cat&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cue&quot;</span>)</span>
+<span id="cb660-2"><a href="regexp.html#cb660-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;ca&quot; &quot;cu&quot; &quot;cu&quot;</code></pre>
-<div class="sourceCode" id="cb658"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb658-1"><a href="regexp.html#cb658-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.t&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb662"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb662-1"><a href="regexp.html#cb662-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.t&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;cat&quot; &quot;cut&quot; NA</code></pre>
 </div>
 <div id="character-classes" class="section level2" number="11.3">
 <h2><span class="header-section-number">A.3</span> Character classes</h2>
 <p>So far we have only been able to match either exact characters or wildcards. <strong>Character classes</strong> (also called character sets) let us do more than that. A character class allows us to match a character specified inside the class. A character class is constructed with square brackets. The character class <code>[ac]</code> will match <em>either</em> an “a” or a “c.”</p>
-<div class="sourceCode" id="cb660"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb660-1"><a href="regexp.html#cb660-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
-<span id="cb660-2"><a href="regexp.html#cb660-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[ac]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb664"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb664-1"><a href="regexp.html#cb664-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
+<span id="cb664-2"><a href="regexp.html#cb664-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[ac]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE  TRUE</code></pre>
 <div class="rmdnote">
 <p>
@@ -594,11 +594,11 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 </p>
 </div>
 <p>We can use a hyphen character to define a range of characters. Thus <code>[1-5]</code> is the same as <code>[12345]</code>.</p>
-<div class="sourceCode" id="cb662"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb662-1"><a href="regexp.html#cb662-1" aria-hidden="true" tabindex="-1"></a>numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>)</span>
-<span id="cb662-2"><a href="regexp.html#cb662-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(numbers, <span class="st">&quot;[2-7]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb666"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb666-1"><a href="regexp.html#cb666-1" aria-hidden="true" tabindex="-1"></a>numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>)</span>
+<span id="cb666-2"><a href="regexp.html#cb666-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(numbers, <span class="st">&quot;[2-7]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE</code></pre>
-<div class="sourceCode" id="cb664"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb664-1"><a href="regexp.html#cb664-1" aria-hidden="true" tabindex="-1"></a>sentence <span class="ot">&lt;-</span> <span class="st">&quot;This is a long sentence with 2 numbers with 1 digits.&quot;</span></span>
-<span id="cb664-2"><a href="regexp.html#cb664-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_locate_all</span>(sentence, <span class="st">&quot;[1-2a-b]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb668"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb668-1"><a href="regexp.html#cb668-1" aria-hidden="true" tabindex="-1"></a>sentence <span class="ot">&lt;-</span> <span class="st">&quot;This is a long sentence with 2 numbers with 1 digits.&quot;</span></span>
+<span id="cb668-2"><a href="regexp.html#cb668-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_locate_all</span>(sentence, <span class="st">&quot;[1-2a-b]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
 #&gt;      start end
 #&gt; [1,]     9   9
@@ -606,8 +606,8 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 #&gt; [3,]    35  35
 #&gt; [4,]    45  45</code></pre>
 <p>We can also negate characters in a class with a caret <code>^</code>. Placing a caret immediately inside the opening square bracket will make the regular expression match anything <em>not</em> inside the class. Thus the regular expression <code>[^ac]</code> will match anything that isn’t the letter “a” or “c.”</p>
-<div class="sourceCode" id="cb666"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb666-1"><a href="regexp.html#cb666-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
-<span id="cb666-2"><a href="regexp.html#cb666-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[^ac]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="regexp.html#cb670-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
+<span id="cb670-2"><a href="regexp.html#cb670-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[^ac]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE  TRUE FALSE</code></pre>
 <div id="shorthand-character-classes" class="section level3" number="11.3.1">
 <h3><span class="header-section-number">A.3.1</span> Shorthand character classes</h3>
@@ -733,20 +733,20 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 </tbody>
 </table>
 <p>We can detect both color and colour by placing a quantifier after the “u” that detects 0 or 1 times used.</p>
-<div class="sourceCode" id="cb668"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb668-1"><a href="regexp.html#cb668-1" aria-hidden="true" tabindex="-1"></a>col <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;colour&quot;</span>, <span class="st">&quot;color&quot;</span>, <span class="st">&quot;farver&quot;</span>)</span>
-<span id="cb668-2"><a href="regexp.html#cb668-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(col, <span class="st">&quot;colou?r&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb672"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb672-1"><a href="regexp.html#cb672-1" aria-hidden="true" tabindex="-1"></a>col <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;colour&quot;</span>, <span class="st">&quot;color&quot;</span>, <span class="st">&quot;farver&quot;</span>)</span>
+<span id="cb672-2"><a href="regexp.html#cb672-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(col, <span class="st">&quot;colou?r&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE</code></pre>
 <p>And we can extract four-digit numbers using <code>{4}</code>.</p>
-<div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="regexp.html#cb670-1" aria-hidden="true" tabindex="-1"></a>sentences <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;The year was 1776.&quot;</span>, <span class="st">&quot;Alexander Hamilton died at 47.&quot;</span>)</span>
-<span id="cb670-2"><a href="regexp.html#cb670-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(sentences, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{4}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb674"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb674-1"><a href="regexp.html#cb674-1" aria-hidden="true" tabindex="-1"></a>sentences <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;The year was 1776.&quot;</span>, <span class="st">&quot;Alexander Hamilton died at 47.&quot;</span>)</span>
+<span id="cb674-2"><a href="regexp.html#cb674-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(sentences, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{4}&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;1776&quot; NA</code></pre>
 <p>Sometimes we want the repetition to happen over multiple characters. This can be achieved by wrapping what we want repeated in parentheses. In the following example, we want to match all the instances of “NA” in the string. We put <code>"NA "</code> inside a set of parentheses and <code>+</code> after to make sure we match at least once.</p>
-<div class="sourceCode" id="cb672"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb672-1"><a href="regexp.html#cb672-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
-<span id="cb672-2"><a href="regexp.html#cb672-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA )+&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb676"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb676-1"><a href="regexp.html#cb676-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
+<span id="cb676-2"><a href="regexp.html#cb676-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA )+&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA &quot;</code></pre>
 <p>However, notice that this also matches the last space, which we don’t want. We can fix this by matching zero or more “NA” followed by exactly 1 “NA.”</p>
-<div class="sourceCode" id="cb674"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb674-1"><a href="regexp.html#cb674-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
-<span id="cb674-2"><a href="regexp.html#cb674-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA )*(NA){1}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb678"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb678-1"><a href="regexp.html#cb678-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
+<span id="cb678-2"><a href="regexp.html#cb678-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA )*(NA){1}&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA&quot;</code></pre>
 <p>By default these matches are “greedy,” meaning that they will try to match the longest string possible. We can instead make them “lazy” by placing a <code>?</code> after, as shown in Table <a href="regexp.html#tab:lazyquantifiers">A.4</a>. This will make the regular expressions try to match the shortest string possible instead of the longest.</p>
 <table>
@@ -789,26 +789,26 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 </tbody>
 </table>
 <p>Comparing greedy and lazy matches gives us 3 and 7 “NA”’s, respectively.</p>
-<div class="sourceCode" id="cb676"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb676-1"><a href="regexp.html#cb676-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
-<span id="cb676-2"><a href="regexp.html#cb676-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA ){3,7}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb680"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb680-1"><a href="regexp.html#cb680-1" aria-hidden="true" tabindex="-1"></a>batman <span class="ot">&lt;-</span> <span class="st">&quot;NA NA NA NA NA NA NA NA NA NA NA NA NA NA BATMAN!!!&quot;</span></span>
+<span id="cb680-2"><a href="regexp.html#cb680-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA ){3,7}&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;NA NA NA NA NA NA NA &quot;</code></pre>
-<div class="sourceCode" id="cb678"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb678-1"><a href="regexp.html#cb678-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA ){3,7}?&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb682"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb682-1"><a href="regexp.html#cb682-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA ){3,7}?&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;NA NA NA &quot;</code></pre>
 </div>
 <div id="anchors" class="section level2" number="11.5">
 <h2><span class="header-section-number">A.5</span> Anchors</h2>
 <p>The meta characters <code>^</code> and <code>$</code> have special meaning in regular expressions. They force the engine to check the beginning and end of the string, respectively, hence the name <strong>anchor</strong>. A mnemonic device to remember this is “First you get the power(<code>^</code>) and then you get the money(<code>\$</code>).”</p>
-<div class="sourceCode" id="cb680"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb680-1"><a href="regexp.html#cb680-1" aria-hidden="true" tabindex="-1"></a>seasons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;The summer is hot this year&quot;</span>,</span>
-<span id="cb680-2"><a href="regexp.html#cb680-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;The spring is a lovely time&quot;</span>,</span>
-<span id="cb680-3"><a href="regexp.html#cb680-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Winter is my favorite time of the year&quot;</span>,</span>
-<span id="cb680-4"><a href="regexp.html#cb680-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Fall is a time of peace&quot;</span>)</span>
-<span id="cb680-5"><a href="regexp.html#cb680-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(seasons, <span class="st">&quot;^The&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb684"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb684-1"><a href="regexp.html#cb684-1" aria-hidden="true" tabindex="-1"></a>seasons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;The summer is hot this year&quot;</span>,</span>
+<span id="cb684-2"><a href="regexp.html#cb684-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;The spring is a lovely time&quot;</span>,</span>
+<span id="cb684-3"><a href="regexp.html#cb684-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Winter is my favorite time of the year&quot;</span>,</span>
+<span id="cb684-4"><a href="regexp.html#cb684-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;Fall is a time of peace&quot;</span>)</span>
+<span id="cb684-5"><a href="regexp.html#cb684-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(seasons, <span class="st">&quot;^The&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE FALSE</code></pre>
-<div class="sourceCode" id="cb682"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb682-1"><a href="regexp.html#cb682-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(seasons, <span class="st">&quot;year$&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb686"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb686-1"><a href="regexp.html#cb686-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(seasons, <span class="st">&quot;year$&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE  TRUE FALSE</code></pre>
 <p>We can also combine the two to match a string completely.</p>
-<div class="sourceCode" id="cb684"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb684-1"><a href="regexp.html#cb684-1" aria-hidden="true" tabindex="-1"></a>folder_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;data-raw&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;R&quot;</span>)</span>
-<span id="cb684-2"><a href="regexp.html#cb684-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(folder_names, <span class="st">&quot;^data$&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb688"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb688-1"><a href="regexp.html#cb688-1" aria-hidden="true" tabindex="-1"></a>folder_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;data-raw&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;R&quot;</span>)</span>
+<span id="cb688-2"><a href="regexp.html#cb688-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(folder_names, <span class="st">&quot;^data$&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE FALSE  TRUE FALSE</code></pre>
 </div>
 <div id="additional-resources" class="section level2" number="11.6">

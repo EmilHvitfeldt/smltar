@@ -74,7 +74,7 @@ simple_cnn_model
 
 ```
 #> Model
-#> Model: "sequential_1"
+#> Model: "sequential"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -141,18 +141,18 @@ val_res
 
 ```
 #> # A tibble: 50,524 × 3
-#>       .pred_1 .pred_class state
-#>         <dbl> <fct>       <fct>
-#>  1 0.00000331 0           0    
-#>  2 0.0000570  0           0    
-#>  3 0.000785   0           0    
-#>  4 0.000134   0           0    
-#>  5 0.967      1           1    
-#>  6 0.999      1           1    
-#>  7 0.00000238 0           0    
-#>  8 0.000199   0           0    
-#>  9 0.0841     0           1    
-#> 10 0.998      1           1    
+#>      .pred_1 .pred_class state
+#>        <dbl> <fct>       <fct>
+#>  1 0.0000813 0           0    
+#>  2 0.000250  0           0    
+#>  3 0.000561  0           0    
+#>  4 0.952     1           0    
+#>  5 1.00      1           1    
+#>  6 1.00      1           1    
+#>  7 0.0000564 0           0    
+#>  8 0.00195   0           0    
+#>  9 1.00      1           1    
+#> 10 0.998     1           1    
 #> # … with 50,514 more rows
 ```
 
@@ -167,9 +167,9 @@ metrics(val_res, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.812
-#> 2 kap         binary         0.624
-#> 3 mn_log_loss binary         0.956
+#> 1 accuracy    binary         0.809
+#> 2 kap         binary         0.618
+#> 3 mn_log_loss binary         0.951
 #> 4 roc_auc     binary         0.862
 ```
 
@@ -242,7 +242,7 @@ cnn_double_dense
 
 ```
 #> Model
-#> Model: "sequential_2"
+#> Model: "sequential_1"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -298,9 +298,9 @@ metrics(val_res_double_dense, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.801
-#> 2 kap         binary         0.602
-#> 3 mn_log_loss binary         1.01 
+#> 1 accuracy    binary         0.806
+#> 2 kap         binary         0.611
+#> 3 mn_log_loss binary         0.951
 #> 4 roc_auc     binary         0.858
 ```
 
@@ -329,7 +329,7 @@ cnn_double_conv
 
 ```
 #> Model
-#> Model: "sequential_3"
+#> Model: "sequential_2"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -402,9 +402,9 @@ metrics(val_res_double_conv, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.805
-#> 2 kap         binary         0.610
-#> 3 mn_log_loss binary         1.04 
+#> 1 accuracy    binary         0.807
+#> 2 kap         binary         0.613
+#> 3 mn_log_loss binary         1.05 
 #> 4 roc_auc     binary         0.854
 ```
 
@@ -423,18 +423,18 @@ all_cnn_model_predictions
 
 ```
 #> # A tibble: 151,572 × 4
-#>       .pred_1 .pred_class state model    
-#>         <dbl> <fct>       <fct> <chr>    
-#>  1 0.00000331 0           0     Basic CNN
-#>  2 0.0000570  0           0     Basic CNN
-#>  3 0.000785   0           0     Basic CNN
-#>  4 0.000134   0           0     Basic CNN
-#>  5 0.967      1           1     Basic CNN
-#>  6 0.999      1           1     Basic CNN
-#>  7 0.00000238 0           0     Basic CNN
-#>  8 0.000199   0           0     Basic CNN
-#>  9 0.0841     0           1     Basic CNN
-#> 10 0.998      1           1     Basic CNN
+#>      .pred_1 .pred_class state model    
+#>        <dbl> <fct>       <fct> <chr>    
+#>  1 0.0000813 0           0     Basic CNN
+#>  2 0.000250  0           0     Basic CNN
+#>  3 0.000561  0           0     Basic CNN
+#>  4 0.952     1           0     Basic CNN
+#>  5 1.00      1           1     Basic CNN
+#>  6 1.00      1           1     Basic CNN
+#>  7 0.0000564 0           0     Basic CNN
+#>  8 0.00195   0           0     Basic CNN
+#>  9 1.00      1           1     Basic CNN
+#> 10 0.998     1           1     Basic CNN
 #> # … with 151,562 more rows
 ```
 
@@ -451,15 +451,15 @@ all_cnn_model_predictions %>%
 #> # A tibble: 12 × 4
 #>    model        .metric     .estimator .estimate
 #>    <chr>        <chr>       <chr>          <dbl>
-#>  1 Basic CNN    accuracy    binary         0.812
-#>  2 Double Conv  accuracy    binary         0.805
-#>  3 Double Dense accuracy    binary         0.801
-#>  4 Basic CNN    kap         binary         0.624
-#>  5 Double Conv  kap         binary         0.610
-#>  6 Double Dense kap         binary         0.602
-#>  7 Basic CNN    mn_log_loss binary         0.956
-#>  8 Double Conv  mn_log_loss binary         1.04 
-#>  9 Double Dense mn_log_loss binary         1.01 
+#>  1 Basic CNN    accuracy    binary         0.809
+#>  2 Double Conv  accuracy    binary         0.807
+#>  3 Double Dense accuracy    binary         0.806
+#>  4 Basic CNN    kap         binary         0.618
+#>  5 Double Conv  kap         binary         0.613
+#>  6 Double Dense kap         binary         0.611
+#>  7 Basic CNN    mn_log_loss binary         0.951
+#>  8 Double Conv  mn_log_loss binary         1.05 
+#>  9 Double Dense mn_log_loss binary         0.951
 #> 10 Basic CNN    roc_auc     binary         0.862
 #> 11 Double Conv  roc_auc     binary         0.854
 #> 12 Double Dense roc_auc     binary         0.858
@@ -610,6 +610,28 @@ cnn_bpe <- keras_model_sequential() %>%
 cnn_bpe
 ```
 
+```
+#> Model
+#> Model: "sequential"
+#> ________________________________________________________________________________
+#> Layer (type)                        Output Shape                    Param #     
+#> ================================================================================
+#> embedding (Embedding)               (None, 40, 16)                  320016      
+#> ________________________________________________________________________________
+#> conv1d (Conv1D)                     (None, 34, 32)                  3616        
+#> ________________________________________________________________________________
+#> global_max_pooling1d (GlobalMaxPool (None, 32)                      0           
+#> ________________________________________________________________________________
+#> dense_1 (Dense)                     (None, 64)                      2112        
+#> ________________________________________________________________________________
+#> dense (Dense)                       (None, 1)                       65          
+#> ================================================================================
+#> Total params: 325,809
+#> Trainable params: 325,809
+#> Non-trainable params: 0
+#> ________________________________________________________________________________
+```
+
 We can compile and train like we have done so many times now.
 
 
@@ -631,6 +653,15 @@ bpe_history <- cnn_bpe %>% fit(
 bpe_history
 ```
 
+```
+#> 
+#> Final epoch (plot to see history):
+#>         loss: 0.03052
+#>     accuracy: 0.9952
+#>     val_loss: 0.9909
+#> val_accuracy: 0.8083
+```
+
 The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher-detail tokenizer.
 
 The \index{matrix!confusion}confusion matrix in Figure \@ref(fig:bpeheatmap) also clearly shows that there isn't much bias between the two classes with this new tokenizer.
@@ -644,6 +675,11 @@ val_res_bpe %>%
   autoplot(type = "heatmap")
 ```
 
+<div class="figure" style="text-align: center">
+<img src="10_dl_cnn_files/figure-html/bpeheatmap-1.svg" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
+<p class="caption">(\#fig:bpeheatmap)Confusion matrix for CNN model using byte pair encoding tokenization</p>
+</div>
+
 What are the subwords being used in this model? We can extract them from `step_sequence_onehot()` using `tidy()` on the prepped recipe. All the tokens that start with an `"h"` are seen here.
 
 
@@ -653,6 +689,16 @@ bpe_rec %>%
   tidy(3) %>%
   filter(str_detect(token, "^h")) %>%
   pull(token)
+```
+
+```
+#>  [1] "h"       "ha"      "hab"     "hal"     "ham"     "hand"    "he"     
+#>  [8] "head"    "heart"   "hearted" "heast"   "hed"     "hedul"   "heim"   
+#> [15] "hel"     "help"    "hem"     "hen"     "hent"    "her"     "here"   
+#> [22] "hern"    "hero"    "hes"     "hes,"    "hes."    "hest"    "het"    
+#> [29] "hetic"   "hett"    "hib"     "hic"     "hing"    "hing."   "hip"    
+#> [36] "hist"    "hn"      "hol"     "hold"    "hood"    "hop"     "hor"    
+#> [43] "hous"    "house"   "how"     "hr"      "hs"      "hu"
 ```
 
 Notice how some of these subword tokens\index{tokenization!subword} are full words, and some are parts of words. This is what allows the model to be able to "read" long unknown words by combining many smaller subwords.
@@ -666,6 +712,18 @@ bpe_rec %>%
   arrange(desc(nchar(token))) %>%
   slice_head(n = 25) %>%
   pull(token)
+```
+
+```
+#>  [1] "▁singer-songwriter" "▁singer/songwriter" "▁post-apocalyptic" 
+#>  [4] "▁interchangeable"   "▁singer/songwrit"   "▁entertainment."   
+#>  [7] "▁feature-length"    "▁groundbreaking"    "▁illustrations."   
+#> [10] "▁professionally"    "▁relationships."    "▁self-published"   
+#> [13] "▁sustainability"    "▁transformation"    "▁unconventional"   
+#> [16] "▁architectural"     "▁automatically"     "▁award-winning"    
+#> [19] "▁collaborating"     "▁collaboration"     "▁collaborative"    
+#> [22] "▁coming-of-age"     "▁communication"     "▁comprehensive"    
+#> [25] "▁consciousness"
 ```
 
 These 25 words were common enough to get their own subword token, and helps us understand the nature of these Kickstarter crowdfunding campaigns.
@@ -757,25 +815,25 @@ explanation
 #> # A tibble: 19 × 13
 #>    model_type      case label label_prob model_r2 model_intercept model_prediction
 #>  * <chr>          <int> <chr>      <dbl>    <dbl>           <dbl>            <dbl>
-#>  1 classification     1 1          0.999    0.303           0.706            1.02 
-#>  2 classification     1 1          0.999    0.303           0.706            1.02 
-#>  3 classification     1 1          0.999    0.303           0.706            1.02 
-#>  4 classification     1 1          0.999    0.303           0.706            1.02 
-#>  5 classification     1 1          0.999    0.303           0.706            1.02 
-#>  6 classification     1 1          0.999    0.303           0.706            1.02 
-#>  7 classification     1 1          0.999    0.303           0.706            1.02 
-#>  8 classification     1 1          0.999    0.303           0.706            1.02 
-#>  9 classification     1 1          0.999    0.303           0.706            1.02 
-#> 10 classification     1 1          0.999    0.303           0.706            1.02 
-#> 11 classification     1 1          0.999    0.303           0.706            1.02 
-#> 12 classification     2 1          0.999    0.382           0.114            0.672
-#> 13 classification     2 1          0.999    0.382           0.114            0.672
-#> 14 classification     2 1          0.999    0.382           0.114            0.672
-#> 15 classification     2 1          0.999    0.382           0.114            0.672
-#> 16 classification     2 1          0.999    0.382           0.114            0.672
-#> 17 classification     2 1          0.999    0.382           0.114            0.672
-#> 18 classification     2 1          0.999    0.382           0.114            0.672
-#> 19 classification     2 1          0.999    0.382           0.114            0.672
+#>  1 classification     1 1          0.999    0.371           0.537            1.04 
+#>  2 classification     1 1          0.999    0.371           0.537            1.04 
+#>  3 classification     1 1          0.999    0.371           0.537            1.04 
+#>  4 classification     1 1          0.999    0.371           0.537            1.04 
+#>  5 classification     1 1          0.999    0.371           0.537            1.04 
+#>  6 classification     1 1          0.999    0.371           0.537            1.04 
+#>  7 classification     1 1          0.999    0.371           0.537            1.04 
+#>  8 classification     1 1          0.999    0.371           0.537            1.04 
+#>  9 classification     1 1          0.999    0.371           0.537            1.04 
+#> 10 classification     1 1          0.999    0.371           0.537            1.04 
+#> 11 classification     1 1          0.999    0.371           0.537            1.04 
+#> 12 classification     2 1          0.999    0.571           0.536            0.879
+#> 13 classification     2 1          0.999    0.571           0.536            0.879
+#> 14 classification     2 1          0.999    0.571           0.536            0.879
+#> 15 classification     2 1          0.999    0.571           0.536            0.879
+#> 16 classification     2 1          0.999    0.571           0.536            0.879
+#> 17 classification     2 1          0.999    0.571           0.536            0.879
+#> 18 classification     2 1          0.999    0.571           0.536            0.879
+#> 19 classification     2 1          0.999    0.571           0.536            0.879
 #> # … with 6 more variables: feature <chr>, feature_value <chr>,
 #> #   feature_weight <dbl>, feature_desc <chr>, data <chr>, prediction <list>
 ```
@@ -787,6 +845,8 @@ The output comes in a tibble format where `feature` and `feature_weight` are inc
 plot_features(explanation)
 ```
 
+<img src="10_dl_cnn_files/figure-html/unnamed-chunk-40-1.svg" width="672" style="display: block; margin: auto;" />
+
 <div class="figure" style="text-align: center">
 <img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.svg" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
 <p class="caption">(\#fig:limeplotfeatures)Plot of most important features for a CNN model predicting two observations.</p>
@@ -797,6 +857,11 @@ plot_features(explanation)
 
 ```r
 plot_text_explanations(explanation)
+```
+
+```{=html}
+<div id="htmlwidget-7235292f32d1c7f5b25d" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7235292f32d1c7f5b25d">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='positive_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='negative_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.93%)<br/>Explainer fit: 0.37<\/sub> <\/p><br/><p> <span class='negative_2'>Happiness<\/span> <span class='negative_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_1'>jar<\/span> <span class='positive_1'>has<\/span> <span class='negative_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='positive_2'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.94%)<br/>Explainer fit: 0.57<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <div class="figure" style="text-align: center">
@@ -828,7 +893,7 @@ plot_text_explanations(explanation)
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-7235292f32d1c7f5b25d" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7235292f32d1c7f5b25d">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='positive_1'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_2'>learning<\/span> <span class='positive_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.91%)<br/>Explainer fit: 0.3<\/sub> <\/p><br/><p> <span class='negative_2'>Happiness<\/span> <span class='positive_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_1'>jar<\/span> <span class='positive_2'>has<\/span> <span class='positive_1'>finally<\/span> <span class='positive_2'>been<\/span> <span class='negative_1'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.95%)<br/>Explainer fit: 0.38<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-7235292f32d1c7f5b25d">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='positive_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='negative_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.93%)<br/>Explainer fit: 0.37<\/sub> <\/p><br/><p> <span class='negative_2'>Happiness<\/span> <span class='negative_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_1'>jar<\/span> <span class='positive_1'>has<\/span> <span class='negative_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='positive_2'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.94%)<br/>Explainer fit: 0.57<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:limeplottextexplanations)Feature highlighting of words for two examples explained by a CNN model.</p>
@@ -869,6 +934,11 @@ Explanations based on these two sentences are fairly similar as we can see in Fi
 plot_text_explanations(explanation)
 ```
 
+```{=html}
+<div id="htmlwidget-9eedbe84082c945df517" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9eedbe84082c945df517">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_3'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (54.74%)<br/>Explainer fit: 0.55<\/sub> <\/p><br/><p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_2'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (89.96%)<br/>Explainer fit: 0.42<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+```
+
 
 <div class="figure" style="text-align: center">
 
@@ -899,7 +969,7 @@ plot_text_explanations(explanation)
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-9eedbe84082c945df517" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9eedbe84082c945df517">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='negative_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.98%)<br/>Explainer fit: 0.89<\/sub> <\/p><br/><p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.98%)<br/>Explainer fit: 0.89<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-9eedbe84082c945df517">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_3'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (54.74%)<br/>Explainer fit: 0.55<\/sub> <\/p><br/><p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_2'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (89.96%)<br/>Explainer fit: 0.42<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:robustlimeplottextexplanations)Feature highlighting of words in two examples explained by a CNN model.</p>
@@ -1020,12 +1090,12 @@ runs_results
 #> # A tibble: 6 × 24
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.03       0.0318           0.993           1.03             0.810
-#> 2 _tuning/20… 0.970      0.0392           0.991           0.970            0.809
-#> 3 _tuning/20… 0.983      0.0504           0.986           0.983            0.804
-#> 4 _tuning/20… 0.960      0.0293           0.994           0.960            0.809
-#> 5 _tuning/20… 0.950      0.0326           0.993           0.950            0.813
-#> 6 _tuning/20… 0.941      0.0463           0.988           0.941            0.811
+#> 1 _tuning/20… 1.01       0.0378           0.991           1.01             0.809
+#> 2 _tuning/20… 0.983      0.0378           0.991           0.983            0.807
+#> 3 _tuning/20… 0.979      0.0464           0.988           0.979            0.803
+#> 4 _tuning/20… 0.964      0.0276           0.995           0.964            0.813
+#> 5 _tuning/20… 0.963      0.0362           0.992           0.963            0.810
+#> 6 _tuning/20… 0.930      0.044            0.990           0.930            0.810
 #> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
 #> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
 #> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
@@ -1048,15 +1118,15 @@ best_runs
 #> # A tibble: 6 × 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
 #>                 <dbl>             <int>         <int>
-#> 1               0.813                 5             1
-#> 2               0.811                 3             1
-#> 3               0.810                 7             2
-#> 4               0.809                 7             1
-#> 5               0.809                 5             2
-#> 6               0.804                 3             2
+#> 1               0.813                 7             1
+#> 2               0.810                 3             1
+#> 3               0.810                 5             1
+#> 4               0.809                 7             2
+#> 5               0.807                 5             2
+#> 6               0.803                 3             2
 ```
 
-There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
+There isn't much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.
 
 ## Cross-validation for evaluation
 
@@ -1162,25 +1232,25 @@ cv_fitted %>%
 #> # A tibble: 20 × 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.825
-#>  2 <split [161673/40419]> Fold1 kap         binary         0.649
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.901
+#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.824
+#>  2 <split [161673/40419]> Fold1 kap         binary         0.646
+#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.918
 #>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.874
-#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.823
-#>  6 <split [161673/40419]> Fold2 kap         binary         0.645
-#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.909
-#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.870
+#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.827
+#>  6 <split [161673/40419]> Fold2 kap         binary         0.653
+#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.872
+#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.876
 #>  9 <split [161674/40418]> Fold3 accuracy    binary         0.826
 #> 10 <split [161674/40418]> Fold3 kap         binary         0.652
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.884
+#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.906
 #> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.873
-#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.822
-#> 14 <split [161674/40418]> Fold4 kap         binary         0.642
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.938
-#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.868
+#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.825
+#> 14 <split [161674/40418]> Fold4 kap         binary         0.649
+#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.912
+#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.873
 #> 17 <split [161674/40418]> Fold5 accuracy    binary         0.827
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.652
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.898
+#> 18 <split [161674/40418]> Fold5 kap         binary         0.653
+#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.891
 #> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.875
 ```
 
@@ -1202,10 +1272,10 @@ cv_fitted %>%
 #> # A tibble: 4 × 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.824     5 0.000994
-#> 2 kap         0.648     5 0.00192 
-#> 3 mn_log_loss 0.906     5 0.00903 
-#> 4 roc_auc     0.872     5 0.00137
+#> 1 accuracy    0.826     5 0.000623
+#> 2 kap         0.651     5 0.00132 
+#> 3 mn_log_loss 0.900     5 0.00825 
+#> 4 roc_auc     0.874     5 0.000535
 ```
 
 The metrics have little variance just like they did last time, which is reassuring; our model is robust with respect to the evaluation metrics. 
@@ -1283,10 +1353,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03239
-#>     accuracy: 0.993
-#>     val_loss: 0.7546
-#> val_accuracy: 0.8533
+#>         loss: 0.03318
+#>     accuracy: 0.9929
+#>     val_loss: 0.776
+#> val_accuracy: 0.8523
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -1304,8 +1374,8 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.849
-#> 2 kap         binary         0.698
-#> 3 mn_log_loss binary         0.783
+#> 2 kap         binary         0.697
+#> 3 mn_log_loss binary         0.792
 #> 4 roc_auc     binary         0.892
 ```
 
