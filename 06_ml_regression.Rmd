@@ -592,7 +592,7 @@ lemma_rec
 
 Let's combine this lemmatized\index{lemma} text with our linear SVM workflow. We can then fit our workflow to our resampled data sets and estimate performance using lemmatization.
 
-```{r lemmars, dependson=c("svmwf", "lemmarec", "scotusfolds")}
+```{r lemmars, dependson=c("svmwf", "lemmarec", "scotusfolds"), eval=FALSE}
 lemma_rs <- fit_resamples(
   svm_wf %>% add_recipe(lemma_rec),
   scotus_folds
@@ -601,8 +601,12 @@ lemma_rs <- fit_resamples(
 
 How did this model perform? 
 
-```{r dependson="lemmars"}
+```{r dependson="lemmars", eval=FALSE}
 collect_metrics(lemma_rs)
+```
+
+```{r, echo=FALSE, message=FALSE}
+readr::read_csv("inst/collect_metrics_lemma_rs.csv")
 ```
 
 The best value for RMSE at `r collect_metrics(lemma_rs) %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over 10-fold.\index{computational speed}
