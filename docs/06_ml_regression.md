@@ -861,13 +861,7 @@ Lemmatization is, like choices around n-grams and stop words, part of data prepr
 
 ```r
 spacyr::spacy_initialize(entity = FALSE)
-```
 
-```
-#> NULL
-```
-
-```r
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
@@ -913,10 +907,11 @@ How did this model perform?
 collect_metrics(lemma_rs)
 ```
 
+
 ```
 #> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
-#>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
+#>   <chr>   <chr>       <dbl> <dbl>   <dbl> <chr>               
 #> 1 rmse    standard   14.2      10 0.276   Preprocessor1_Model1
 #> 2 rsq     standard    0.913    10 0.00304 Preprocessor1_Model1
 ```
