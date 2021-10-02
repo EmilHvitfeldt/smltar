@@ -10,8 +10,8 @@
 
   <meta property="og:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  
-  
+  <meta property="og:url" content="https://smltar.com" />
+  <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
 
@@ -19,12 +19,12 @@
   <meta name="twitter:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   
   <meta name="twitter:description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
-  
+  <meta name="twitter:image" content="https://smltar.com/cover.jpg" />
 
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-09-25" />
+<meta name="date" content="2021-10-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -504,17 +504,17 @@ By contrast, a kernel size of 5 with word tokenization will learn patterns withi
 <p>We will be using the same data, which we examine in Sections <a href="dldnn.html#kickstarter">8.1</a> and <a href="appendixdata.html#kickstarter-blurbs">B.4</a> and use throughout Chapters <a href="dldnn.html#dldnn">8</a> and <a href="dllstm.html#dllstm">9</a>. This data set contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections <a href="dldnn.html#dnnrecipe">8.2.1</a> and <a href="dllstm.html#firstlstm">9.1</a>.</p>
 <p>Our first CNN will look a lot like what is shown in Figure <a href="dlcnn.html#fig:cnn-architecture">10.1</a>.
 We start with an embedding layer, followed by a single one-dimensional convolution layer <code>layer_conv_1d()</code>, then a global max pooling layer <code>layer_global_max_pooling_1d()</code>, a densely connected layer, and end with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.</p>
-<div class="sourceCode" id="cb574"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb574-1"><a href="dlcnn.html#cb574-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
-<span id="cb574-2"><a href="dlcnn.html#cb574-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb574-3"><a href="dlcnn.html#cb574-3" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb574-4"><a href="dlcnn.html#cb574-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb574-5"><a href="dlcnn.html#cb574-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb574-6"><a href="dlcnn.html#cb574-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb574-7"><a href="dlcnn.html#cb574-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb574-8"><a href="dlcnn.html#cb574-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb574-9"><a href="dlcnn.html#cb574-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb574-10"><a href="dlcnn.html#cb574-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb574-11"><a href="dlcnn.html#cb574-11" aria-hidden="true" tabindex="-1"></a>simple_cnn_model</span></code></pre></div>
+<div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb572-1"><a href="dlcnn.html#cb572-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb572-2"><a href="dlcnn.html#cb572-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb572-3"><a href="dlcnn.html#cb572-3" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb572-4"><a href="dlcnn.html#cb572-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb572-5"><a href="dlcnn.html#cb572-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb572-6"><a href="dlcnn.html#cb572-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb572-7"><a href="dlcnn.html#cb572-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb572-8"><a href="dlcnn.html#cb572-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb572-9"><a href="dlcnn.html#cb572-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb572-10"><a href="dlcnn.html#cb572-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb572-11"><a href="dlcnn.html#cb572-11" aria-hidden="true" tabindex="-1"></a>simple_cnn_model</span></code></pre></div>
 <pre><code>#&gt; Model
 #&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
@@ -546,19 +546,19 @@ Constructing a sequence layer by layer and using the print method from <strong>k
 </p>
 </div>
 <p>The compilation and fitting are the same as we have seen before, using a validation split created with tidymodels as shown in Sections <a href="dldnn.html#evaluate-dnn">8.2.4</a> and <a href="dllstm.html#lstmevaluation">9.1.2</a>.</p>
-<div class="sourceCode" id="cb576"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb576-1"><a href="dlcnn.html#cb576-1" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb576-2"><a href="dlcnn.html#cb576-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb576-3"><a href="dlcnn.html#cb576-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb576-4"><a href="dlcnn.html#cb576-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb576-5"><a href="dlcnn.html#cb576-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb576-6"><a href="dlcnn.html#cb576-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb576-7"><a href="dlcnn.html#cb576-7" aria-hidden="true" tabindex="-1"></a>cnn_history <span class="ot">&lt;-</span> simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb576-8"><a href="dlcnn.html#cb576-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
-<span id="cb576-9"><a href="dlcnn.html#cb576-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
-<span id="cb576-10"><a href="dlcnn.html#cb576-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb576-11"><a href="dlcnn.html#cb576-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb576-12"><a href="dlcnn.html#cb576-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
-<span id="cb576-13"><a href="dlcnn.html#cb576-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb574"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb574-1"><a href="dlcnn.html#cb574-1" aria-hidden="true" tabindex="-1"></a>simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb574-2"><a href="dlcnn.html#cb574-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb574-3"><a href="dlcnn.html#cb574-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb574-4"><a href="dlcnn.html#cb574-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb574-5"><a href="dlcnn.html#cb574-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb574-6"><a href="dlcnn.html#cb574-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb574-7"><a href="dlcnn.html#cb574-7" aria-hidden="true" tabindex="-1"></a>cnn_history <span class="ot">&lt;-</span> simple_cnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb574-8"><a href="dlcnn.html#cb574-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb574-9"><a href="dlcnn.html#cb574-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb574-10"><a href="dlcnn.html#cb574-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb574-11"><a href="dlcnn.html#cb574-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb574-12"><a href="dlcnn.html#cb574-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb574-13"><a href="dlcnn.html#cb574-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 
 <div class="rmdnote">
 <p>
@@ -566,8 +566,8 @@ We are using the <code>“adam”</code> optimizer since it performs well for ma
 </p>
 </div>
 <p>Now that the model is done fitting, we can evaluate it on the validation data set using the same <code>keras_predict()</code> function we created in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a> and used throughout Chapters <a href="dldnn.html#dldnn">8</a> and <a href="dllstm.html#dllstm">9</a>.</p>
-<div class="sourceCode" id="cb577"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb577-1"><a href="dlcnn.html#cb577-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(simple_cnn_model, kick_assess, state_assess)</span>
-<span id="cb577-2"><a href="dlcnn.html#cb577-2" aria-hidden="true" tabindex="-1"></a>val_res</span></code></pre></div>
+<div class="sourceCode" id="cb575"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb575-1"><a href="dlcnn.html#cb575-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(simple_cnn_model, kick_assess, state_assess)</span>
+<span id="cb575-2"><a href="dlcnn.html#cb575-2" aria-hidden="true" tabindex="-1"></a>val_res</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 50,524 × 3
 #&gt;      .pred_1 .pred_class state
 #&gt;        &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
@@ -583,7 +583,7 @@ We are using the <code>“adam”</code> optimizer since it performs well for ma
 #&gt; 10 0.998     1           1    
 #&gt; # … with 50,514 more rows</code></pre>
 <p>We can calculate some standard metrics with <code>metrics()</code>.</p>
-<div class="sourceCode" id="cb579"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb579-1"><a href="dlcnn.html#cb579-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res, state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb577"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb577-1"><a href="dlcnn.html#cb577-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res, state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -593,9 +593,9 @@ We are using the <code>“adam”</code> optimizer since it performs well for ma
 #&gt; 4 roc_auc     binary         0.862</code></pre>
 <p>We already see improvement over the densely connected network from Chapter <a href="dldnn.html#dldnn">8</a>, our best performing model on the Kickstarter data so far.</p>
 <p>The heatmap in Figure <a href="dlcnn.html#fig:cnnheatmap">10.3</a> shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model!</p>
-<div class="sourceCode" id="cb581"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb581-1"><a href="dlcnn.html#cb581-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
-<span id="cb581-2"><a href="dlcnn.html#cb581-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb581-3"><a href="dlcnn.html#cb581-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb579"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb579-1"><a href="dlcnn.html#cb579-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
+<span id="cb579-2"><a href="dlcnn.html#cb579-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb579-3"><a href="dlcnn.html#cb579-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cnnheatmap"></span>
 <img src="10_dl_cnn_files/figure-html/cnnheatmap-1.svg" alt="Confusion matrix for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -603,12 +603,12 @@ FIGURE 10.3: Confusion matrix for first CNN model predictions of Kickstarter cam
 </p>
 </div>
 <p>The ROC curve in Figure <a href="dlcnn.html#fig:cnnroccurve">10.4</a> shows how the model performs at different thresholds.</p>
-<div class="sourceCode" id="cb582"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb582-1"><a href="dlcnn.html#cb582-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
-<span id="cb582-2"><a href="dlcnn.html#cb582-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
-<span id="cb582-3"><a href="dlcnn.html#cb582-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
-<span id="cb582-4"><a href="dlcnn.html#cb582-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb582-5"><a href="dlcnn.html#cb582-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
-<span id="cb582-6"><a href="dlcnn.html#cb582-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb580"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb580-1"><a href="dlcnn.html#cb580-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
+<span id="cb580-2"><a href="dlcnn.html#cb580-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb580-3"><a href="dlcnn.html#cb580-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb580-4"><a href="dlcnn.html#cb580-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb580-5"><a href="dlcnn.html#cb580-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
+<span id="cb580-6"><a href="dlcnn.html#cb580-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cnnroccurve"></span>
 <img src="10_dl_cnn_files/figure-html/cnnroccurve-1.svg" alt="ROC curve for first CNN model predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -633,16 +633,16 @@ When working with CNNs, the different layers perform different tasks. A convolut
 </p>
 </div>
 <p>We can think of the convolutional layers as doing preprocessing on the text, which is then fed into the dense neural network that tries to fit the best curve. Adding more fully connected layers allows the network to create more intricate curves, and adding more convolutional layers creates richer features that are used when fitting the curves. Your job when constructing a CNN is to make the architecture just complex enough to match the data without overfitting. One ad-hoc rule to follow when refining your network architecture is to start small and keep adding layers until the validation error does not improve anymore.</p>
-<div class="sourceCode" id="cb583"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb583-1"><a href="dlcnn.html#cb583-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb583-2"><a href="dlcnn.html#cb583-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb583-3"><a href="dlcnn.html#cb583-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb583-4"><a href="dlcnn.html#cb583-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb583-5"><a href="dlcnn.html#cb583-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb583-6"><a href="dlcnn.html#cb583-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb583-7"><a href="dlcnn.html#cb583-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb583-8"><a href="dlcnn.html#cb583-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb583-9"><a href="dlcnn.html#cb583-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb583-10"><a href="dlcnn.html#cb583-10" aria-hidden="true" tabindex="-1"></a>cnn_double_dense</span></code></pre></div>
+<div class="sourceCode" id="cb581"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb581-1"><a href="dlcnn.html#cb581-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb581-2"><a href="dlcnn.html#cb581-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb581-3"><a href="dlcnn.html#cb581-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb581-4"><a href="dlcnn.html#cb581-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb581-5"><a href="dlcnn.html#cb581-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb581-6"><a href="dlcnn.html#cb581-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb581-7"><a href="dlcnn.html#cb581-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb581-8"><a href="dlcnn.html#cb581-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb581-9"><a href="dlcnn.html#cb581-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb581-10"><a href="dlcnn.html#cb581-10" aria-hidden="true" tabindex="-1"></a>cnn_double_dense</span></code></pre></div>
 <pre><code>#&gt; Model
 #&gt; Model: &quot;sequential_1&quot;
 #&gt; ________________________________________________________________________________
@@ -665,26 +665,26 @@ When working with CNNs, the different layers perform different tasks. A convolut
 #&gt; Non-trainable params: 0
 #&gt; ________________________________________________________________________________</code></pre>
 <p>We can compile and fit this new model. We will try to keep as much as we can constant as we compare the different models.</p>
-<div class="sourceCode" id="cb585"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb585-1"><a href="dlcnn.html#cb585-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb585-2"><a href="dlcnn.html#cb585-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb585-3"><a href="dlcnn.html#cb585-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb585-4"><a href="dlcnn.html#cb585-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb585-5"><a href="dlcnn.html#cb585-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb585-6"><a href="dlcnn.html#cb585-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb585-7"><a href="dlcnn.html#cb585-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb585-8"><a href="dlcnn.html#cb585-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
-<span id="cb585-9"><a href="dlcnn.html#cb585-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
-<span id="cb585-10"><a href="dlcnn.html#cb585-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb585-11"><a href="dlcnn.html#cb585-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb585-12"><a href="dlcnn.html#cb585-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
-<span id="cb585-13"><a href="dlcnn.html#cb585-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb586"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb586-1"><a href="dlcnn.html#cb586-1" aria-hidden="true" tabindex="-1"></a>val_res_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
-<span id="cb586-2"><a href="dlcnn.html#cb586-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_dense,</span>
-<span id="cb586-3"><a href="dlcnn.html#cb586-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
-<span id="cb586-4"><a href="dlcnn.html#cb586-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
-<span id="cb586-5"><a href="dlcnn.html#cb586-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb586-6"><a href="dlcnn.html#cb586-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb586-7"><a href="dlcnn.html#cb586-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_dense, state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb583"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb583-1"><a href="dlcnn.html#cb583-1" aria-hidden="true" tabindex="-1"></a>cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb583-2"><a href="dlcnn.html#cb583-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb583-3"><a href="dlcnn.html#cb583-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb583-4"><a href="dlcnn.html#cb583-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb583-5"><a href="dlcnn.html#cb583-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb583-6"><a href="dlcnn.html#cb583-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb583-7"><a href="dlcnn.html#cb583-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_dense <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb583-8"><a href="dlcnn.html#cb583-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb583-9"><a href="dlcnn.html#cb583-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb583-10"><a href="dlcnn.html#cb583-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb583-11"><a href="dlcnn.html#cb583-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb583-12"><a href="dlcnn.html#cb583-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb583-13"><a href="dlcnn.html#cb583-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb584"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb584-1"><a href="dlcnn.html#cb584-1" aria-hidden="true" tabindex="-1"></a>val_res_double_dense <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
+<span id="cb584-2"><a href="dlcnn.html#cb584-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_dense,</span>
+<span id="cb584-3"><a href="dlcnn.html#cb584-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
+<span id="cb584-4"><a href="dlcnn.html#cb584-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
+<span id="cb584-5"><a href="dlcnn.html#cb584-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb584-6"><a href="dlcnn.html#cb584-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb584-7"><a href="dlcnn.html#cb584-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_dense, state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -699,17 +699,17 @@ If we have two models with nearly identical performance, we should choose the le
 </p>
 </div>
 <p>We can also change the number of convolutional layers, by adding more such layers.</p>
-<div class="sourceCode" id="cb588"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb588-1"><a href="dlcnn.html#cb588-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb588-2"><a href="dlcnn.html#cb588-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb588-3"><a href="dlcnn.html#cb588-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb588-4"><a href="dlcnn.html#cb588-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb588-5"><a href="dlcnn.html#cb588-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_max_pooling_1d</span>(<span class="at">pool_size =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb588-6"><a href="dlcnn.html#cb588-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb588-7"><a href="dlcnn.html#cb588-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb588-8"><a href="dlcnn.html#cb588-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb588-9"><a href="dlcnn.html#cb588-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb588-10"><a href="dlcnn.html#cb588-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb588-11"><a href="dlcnn.html#cb588-11" aria-hidden="true" tabindex="-1"></a>cnn_double_conv</span></code></pre></div>
+<div class="sourceCode" id="cb586"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb586-1"><a href="dlcnn.html#cb586-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb586-2"><a href="dlcnn.html#cb586-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb586-3"><a href="dlcnn.html#cb586-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb586-4"><a href="dlcnn.html#cb586-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb586-5"><a href="dlcnn.html#cb586-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_max_pooling_1d</span>(<span class="at">pool_size =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb586-6"><a href="dlcnn.html#cb586-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">64</span>, <span class="at">kernel_size =</span> <span class="dv">3</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb586-7"><a href="dlcnn.html#cb586-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb586-8"><a href="dlcnn.html#cb586-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb586-9"><a href="dlcnn.html#cb586-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb586-10"><a href="dlcnn.html#cb586-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb586-11"><a href="dlcnn.html#cb586-11" aria-hidden="true" tabindex="-1"></a>cnn_double_conv</span></code></pre></div>
 <pre><code>#&gt; Model
 #&gt; Model: &quot;sequential_2&quot;
 #&gt; ________________________________________________________________________________
@@ -746,26 +746,26 @@ The early layers extract general or low-level features while the later layers le
 This is done in the hope that the pooled features will be able to perform better by weeding out the small weights.
 This is another parameter you can tinker with when you are designing the network.</p>
 <p>We compile this model like the others, again trying to keep as much as we can constant. The only thing that changed in this model compared to the first is the addition of a <code>layer_max_pooling_1d()</code> and a <code>layer_conv_1d()</code>.</p>
-<div class="sourceCode" id="cb590"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb590-1"><a href="dlcnn.html#cb590-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb590-2"><a href="dlcnn.html#cb590-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb590-3"><a href="dlcnn.html#cb590-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb590-4"><a href="dlcnn.html#cb590-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb590-5"><a href="dlcnn.html#cb590-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb590-6"><a href="dlcnn.html#cb590-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb590-7"><a href="dlcnn.html#cb590-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb590-8"><a href="dlcnn.html#cb590-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
-<span id="cb590-9"><a href="dlcnn.html#cb590-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
-<span id="cb590-10"><a href="dlcnn.html#cb590-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb590-11"><a href="dlcnn.html#cb590-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb590-12"><a href="dlcnn.html#cb590-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
-<span id="cb590-13"><a href="dlcnn.html#cb590-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb591"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb591-1"><a href="dlcnn.html#cb591-1" aria-hidden="true" tabindex="-1"></a>val_res_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
-<span id="cb591-2"><a href="dlcnn.html#cb591-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_conv,</span>
-<span id="cb591-3"><a href="dlcnn.html#cb591-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
-<span id="cb591-4"><a href="dlcnn.html#cb591-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
-<span id="cb591-5"><a href="dlcnn.html#cb591-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb591-6"><a href="dlcnn.html#cb591-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb591-7"><a href="dlcnn.html#cb591-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_conv, state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb588"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb588-1"><a href="dlcnn.html#cb588-1" aria-hidden="true" tabindex="-1"></a>cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb588-2"><a href="dlcnn.html#cb588-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb588-3"><a href="dlcnn.html#cb588-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb588-4"><a href="dlcnn.html#cb588-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb588-5"><a href="dlcnn.html#cb588-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb588-6"><a href="dlcnn.html#cb588-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb588-7"><a href="dlcnn.html#cb588-7" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> cnn_double_conv <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb588-8"><a href="dlcnn.html#cb588-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> kick_analysis,</span>
+<span id="cb588-9"><a href="dlcnn.html#cb588-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> state_analysis,</span>
+<span id="cb588-10"><a href="dlcnn.html#cb588-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb588-11"><a href="dlcnn.html#cb588-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb588-12"><a href="dlcnn.html#cb588-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb588-13"><a href="dlcnn.html#cb588-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb589"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb589-1"><a href="dlcnn.html#cb589-1" aria-hidden="true" tabindex="-1"></a>val_res_double_conv <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(</span>
+<span id="cb589-2"><a href="dlcnn.html#cb589-2" aria-hidden="true" tabindex="-1"></a>  cnn_double_conv,</span>
+<span id="cb589-3"><a href="dlcnn.html#cb589-3" aria-hidden="true" tabindex="-1"></a>  kick_assess,</span>
+<span id="cb589-4"><a href="dlcnn.html#cb589-4" aria-hidden="true" tabindex="-1"></a>  state_assess</span>
+<span id="cb589-5"><a href="dlcnn.html#cb589-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb589-6"><a href="dlcnn.html#cb589-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb589-7"><a href="dlcnn.html#cb589-7" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res_double_conv, state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -774,13 +774,13 @@ This is another parameter you can tinker with when you are designing the network
 #&gt; 3 mn_log_loss binary         1.05 
 #&gt; 4 roc_auc     binary         0.854</code></pre>
 <p>This model also performs well compared to earlier results. Let us extract the the prediction using <code>keras_predict()</code> we defined in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a>.</p>
-<div class="sourceCode" id="cb593"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb593-1"><a href="dlcnn.html#cb593-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb593-2"><a href="dlcnn.html#cb593-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res, <span class="at">model =</span> <span class="st">&quot;Basic CNN&quot;</span>),</span>
-<span id="cb593-3"><a href="dlcnn.html#cb593-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_dense, <span class="at">model =</span> <span class="st">&quot;Double Dense&quot;</span>),</span>
-<span id="cb593-4"><a href="dlcnn.html#cb593-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_conv, <span class="at">model =</span> <span class="st">&quot;Double Conv&quot;</span>)</span>
-<span id="cb593-5"><a href="dlcnn.html#cb593-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb593-6"><a href="dlcnn.html#cb593-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb593-7"><a href="dlcnn.html#cb593-7" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions</span></code></pre></div>
+<div class="sourceCode" id="cb591"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb591-1"><a href="dlcnn.html#cb591-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb591-2"><a href="dlcnn.html#cb591-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res, <span class="at">model =</span> <span class="st">&quot;Basic CNN&quot;</span>),</span>
+<span id="cb591-3"><a href="dlcnn.html#cb591-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_dense, <span class="at">model =</span> <span class="st">&quot;Double Dense&quot;</span>),</span>
+<span id="cb591-4"><a href="dlcnn.html#cb591-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res_double_conv, <span class="at">model =</span> <span class="st">&quot;Double Conv&quot;</span>)</span>
+<span id="cb591-5"><a href="dlcnn.html#cb591-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb591-6"><a href="dlcnn.html#cb591-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb591-7"><a href="dlcnn.html#cb591-7" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 151,572 × 4
 #&gt;      .pred_1 .pred_class state model    
 #&gt;        &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;    
@@ -796,9 +796,9 @@ This is another parameter you can tinker with when you are designing the network
 #&gt; 10 0.998     1           1     Basic CNN
 #&gt; # … with 151,562 more rows</code></pre>
 <p>Now that the results are combined in <code>all_cnn_model_predictions</code> we can calculate group-wise evaluation statistics by grouping them by the <code>model</code> variable.</p>
-<div class="sourceCode" id="cb595"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb595-1"><a href="dlcnn.html#cb595-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb595-2"><a href="dlcnn.html#cb595-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
-<span id="cb595-3"><a href="dlcnn.html#cb595-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb593"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb593-1"><a href="dlcnn.html#cb593-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb593-2"><a href="dlcnn.html#cb593-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb593-3"><a href="dlcnn.html#cb593-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 12 × 4
 #&gt;    model        .metric     .estimator .estimate
 #&gt;    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -815,13 +815,13 @@ This is another parameter you can tinker with when you are designing the network
 #&gt; 11 Double Conv  roc_auc     binary         0.854
 #&gt; 12 Double Dense roc_auc     binary         0.858</code></pre>
 <p>We can also compute ROC curves for all our models so far. Figure <a href="dlcnn.html#fig:allcnnroccurve">10.5</a> shows the three different ROC curves together in one chart.</p>
-<div class="sourceCode" id="cb597"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb597-1"><a href="dlcnn.html#cb597-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb597-2"><a href="dlcnn.html#cb597-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
-<span id="cb597-3"><a href="dlcnn.html#cb597-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
-<span id="cb597-4"><a href="dlcnn.html#cb597-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
-<span id="cb597-5"><a href="dlcnn.html#cb597-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb597-6"><a href="dlcnn.html#cb597-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
-<span id="cb597-7"><a href="dlcnn.html#cb597-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb595"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb595-1"><a href="dlcnn.html#cb595-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb595-2"><a href="dlcnn.html#cb595-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
+<span id="cb595-3"><a href="dlcnn.html#cb595-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb595-4"><a href="dlcnn.html#cb595-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb595-5"><a href="dlcnn.html#cb595-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb595-6"><a href="dlcnn.html#cb595-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Receiver operator curve for Kickstarter blurbs&quot;</span></span>
+<span id="cb595-7"><a href="dlcnn.html#cb595-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:allcnnroccurve"></span>
 <img src="10_dl_cnn_files/figure-html/allcnnroccurve-1.svg" alt="ROC curve for three CNN variants' predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -853,26 +853,26 @@ The <strong>textrecipes</strong> package has a tokenization engine to perform by
 </p>
 </div>
 <p>Let’s write a function that takes a character vector and a vocabulary size and returns a dataframe with the number of tokens in each observation.</p>
-<div class="sourceCode" id="cb598"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb598-1"><a href="dlcnn.html#cb598-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
-<span id="cb598-2"><a href="dlcnn.html#cb598-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb598-3"><a href="dlcnn.html#cb598-3" aria-hidden="true" tabindex="-1"></a>get_bpe_token_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(vocab_size, x) {</span>
-<span id="cb598-4"><a href="dlcnn.html#cb598-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(<span class="sc">~</span>text, <span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">text =</span> x)) <span class="sc">%&gt;%</span></span>
-<span id="cb598-5"><a href="dlcnn.html#cb598-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_mutate</span>(<span class="at">text =</span> <span class="fu">tolower</span>(text)) <span class="sc">%&gt;%</span></span>
-<span id="cb598-6"><a href="dlcnn.html#cb598-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_tokenize</span>(text,</span>
-<span id="cb598-7"><a href="dlcnn.html#cb598-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
-<span id="cb598-8"><a href="dlcnn.html#cb598-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> vocab_size)) <span class="sc">%&gt;%</span></span>
-<span id="cb598-9"><a href="dlcnn.html#cb598-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb598-10"><a href="dlcnn.html#cb598-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb598-11"><a href="dlcnn.html#cb598-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(<span class="at">n_tokens =</span> <span class="fu">lengths</span>(textrecipes<span class="sc">:::</span><span class="fu">get_tokens</span>(text)),</span>
-<span id="cb598-12"><a href="dlcnn.html#cb598-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">vocab_size =</span> vocab_size)</span>
-<span id="cb598-13"><a href="dlcnn.html#cb598-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb596"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb596-1"><a href="dlcnn.html#cb596-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb596-2"><a href="dlcnn.html#cb596-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb596-3"><a href="dlcnn.html#cb596-3" aria-hidden="true" tabindex="-1"></a>get_bpe_token_dist <span class="ot">&lt;-</span> <span class="cf">function</span>(vocab_size, x) {</span>
+<span id="cb596-4"><a href="dlcnn.html#cb596-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(<span class="sc">~</span>text, <span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">text =</span> x)) <span class="sc">%&gt;%</span></span>
+<span id="cb596-5"><a href="dlcnn.html#cb596-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_mutate</span>(<span class="at">text =</span> <span class="fu">tolower</span>(text)) <span class="sc">%&gt;%</span></span>
+<span id="cb596-6"><a href="dlcnn.html#cb596-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">step_tokenize</span>(text,</span>
+<span id="cb596-7"><a href="dlcnn.html#cb596-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
+<span id="cb596-8"><a href="dlcnn.html#cb596-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> vocab_size)) <span class="sc">%&gt;%</span></span>
+<span id="cb596-9"><a href="dlcnn.html#cb596-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb596-10"><a href="dlcnn.html#cb596-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb596-11"><a href="dlcnn.html#cb596-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(<span class="at">n_tokens =</span> <span class="fu">lengths</span>(textrecipes<span class="sc">:::</span><span class="fu">get_tokens</span>(text)),</span>
+<span id="cb596-12"><a href="dlcnn.html#cb596-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">vocab_size =</span> vocab_size)</span>
+<span id="cb596-13"><a href="dlcnn.html#cb596-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>We can use <code>map()</code> to try a handful of different vocabulary sizes.</p>
-<div class="sourceCode" id="cb599"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb599-1"><a href="dlcnn.html#cb599-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
-<span id="cb599-2"><a href="dlcnn.html#cb599-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">20000</span>),</span>
-<span id="cb599-3"><a href="dlcnn.html#cb599-3" aria-hidden="true" tabindex="-1"></a>  get_bpe_token_dist,</span>
-<span id="cb599-4"><a href="dlcnn.html#cb599-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_train<span class="sc">$</span>blurb</span>
-<span id="cb599-5"><a href="dlcnn.html#cb599-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb599-6"><a href="dlcnn.html#cb599-6" aria-hidden="true" tabindex="-1"></a>bpe_token_dist</span></code></pre></div>
+<div class="sourceCode" id="cb597"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb597-1"><a href="dlcnn.html#cb597-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb597-2"><a href="dlcnn.html#cb597-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">2500</span>, <span class="dv">5000</span>, <span class="dv">10000</span>, <span class="dv">20000</span>),</span>
+<span id="cb597-3"><a href="dlcnn.html#cb597-3" aria-hidden="true" tabindex="-1"></a>  get_bpe_token_dist,</span>
+<span id="cb597-4"><a href="dlcnn.html#cb597-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_train<span class="sc">$</span>blurb</span>
+<span id="cb597-5"><a href="dlcnn.html#cb597-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb597-6"><a href="dlcnn.html#cb597-6" aria-hidden="true" tabindex="-1"></a>bpe_token_dist</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 808,368 × 2
 #&gt;    n_tokens vocab_size
 #&gt;       &lt;int&gt;      &lt;dbl&gt;
@@ -888,12 +888,12 @@ The <strong>textrecipes</strong> package has a tokenization engine to perform by
 #&gt; 10       37       2500
 #&gt; # … with 808,358 more rows</code></pre>
 <p>If we compare with the word count distribution we saw in Figure <a href="dldnn.html#fig:kickstarterwordlength">8.4</a>, then we see in Figure <a href="dlcnn.html#fig:kickstartersubwordlength">10.6</a> that any of these choices for vocabulary size will result in more tokens overall.</p>
-<div class="sourceCode" id="cb601"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb601-1"><a href="dlcnn.html#cb601-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="sc">%&gt;%</span></span>
-<span id="cb601-2"><a href="dlcnn.html#cb601-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n_tokens)) <span class="sc">+</span></span>
-<span id="cb601-3"><a href="dlcnn.html#cb601-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb601-4"><a href="dlcnn.html#cb601-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>vocab_size) <span class="sc">+</span></span>
-<span id="cb601-5"><a href="dlcnn.html#cb601-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of subwords per campaign blurb&quot;</span>,</span>
-<span id="cb601-6"><a href="dlcnn.html#cb601-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb599"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb599-1"><a href="dlcnn.html#cb599-1" aria-hidden="true" tabindex="-1"></a>bpe_token_dist <span class="sc">%&gt;%</span></span>
+<span id="cb599-2"><a href="dlcnn.html#cb599-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n_tokens)) <span class="sc">+</span></span>
+<span id="cb599-3"><a href="dlcnn.html#cb599-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb599-4"><a href="dlcnn.html#cb599-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>vocab_size) <span class="sc">+</span></span>
+<span id="cb599-5"><a href="dlcnn.html#cb599-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Number of subwords per campaign blurb&quot;</span>,</span>
+<span id="cb599-6"><a href="dlcnn.html#cb599-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Number of campaign blurbs&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:kickstartersubwordlength"></span>
 <img src="10_dl_cnn_files/figure-html/kickstartersubwordlength-1.svg" alt="Distribution of subword count for Kickstarter campaign blurbs for different vocabulary sizes" width="672" />
 <p class="caption">
@@ -901,32 +901,32 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 </p>
 </div>
 <p>Let’s pick a vocabulary size of 10,000 and a corresponding sequence length of 40. To use byte pair encoding as a tokenizer in textrecipes set <code>engine = "tokenizers.bpe"</code>; the vocabulary size can be denoted using the <code>training_options</code> argument. Everything else in the recipe stays the same.</p>
-<div class="sourceCode" id="cb602"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb602-1"><a href="dlcnn.html#cb602-1" aria-hidden="true" tabindex="-1"></a>max_subwords <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb602-2"><a href="dlcnn.html#cb602-2" aria-hidden="true" tabindex="-1"></a>bpe_max_length <span class="ot">&lt;-</span> <span class="dv">40</span></span>
-<span id="cb602-3"><a href="dlcnn.html#cb602-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb602-4"><a href="dlcnn.html#cb602-4" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span>blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb602-5"><a href="dlcnn.html#cb602-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">blurb =</span> <span class="fu">tolower</span>(blurb)) <span class="sc">%&gt;%</span></span>
-<span id="cb602-6"><a href="dlcnn.html#cb602-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb,</span>
-<span id="cb602-7"><a href="dlcnn.html#cb602-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
-<span id="cb602-8"><a href="dlcnn.html#cb602-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> max_subwords)) <span class="sc">%&gt;%</span></span>
-<span id="cb602-9"><a href="dlcnn.html#cb602-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> bpe_max_length)</span>
-<span id="cb602-10"><a href="dlcnn.html#cb602-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb602-11"><a href="dlcnn.html#cb602-11" aria-hidden="true" tabindex="-1"></a>bpe_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(bpe_rec)</span>
-<span id="cb602-12"><a href="dlcnn.html#cb602-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb602-13"><a href="dlcnn.html#cb602-13" aria-hidden="true" tabindex="-1"></a>bpe_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb602-14"><a href="dlcnn.html#cb602-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb602-15"><a href="dlcnn.html#cb602-15" aria-hidden="true" tabindex="-1"></a>bpe_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb602-16"><a href="dlcnn.html#cb602-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb600"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb600-1"><a href="dlcnn.html#cb600-1" aria-hidden="true" tabindex="-1"></a>max_subwords <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb600-2"><a href="dlcnn.html#cb600-2" aria-hidden="true" tabindex="-1"></a>bpe_max_length <span class="ot">&lt;-</span> <span class="dv">40</span></span>
+<span id="cb600-3"><a href="dlcnn.html#cb600-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb600-4"><a href="dlcnn.html#cb600-4" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span>blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb600-5"><a href="dlcnn.html#cb600-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">blurb =</span> <span class="fu">tolower</span>(blurb)) <span class="sc">%&gt;%</span></span>
+<span id="cb600-6"><a href="dlcnn.html#cb600-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb,</span>
+<span id="cb600-7"><a href="dlcnn.html#cb600-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">engine =</span> <span class="st">&quot;tokenizers.bpe&quot;</span>,</span>
+<span id="cb600-8"><a href="dlcnn.html#cb600-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">training_options =</span> <span class="fu">list</span>(<span class="at">vocab_size =</span> max_subwords)) <span class="sc">%&gt;%</span></span>
+<span id="cb600-9"><a href="dlcnn.html#cb600-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> bpe_max_length)</span>
+<span id="cb600-10"><a href="dlcnn.html#cb600-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb600-11"><a href="dlcnn.html#cb600-11" aria-hidden="true" tabindex="-1"></a>bpe_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(bpe_rec)</span>
+<span id="cb600-12"><a href="dlcnn.html#cb600-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb600-13"><a href="dlcnn.html#cb600-13" aria-hidden="true" tabindex="-1"></a>bpe_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb600-14"><a href="dlcnn.html#cb600-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb600-15"><a href="dlcnn.html#cb600-15" aria-hidden="true" tabindex="-1"></a>bpe_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(bpe_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb600-16"><a href="dlcnn.html#cb600-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
 <p>Our model will be very similar to the baseline CNN model from Section <a href="dlcnn.html#firstcnn">10.2</a>; we’ll use a larger kernel size of 7 to account for the finer detail in the tokens.</p>
-<div class="sourceCode" id="cb603"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb603-1"><a href="dlcnn.html#cb603-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb603-2"><a href="dlcnn.html#cb603-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb603-3"><a href="dlcnn.html#cb603-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> bpe_max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb603-4"><a href="dlcnn.html#cb603-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb603-5"><a href="dlcnn.html#cb603-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb603-6"><a href="dlcnn.html#cb603-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb603-7"><a href="dlcnn.html#cb603-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb603-8"><a href="dlcnn.html#cb603-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb603-9"><a href="dlcnn.html#cb603-9" aria-hidden="true" tabindex="-1"></a>cnn_bpe</span></code></pre></div>
+<div class="sourceCode" id="cb601"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb601-1"><a href="dlcnn.html#cb601-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb601-2"><a href="dlcnn.html#cb601-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb601-3"><a href="dlcnn.html#cb601-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> bpe_max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb601-4"><a href="dlcnn.html#cb601-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb601-5"><a href="dlcnn.html#cb601-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb601-6"><a href="dlcnn.html#cb601-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb601-7"><a href="dlcnn.html#cb601-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb601-8"><a href="dlcnn.html#cb601-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb601-9"><a href="dlcnn.html#cb601-9" aria-hidden="true" tabindex="-1"></a>cnn_bpe</span></code></pre></div>
 <pre><code>#&gt; Model
 #&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
@@ -947,21 +947,21 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 #&gt; Non-trainable params: 0
 #&gt; ________________________________________________________________________________</code></pre>
 <p>We can compile and train like we have done so many times now.</p>
-<div class="sourceCode" id="cb605"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb605-1"><a href="dlcnn.html#cb605-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb605-2"><a href="dlcnn.html#cb605-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb605-3"><a href="dlcnn.html#cb605-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb605-4"><a href="dlcnn.html#cb605-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb605-5"><a href="dlcnn.html#cb605-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb605-6"><a href="dlcnn.html#cb605-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb605-7"><a href="dlcnn.html#cb605-7" aria-hidden="true" tabindex="-1"></a>bpe_history <span class="ot">&lt;-</span> cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb605-8"><a href="dlcnn.html#cb605-8" aria-hidden="true" tabindex="-1"></a>  bpe_analysis,</span>
-<span id="cb605-9"><a href="dlcnn.html#cb605-9" aria-hidden="true" tabindex="-1"></a>  state_analysis,</span>
-<span id="cb605-10"><a href="dlcnn.html#cb605-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb605-11"><a href="dlcnn.html#cb605-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(bpe_assess, state_assess),</span>
-<span id="cb605-12"><a href="dlcnn.html#cb605-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span></span>
-<span id="cb605-13"><a href="dlcnn.html#cb605-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb605-14"><a href="dlcnn.html#cb605-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb605-15"><a href="dlcnn.html#cb605-15" aria-hidden="true" tabindex="-1"></a>bpe_history</span></code></pre></div>
+<div class="sourceCode" id="cb603"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb603-1"><a href="dlcnn.html#cb603-1" aria-hidden="true" tabindex="-1"></a>cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb603-2"><a href="dlcnn.html#cb603-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb603-3"><a href="dlcnn.html#cb603-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb603-4"><a href="dlcnn.html#cb603-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb603-5"><a href="dlcnn.html#cb603-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb603-6"><a href="dlcnn.html#cb603-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb603-7"><a href="dlcnn.html#cb603-7" aria-hidden="true" tabindex="-1"></a>bpe_history <span class="ot">&lt;-</span> cnn_bpe <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb603-8"><a href="dlcnn.html#cb603-8" aria-hidden="true" tabindex="-1"></a>  bpe_analysis,</span>
+<span id="cb603-9"><a href="dlcnn.html#cb603-9" aria-hidden="true" tabindex="-1"></a>  state_analysis,</span>
+<span id="cb603-10"><a href="dlcnn.html#cb603-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb603-11"><a href="dlcnn.html#cb603-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_data =</span> <span class="fu">list</span>(bpe_assess, state_assess),</span>
+<span id="cb603-12"><a href="dlcnn.html#cb603-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> <span class="dv">512</span></span>
+<span id="cb603-13"><a href="dlcnn.html#cb603-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb603-14"><a href="dlcnn.html#cb603-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb603-15"><a href="dlcnn.html#cb603-15" aria-hidden="true" tabindex="-1"></a>bpe_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
 #&gt;         loss: 0.03052
@@ -970,11 +970,11 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 #&gt; val_accuracy: 0.8083</code></pre>
 <p>The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher-detail tokenizer.</p>
 <p>The confusion matrix in Figure <a href="dlcnn.html#fig:bpeheatmap">10.7</a> also clearly shows that there isn’t much bias between the two classes with this new tokenizer.</p>
-<div class="sourceCode" id="cb607"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb607-1"><a href="dlcnn.html#cb607-1" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(cnn_bpe, bpe_assess, state_assess)</span>
-<span id="cb607-2"><a href="dlcnn.html#cb607-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb607-3"><a href="dlcnn.html#cb607-3" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="sc">%&gt;%</span></span>
-<span id="cb607-4"><a href="dlcnn.html#cb607-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb607-5"><a href="dlcnn.html#cb607-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb605"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb605-1"><a href="dlcnn.html#cb605-1" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(cnn_bpe, bpe_assess, state_assess)</span>
+<span id="cb605-2"><a href="dlcnn.html#cb605-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb605-3"><a href="dlcnn.html#cb605-3" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="sc">%&gt;%</span></span>
+<span id="cb605-4"><a href="dlcnn.html#cb605-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb605-5"><a href="dlcnn.html#cb605-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:bpeheatmap"></span>
 <img src="10_dl_cnn_files/figure-html/bpeheatmap-1.svg" alt="Confusion matrix for CNN model using byte pair encoding tokenization" width="672" />
 <p class="caption">
@@ -982,11 +982,11 @@ FIGURE 10.7: Confusion matrix for CNN model using byte pair encoding tokenizatio
 </p>
 </div>
 <p>What are the subwords being used in this model? We can extract them from <code>step_sequence_onehot()</code> using <code>tidy()</code> on the prepped recipe. All the tokens that start with an <code>"h"</code> are seen here.</p>
-<div class="sourceCode" id="cb608"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb608-1"><a href="dlcnn.html#cb608-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
-<span id="cb608-2"><a href="dlcnn.html#cb608-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb608-3"><a href="dlcnn.html#cb608-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb608-4"><a href="dlcnn.html#cb608-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(token, <span class="st">&quot;^h&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb608-5"><a href="dlcnn.html#cb608-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
+<div class="sourceCode" id="cb606"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb606-1"><a href="dlcnn.html#cb606-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
+<span id="cb606-2"><a href="dlcnn.html#cb606-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb606-3"><a href="dlcnn.html#cb606-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb606-4"><a href="dlcnn.html#cb606-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(token, <span class="st">&quot;^h&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb606-5"><a href="dlcnn.html#cb606-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
 <pre><code>#&gt;  [1] &quot;h&quot;       &quot;ha&quot;      &quot;hab&quot;     &quot;hal&quot;     &quot;ham&quot;     &quot;hand&quot;    &quot;he&quot;     
 #&gt;  [8] &quot;head&quot;    &quot;heart&quot;   &quot;hearted&quot; &quot;heast&quot;   &quot;hed&quot;     &quot;hedul&quot;   &quot;heim&quot;   
 #&gt; [15] &quot;hel&quot;     &quot;help&quot;    &quot;hem&quot;     &quot;hen&quot;     &quot;hent&quot;    &quot;her&quot;     &quot;here&quot;   
@@ -996,12 +996,12 @@ FIGURE 10.7: Confusion matrix for CNN model using byte pair encoding tokenizatio
 #&gt; [43] &quot;hous&quot;    &quot;house&quot;   &quot;how&quot;     &quot;hr&quot;      &quot;hs&quot;      &quot;hu&quot;</code></pre>
 <p>Notice how some of these subword tokens are full words, and some are parts of words. This is what allows the model to be able to “read” long unknown words by combining many smaller subwords.
 We can also look at common long words.</p>
-<div class="sourceCode" id="cb610"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb610-1"><a href="dlcnn.html#cb610-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
-<span id="cb610-2"><a href="dlcnn.html#cb610-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb610-3"><a href="dlcnn.html#cb610-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb610-4"><a href="dlcnn.html#cb610-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">nchar</span>(token))) <span class="sc">%&gt;%</span></span>
-<span id="cb610-5"><a href="dlcnn.html#cb610-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">25</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb610-6"><a href="dlcnn.html#cb610-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
+<div class="sourceCode" id="cb608"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb608-1"><a href="dlcnn.html#cb608-1" aria-hidden="true" tabindex="-1"></a>bpe_rec <span class="sc">%&gt;%</span></span>
+<span id="cb608-2"><a href="dlcnn.html#cb608-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb608-3"><a href="dlcnn.html#cb608-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb608-4"><a href="dlcnn.html#cb608-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">nchar</span>(token))) <span class="sc">%&gt;%</span></span>
+<span id="cb608-5"><a href="dlcnn.html#cb608-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">25</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb608-6"><a href="dlcnn.html#cb608-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(token)</span></code></pre></div>
 <pre><code>#&gt;  [1] &quot;▁singer-songwriter&quot; &quot;▁singer/songwriter&quot; &quot;▁post-apocalyptic&quot; 
 #&gt;  [4] &quot;▁interchangeable&quot;   &quot;▁singer/songwrit&quot;   &quot;▁entertainment.&quot;   
 #&gt;  [7] &quot;▁feature-length&quot;    &quot;▁groundbreaking&quot;    &quot;▁illustrations.&quot;   
@@ -1033,26 +1033,26 @@ As indicated by its name, LIME is an approach to compute local feature importanc
 The <strong>lime</strong> package in R <span class="citation">(<a href="#ref-R-lime" role="doc-biblioref">Pedersen and Benesty 2021</a>)</span> implements the LIME algorithm; it can take a prediction from a model and determine a small set of features in the original data that drives the outcome of the prediction.
 </div>
 <p>To use this package we need to write a helper function to get the data in the format we want. The <code>lime()</code> function takes two mandatory arguments, <code>x</code> and <code>model</code>. The <code>model</code> argument is the trained model we are trying to explain. The <code>lime()</code> function works out of the box with Keras models so we should be good to go there. The <code>x</code> argument is the training data used for training the model. This is where we need to to create a helper function; the lime package is expecting <code>x</code> to be a character vector so we’ll need a function that takes a character vector as input and returns the matrix the Keras model is expecting.</p>
-<div class="sourceCode" id="cb612"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb612-1"><a href="dlcnn.html#cb612-1" aria-hidden="true" tabindex="-1"></a>kick_prepped_rec <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb612-2"><a href="dlcnn.html#cb612-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb612-3"><a href="dlcnn.html#cb612-3" aria-hidden="true" tabindex="-1"></a>text_to_matrix <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb612-4"><a href="dlcnn.html#cb612-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(</span>
-<span id="cb612-5"><a href="dlcnn.html#cb612-5" aria-hidden="true" tabindex="-1"></a>    kick_prepped_rec,</span>
-<span id="cb612-6"><a href="dlcnn.html#cb612-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_data =</span> <span class="fu">tibble</span>(<span class="at">blurb =</span> x),</span>
-<span id="cb612-7"><a href="dlcnn.html#cb612-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span></span>
-<span id="cb612-8"><a href="dlcnn.html#cb612-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb612-9"><a href="dlcnn.html#cb612-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb610"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb610-1"><a href="dlcnn.html#cb610-1" aria-hidden="true" tabindex="-1"></a>kick_prepped_rec <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb610-2"><a href="dlcnn.html#cb610-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb610-3"><a href="dlcnn.html#cb610-3" aria-hidden="true" tabindex="-1"></a>text_to_matrix <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb610-4"><a href="dlcnn.html#cb610-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(</span>
+<span id="cb610-5"><a href="dlcnn.html#cb610-5" aria-hidden="true" tabindex="-1"></a>    kick_prepped_rec,</span>
+<span id="cb610-6"><a href="dlcnn.html#cb610-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_data =</span> <span class="fu">tibble</span>(<span class="at">blurb =</span> x),</span>
+<span id="cb610-7"><a href="dlcnn.html#cb610-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span></span>
+<span id="cb610-8"><a href="dlcnn.html#cb610-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb610-9"><a href="dlcnn.html#cb610-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <div class="rmdnote">
 <p>
 Since the function needs to be able to work with just the <code>x</code> parameter alone, we need to put <code>prepped_recipe</code> inside the function rather than passing it in as an argument. This will work with R’s scoping rules but does require you to create a new function for each recipe.
 </p>
 </div>
 <p>Let’s select a couple of training observations to explain.</p>
-<div class="sourceCode" id="cb613"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb613-1"><a href="dlcnn.html#cb613-1" aria-hidden="true" tabindex="-1"></a>sentence_to_explain <span class="ot">&lt;-</span> kickstarter_train <span class="sc">%&gt;%</span></span>
-<span id="cb613-2"><a href="dlcnn.html#cb613-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb613-3"><a href="dlcnn.html#cb613-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span>
-<span id="cb613-4"><a href="dlcnn.html#cb613-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb613-5"><a href="dlcnn.html#cb613-5" aria-hidden="true" tabindex="-1"></a>sentence_to_explain</span></code></pre></div>
+<div class="sourceCode" id="cb611"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb611-1"><a href="dlcnn.html#cb611-1" aria-hidden="true" tabindex="-1"></a>sentence_to_explain <span class="ot">&lt;-</span> kickstarter_train <span class="sc">%&gt;%</span></span>
+<span id="cb611-2"><a href="dlcnn.html#cb611-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb611-3"><a href="dlcnn.html#cb611-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(blurb)</span>
+<span id="cb611-4"><a href="dlcnn.html#cb611-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb611-5"><a href="dlcnn.html#cb611-5" aria-hidden="true" tabindex="-1"></a>sentence_to_explain</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;The new way of learning English made simple, interesting and practical!&quot;
 #&gt; [2] &quot;Happiness in a jar has finally been reached.&quot;</code></pre>
 <p>We now load the lime package and pass observations into <code>lime()</code> along with the model we are trying to explain and the preprocess function.</p>
@@ -1061,22 +1061,22 @@ Since the function needs to be able to work with just the <code>x</code> paramet
 Be sure that the preprocessing function <em>matches</em> the preprocessing that was used to train the model.
 </p>
 </div>
-<div class="sourceCode" id="cb615"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb615-1"><a href="dlcnn.html#cb615-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lime)</span>
-<span id="cb615-2"><a href="dlcnn.html#cb615-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb615-3"><a href="dlcnn.html#cb615-3" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
-<span id="cb615-4"><a href="dlcnn.html#cb615-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
-<span id="cb615-5"><a href="dlcnn.html#cb615-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
-<span id="cb615-6"><a href="dlcnn.html#cb615-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
-<span id="cb615-7"><a href="dlcnn.html#cb615-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb613"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb613-1"><a href="dlcnn.html#cb613-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lime)</span>
+<span id="cb613-2"><a href="dlcnn.html#cb613-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb613-3"><a href="dlcnn.html#cb613-3" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
+<span id="cb613-4"><a href="dlcnn.html#cb613-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
+<span id="cb613-5"><a href="dlcnn.html#cb613-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
+<span id="cb613-6"><a href="dlcnn.html#cb613-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
+<span id="cb613-7"><a href="dlcnn.html#cb613-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>This <code>explainer</code> object can now be used with <code>explain()</code> to generate explanations for the sentences. We set <code>n_labels = 1</code> to only get explanations for the first label, since we are working with a binary classification model<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a>. We set <code>n_features = 12</code> to return the 12 most important features. If we were dealing with longer text, we might want to change <code>n_features</code> to return more features (tokens).</p>
-<div class="sourceCode" id="cb616"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb616-1"><a href="dlcnn.html#cb616-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
-<span id="cb616-2"><a href="dlcnn.html#cb616-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
-<span id="cb616-3"><a href="dlcnn.html#cb616-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
-<span id="cb616-4"><a href="dlcnn.html#cb616-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
-<span id="cb616-5"><a href="dlcnn.html#cb616-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
-<span id="cb616-6"><a href="dlcnn.html#cb616-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb616-7"><a href="dlcnn.html#cb616-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb616-8"><a href="dlcnn.html#cb616-8" aria-hidden="true" tabindex="-1"></a>explanation</span></code></pre></div>
+<div class="sourceCode" id="cb614"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb614-1"><a href="dlcnn.html#cb614-1" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
+<span id="cb614-2"><a href="dlcnn.html#cb614-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> sentence_to_explain,</span>
+<span id="cb614-3"><a href="dlcnn.html#cb614-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
+<span id="cb614-4"><a href="dlcnn.html#cb614-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
+<span id="cb614-5"><a href="dlcnn.html#cb614-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
+<span id="cb614-6"><a href="dlcnn.html#cb614-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb614-7"><a href="dlcnn.html#cb614-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb614-8"><a href="dlcnn.html#cb614-8" aria-hidden="true" tabindex="-1"></a>explanation</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 19 × 13
 #&gt;    model_type      case label label_prob model_r2 model_intercept model_prediction
 #&gt;  * &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
@@ -1102,7 +1102,7 @@ Be sure that the preprocessing function <em>matches</em> the preprocessing that 
 #&gt; # … with 6 more variables: feature &lt;chr&gt;, feature_value &lt;chr&gt;,
 #&gt; #   feature_weight &lt;dbl&gt;, feature_desc &lt;chr&gt;, data &lt;chr&gt;, prediction &lt;list&gt;</code></pre>
 <p>The output comes in a tibble format where <code>feature</code> and <code>feature_weight</code> are included, but fortunately lime contains some functions to visualize these weights. Figure <a href="dlcnn.html#fig:limeplotfeatures">10.8</a> shows the result of using <code>plot_features()</code>, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Bars in the positive direction (darker) indicate that the weights <em>support</em> the prediction and bars in the negative direction (lighter) indicate <em>contradictions</em>. This chart is great for finding the most prominent features in an observation.</p>
-<div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_features</span>(explanation)</span></code></pre></div>
+<div class="sourceCode" id="cb616"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb616-1"><a href="dlcnn.html#cb616-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_features</span>(explanation)</span></code></pre></div>
 <p><img src="10_dl_cnn_files/figure-html/unnamed-chunk-40-1.svg" width="672" style="display: block; margin: auto;" /></p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:limeplotfeatures"></span>
 <img src="10_dl_cnn_files/figure-html/limeplotfeatures-1.svg" alt="Plot of most important features for a CNN model predicting two observations." width="672" />
@@ -1111,7 +1111,7 @@ FIGURE 10.8: Plot of most important features for a CNN model predicting two obse
 </p>
 </div>
 <p>Figure <a href="dlcnn.html#fig:limeplottextexplanations">10.9</a> shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.</p>
-<div class="sourceCode" id="cb619"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb619-1"><a href="dlcnn.html#cb619-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
+<div class="sourceCode" id="cb617"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb617-1"><a href="dlcnn.html#cb617-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
 <div id="htmlwidget-7235292f32d1c7f5b25d" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-7235292f32d1c7f5b25d">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='positive_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='negative_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.93%)<br/>Explainer fit: 0.37<\/sub> <\/p><br/><p> <span class='negative_2'>Happiness<\/span> <span class='negative_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_1'>jar<\/span> <span class='positive_1'>has<\/span> <span class='negative_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='positive_2'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.94%)<br/>Explainer fit: 0.57<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:limeplottextexplanations"></span>
@@ -1153,25 +1153,25 @@ The <code>interactive_text_explanations()</code> function can be used to launch 
 </div>
 <p>One of the ways a deep learning model is hard to explain is that changes to a part of the input can affect how the input is being used as a whole. Remember that in bag-of-words models adding another token when predicting would just add another unit in the weight; this is not always the case when using deep learning models.
 The following example shows this effect. We have created two very similar sentences in <code>fake_sentences</code>.</p>
-<div class="sourceCode" id="cb620"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb620-1"><a href="dlcnn.html#cb620-1" aria-hidden="true" tabindex="-1"></a>fake_sentences <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb620-2"><a href="dlcnn.html#cb620-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the whole family&quot;</span>,</span>
-<span id="cb620-3"><a href="dlcnn.html#cb620-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the family&quot;</span></span>
-<span id="cb620-4"><a href="dlcnn.html#cb620-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb620-5"><a href="dlcnn.html#cb620-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb620-6"><a href="dlcnn.html#cb620-6" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
-<span id="cb620-7"><a href="dlcnn.html#cb620-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
-<span id="cb620-8"><a href="dlcnn.html#cb620-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
-<span id="cb620-9"><a href="dlcnn.html#cb620-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
-<span id="cb620-10"><a href="dlcnn.html#cb620-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb620-11"><a href="dlcnn.html#cb620-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb620-12"><a href="dlcnn.html#cb620-12" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
-<span id="cb620-13"><a href="dlcnn.html#cb620-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
-<span id="cb620-14"><a href="dlcnn.html#cb620-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
-<span id="cb620-15"><a href="dlcnn.html#cb620-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
-<span id="cb620-16"><a href="dlcnn.html#cb620-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
-<span id="cb620-17"><a href="dlcnn.html#cb620-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="dlcnn.html#cb618-1" aria-hidden="true" tabindex="-1"></a>fake_sentences <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb618-2"><a href="dlcnn.html#cb618-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the whole family&quot;</span>,</span>
+<span id="cb618-3"><a href="dlcnn.html#cb618-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Fun and exciting dice game for the family&quot;</span></span>
+<span id="cb618-4"><a href="dlcnn.html#cb618-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb618-5"><a href="dlcnn.html#cb618-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb618-6"><a href="dlcnn.html#cb618-6" aria-hidden="true" tabindex="-1"></a>explainer <span class="ot">&lt;-</span> <span class="fu">lime</span>(</span>
+<span id="cb618-7"><a href="dlcnn.html#cb618-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
+<span id="cb618-8"><a href="dlcnn.html#cb618-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> simple_cnn_model,</span>
+<span id="cb618-9"><a href="dlcnn.html#cb618-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">preprocess =</span> text_to_matrix</span>
+<span id="cb618-10"><a href="dlcnn.html#cb618-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb618-11"><a href="dlcnn.html#cb618-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb618-12"><a href="dlcnn.html#cb618-12" aria-hidden="true" tabindex="-1"></a>explanation <span class="ot">&lt;-</span> <span class="fu">explain</span>(</span>
+<span id="cb618-13"><a href="dlcnn.html#cb618-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> fake_sentences,</span>
+<span id="cb618-14"><a href="dlcnn.html#cb618-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">explainer =</span> explainer,</span>
+<span id="cb618-15"><a href="dlcnn.html#cb618-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_labels =</span> <span class="dv">1</span>,</span>
+<span id="cb618-16"><a href="dlcnn.html#cb618-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_features =</span> <span class="dv">12</span></span>
+<span id="cb618-17"><a href="dlcnn.html#cb618-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Explanations based on these two sentences are fairly similar as we can see in Figure <a href="dlcnn.html#fig:robustlimeplottextexplanations">10.10</a>. However, notice how the removal of the word “whole” affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.</p>
-<div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="dlcnn.html#cb621-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
+<div class="sourceCode" id="cb619"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb619-1"><a href="dlcnn.html#cb619-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_text_explanations</span>(explanation)</span></code></pre></div>
 <div id="htmlwidget-9eedbe84082c945df517" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
 <script type="application/json" data-for="htmlwidget-9eedbe84082c945df517">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_3'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (54.74%)<br/>Explainer fit: 0.55<\/sub> <\/p><br/><p> <span class='positive_2'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='negative_2'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 1 (89.96%)<br/>Explainer fit: 0.42<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:robustlimeplottextexplanations"></span>
@@ -1222,106 +1222,106 @@ The LIME algorithm and <strong>lime</strong> R package are not limited to explai
 Be sure you are using the right type for each of these flags; Keras is quite picky! If Keras is expecting an integer and gets a numeric then you will get an error.
 </p>
 </div>
-<div class="sourceCode" id="cb622"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb622-1"><a href="dlcnn.html#cb622-1" aria-hidden="true" tabindex="-1"></a>FLAGS <span class="ot">&lt;-</span> <span class="fu">flags</span>(</span>
-<span id="cb622-2"><a href="dlcnn.html#cb622-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;kernel_size1&quot;</span>, <span class="dv">5</span>),</span>
-<span id="cb622-3"><a href="dlcnn.html#cb622-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;strides1&quot;</span>, <span class="dv">1</span>)</span>
-<span id="cb622-4"><a href="dlcnn.html#cb622-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb620"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb620-1"><a href="dlcnn.html#cb620-1" aria-hidden="true" tabindex="-1"></a>FLAGS <span class="ot">&lt;-</span> <span class="fu">flags</span>(</span>
+<span id="cb620-2"><a href="dlcnn.html#cb620-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;kernel_size1&quot;</span>, <span class="dv">5</span>),</span>
+<span id="cb620-3"><a href="dlcnn.html#cb620-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">flag_integer</span>(<span class="st">&quot;strides1&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb620-4"><a href="dlcnn.html#cb620-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Notice how we are giving each flag a name and a possible value. The value itself isn’t important, as it is not used once we start running multiple models, but it needs to be the right type for the model we are using.</p>
 <p>Next, we specify the Keras model we want to run.</p>
-<div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="dlcnn.html#cb623-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb623-2"><a href="dlcnn.html#cb623-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb623-3"><a href="dlcnn.html#cb623-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb623-4"><a href="dlcnn.html#cb623-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>,</span>
-<span id="cb623-5"><a href="dlcnn.html#cb623-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">kernel_size =</span> FLAGS<span class="sc">$</span>kernel_size1,</span>
-<span id="cb623-6"><a href="dlcnn.html#cb623-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> FLAGS<span class="sc">$</span>strides1,</span>
-<span id="cb623-7"><a href="dlcnn.html#cb623-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb623-8"><a href="dlcnn.html#cb623-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb623-9"><a href="dlcnn.html#cb623-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb623-10"><a href="dlcnn.html#cb623-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb623-11"><a href="dlcnn.html#cb623-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb623-12"><a href="dlcnn.html#cb623-12" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb623-13"><a href="dlcnn.html#cb623-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb623-14"><a href="dlcnn.html#cb623-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb623-15"><a href="dlcnn.html#cb623-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb623-16"><a href="dlcnn.html#cb623-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="dlcnn.html#cb621-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb621-2"><a href="dlcnn.html#cb621-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb621-3"><a href="dlcnn.html#cb621-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb621-4"><a href="dlcnn.html#cb621-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>,</span>
+<span id="cb621-5"><a href="dlcnn.html#cb621-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">kernel_size =</span> FLAGS<span class="sc">$</span>kernel_size1,</span>
+<span id="cb621-6"><a href="dlcnn.html#cb621-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> FLAGS<span class="sc">$</span>strides1,</span>
+<span id="cb621-7"><a href="dlcnn.html#cb621-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb621-8"><a href="dlcnn.html#cb621-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb621-9"><a href="dlcnn.html#cb621-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb621-10"><a href="dlcnn.html#cb621-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb621-11"><a href="dlcnn.html#cb621-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb621-12"><a href="dlcnn.html#cb621-12" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb621-13"><a href="dlcnn.html#cb621-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb621-14"><a href="dlcnn.html#cb621-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb621-15"><a href="dlcnn.html#cb621-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb621-16"><a href="dlcnn.html#cb621-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We target the hyperparameters we want to change by marking them as <code>FLAGS$name</code>. So in this model, we are tuning different values of <code>kernel_size</code> and <code>strides</code>, which are denoted by the <code>kernel_size1</code> and <code>strides1</code> flag, respectively.</p>
 <p>Lastly, we must specify how the model is trained and evaluated.</p>
-<div class="sourceCode" id="cb624"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb624-1"><a href="dlcnn.html#cb624-1" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span></span>
-<span id="cb624-2"><a href="dlcnn.html#cb624-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb624-3"><a href="dlcnn.html#cb624-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> kick_analysis,</span>
-<span id="cb624-4"><a href="dlcnn.html#cb624-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> state_analysis,</span>
-<span id="cb624-5"><a href="dlcnn.html#cb624-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb624-6"><a href="dlcnn.html#cb624-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb624-7"><a href="dlcnn.html#cb624-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
-<span id="cb624-8"><a href="dlcnn.html#cb624-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb624-9"><a href="dlcnn.html#cb624-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb624-10"><a href="dlcnn.html#cb624-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history)</span>
-<span id="cb624-11"><a href="dlcnn.html#cb624-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb624-12"><a href="dlcnn.html#cb624-12" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span> <span class="fu">evaluate</span>(</span>
-<span id="cb624-13"><a href="dlcnn.html#cb624-13" aria-hidden="true" tabindex="-1"></a>  kick_assess, state_assess</span>
-<span id="cb624-14"><a href="dlcnn.html#cb624-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb624-15"><a href="dlcnn.html#cb624-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb624-16"><a href="dlcnn.html#cb624-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test accuracy:&quot;</span>, score[<span class="st">&quot;accuracy&quot;</span>], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb622"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb622-1"><a href="dlcnn.html#cb622-1" aria-hidden="true" tabindex="-1"></a>history <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span></span>
+<span id="cb622-2"><a href="dlcnn.html#cb622-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb622-3"><a href="dlcnn.html#cb622-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> kick_analysis,</span>
+<span id="cb622-4"><a href="dlcnn.html#cb622-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> state_analysis,</span>
+<span id="cb622-5"><a href="dlcnn.html#cb622-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb622-6"><a href="dlcnn.html#cb622-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb622-7"><a href="dlcnn.html#cb622-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess)</span>
+<span id="cb622-8"><a href="dlcnn.html#cb622-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb622-9"><a href="dlcnn.html#cb622-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb622-10"><a href="dlcnn.html#cb622-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history)</span>
+<span id="cb622-11"><a href="dlcnn.html#cb622-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb622-12"><a href="dlcnn.html#cb622-12" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> model <span class="sc">%&gt;%</span> <span class="fu">evaluate</span>(</span>
+<span id="cb622-13"><a href="dlcnn.html#cb622-13" aria-hidden="true" tabindex="-1"></a>  kick_assess, state_assess</span>
+<span id="cb622-14"><a href="dlcnn.html#cb622-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb622-15"><a href="dlcnn.html#cb622-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb622-16"><a href="dlcnn.html#cb622-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test accuracy:&quot;</span>, score[<span class="st">&quot;accuracy&quot;</span>], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
 <p>This is mostly the same as what we have seen before. When we are running these different models, the scripts will be run in the environment they are initialized from, so the models will have access to objects like <code>prepped_training</code> and <code>kickstarter_train</code>, and we don’t have to create them inside the file.</p>
 <p>Now that we have the file set up we need to specify the different hyperparameters we want to try. Three different values for the kernel size and two different values for the stride length give us <code>3 * 2 = 6</code> different runs.</p>
-<div class="sourceCode" id="cb625"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb625-1"><a href="dlcnn.html#cb625-1" aria-hidden="true" tabindex="-1"></a>hyperparams <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb625-2"><a href="dlcnn.html#cb625-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel_size1 =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>),</span>
-<span id="cb625-3"><a href="dlcnn.html#cb625-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">strides1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
-<span id="cb625-4"><a href="dlcnn.html#cb625-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="dlcnn.html#cb623-1" aria-hidden="true" tabindex="-1"></a>hyperparams <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb623-2"><a href="dlcnn.html#cb623-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel_size1 =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>),</span>
+<span id="cb623-3"><a href="dlcnn.html#cb623-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">strides1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb623-4"><a href="dlcnn.html#cb623-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <div class="rmdnote">
 <p>
 This is a small selection of hyperparameters and ranges. There is much more room for experimentation.
 </p>
 </div>
 <p>Now we have everything we need for hyperparameter searching. Load up <strong>tfruns</strong> and pass the name of the file we just created along with <code>hyperparams</code> to the <code>tuning_run()</code> function.</p>
-<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="dlcnn.html#cb626-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tfruns)</span>
-<span id="cb626-2"><a href="dlcnn.html#cb626-2" aria-hidden="true" tabindex="-1"></a>runs <span class="ot">&lt;-</span> <span class="fu">tuning_run</span>(</span>
-<span id="cb626-3"><a href="dlcnn.html#cb626-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;cnn-spec.R&quot;</span>,</span>
-<span id="cb626-4"><a href="dlcnn.html#cb626-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">runs_dir =</span> <span class="st">&quot;_tuning&quot;</span>,</span>
-<span id="cb626-5"><a href="dlcnn.html#cb626-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">flags =</span> hyperparams</span>
-<span id="cb626-6"><a href="dlcnn.html#cb626-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb626-7"><a href="dlcnn.html#cb626-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb626-8"><a href="dlcnn.html#cb626-8" aria-hidden="true" tabindex="-1"></a>runs_results <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">ls_runs</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb624"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb624-1"><a href="dlcnn.html#cb624-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tfruns)</span>
+<span id="cb624-2"><a href="dlcnn.html#cb624-2" aria-hidden="true" tabindex="-1"></a>runs <span class="ot">&lt;-</span> <span class="fu">tuning_run</span>(</span>
+<span id="cb624-3"><a href="dlcnn.html#cb624-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;cnn-spec.R&quot;</span>,</span>
+<span id="cb624-4"><a href="dlcnn.html#cb624-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">runs_dir =</span> <span class="st">&quot;_tuning&quot;</span>,</span>
+<span id="cb624-5"><a href="dlcnn.html#cb624-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">flags =</span> hyperparams</span>
+<span id="cb624-6"><a href="dlcnn.html#cb624-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb624-7"><a href="dlcnn.html#cb624-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb624-8"><a href="dlcnn.html#cb624-8" aria-hidden="true" tabindex="-1"></a>runs_results <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">ls_runs</span>())</span></code></pre></div>
 <p>You don’t have to, but we have manually specified the <code>runs_dir</code> argument, which is where the results of the tuning will be saved.</p>
 <p>A summary of all the runs in the folder can be retrieved with <code>ls_runs()</code>; here we use <code>as_tibble()</code> to get the results as a tibble.</p>
-<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="dlcnn.html#cb627-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
+<div class="sourceCode" id="cb625"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb625-1"><a href="dlcnn.html#cb625-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/20… 1.01       0.0378           0.991           1.01             0.809
-#&gt; 2 _tuning/20… 0.983      0.0378           0.991           0.983            0.807
-#&gt; 3 _tuning/20… 0.979      0.0464           0.988           0.979            0.803
-#&gt; 4 _tuning/20… 0.964      0.0276           0.995           0.964            0.813
-#&gt; 5 _tuning/20… 0.963      0.0362           0.992           0.963            0.810
-#&gt; 6 _tuning/20… 0.930      0.044            0.990           0.930            0.810
+#&gt; 1 _tuning/20… 1.00       0.0343           0.992           1.00             0.810
+#&gt; 2 _tuning/20… 0.993      0.0359           0.992           0.993            0.805
+#&gt; 3 _tuning/20… 0.980      0.0487           0.987           0.980            0.807
+#&gt; 4 _tuning/20… 0.957      0.0329           0.993           0.957            0.811
+#&gt; 5 _tuning/20… 0.935      0.0336           0.993           0.935            0.812
+#&gt; 6 _tuning/20… 0.928      0.0502           0.987           0.928            0.806
 #&gt; # … with 18 more variables: flag_kernel_size1 &lt;int&gt;, flag_strides1 &lt;int&gt;,
 #&gt; #   epochs &lt;int&gt;, epochs_completed &lt;int&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
 #&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
 #&gt; #   start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;, source_code &lt;chr&gt;,
 #&gt; #   context &lt;chr&gt;, type &lt;chr&gt;, NA. &lt;dbl&gt;</code></pre>
 <p>We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.</p>
-<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a>best_runs <span class="ot">&lt;-</span> runs_results <span class="sc">%&gt;%</span></span>
-<span id="cb629-2"><a href="dlcnn.html#cb629-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(metric_val_accuracy, flag_kernel_size1, flag_strides1) <span class="sc">%&gt;%</span></span>
-<span id="cb629-3"><a href="dlcnn.html#cb629-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
-<span id="cb629-4"><a href="dlcnn.html#cb629-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb629-5"><a href="dlcnn.html#cb629-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
+<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="dlcnn.html#cb627-1" aria-hidden="true" tabindex="-1"></a>best_runs <span class="ot">&lt;-</span> runs_results <span class="sc">%&gt;%</span></span>
+<span id="cb627-2"><a href="dlcnn.html#cb627-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(metric_val_accuracy, flag_kernel_size1, flag_strides1) <span class="sc">%&gt;%</span></span>
+<span id="cb627-3"><a href="dlcnn.html#cb627-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
+<span id="cb627-4"><a href="dlcnn.html#cb627-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb627-5"><a href="dlcnn.html#cb627-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;int&gt;         &lt;int&gt;
-#&gt; 1               0.813                 7             1
-#&gt; 2               0.810                 3             1
-#&gt; 3               0.810                 5             1
-#&gt; 4               0.809                 7             2
-#&gt; 5               0.807                 5             2
-#&gt; 6               0.803                 3             2</code></pre>
-<p>There isn’t much performance difference between the different choices but using kernel size of 7 and stride length of 1 narrowly came out on top.</p>
+#&gt; 1               0.812                 5             1
+#&gt; 2               0.811                 7             1
+#&gt; 3               0.810                 7             2
+#&gt; 4               0.807                 3             2
+#&gt; 5               0.806                 3             1
+#&gt; 6               0.805                 5             2</code></pre>
+<p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
 <div id="cross-validation-for-evaluation" class="section level2" number="10.7">
 <h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
 <p>In Section <a href="dldnn.html#dnncross">8.5</a>, we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter data set we are using is big enough that we have ample data for a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. However, it is important to understand how to implement other resampling strategies for situations when your data budget may not be as plentiful or when you need to compute performance metrics that are more precise.</p>
-<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="dlcnn.html#cb631-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
-<span id="cb631-2"><a href="dlcnn.html#cb631-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
-<span id="cb631-3"><a href="dlcnn.html#cb631-3" aria-hidden="true" tabindex="-1"></a>kick_folds</span></code></pre></div>
+<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<span id="cb629-2"><a href="dlcnn.html#cb629-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb629-3"><a href="dlcnn.html#cb629-3" aria-hidden="true" tabindex="-1"></a>kick_folds</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
 #&gt; # A tibble: 5 × 2
 #&gt;   splits                 id   
@@ -1333,50 +1333,50 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt; 5 &lt;split [161674/40418]&gt; Fold5</code></pre>
 <p>Each of these folds has an analysis or training set and an assessment or validation set. Instead of training our model one time and getting one measure of performance, we can train our model <code>v</code> times and get <code>v</code> measures (five, in this case), for more reliability.</p>
 <p>Last time we saw how to create a custom function to handle preprocessing, fitting, and evaluation. We will use the same approach of creating the function, but this time use the model specification from Section <a href="dlcnn.html#firstcnn">10.2</a>.</p>
-<div class="sourceCode" id="cb633"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb633-1"><a href="dlcnn.html#cb633-1" aria-hidden="true" tabindex="-1"></a>fit_split <span class="ot">&lt;-</span> <span class="cf">function</span>(split, prepped_rec) {</span>
-<span id="cb633-2"><a href="dlcnn.html#cb633-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## preprocessing</span></span>
-<span id="cb633-3"><a href="dlcnn.html#cb633-3" aria-hidden="true" tabindex="-1"></a>  x_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">analysis</span>(split),</span>
-<span id="cb633-4"><a href="dlcnn.html#cb633-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb633-5"><a href="dlcnn.html#cb633-5" aria-hidden="true" tabindex="-1"></a>  x_val   <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">assessment</span>(split),</span>
-<span id="cb633-6"><a href="dlcnn.html#cb633-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb633-7"><a href="dlcnn.html#cb633-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb633-8"><a href="dlcnn.html#cb633-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create model</span></span>
-<span id="cb633-9"><a href="dlcnn.html#cb633-9" aria-hidden="true" tabindex="-1"></a>  y_train <span class="ot">&lt;-</span> <span class="fu">analysis</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
-<span id="cb633-10"><a href="dlcnn.html#cb633-10" aria-hidden="true" tabindex="-1"></a>  y_val   <span class="ot">&lt;-</span> <span class="fu">assessment</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
-<span id="cb633-11"><a href="dlcnn.html#cb633-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb633-12"><a href="dlcnn.html#cb633-12" aria-hidden="true" tabindex="-1"></a>  mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb633-13"><a href="dlcnn.html#cb633-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb633-14"><a href="dlcnn.html#cb633-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb633-15"><a href="dlcnn.html#cb633-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb633-16"><a href="dlcnn.html#cb633-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb633-17"><a href="dlcnn.html#cb633-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb633-18"><a href="dlcnn.html#cb633-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb633-19"><a href="dlcnn.html#cb633-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compile</span>(</span>
-<span id="cb633-20"><a href="dlcnn.html#cb633-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb633-21"><a href="dlcnn.html#cb633-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb633-22"><a href="dlcnn.html#cb633-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb633-23"><a href="dlcnn.html#cb633-23" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb633-24"><a href="dlcnn.html#cb633-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb633-25"><a href="dlcnn.html#cb633-25" aria-hidden="true" tabindex="-1"></a>  <span class="do">## fit model</span></span>
-<span id="cb633-26"><a href="dlcnn.html#cb633-26" aria-hidden="true" tabindex="-1"></a>  mod <span class="sc">%&gt;%</span></span>
-<span id="cb633-27"><a href="dlcnn.html#cb633-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(</span>
-<span id="cb633-28"><a href="dlcnn.html#cb633-28" aria-hidden="true" tabindex="-1"></a>      x_train,</span>
-<span id="cb633-29"><a href="dlcnn.html#cb633-29" aria-hidden="true" tabindex="-1"></a>      y_train,</span>
-<span id="cb633-30"><a href="dlcnn.html#cb633-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb633-31"><a href="dlcnn.html#cb633-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">validation_data =</span> <span class="fu">list</span>(x_val, y_val),</span>
-<span id="cb633-32"><a href="dlcnn.html#cb633-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb633-33"><a href="dlcnn.html#cb633-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb633-34"><a href="dlcnn.html#cb633-34" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb633-35"><a href="dlcnn.html#cb633-35" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb633-36"><a href="dlcnn.html#cb633-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">## evaluate model</span></span>
-<span id="cb633-37"><a href="dlcnn.html#cb633-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keras_predict</span>(mod, x_val, y_val) <span class="sc">%&gt;%</span></span>
-<span id="cb633-38"><a href="dlcnn.html#cb633-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span>
-<span id="cb633-39"><a href="dlcnn.html#cb633-39" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="dlcnn.html#cb631-1" aria-hidden="true" tabindex="-1"></a>fit_split <span class="ot">&lt;-</span> <span class="cf">function</span>(split, prepped_rec) {</span>
+<span id="cb631-2"><a href="dlcnn.html#cb631-2" aria-hidden="true" tabindex="-1"></a>  <span class="do">## preprocessing</span></span>
+<span id="cb631-3"><a href="dlcnn.html#cb631-3" aria-hidden="true" tabindex="-1"></a>  x_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">analysis</span>(split),</span>
+<span id="cb631-4"><a href="dlcnn.html#cb631-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb631-5"><a href="dlcnn.html#cb631-5" aria-hidden="true" tabindex="-1"></a>  x_val   <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped_rec, <span class="at">new_data =</span> <span class="fu">assessment</span>(split),</span>
+<span id="cb631-6"><a href="dlcnn.html#cb631-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb631-7"><a href="dlcnn.html#cb631-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb631-8"><a href="dlcnn.html#cb631-8" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create model</span></span>
+<span id="cb631-9"><a href="dlcnn.html#cb631-9" aria-hidden="true" tabindex="-1"></a>  y_train <span class="ot">&lt;-</span> <span class="fu">analysis</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
+<span id="cb631-10"><a href="dlcnn.html#cb631-10" aria-hidden="true" tabindex="-1"></a>  y_val   <span class="ot">&lt;-</span> <span class="fu">assessment</span>(split) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
+<span id="cb631-11"><a href="dlcnn.html#cb631-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb631-12"><a href="dlcnn.html#cb631-12" aria-hidden="true" tabindex="-1"></a>  mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb631-13"><a href="dlcnn.html#cb631-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb631-14"><a href="dlcnn.html#cb631-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb631-15"><a href="dlcnn.html#cb631-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb631-16"><a href="dlcnn.html#cb631-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb631-17"><a href="dlcnn.html#cb631-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb631-18"><a href="dlcnn.html#cb631-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb631-19"><a href="dlcnn.html#cb631-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compile</span>(</span>
+<span id="cb631-20"><a href="dlcnn.html#cb631-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb631-21"><a href="dlcnn.html#cb631-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb631-22"><a href="dlcnn.html#cb631-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb631-23"><a href="dlcnn.html#cb631-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb631-24"><a href="dlcnn.html#cb631-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb631-25"><a href="dlcnn.html#cb631-25" aria-hidden="true" tabindex="-1"></a>  <span class="do">## fit model</span></span>
+<span id="cb631-26"><a href="dlcnn.html#cb631-26" aria-hidden="true" tabindex="-1"></a>  mod <span class="sc">%&gt;%</span></span>
+<span id="cb631-27"><a href="dlcnn.html#cb631-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(</span>
+<span id="cb631-28"><a href="dlcnn.html#cb631-28" aria-hidden="true" tabindex="-1"></a>      x_train,</span>
+<span id="cb631-29"><a href="dlcnn.html#cb631-29" aria-hidden="true" tabindex="-1"></a>      y_train,</span>
+<span id="cb631-30"><a href="dlcnn.html#cb631-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb631-31"><a href="dlcnn.html#cb631-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">validation_data =</span> <span class="fu">list</span>(x_val, y_val),</span>
+<span id="cb631-32"><a href="dlcnn.html#cb631-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb631-33"><a href="dlcnn.html#cb631-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb631-34"><a href="dlcnn.html#cb631-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb631-35"><a href="dlcnn.html#cb631-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb631-36"><a href="dlcnn.html#cb631-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">## evaluate model</span></span>
+<span id="cb631-37"><a href="dlcnn.html#cb631-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">keras_predict</span>(mod, x_val, y_val) <span class="sc">%&gt;%</span></span>
+<span id="cb631-38"><a href="dlcnn.html#cb631-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span>
+<span id="cb631-39"><a href="dlcnn.html#cb631-39" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>We can <code>map()</code> this function across all our cross-validation folds. This takes longer than our previous models to train, since we are training for 10 epochs each on 5 folds.</p>
-<div class="sourceCode" id="cb634"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb634-1"><a href="dlcnn.html#cb634-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="ot">&lt;-</span> kick_folds <span class="sc">%&gt;%</span></span>
-<span id="cb634-2"><a href="dlcnn.html#cb634-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">validation =</span> <span class="fu">map</span>(splits, fit_split, kick_prep))</span>
-<span id="cb634-3"><a href="dlcnn.html#cb634-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb634-4"><a href="dlcnn.html#cb634-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
+<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="dlcnn.html#cb632-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="ot">&lt;-</span> kick_folds <span class="sc">%&gt;%</span></span>
+<span id="cb632-2"><a href="dlcnn.html#cb632-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">validation =</span> <span class="fu">map</span>(splits, fit_split, kick_prep))</span>
+<span id="cb632-3"><a href="dlcnn.html#cb632-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb632-4"><a href="dlcnn.html#cb632-4" aria-hidden="true" tabindex="-1"></a>cv_fitted</span></code></pre></div>
 <pre><code>#&gt; #  5-fold cross-validation 
 #&gt; # A tibble: 5 × 3
 #&gt;   splits                 id    validation      
@@ -1387,8 +1387,8 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt; 4 &lt;split [161674/40418]&gt; Fold4 &lt;tibble [4 × 3]&gt;
 #&gt; 5 &lt;split [161674/40418]&gt; Fold5 &lt;tibble [4 × 3]&gt;</code></pre>
 <p>Now we can use <code>unnest()</code> to find the metrics we computed.</p>
-<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="dlcnn.html#cb636-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
-<span id="cb636-2"><a href="dlcnn.html#cb636-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>
+<div class="sourceCode" id="cb634"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb634-1"><a href="dlcnn.html#cb634-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
+<span id="cb634-2"><a href="dlcnn.html#cb634-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 20 × 5
 #&gt;    splits                 id    .metric     .estimator .estimate
 #&gt;    &lt;list&gt;                 &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -1413,14 +1413,14 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         0.891
 #&gt; 20 &lt;split [161674/40418]&gt; Fold5 roc_auc     binary         0.875</code></pre>
 <p>We can summarize the unnested results to match what we normally would get from <code>collect_metrics()</code></p>
-<div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="dlcnn.html#cb638-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
-<span id="cb638-2"><a href="dlcnn.html#cb638-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation) <span class="sc">%&gt;%</span></span>
-<span id="cb638-3"><a href="dlcnn.html#cb638-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(.metric) <span class="sc">%&gt;%</span></span>
-<span id="cb638-4"><a href="dlcnn.html#cb638-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb638-5"><a href="dlcnn.html#cb638-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(.estimate),</span>
-<span id="cb638-6"><a href="dlcnn.html#cb638-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb638-7"><a href="dlcnn.html#cb638-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_err =</span> <span class="fu">sd</span>(.estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
-<span id="cb638-8"><a href="dlcnn.html#cb638-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="dlcnn.html#cb636-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
+<span id="cb636-2"><a href="dlcnn.html#cb636-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation) <span class="sc">%&gt;%</span></span>
+<span id="cb636-3"><a href="dlcnn.html#cb636-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(.metric) <span class="sc">%&gt;%</span></span>
+<span id="cb636-4"><a href="dlcnn.html#cb636-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb636-5"><a href="dlcnn.html#cb636-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(.estimate),</span>
+<span id="cb636-6"><a href="dlcnn.html#cb636-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb636-7"><a href="dlcnn.html#cb636-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_err =</span> <span class="fu">sd</span>(.estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb636-8"><a href="dlcnn.html#cb636-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 4
 #&gt;   .metric      mean     n  std_err
 #&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
@@ -1442,50 +1442,50 @@ There are an incredible number of ways to change a deep learning network archite
 <div id="cnnfullpreprocess" class="section level3" number="10.8.1">
 <h3><span class="header-section-number">10.8.1</span> Preprocess the data</h3>
 <p>For this final model, we are not going to use our separate validation data again, so we only need to preprocess the training data.</p>
-<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="dlcnn.html#cb640-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
-<span id="cb640-2"><a href="dlcnn.html#cb640-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb640-3"><a href="dlcnn.html#cb640-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb640-4"><a href="dlcnn.html#cb640-4" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb640-5"><a href="dlcnn.html#cb640-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb640-6"><a href="dlcnn.html#cb640-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb640-7"><a href="dlcnn.html#cb640-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
-<span id="cb640-8"><a href="dlcnn.html#cb640-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb640-9"><a href="dlcnn.html#cb640-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb640-10"><a href="dlcnn.html#cb640-10" aria-hidden="true" tabindex="-1"></a>kick_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb640-11"><a href="dlcnn.html#cb640-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb640-12"><a href="dlcnn.html#cb640-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
+<div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="dlcnn.html#cb638-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
+<span id="cb638-2"><a href="dlcnn.html#cb638-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb638-3"><a href="dlcnn.html#cb638-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb638-4"><a href="dlcnn.html#cb638-4" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb638-5"><a href="dlcnn.html#cb638-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb638-6"><a href="dlcnn.html#cb638-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb638-7"><a href="dlcnn.html#cb638-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
+<span id="cb638-8"><a href="dlcnn.html#cb638-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb638-9"><a href="dlcnn.html#cb638-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb638-10"><a href="dlcnn.html#cb638-10" aria-hidden="true" tabindex="-1"></a>kick_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb638-11"><a href="dlcnn.html#cb638-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb638-12"><a href="dlcnn.html#cb638-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 </div>
 <div id="cnnfullmodel" class="section level3" number="10.8.2">
 <h3><span class="header-section-number">10.8.2</span> Specify the model</h3>
 <p>Instead of using specific validation data that we can then compute performance metrics for, let’s go back to specifying <code>validation_split = 0.1</code> and let the Keras model choose the validation set.</p>
-<div class="sourceCode" id="cb642"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb642-1"><a href="dlcnn.html#cb642-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb642-2"><a href="dlcnn.html#cb642-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
-<span id="cb642-3"><a href="dlcnn.html#cb642-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
-<span id="cb642-4"><a href="dlcnn.html#cb642-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>,</span>
-<span id="cb642-5"><a href="dlcnn.html#cb642-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb642-6"><a href="dlcnn.html#cb642-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb642-7"><a href="dlcnn.html#cb642-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb642-8"><a href="dlcnn.html#cb642-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb642-9"><a href="dlcnn.html#cb642-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb642-10"><a href="dlcnn.html#cb642-10" aria-hidden="true" tabindex="-1"></a>final_mod <span class="sc">%&gt;%</span></span>
-<span id="cb642-11"><a href="dlcnn.html#cb642-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb642-12"><a href="dlcnn.html#cb642-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb642-13"><a href="dlcnn.html#cb642-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb642-14"><a href="dlcnn.html#cb642-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb642-15"><a href="dlcnn.html#cb642-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb642-16"><a href="dlcnn.html#cb642-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb642-17"><a href="dlcnn.html#cb642-17" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
-<span id="cb642-18"><a href="dlcnn.html#cb642-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb642-19"><a href="dlcnn.html#cb642-19" aria-hidden="true" tabindex="-1"></a>    kick_matrix,</span>
-<span id="cb642-20"><a href="dlcnn.html#cb642-20" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
-<span id="cb642-21"><a href="dlcnn.html#cb642-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb642-22"><a href="dlcnn.html#cb642-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
-<span id="cb642-23"><a href="dlcnn.html#cb642-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb642-24"><a href="dlcnn.html#cb642-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb642-25"><a href="dlcnn.html#cb642-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb642-26"><a href="dlcnn.html#cb642-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb642-27"><a href="dlcnn.html#cb642-27" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
+<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="dlcnn.html#cb640-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb640-2"><a href="dlcnn.html#cb640-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
+<span id="cb640-3"><a href="dlcnn.html#cb640-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">input_length =</span> max_length) <span class="sc">%&gt;%</span></span>
+<span id="cb640-4"><a href="dlcnn.html#cb640-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_conv_1d</span>(<span class="at">filter =</span> <span class="dv">32</span>, <span class="at">kernel_size =</span> <span class="dv">7</span>,</span>
+<span id="cb640-5"><a href="dlcnn.html#cb640-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">strides =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb640-6"><a href="dlcnn.html#cb640-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_global_max_pooling_1d</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb640-7"><a href="dlcnn.html#cb640-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&quot;relu&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb640-8"><a href="dlcnn.html#cb640-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb640-9"><a href="dlcnn.html#cb640-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb640-10"><a href="dlcnn.html#cb640-10" aria-hidden="true" tabindex="-1"></a>final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb640-11"><a href="dlcnn.html#cb640-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb640-12"><a href="dlcnn.html#cb640-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb640-13"><a href="dlcnn.html#cb640-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb640-14"><a href="dlcnn.html#cb640-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb640-15"><a href="dlcnn.html#cb640-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb640-16"><a href="dlcnn.html#cb640-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb640-17"><a href="dlcnn.html#cb640-17" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb640-18"><a href="dlcnn.html#cb640-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb640-19"><a href="dlcnn.html#cb640-19" aria-hidden="true" tabindex="-1"></a>    kick_matrix,</span>
+<span id="cb640-20"><a href="dlcnn.html#cb640-20" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
+<span id="cb640-21"><a href="dlcnn.html#cb640-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb640-22"><a href="dlcnn.html#cb640-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
+<span id="cb640-23"><a href="dlcnn.html#cb640-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb640-24"><a href="dlcnn.html#cb640-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb640-25"><a href="dlcnn.html#cb640-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb640-26"><a href="dlcnn.html#cb640-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb640-27"><a href="dlcnn.html#cb640-27" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
 #&gt;         loss: 0.03318
@@ -1493,10 +1493,10 @@ There are an incredible number of ways to change a deep learning network archite
 #&gt;     val_loss: 0.776
 #&gt; val_accuracy: 0.8523</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
-<div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="dlcnn.html#cb644-1" aria-hidden="true" tabindex="-1"></a>kick_matrix_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
-<span id="cb644-2"><a href="dlcnn.html#cb644-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb644-3"><a href="dlcnn.html#cb644-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_matrix_test, kickstarter_test<span class="sc">$</span>state)</span>
-<span id="cb644-4"><a href="dlcnn.html#cb644-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb642"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb642-1"><a href="dlcnn.html#cb642-1" aria-hidden="true" tabindex="-1"></a>kick_matrix_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
+<span id="cb642-2"><a href="dlcnn.html#cb642-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb642-3"><a href="dlcnn.html#cb642-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_matrix_test, kickstarter_test<span class="sc">$</span>state)</span>
+<span id="cb642-4"><a href="dlcnn.html#cb642-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
@@ -1505,9 +1505,9 @@ There are an incredible number of ways to change a deep learning network archite
 #&gt; 3 mn_log_loss binary         0.792
 #&gt; 4 roc_auc     binary         0.892</code></pre>
 <p>This is our best-performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dlcnn.html#fig:cnnfinalroc">10.11</a>.</p>
-<div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="dlcnn.html#cb646-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
-<span id="cb646-2"><a href="dlcnn.html#cb646-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
-<span id="cb646-3"><a href="dlcnn.html#cb646-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="dlcnn.html#cb644-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb644-2"><a href="dlcnn.html#cb644-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb644-3"><a href="dlcnn.html#cb644-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cnnfinalroc"></span>
 <img src="10_dl_cnn_files/figure-html/cnnfinalroc-1.svg" alt="ROC curve for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -1515,9 +1515,9 @@ FIGURE 10.11: ROC curve for final CNN model predictions on testing set of Kickst
 </p>
 </div>
 <p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final CNN model’s performance using a confusion matrix as well, in Figure <a href="dlcnn.html#fig:cnnheatmapfinal">10.12</a>.</p>
-<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="dlcnn.html#cb647-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
-<span id="cb647-2"><a href="dlcnn.html#cb647-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb647-3"><a href="dlcnn.html#cb647-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="dlcnn.html#cb645-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb645-2"><a href="dlcnn.html#cb645-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb645-3"><a href="dlcnn.html#cb645-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cnnheatmapfinal"></span>
 <img src="10_dl_cnn_files/figure-html/cnnheatmapfinal-1.svg" alt="Confusion matrix for final CNN model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">

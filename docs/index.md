@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-09-25"
+date: "2021-10-02"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
@@ -14,6 +14,8 @@ monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 github-repo: EmilHvitfeldt/smltar
 description: "Supervised Machine Learning for Text Analysis in R"
+cover-image: cover.jpg
+url: https://smltar.com
 graphics: yes
 ---
 
