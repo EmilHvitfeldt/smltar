@@ -789,7 +789,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 
 Now we have everything we need for hyperparameter searching. Load up **tfruns** and pass the name of the file we just created along with `hyperparams` to the `tuning_run()` function.
 
-```{r, results='hide', cache=FALSE, message=FALSE}
+```{r, results='hide', cache=FALSE, message=FALSE, eval=FALSE}
 library(tfruns)
 runs <- tuning_run(
   file = "cnn-spec.R",
@@ -798,6 +798,11 @@ runs <- tuning_run(
 )
 
 runs_results <- as_tibble(ls_runs())
+```
+
+```{r, echo=FALSE, message=FALSE}
+runs_results <- readr::read_csv("inst/runs_results.csv")
+runs_results
 ```
 
 You don't have to, but we have manually specified the `runs_dir` argument, which is where the results of the tuning will be saved.

@@ -1077,6 +1077,28 @@ runs <- tuning_run(
 runs_results <- as_tibble(ls_runs())
 ```
 
+
+```
+#> # A tibble: 9 × 27
+#>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
+#>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
+#> 1 _tuning/2…  1.03       0.0321           0.993           1.03             0.803
+#> 2 _tuning/2…  1.01       0.0348           0.992           1.01             0.810
+#> 3 _tuning/2…  0.992      0.044            0.989           0.992            0.804
+#> 4 _tuning/2…  0.972      0.0286           0.995           0.972            0.814
+#> 5 _tuning/2…  0.924      0.037            0.992           0.924            0.815
+#> 6 _tuning/2…  0.967      0.0414           0.990           0.966            0.810
+#> 7 _tuning/2… NA         NA               NA              NA               NA    
+#> 8 _tuning/2… NA         NA               NA              NA               NA    
+#> 9 _tuning/2… NA         NA               NA              NA               NA    
+#> # … with 21 more variables: flag_kernel_size1 <dbl>, flag_strides1 <dbl>,
+#> #   steps_completed <dbl>, epochs <dbl>, epochs_completed <dbl>, metrics <chr>,
+#> #   model <chr>, loss_function <chr>, optimizer <chr>, learning_rate <dbl>,
+#> #   script <chr>, start <dttm>, end <dttm>, completed <lgl>, output <chr>,
+#> #   error_message <chr>, error_traceback <chr>, source_code <chr>,
+#> #   context <chr>, type <chr>, NA. <dbl>
+```
+
 You don't have to, but we have manually specified the `runs_dir` argument, which is where the results of the tuning will be saved.
 
 A summary of all the runs in the folder can be retrieved with `ls_runs()`; here we use `as_tibble()` to get the results as a tibble.
@@ -1087,19 +1109,23 @@ runs_results
 ```
 
 ```
-#> # A tibble: 6 × 24
+#> # A tibble: 9 × 27
 #>   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #>   <chr>       <dbl>       <dbl>           <dbl>           <dbl>            <dbl>
-#> 1 _tuning/20… 1.00       0.0343           0.992           1.00             0.810
-#> 2 _tuning/20… 0.993      0.0359           0.992           0.993            0.805
-#> 3 _tuning/20… 0.980      0.0487           0.987           0.980            0.807
-#> 4 _tuning/20… 0.957      0.0329           0.993           0.957            0.811
-#> 5 _tuning/20… 0.935      0.0336           0.993           0.935            0.812
-#> 6 _tuning/20… 0.928      0.0502           0.987           0.928            0.806
-#> # … with 18 more variables: flag_kernel_size1 <int>, flag_strides1 <int>,
-#> #   epochs <int>, epochs_completed <int>, metrics <chr>, model <chr>,
-#> #   loss_function <chr>, optimizer <chr>, learning_rate <dbl>, script <chr>,
-#> #   start <dttm>, end <dttm>, completed <lgl>, output <chr>, source_code <chr>,
+#> 1 _tuning/2…  1.03       0.0321           0.993           1.03             0.803
+#> 2 _tuning/2…  1.01       0.0348           0.992           1.01             0.810
+#> 3 _tuning/2…  0.992      0.044            0.989           0.992            0.804
+#> 4 _tuning/2…  0.972      0.0286           0.995           0.972            0.814
+#> 5 _tuning/2…  0.924      0.037            0.992           0.924            0.815
+#> 6 _tuning/2…  0.967      0.0414           0.990           0.966            0.810
+#> 7 _tuning/2… NA         NA               NA              NA               NA    
+#> 8 _tuning/2… NA         NA               NA              NA               NA    
+#> 9 _tuning/2… NA         NA               NA              NA               NA    
+#> # … with 21 more variables: flag_kernel_size1 <dbl>, flag_strides1 <dbl>,
+#> #   steps_completed <dbl>, epochs <dbl>, epochs_completed <dbl>, metrics <chr>,
+#> #   model <chr>, loss_function <chr>, optimizer <chr>, learning_rate <dbl>,
+#> #   script <chr>, start <dttm>, end <dttm>, completed <lgl>, output <chr>,
+#> #   error_message <chr>, error_traceback <chr>, source_code <chr>,
 #> #   context <chr>, type <chr>, NA. <dbl>
 ```
 
@@ -1115,15 +1141,18 @@ best_runs
 ```
 
 ```
-#> # A tibble: 6 × 3
+#> # A tibble: 9 × 3
 #>   metric_val_accuracy flag_kernel_size1 flag_strides1
-#>                 <dbl>             <int>         <int>
-#> 1               0.812                 5             1
-#> 2               0.811                 7             1
-#> 3               0.810                 7             2
-#> 4               0.807                 3             2
-#> 5               0.806                 3             1
-#> 6               0.805                 5             2
+#>                 <dbl>             <dbl>         <dbl>
+#> 1               0.815                 5             1
+#> 2               0.814                 7             1
+#> 3               0.810                 3             1
+#> 4               0.810                 5             2
+#> 5               0.804                 3             2
+#> 6               0.803                 7             2
+#> 7              NA                     3             1
+#> 8              NA                     3             1
+#> 9              NA                     3             1
 ```
 
 There isn't much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.
@@ -1232,25 +1261,25 @@ cv_fitted %>%
 #> # A tibble: 20 × 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.824
-#>  2 <split [161673/40419]> Fold1 kap         binary         0.646
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.918
+#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.828
+#>  2 <split [161673/40419]> Fold1 kap         binary         0.656
+#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.907
 #>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.874
-#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.827
-#>  6 <split [161673/40419]> Fold2 kap         binary         0.653
-#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.872
-#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.876
+#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.825
+#>  6 <split [161673/40419]> Fold2 kap         binary         0.649
+#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.880
+#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.874
 #>  9 <split [161674/40418]> Fold3 accuracy    binary         0.826
-#> 10 <split [161674/40418]> Fold3 kap         binary         0.652
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.906
-#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.873
-#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.825
-#> 14 <split [161674/40418]> Fold4 kap         binary         0.649
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.912
-#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.873
-#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.827
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.653
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.891
+#> 10 <split [161674/40418]> Fold3 kap         binary         0.650
+#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.868
+#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.875
+#> 13 <split [161674/40418]> Fold4 accuracy    binary         0.823
+#> 14 <split [161674/40418]> Fold4 kap         binary         0.647
+#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.894
+#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.872
+#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.825
+#> 18 <split [161674/40418]> Fold5 kap         binary         0.650
+#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.877
 #> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.875
 ```
 
@@ -1272,10 +1301,10 @@ cv_fitted %>%
 #> # A tibble: 4 × 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.826     5 0.000623
-#> 2 kap         0.651     5 0.00132 
-#> 3 mn_log_loss 0.900     5 0.00825 
-#> 4 roc_auc     0.874     5 0.000535
+#> 1 accuracy    0.825     5 0.000821
+#> 2 kap         0.650     5 0.00155 
+#> 3 mn_log_loss 0.885     5 0.00686 
+#> 4 roc_auc     0.874     5 0.000577
 ```
 
 The metrics have little variance just like they did last time, which is reassuring; our model is robust with respect to the evaluation metrics. 
@@ -1353,10 +1382,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03318
-#>     accuracy: 0.9929
-#>     val_loss: 0.776
-#> val_accuracy: 0.8523
+#>         loss: 0.03222
+#>     accuracy: 0.9933
+#>     val_loss: 0.7509
+#> val_accuracy: 0.8553
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -1373,10 +1402,10 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.849
-#> 2 kap         binary         0.697
-#> 3 mn_log_loss binary         0.792
-#> 4 roc_auc     binary         0.892
+#> 1 accuracy    binary         0.850
+#> 2 kap         binary         0.699
+#> 3 mn_log_loss binary         0.788
+#> 4 roc_auc     binary         0.894
 ```
 
 This is our best-performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:cnnfinalroc).
