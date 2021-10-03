@@ -606,11 +606,11 @@ collect_metrics(lemma_rs)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
-collect_metrics_lemma_rs.csv <- readr::read_csv("inst/collect_metrics_lemma_rs.csv")
-collect_metrics_lemma_rs.csv
+collect_metrics_lemma_rs <- readr::read_csv("inst/collect_metrics_lemma_rs.csv")
+collect_metrics_lemma_rs
 ```
 
-The best value for RMSE at `r collect_metrics_lemma_rs.csv %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over 10-fold.\index{computational speed}
+The best value for RMSE at `r collect_metrics_lemma_rs %>% filter(.metric == "rmse") %>% pull(mean) %>% round(1)` shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to `r first_attemp_rmse` from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over 10-fold.\index{computational speed}
 
 ```{block, type="rmdnote"}
 We can use `engine = "spacyr"` to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this [**textrecipes** blogpost](https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/) and can be performed with `step_pos_filter()`.
