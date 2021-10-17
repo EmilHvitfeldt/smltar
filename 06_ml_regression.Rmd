@@ -515,18 +515,36 @@ trigram_rs <- fit_ngram(list(n = 3, n_min = 1))
 
 These sets of results contain metrics computed for the model with that tokenization strategy.\index{tokenization!n-gram}
 
-```{r dependson="ngramrs"}
+```{r dependson="ngramrs", eval=FALSE}
 collect_metrics(bigram_rs)
+```
+
+```{r, echo=FALSE, message=FALSE}
+readr::read_csv("inst/collect_metrics_bigram_rs.csv")
 ```
 
 We can compare the performance of these models in terms of RMSE as shown Figure \@ref(fig:ngramrmse).
 
-```{r ngramrmse, dependson="ngramrs", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams"}
+```{r, dependson="ngramrs", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams", eval=FALSE}
 list(`1` = unigram_rs,
      `1 and 2` = bigram_rs,
      `1, 2, and 3` = trigram_rs) %>%
   map_dfr(collect_metrics, .id = "name") %>%
   filter(.metric == "rmse") %>%
+  ggplot(aes(name, mean, color = name)) +
+  geom_crossbar(aes(ymin = mean - std_err, ymax = mean + std_err), alpha = 0.6) +
+  geom_point(size = 3, alpha = 0.8) +
+  theme(legend.position = "none") +
+  labs(
+    x = "Degree of n-grams",
+    y = "RMSE",
+    title = "Model performance for different degrees of n-gram tokenization",
+    subtitle = "For the same number of tokens, unigrams performed best"
+  )
+```
+
+```{r ngramrmse, dependson="ngramrs", fig.cap="Comparing model performance for predicting the year of Supreme Court opinions with three different degrees of n-grams", echo=FALSE, message=FALSE}
+readr::read_csv("inst/collect_metrics_all_ngram.csv") %>%
   ggplot(aes(name, mean, color = name)) +
   geom_crossbar(aes(ymin = mean - std_err, ymax = mean + std_err), alpha = 0.6) +
   geom_point(size = 3, alpha = 0.8) +
