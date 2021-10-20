@@ -760,10 +760,11 @@ These sets of results contain metrics computed for the model with that tokenizat
 collect_metrics(bigram_rs)
 ```
 
+
 ```
 #> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
-#>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
+#>   <chr>   <chr>       <dbl> <dbl>   <dbl> <chr>               
 #> 1 rmse    standard   15.9      10 0.225   Preprocessor1_Model1
 #> 2 rsq     standard    0.892    10 0.00240 Preprocessor1_Model1
 ```
