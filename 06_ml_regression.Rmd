@@ -142,6 +142,21 @@ svm_fit %>%
   arrange(-estimate)
 ```
 
+```{r echo=FALSE, dependson="svmfit"}
+test_words1 <- 
+  svm_fit %>%
+  extract_fit_parsnip() %>%
+  tidy() %>%
+  slice_max(estimate, n = 10) %>%
+  mutate(term = str_remove(term, "tfidf_text_")) %>%
+  pull(term)
+
+if (!all(c("appeals", "petitioner") %in% test_words1)) {
+  rlang::abort('In Chapter 6 on regression, tidied SVM terms (more recent) do not match previous results.')
+}
+```
+
+
 The term `Bias` here means the same thing as an intercept. We see here what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
 
 What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?
@@ -151,6 +166,20 @@ svm_fit %>%
   pull_workflow_fit() %>%
   tidy() %>%
   arrange(estimate)
+```
+
+```{r echo=FALSE, dependson="svmfit"}
+test_words2 <- 
+  svm_fit %>%
+  extract_fit_parsnip() %>%
+  tidy() %>%
+  slice_max(-estimate, n = 10) %>%
+  mutate(term = str_remove(term, "tfidf_text_")) %>%
+  pull(term)
+
+if (!all(c("ought", "therefore") %in% test_words2)) {
+  rlang::abort('In Chapter 6 on regression, tidied SVM terms (older) do not match previous results.')
+}
 ```
 
 Here we see words like "ought" and "therefore".
@@ -904,7 +933,9 @@ final_grid <- grid_regular(
 final_grid
 ```
 
-Now it's time for tuning. Instead of using `fit_resamples()` as we have throughout this chapter, we are going to use `tune_grid()`, a function that has a very similar set of arguments. We pass this function our workflow (which holds our preprocessing recipe and SVM model), our resampling folds, and also the grid of possible parameter values to try. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
+
+
+
 
 ```{r finalscotusrsoffline, dependson=c("finalscotusgrid", "tunescotuswf", "finalscotusrec", "scotusfolds")}
 final_rs <- tune_grid(
@@ -941,13 +972,19 @@ final_rs %>%
 
 Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be one of the ones with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
 
-Let's choose by percent loss compared to the best model, with the default 2% loss.
+Let's choose by percent loss compared to the best model, with a limit of 3% loss.
 
 ```{r chosenmae, dependson="finalscotusrs"}
 chosen_mae <- final_rs %>%
-  select_by_pct_loss(metric = "mae", max_tokens)
+  select_by_pct_loss(metric = "mae", max_tokens, limit = 3)
 
 chosen_mae
+```
+
+```{r echo=FALSE, dependson=c("finalscotusrs")}
+if (!chosen_mae$max_tokens == 3000) {
+  rlang::abort('In Chapter 6 on regression, chosen max_tokens is not 3000.')
+}
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -1008,7 +1045,42 @@ scotus_fit %>%
   )
 ```
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.
+```{r echo=FALSE, dependson=c("scotusfinalwf", "scotussplit")}
+scotus_vip <-
+  scotus_fit %>%
+  tidy() %>%
+  filter(term != "Bias") %>%
+  mutate(
+    sign = case_when(estimate > 0 ~ "Later",
+                     TRUE ~ "Earlier"),
+    estimate = abs(estimate),
+    term = str_remove_all(term, "tfidf_text_")
+  ) %>%
+  group_by(sign) %>%
+  top_n(20, estimate) %>%
+  ungroup()
+
+later_words <-
+  scotus_vip %>%
+  filter(sign == "Later") %>%
+  pull(term)
+
+earlier_words <-
+  scotus_vip %>%
+  filter(sign == "Earlier") %>%
+  pull(term)
+
+
+if (!all(c("citizenship", "court said") %in% later_words)) {
+  rlang::abort('In Chapter 6 on regression, the "later" words have changed.')
+}
+
+if (!all(c("ought", "therefore") %in% earlier_words)) {
+  rlang::abort('In Chapter 6 on regression, the "earlier" words have changed.')
+}
+```
+
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "constitutionally," are associated with higher, later years; those that contribute in the negative direction, like "ought" and "therefore," are associated with lower, earlier years for these Supreme Court opinions.
 
 ```{block, type = "rmdnote"}
 Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
@@ -1045,6 +1117,21 @@ There isn't too much training data to start with for the earliest years, so we a
 scotus_bind %>%
   arrange(-year) %>%
   select(year, .pred, case_name, text)
+```
+
+```{r echo=FALSE}
+top_cases <-
+  scotus_bind %>%
+  slice_max(year, n = 10) %>%
+  pull(case_name)
+
+if (!"Dalehite v. United States" %in% top_cases) {
+  rlang::abort('In Chapter 6 on regression, "Dalehite v. United States" is missing.')
+}
+
+if (!"Bush v. Palm Beach County Canvassing Bd." %in% top_cases) {
+  rlang::abort('In Chapter 6 on regression, "Bush v. Palm Beach County" is missing.')
+}
 ```
 
 There are some interesting examples here where we can understand why the model would mispredict:
