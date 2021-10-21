@@ -141,7 +141,7 @@ slide_windows <- function(tbl, window_size) {
   out <- map2(skipgrams,
               1:length(skipgrams),
               ~ safe_mutate(.x, window_id = .y))
-
+  
   out %>%
     transpose() %>%
     pluck("result") %>%
@@ -225,9 +225,9 @@ nearest_neighbors <- function(df, token) {
         y <- .[rep(token, nrow(.)), ]
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
-
+        
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
-        },
+      },
       sort = TRUE
     )(item1, dimension, value) %>%
     select(-item2)
@@ -240,7 +240,19 @@ What words are closest to `"error"` in the data set of CFPB complaints, as deter
 
 ```{r dependson=c("tidywordvectors", "nearestsynonyms")}
 tidy_word_vectors %>%
-    nearest_neighbors("error")
+  nearest_neighbors("error")
+```
+
+```{r echo=FALSE, dependson=c("tidywordvectors", "nearestsynonyms")}
+test_words1 <- 
+  tidy_word_vectors %>%
+  nearest_neighbors("error") %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("mistake", "problem", "glitch") %in% test_words1)) {
+  rlang::abort('In Chapter 5 on word embeddings, words closest to "error" do not match previous results.')
+}
 ```
 
 Mistakes, problems, glitches -- sounds bad!
@@ -249,8 +261,21 @@ What is closest to the word `"month"`?
 
 ```{r dependson=c("tidywordvectors", "nearestsynonyms")}
 tidy_word_vectors %>%
-    nearest_neighbors("month")
+  nearest_neighbors("month")
 ```
+
+```{r echo=FALSE, dependson=c("tidywordvectors", "nearestsynonyms")}
+test_words2 <- 
+  tidy_word_vectors %>%
+  nearest_neighbors("month") %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("installments", "payment", "year", "week", "monthly", "months") %in% test_words2)) {
+  rlang::abort('In Chapter 5 on word embeddings, words closest to "month" do not match previous results.')
+}
+```
+
 
 We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter \@ref(stemming)), but the word embeddings learned that "month", "months", and "monthly" belong together.
 
@@ -258,7 +283,7 @@ What words are closest in this embedding space to `"fee"`?
 
 ```{r dependson=c("tidywordvectors", "nearestsynonyms")}
 tidy_word_vectors %>%
-    nearest_neighbors("fee")
+  nearest_neighbors("fee")
 ```
 
 We find a lot of dollar amounts, which makes sense. Let us filter out the numbers to see what non-dollar words are similar to "fee".
@@ -269,29 +294,64 @@ tidy_word_vectors %>%
   filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE))
 ```
 
+```{r echo=FALSE, dependson=c("tidywordvectors", "nearestsynonyms")}
+test_words3 <- 
+  tidy_word_vectors %>%
+  nearest_neighbors("fee") %>%
+  filter(str_detect(item1, "[0-9]*.[0-9]{2}", negate = TRUE)) %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("fees", "overdraft", "charge") %in% test_words3)) {
+  rlang::abort('In Chapter 5 on word embeddings, words closest to "fee" do not match previous results.')
+}
+```
+
+
 We now find words about overdrafts and charges. The top two words are "fee" and "fees"; word embeddings can learn that singular and plural\index{singular versus plural} forms of words are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD\index{SVD} used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
+```{r echo=FALSE, dependson="tidywordvectors"}
+test_words4 <-
+  tidy_word_vectors %>%
+  filter(dimension <= 24) %>%
+  group_by(dimension) %>%
+  top_n(12, abs(value)) %>%
+  ungroup()
+
+dim12 <- test_words4 %>% filter(dimension == 12) %>% pull(item1)
+dim09 <- test_words4 %>% filter(dimension == 9) %>% pull(item1)
+
+if (!all(c("regarding", "contacted", "called") %in% dim12)) {
+  rlang::abort('In Chapter 5 on word embeddings, component 12 of word vectors has changed.')
+}
+
+if (!all(c("deceptive", "predatory", "unethical") %in% dim09)) {
+  rlang::abort('In Chapter 5 on word embeddings, component 12 of word vectors has changed.')
+}
+```
+
+
 ```{r embeddingpca, dependson="tidywordvectors", fig.width=8, fig.asp = 1.5, fig.cap="Word embeddings for Consumer Finance Protection Bureau complaints"}
 tidy_word_vectors %>%
-    filter(dimension <= 24) %>%
-    group_by(dimension) %>%
-    top_n(12, abs(value)) %>%
-    ungroup %>%
-    mutate(item1 = reorder_within(item1, value, dimension)) %>%
-    ggplot(aes(item1, value, fill = dimension)) +
-    geom_col(alpha = 0.8, show.legend = FALSE) +
-    facet_wrap(~dimension, scales = "free_y", ncol = 4) +
-    scale_x_reordered() +
-    coord_flip() +
-    labs(
-      x = NULL,
-      y = "Value",
-      title = "First 24 principal components for text of CFPB complaints",
-      subtitle = paste("Top words contributing to the components that explain",
-                       "the most variation")
-    )
+  filter(dimension <= 24) %>%
+  group_by(dimension) %>%
+  top_n(12, abs(value)) %>%
+  ungroup() %>%
+  mutate(item1 = reorder_within(item1, value, dimension)) %>%
+  ggplot(aes(item1, value, fill = dimension)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~dimension, scales = "free_y", ncol = 4) +
+  scale_x_reordered() +
+  coord_flip() +
+  labs(
+    x = NULL,
+    y = "Value",
+    title = "First 24 principal components for text of CFPB complaints",
+    subtitle = paste("Top words contributing to the components that explain",
+                     "the most variation")
+  )
 ```
 
 It becomes very clear in Figure \@ref(fig:embeddingpca) that stop words have not been removed, but notice that we can learn meaningful relationships in how very common words are used. Component 12 shows us how common prepositions are often used with words like `"regarding"`, `"contacted"`, and `"called"`, while component 9 highlights the use of *different* common words when submitting a complaint about unethical, predatory, and/or deceptive practices. Stop words do carry information, and methods like determining word embeddings can make that information usable.
@@ -363,7 +423,7 @@ nearest_neighbors <- function(df, token) {
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
-        },
+      },
       sort = TRUE,
       maximum_size = NULL
     )(item1, dimension, value) %>%
@@ -375,16 +435,40 @@ nearest_neighbors <- function(df, token) {
 
 ```{r dependson=c("tidyglove", "nearestsynonyms2")}
 tidy_glove %>%
-    nearest_neighbors("error")
+  nearest_neighbors("error")
 ```
 
-Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
+```{r echo=FALSE, dependson=c("tidyglove", "nearestsynonyms2")}
+test_words5 <- 
+  tidy_glove %>%
+  nearest_neighbors("error") %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("correct", "incorrect") %in% test_words5)) {
+  rlang::abort('In Chapter 5 on word embeddings, GloVe words closest to "error" do not match previous results.')
+}
+```
+
+Instead of the more specific clerical mistakes and discrepancies in the CFPB embeddings, we now see more general words about being correct or incorrect. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
 
 What is closest to the word `"month"` in these pre-trained \index{embeddings!GloVe}GloVe embeddings?\index{embeddings!pre-trained}
 
 ```{r dependson=c("tidyglove", "nearestsynonyms2")}
 tidy_glove %>%
-    nearest_neighbors("month")
+  nearest_neighbors("month")
+```
+
+```{r echo=FALSE, dependson=c("tidyglove", "nearestsynonyms2")}
+test_words6 <- 
+  tidy_glove %>%
+  nearest_neighbors("month") %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("week", "year") %in% test_words6)) {
+  rlang::abort('In Chapter 5 on word embeddings, GloVe words closest to "month" do not match previous results.')
+}
 ```
 
 Instead of words about payments, the GloVe results here focus on different time periods only.
@@ -393,7 +477,19 @@ What words are closest in the \index{embeddings!GloVe}GloVe embedding space to `
 
 ```{r dependson=c("tidyglove", "nearestsynonyms2")}
 tidy_glove %>%
-    nearest_neighbors("fee")
+  nearest_neighbors("fee")
+```
+
+```{r echo=FALSE, dependson=c("tidyglove", "nearestsynonyms2")}
+test_words7 <- 
+  tidy_glove %>%
+  nearest_neighbors("fee") %>%
+  slice_max(value, n = 10) %>%
+  pull(item1)
+
+if (!all(c("payment", "pay", "salary") %in% test_words7)) {
+  rlang::abort('In Chapter 5 on word embeddings, GloVe words closest to "fee" do not match previous results.')
+}
 ```
 
 The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.
@@ -440,7 +536,7 @@ The package **wordsalad** [@R-wordsalad] provides a unified interface for findin
 ## Fairness and word embeddings {#fairnessembeddings}
 
 Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias.\index{bias}
- 
+
 \index{corpus}
 ```{block, type = "rmdwarning"}
 Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings. 
