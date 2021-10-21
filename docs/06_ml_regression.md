@@ -112,7 +112,7 @@ scotus_rec
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
@@ -219,6 +219,9 @@ svm_fit %>%
 #> # … with 991 more rows
 ```
 
+
+
+
 The term `Bias` here means the same thing as an intercept. We see here what terms contribute to a Supreme Court opinion being written more recently, like "appeals" and "petitioner". 
 
 What terms contribute to a Supreme Court opinion being written further in the past, for this first attempt at a model?
@@ -247,6 +250,8 @@ svm_fit %>%
 #> 10 tfidf_text_be           -1.33
 #> # … with 991 more rows
 ```
+
+
 
 Here we see words like "ought" and "therefore".
 
@@ -497,8 +502,8 @@ collect_metrics(rf_rs)
 #> # A tibble: 2 × 6
 #>   .metric .estimator   mean     n std_err .config             
 #>   <chr>   <chr>       <dbl> <int>   <dbl> <chr>               
-#> 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
-#> 2 rsq     standard    0.919    10 0.00283 Preprocessor1_Model1
+#> 1 rmse    standard   15.0      10 0.262   Preprocessor1_Model1
+#> 2 rsq     standard    0.919    10 0.00280 Preprocessor1_Model1
 ```
 
 This looks pretty promising, so let's explore the predictions for this random forest model.
@@ -562,7 +567,7 @@ stopword_rec("snowball")
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
@@ -862,7 +867,13 @@ Lemmatization is, like choices around n-grams and stop words, part of data prepr
 
 ```r
 spacyr::spacy_initialize(entity = FALSE)
+```
 
+```
+#> NULL
+```
+
+```r
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
@@ -874,7 +885,7 @@ lemma_rec
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
@@ -1304,7 +1315,7 @@ final_rec
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
@@ -1401,7 +1412,9 @@ final_grid
 #> 6       6000
 ```
 
-Now it's time for tuning. Instead of using `fit_resamples()` as we have throughout this chapter, we are going to use `tune_grid()`, a function that has a very similar set of arguments. We pass this function our workflow (which holds our preprocessing recipe and SVM model), our resampling folds, and also the grid of possible parameter values to try. Let's save the predictions so we can explore them in more detail, and let's also set custom metrics instead of using the defaults. Let's compute RMSE, mean absolute error, and mean absolute percent error during tuning.
+
+
+
 
 
 ```r
@@ -1463,12 +1476,12 @@ final_rs %>%
 
 Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be one of the ones with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance. 
 
-Let's choose by percent loss compared to the best model, with the default 2% loss.
+Let's choose by percent loss compared to the best model, with a limit of 3% loss.
 
 
 ```r
 chosen_mae <- final_rs %>%
-  select_by_pct_loss(metric = "mae", max_tokens)
+  select_by_pct_loss(metric = "mae", max_tokens, limit = 3)
 
 chosen_mae
 ```
@@ -1477,8 +1490,10 @@ chosen_mae
 #> # A tibble: 1 × 9
 #>   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #>        <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>            <dbl> <dbl>
-#> 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795
+#> 1       3000 mae     standard    10.2    10  0.0664 Preprocessor3_M…  9.98  2.69
 ```
+
+
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
 
@@ -1529,8 +1544,8 @@ collect_metrics(final_fitted)
 #> # A tibble: 2 × 4
 #>   .metric .estimator .estimate .config             
 #>   <chr>   <chr>          <dbl> <chr>               
-#> 1 rmse    standard      13.8   Preprocessor1_Model1
-#> 2 rsq     standard       0.921 Preprocessor1_Model1
+#> 1 rmse    standard      14.1   Preprocessor1_Model1
+#> 2 rsq     standard       0.917 Preprocessor1_Model1
 ```
 
 The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.
@@ -1573,7 +1588,9 @@ scotus_fit %>%
 <p class="caption">(\#fig:scotusvip)Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier</p>
 </div>
 
-The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.
+
+
+The tokens (unigrams or bigrams) that contribute in the positive direction, like "court said" and "constitutionally," are associated with higher, later years; those that contribute in the negative direction, like "ought" and "therefore," are associated with lower, earlier years for these Supreme Court opinions.
 
 <div class="rmdnote">
 <p>Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.</p>
@@ -1621,21 +1638,23 @@ scotus_bind %>%
 ```
 
 ```
-#> # A tibble: 168 × 4
-#>     year .pred case_name                                text                    
-#>    <dbl> <dbl> <chr>                                    <chr>                   
-#>  1  2009 2055. Nijhawan v. Holder                       "Supreme Court of Unite…
-#>  2  2008 1957. Green v. Johnson                         "                 Cite …
-#>  3  2008 1952. Dalehite v. United States                "Supreme Court of Unite…
-#>  4  2008 1982. Preston v. Ferrer                        "Supreme Court of Unite…
-#>  5  2007 1876. Quebec Bank of Toronto v. Hellman        "Supreme Court of Unite…
-#>  6  2004 2035. Illinois v. Lidster                      "No. 02-1060.\nPolice s…
-#>  7  2002 1969. Borgner v. Florida Board of Dentistry    "No. 02-165.\nCERTIORAR…
-#>  8  2000 1974. Ohler v. United States                   "OHLERv.UNITED STATES\n…
-#>  9  2000 1955. Bush v. Palm Beach County Canvassing Bd. "No. 00-836\nON WRIT OF…
-#> 10  1999 1964. Dickinson v. Zurko                       "No. 98 377\nQ. TODD DI…
-#> # … with 158 more rows
+#> # A tibble: 157 × 4
+#>     year .pred case_name                      text                              
+#>    <dbl> <dbl> <chr>                          <chr>                             
+#>  1  2009 2070. Nijhawan v. Holder             "Supreme Court of United States.\…
+#>  2  2008 1967. Green v. Johnson               "                 Cite as: 553 U.…
+#>  3  2008 1959. Dalehite v. United States      "Supreme Court of United States.\…
+#>  4  2007 1873. Quebec Bank of Toronto v. Hel… "Supreme Court of United States.\…
+#>  5  2004 2032. Illinois v. Lidster            "No. 02-1060.\nPolice set up a hi…
+#>  6  2000 1953. Bush v. Palm Beach County Can… "No. 00-836\nON WRIT OF CERTIORAR…
+#>  7  1999 1972. Dickinson v. Zurko             "No. 98 377\nQ. TODD DICKINSON,  …
+#>  8  1998 1960. Dooley v. Korean Air Lines Co. "No. 97-704.\n\n        Syllabus\…
+#>  9  1996 1953. United States v. State of Mai… "No. 35, Original.\non exception …
+#> 10  1996 1958. INS v. Yueh-Shaio Yang         "United States Supreme Court.\n*2…
+#> # … with 147 more rows
 ```
+
+
 
 There are some interesting examples here where we can understand why the model would mispredict:
 

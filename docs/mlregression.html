@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 6 Regression | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-10-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="mloverview.html"/>
 <link rel="next" href="mlclassification.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -540,7 +540,7 @@ The <strong>recipes</strong> package <span class="citation">(<a href="#ref-R-rec
 <span id="cb151-7"><a href="mlregression.html#cb151-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
 <span id="cb151-8"><a href="mlregression.html#cb151-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb151-9"><a href="mlregression.html#cb151-9" aria-hidden="true" tabindex="-1"></a>scotus_rec</span></code></pre></div>
-<pre><code>#&gt; Data Recipe
+<pre><code>#&gt; Recipe
 #&gt; 
 #&gt; Inputs:
 #&gt; 
@@ -818,8 +818,8 @@ A null model is a simple, non-informative model that always predicts the largest
 <pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard   15.0      10 0.264   Preprocessor1_Model1
-#&gt; 2 rsq     standard    0.919    10 0.00283 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard   15.0      10 0.262   Preprocessor1_Model1
+#&gt; 2 rsq     standard    0.919    10 0.00280 Preprocessor1_Model1</code></pre>
 <p>This looks pretty promising, so let’s explore the predictions for this random forest model.</p>
 <div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="mlregression.html#cb179-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(rf_rs) <span class="sc">%&gt;%</span></span>
 <span id="cb179-2"><a href="mlregression.html#cb179-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, .pred, <span class="at">color =</span> id)) <span class="sc">+</span></span>
@@ -863,7 +863,7 @@ Models that work best with text tend to be models designed for or otherwise appr
 <span id="cb180-8"><a href="mlregression.html#cb180-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>For example, now we can create a recipe that removes the Snowball stop words list by calling this function.</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb181-1"><a href="mlregression.html#cb181-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopword_rec</span>(<span class="st">&quot;snowball&quot;</span>)</span></code></pre></div>
-<pre><code>#&gt; Data Recipe
+<pre><code>#&gt; Recipe
 #&gt; 
 #&gt; Inputs:
 #&gt; 
@@ -1190,17 +1190,17 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 </ul>
 <p>Using lemmatization instead of a more straightforward tokenization strategy is slower because of the increased complexity involved, but it can be worth it. Let’s explore how to train a model using <em>lemmas</em> instead of <em>words</em>.</p>
 <p>Lemmatization is, like choices around n-grams and stop words, part of data preprocessing so we define how to set up lemmatization as part of our preprocessing recipe. We use <code>engine = "spacyr"</code> for tokenization (instead of the default) and add <code>step_lemma()</code> to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="mlregression.html#cb197-1" aria-hidden="true" tabindex="-1"></a>spacyr<span class="sc">::</span><span class="fu">spacy_initialize</span>(<span class="at">entity =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb197-2"><a href="mlregression.html#cb197-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb197-3"><a href="mlregression.html#cb197-3" aria-hidden="true" tabindex="-1"></a>lemma_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
-<span id="cb197-4"><a href="mlregression.html#cb197-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text, <span class="at">engine =</span> <span class="st">&quot;spacyr&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb197-5"><a href="mlregression.html#cb197-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_lemma</span>(text) <span class="sc">%&gt;%</span></span>
-<span id="cb197-6"><a href="mlregression.html#cb197-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> <span class="fl">1e3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb197-7"><a href="mlregression.html#cb197-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(text) <span class="sc">%&gt;%</span></span>
-<span id="cb197-8"><a href="mlregression.html#cb197-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
-<span id="cb197-9"><a href="mlregression.html#cb197-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb197-10"><a href="mlregression.html#cb197-10" aria-hidden="true" tabindex="-1"></a>lemma_rec</span></code></pre></div>
-<pre><code>#&gt; Data Recipe
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="mlregression.html#cb197-1" aria-hidden="true" tabindex="-1"></a>spacyr<span class="sc">::</span><span class="fu">spacy_initialize</span>(<span class="at">entity =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<pre><code>#&gt; NULL</code></pre>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="mlregression.html#cb199-1" aria-hidden="true" tabindex="-1"></a>lemma_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
+<span id="cb199-2"><a href="mlregression.html#cb199-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text, <span class="at">engine =</span> <span class="st">&quot;spacyr&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb199-3"><a href="mlregression.html#cb199-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_lemma</span>(text) <span class="sc">%&gt;%</span></span>
+<span id="cb199-4"><a href="mlregression.html#cb199-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> <span class="fl">1e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb199-5"><a href="mlregression.html#cb199-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(text) <span class="sc">%&gt;%</span></span>
+<span id="cb199-6"><a href="mlregression.html#cb199-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb199-7"><a href="mlregression.html#cb199-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb199-8"><a href="mlregression.html#cb199-8" aria-hidden="true" tabindex="-1"></a>lemma_rec</span></code></pre></div>
+<pre><code>#&gt; Recipe
 #&gt; 
 #&gt; Inputs:
 #&gt; 
@@ -1216,12 +1216,12 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 #&gt; Term frequency-inverse document frequency with text
 #&gt; Centering and scaling for all_predictors()</code></pre>
 <p>Let’s combine this lemmatized text with our linear SVM workflow. We can then fit our workflow to our resampled data sets and estimate performance using lemmatization.</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb199-1"><a href="mlregression.html#cb199-1" aria-hidden="true" tabindex="-1"></a>lemma_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb199-2"><a href="mlregression.html#cb199-2" aria-hidden="true" tabindex="-1"></a>  svm_wf <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(lemma_rec),</span>
-<span id="cb199-3"><a href="mlregression.html#cb199-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds</span>
-<span id="cb199-4"><a href="mlregression.html#cb199-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="mlregression.html#cb201-1" aria-hidden="true" tabindex="-1"></a>lemma_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb201-2"><a href="mlregression.html#cb201-2" aria-hidden="true" tabindex="-1"></a>  svm_wf <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(lemma_rec),</span>
+<span id="cb201-3"><a href="mlregression.html#cb201-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds</span>
+<span id="cb201-4"><a href="mlregression.html#cb201-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>How did this model perform?</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="mlregression.html#cb200-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(lemma_rs)</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="mlregression.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(lemma_rs)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric .estimator   mean     n std_err .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;               
@@ -1262,21 +1262,21 @@ Hashing functions are typically very fast and have certain properties. For examp
 <p>Suppose we have many country names in a character vector.
 We can apply the hashing function to each of the country names to project them into an integer space defined by the hashing function.</p>
 <p>Since <code>hash()</code> creates hashes that are very long, let’s create <code>small_hash()</code> for demonstration purposes here that generates slightly smaller hashes. (The specific details of what hashes are generated are not important here.)</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb202-1"><a href="mlregression.html#cb202-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
-<span id="cb202-2"><a href="mlregression.html#cb202-2" aria-hidden="true" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Palau&quot;</span>, <span class="st">&quot;Luxembourg&quot;</span>, <span class="st">&quot;Vietnam&quot;</span>, <span class="st">&quot;Guam&quot;</span>, <span class="st">&quot;Argentina&quot;</span>,</span>
-<span id="cb202-3"><a href="mlregression.html#cb202-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;Mayotte&quot;</span>, <span class="st">&quot;Bouvet Island&quot;</span>, <span class="st">&quot;South Korea&quot;</span>, <span class="st">&quot;San Marino&quot;</span>,</span>
-<span id="cb202-4"><a href="mlregression.html#cb202-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;American Samoa&quot;</span>)</span>
-<span id="cb202-5"><a href="mlregression.html#cb202-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb202-6"><a href="mlregression.html#cb202-6" aria-hidden="true" tabindex="-1"></a>small_hash <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb202-7"><a href="mlregression.html#cb202-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strtoi</span>(<span class="fu">substr</span>(<span class="fu">hash</span>(x), <span class="dv">26</span>, <span class="dv">32</span>), <span class="dv">16</span>)</span>
-<span id="cb202-8"><a href="mlregression.html#cb202-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb202-9"><a href="mlregression.html#cb202-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb202-10"><a href="mlregression.html#cb202-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(countries, small_hash)</span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="mlregression.html#cb204-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
+<span id="cb204-2"><a href="mlregression.html#cb204-2" aria-hidden="true" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Palau&quot;</span>, <span class="st">&quot;Luxembourg&quot;</span>, <span class="st">&quot;Vietnam&quot;</span>, <span class="st">&quot;Guam&quot;</span>, <span class="st">&quot;Argentina&quot;</span>,</span>
+<span id="cb204-3"><a href="mlregression.html#cb204-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;Mayotte&quot;</span>, <span class="st">&quot;Bouvet Island&quot;</span>, <span class="st">&quot;South Korea&quot;</span>, <span class="st">&quot;San Marino&quot;</span>,</span>
+<span id="cb204-4"><a href="mlregression.html#cb204-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;American Samoa&quot;</span>)</span>
+<span id="cb204-5"><a href="mlregression.html#cb204-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb204-6"><a href="mlregression.html#cb204-6" aria-hidden="true" tabindex="-1"></a>small_hash <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb204-7"><a href="mlregression.html#cb204-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strtoi</span>(<span class="fu">substr</span>(<span class="fu">hash</span>(x), <span class="dv">26</span>, <span class="dv">32</span>), <span class="dv">16</span>)</span>
+<span id="cb204-8"><a href="mlregression.html#cb204-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb204-9"><a href="mlregression.html#cb204-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb204-10"><a href="mlregression.html#cb204-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(countries, small_hash)</span></code></pre></div>
 <pre><code>#&gt;  [1]   4292706   2881716 242176357 240902473 204438359  88787026 230339508
 #&gt;  [8]  15112074  96146649 192775182</code></pre>
 <p>Our <code>small_hash()</code> function uses <code>7 * 4 = 28</code> bits, so the number of possible values is <code>2^28 = 268435456</code>. This is admittedly not much of an improvement over 10 country names.
 Let’s take the modulo of these big integer values to project them down to a more manageable space.</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="mlregression.html#cb204-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(countries, small_hash) <span class="sc">%%</span> <span class="dv">24</span></span></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="mlregression.html#cb206-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(countries, small_hash) <span class="sc">%%</span> <span class="dv">24</span></span></code></pre></div>
 <pre><code>#&gt;  [1] 18 12 13  1 23 10 12 18  9  6</code></pre>
 <p>Now we can use these values as indices when creating a matrix.</p>
 <pre><code>#&gt; 10 x 24 sparse Matrix of class &quot;ngCMatrix&quot;
@@ -1316,18 +1316,18 @@ We cannot directly connect model values to words or tokens at all.
 We could go back to our training set and create a paired list of the tokens and what hashes they map to. Sometimes we might find only one token in that list, but it may have two (or three or four or more!) different tokens contributing.
 This feature hashing method is used because of its speed and scalability, not because it is interpretable.</p>
 <p>Feature hashing on tokens is available in tidymodels using the <code>step_texthash()</code> step from <strong>textrecipes</strong>. Let’s <code>prep()</code> and <code>bake()</code> this recipe for demonstration purposes.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="mlregression.html#cb207-1" aria-hidden="true" tabindex="-1"></a>scotus_hash <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
-<span id="cb207-2"><a href="mlregression.html#cb207-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text) <span class="sc">%&gt;%</span></span>
-<span id="cb207-3"><a href="mlregression.html#cb207-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_texthash</span>(text, <span class="at">signed =</span> <span class="cn">TRUE</span>, <span class="at">num_terms =</span> <span class="dv">512</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb207-4"><a href="mlregression.html#cb207-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb207-5"><a href="mlregression.html#cb207-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
-<span id="cb207-6"><a href="mlregression.html#cb207-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb207-7"><a href="mlregression.html#cb207-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_hash)</span></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="mlregression.html#cb209-1" aria-hidden="true" tabindex="-1"></a>scotus_hash <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
+<span id="cb209-2"><a href="mlregression.html#cb209-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text) <span class="sc">%&gt;%</span></span>
+<span id="cb209-3"><a href="mlregression.html#cb209-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_texthash</span>(text, <span class="at">signed =</span> <span class="cn">TRUE</span>, <span class="at">num_terms =</span> <span class="dv">512</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb209-4"><a href="mlregression.html#cb209-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb209-5"><a href="mlregression.html#cb209-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bake</span>(<span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
+<span id="cb209-6"><a href="mlregression.html#cb209-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb209-7"><a href="mlregression.html#cb209-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_hash)</span></code></pre></div>
 <pre><code>#&gt; [1] 7500  513</code></pre>
 <p>There are many columns in the results. Let’s take a <code>glimpse()</code> at the first 10 columns.</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="mlregression.html#cb209-1" aria-hidden="true" tabindex="-1"></a>scotus_hash <span class="sc">%&gt;%</span></span>
-<span id="cb209-2"><a href="mlregression.html#cb209-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">num_range</span>(<span class="st">&quot;text_hash00&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb209-3"><a href="mlregression.html#cb209-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="mlregression.html#cb211-1" aria-hidden="true" tabindex="-1"></a>scotus_hash <span class="sc">%&gt;%</span></span>
+<span id="cb211-2"><a href="mlregression.html#cb211-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">num_range</span>(<span class="st">&quot;text_hash00&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb211-3"><a href="mlregression.html#cb211-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code></pre></div>
 <pre><code>#&gt; Rows: 7,500
 #&gt; Columns: 9
 #&gt; $ text_hash001 &lt;dbl&gt; -16, -5, -12, -10, -10, -2, -7, -13, -16, -18, -1, -2, -1…
@@ -1349,31 +1349,31 @@ Consider the German word “schön.”
 The o with an umlaut (two dots over it) is a fairly simple character, but it can be represented in a couple of different ways.
 We can either use a single character <a href="https://www.fileformat.info/info/unicode/char/00f6/index.htm">\U00f6</a> to represent the letter with an umlaut.
 Alternatively, we can use two characters, one for the o and one character to denote the presence of two dots over the previous character <a href="https://www.fileformat.info/info/unicode/char/0308/index.htm">\U0308</a>.</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="mlregression.html#cb211-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="st">&quot;sch\U00f6n&quot;</span></span>
-<span id="cb211-2"><a href="mlregression.html#cb211-2" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="st">&quot;scho\U0308n&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="mlregression.html#cb213-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="st">&quot;sch\U00f6n&quot;</span></span>
+<span id="cb213-2"><a href="mlregression.html#cb213-2" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="st">&quot;scho\U0308n&quot;</span></span></code></pre></div>
 <p>These two strings will print the same for us as human readers.</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="mlregression.html#cb212-1" aria-hidden="true" tabindex="-1"></a>s1</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="mlregression.html#cb214-1" aria-hidden="true" tabindex="-1"></a>s1</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;schön&quot;</code></pre>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="mlregression.html#cb214-1" aria-hidden="true" tabindex="-1"></a>s2</span></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="mlregression.html#cb216-1" aria-hidden="true" tabindex="-1"></a>s2</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;schön&quot;</code></pre>
 <p>However, they are not equal.</p>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="mlregression.html#cb216-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="sc">==</span> s2</span></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="mlregression.html#cb218-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="sc">==</span> s2</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE</code></pre>
 <p>This poses a problem for the avalanche effect, which is needed for feature hashing to perform correctly. The avalanche effect will result in these two words (which should be identical) hashing to completely different values.</p>
-<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="mlregression.html#cb218-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(s1)</span></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="mlregression.html#cb220-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(s1)</span></code></pre></div>
 <pre><code>#&gt; [1] 180735918</code></pre>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="mlregression.html#cb220-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(s2)</span></code></pre></div>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="mlregression.html#cb222-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(s2)</span></code></pre></div>
 <pre><code>#&gt; [1] 3013209</code></pre>
 <p>We can deal with this problem by performing <strong>text normalization</strong> on our text before feeding it into our preprocessing engine.
 One library to perform text normalization is the <strong>stringi</strong> package, which includes many different text normalization methods.
 How these methods work is beyond the scope of this book, but know that the text normalization functions make text like our two versions of “schön” equivalent. We will use <code>stri_trans_nfc()</code> for this example, which performs canonical decomposition, followed by canonical composition, but we could also use <code>textrecipes::step_text_normalize()</code> within a tidymodels recipe for the same task.</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="mlregression.html#cb222-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
-<span id="cb222-2"><a href="mlregression.html#cb222-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb222-3"><a href="mlregression.html#cb222-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stri_trans_nfc</span>(s1) <span class="sc">==</span> <span class="fu">stri_trans_nfc</span>(s2)</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="mlregression.html#cb224-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
+<span id="cb224-2"><a href="mlregression.html#cb224-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb224-3"><a href="mlregression.html#cb224-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stri_trans_nfc</span>(s1) <span class="sc">==</span> <span class="fu">stri_trans_nfc</span>(s2)</span></code></pre></div>
 <pre><code>#&gt; [1] TRUE</code></pre>
-<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="mlregression.html#cb224-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(<span class="fu">stri_trans_nfc</span>(s1))</span></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="mlregression.html#cb226-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(<span class="fu">stri_trans_nfc</span>(s1))</span></code></pre></div>
 <pre><code>#&gt; [1] 180735918</code></pre>
-<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="mlregression.html#cb226-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(<span class="fu">stri_trans_nfc</span>(s2))</span></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="mlregression.html#cb228-1" aria-hidden="true" tabindex="-1"></a><span class="fu">small_hash</span>(<span class="fu">stri_trans_nfc</span>(s2))</span></code></pre></div>
 <pre><code>#&gt; [1] 180735918</code></pre>
 <p>Now we see that the strings are equal after normalization.</p>
 <div class="rmdwarning">
@@ -1391,25 +1391,25 @@ Representing what should be a single token in multiple ways will split the count
 <h2><span class="header-section-number">6.8</span> What evaluation metrics are appropriate?</h2>
 <p>We have focused on using RMSE and <span class="math inline">\(R^2\)</span> as metrics for our models in this chapter, the defaults in the tidymodels framework. Other metrics can also be appropriate for regression models. Another common set of regression metric options are the various flavors of mean absolute error.</p>
 <p>If you know before you fit your model that you want to compute one or more of these metrics, you can specify them in a call to <code>metric_set()</code>. Let’s set up a tuning grid for mean absolute error (<code>mae</code>) and mean absolute percent error (<code>mape</code>).</p>
-<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="mlregression.html#cb228-1" aria-hidden="true" tabindex="-1"></a>lemma_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb228-2"><a href="mlregression.html#cb228-2" aria-hidden="true" tabindex="-1"></a>  svm_wf <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(lemma_rec),</span>
-<span id="cb228-3"><a href="mlregression.html#cb228-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds,</span>
-<span id="cb228-4"><a href="mlregression.html#cb228-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(mae, mape)</span>
-<span id="cb228-5"><a href="mlregression.html#cb228-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="mlregression.html#cb230-1" aria-hidden="true" tabindex="-1"></a>lemma_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb230-2"><a href="mlregression.html#cb230-2" aria-hidden="true" tabindex="-1"></a>  svm_wf <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(lemma_rec),</span>
+<span id="cb230-3"><a href="mlregression.html#cb230-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds,</span>
+<span id="cb230-4"><a href="mlregression.html#cb230-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(mae, mape)</span>
+<span id="cb230-5"><a href="mlregression.html#cb230-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using <code>control_resamples(save_pred = TRUE)</code>.</p>
 <p>Let’s go back to the first linear SVM model we tuned in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>, with results in <code>svm_rs</code>. We can compute the overall mean absolute percent error.</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="mlregression.html#cb229-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
-<span id="cb229-2"><a href="mlregression.html#cb229-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb229-3"><a href="mlregression.html#cb229-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="mlregression.html#cb231-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
+<span id="cb231-2"><a href="mlregression.html#cb231-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb231-3"><a href="mlregression.html#cb231-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 mape    standard       0.616</code></pre>
 <p>We can also compute the mean absolute percent error for each resample.</p>
-<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="mlregression.html#cb231-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
-<span id="cb231-2"><a href="mlregression.html#cb231-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb231-3"><a href="mlregression.html#cb231-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
-<span id="cb231-4"><a href="mlregression.html#cb231-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="mlregression.html#cb233-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
+<span id="cb233-2"><a href="mlregression.html#cb233-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb233-3"><a href="mlregression.html#cb233-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
+<span id="cb233-4"><a href="mlregression.html#cb233-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mape</span>(year, .pred)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1424,10 +1424,10 @@ Representing what should be a single token in multiple ways will split the count
 #&gt;  9 Fold09 mape    standard       0.604
 #&gt; 10 Fold10 mape    standard       0.605</code></pre>
 <p>Similarly, we can do the same for the mean absolute error, which gives a result in units of the original data (years, in this case) instead of relative units.</p>
-<div class="sourceCode" id="cb233"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb233-1"><a href="mlregression.html#cb233-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
-<span id="cb233-2"><a href="mlregression.html#cb233-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb233-3"><a href="mlregression.html#cb233-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
-<span id="cb233-4"><a href="mlregression.html#cb233-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mae</span>(year, .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="mlregression.html#cb235-1" aria-hidden="true" tabindex="-1"></a>svm_rs <span class="sc">%&gt;%</span></span>
+<span id="cb235-2"><a href="mlregression.html#cb235-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb235-3"><a href="mlregression.html#cb235-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
+<span id="cb235-4"><a href="mlregression.html#cb235-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mae</span>(year, .pred)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1462,14 +1462,14 @@ For the full set of regression metric options, see the <a href="https://yardstic
 <h3><span class="header-section-number">6.9.1</span> Preprocess the data</h3>
 <p>First, let’s create the data preprocessing recipe. By setting the tokenization options to <code>list(n = 2, n_min = 1)</code>, we will include both unigrams and bigrams in our model.</p>
 <p>When we set <code>max_tokens = tune()</code>, we can train multiple models with different numbers of maximum tokens and then compare these models’ performance to choose the best value. Previously, we set <code>max_tokens = 1e3</code> to choose a specific value for the number of tokens included in our model, but here we are going to try multiple different values.</p>
-<div class="sourceCode" id="cb235"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb235-1"><a href="mlregression.html#cb235-1" aria-hidden="true" tabindex="-1"></a>final_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
-<span id="cb235-2"><a href="mlregression.html#cb235-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">2</span>, <span class="at">n_min =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb235-3"><a href="mlregression.html#cb235-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb235-4"><a href="mlregression.html#cb235-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(text) <span class="sc">%&gt;%</span></span>
-<span id="cb235-5"><a href="mlregression.html#cb235-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
-<span id="cb235-6"><a href="mlregression.html#cb235-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb235-7"><a href="mlregression.html#cb235-7" aria-hidden="true" tabindex="-1"></a>final_rec</span></code></pre></div>
-<pre><code>#&gt; Data Recipe
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="mlregression.html#cb237-1" aria-hidden="true" tabindex="-1"></a>final_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(year <span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
+<span id="cb237-2"><a href="mlregression.html#cb237-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">2</span>, <span class="at">n_min =</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb237-3"><a href="mlregression.html#cb237-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb237-4"><a href="mlregression.html#cb237-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(text) <span class="sc">%&gt;%</span></span>
+<span id="cb237-5"><a href="mlregression.html#cb237-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb237-6"><a href="mlregression.html#cb237-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb237-7"><a href="mlregression.html#cb237-7" aria-hidden="true" tabindex="-1"></a>final_rec</span></code></pre></div>
+<pre><code>#&gt; Recipe
 #&gt; 
 #&gt; Inputs:
 #&gt; 
@@ -1487,20 +1487,20 @@ For the full set of regression metric options, see the <a href="https://yardstic
 <div id="specify-the-model" class="section level3" number="6.9.2">
 <h3><span class="header-section-number">6.9.2</span> Specify the model</h3>
 <p>Let’s use the same linear SVM regression model specification we have used multiple times in this chapter, and set it up here again to remind ourselves.</p>
-<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="mlregression.html#cb237-1" aria-hidden="true" tabindex="-1"></a>svm_spec <span class="ot">&lt;-</span> <span class="fu">svm_linear</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb237-2"><a href="mlregression.html#cb237-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb237-3"><a href="mlregression.html#cb237-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;LiblineaR&quot;</span>)</span>
-<span id="cb237-4"><a href="mlregression.html#cb237-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb237-5"><a href="mlregression.html#cb237-5" aria-hidden="true" tabindex="-1"></a>svm_spec</span></code></pre></div>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="mlregression.html#cb239-1" aria-hidden="true" tabindex="-1"></a>svm_spec <span class="ot">&lt;-</span> <span class="fu">svm_linear</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb239-2"><a href="mlregression.html#cb239-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb239-3"><a href="mlregression.html#cb239-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;LiblineaR&quot;</span>)</span>
+<span id="cb239-4"><a href="mlregression.html#cb239-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb239-5"><a href="mlregression.html#cb239-5" aria-hidden="true" tabindex="-1"></a>svm_spec</span></code></pre></div>
 <pre><code>#&gt; Linear Support Vector Machine Specification (regression)
 #&gt; 
 #&gt; Computational engine: LiblineaR</code></pre>
 <p>We can combine the preprocessing recipe and the model specification in a tunable workflow. We can’t fit this workflow right away to training data, because the value for <code>max_tokens</code> hasn’t been chosen yet.</p>
-<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="mlregression.html#cb239-1" aria-hidden="true" tabindex="-1"></a>tune_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb239-2"><a href="mlregression.html#cb239-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(final_rec) <span class="sc">%&gt;%</span></span>
-<span id="cb239-3"><a href="mlregression.html#cb239-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(svm_spec)</span>
-<span id="cb239-4"><a href="mlregression.html#cb239-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb239-5"><a href="mlregression.html#cb239-5" aria-hidden="true" tabindex="-1"></a>tune_wf</span></code></pre></div>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="mlregression.html#cb241-1" aria-hidden="true" tabindex="-1"></a>tune_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb241-2"><a href="mlregression.html#cb241-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(final_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb241-3"><a href="mlregression.html#cb241-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(svm_spec)</span>
+<span id="cb241-4"><a href="mlregression.html#cb241-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb241-5"><a href="mlregression.html#cb241-5" aria-hidden="true" tabindex="-1"></a>tune_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: svm_linear()
@@ -1527,11 +1527,11 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 </p>
 </div>
 <p>Let’s include different possible values for this parameter starting from the value we’ve already tried, for a combination of six models.</p>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="mlregression.html#cb241-1" aria-hidden="true" tabindex="-1"></a>final_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
-<span id="cb241-2"><a href="mlregression.html#cb241-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">6e3</span>)),</span>
-<span id="cb241-3"><a href="mlregression.html#cb241-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="dv">6</span></span>
-<span id="cb241-4"><a href="mlregression.html#cb241-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb241-5"><a href="mlregression.html#cb241-5" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="mlregression.html#cb243-1" aria-hidden="true" tabindex="-1"></a>final_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
+<span id="cb243-2"><a href="mlregression.html#cb243-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">6e3</span>)),</span>
+<span id="cb243-3"><a href="mlregression.html#cb243-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="dv">6</span></span>
+<span id="cb243-4"><a href="mlregression.html#cb243-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb243-5"><a href="mlregression.html#cb243-5" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 6 × 1
 #&gt;   max_tokens
 #&gt;        &lt;int&gt;
@@ -1541,16 +1541,15 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 #&gt; 4       4000
 #&gt; 5       5000
 #&gt; 6       6000</code></pre>
-<p>Now it’s time for tuning. Instead of using <code>fit_resamples()</code> as we have throughout this chapter, we are going to use <code>tune_grid()</code>, a function that has a very similar set of arguments. We pass this function our workflow (which holds our preprocessing recipe and SVM model), our resampling folds, and also the grid of possible parameter values to try. Let’s save the predictions so we can explore them in more detail, and let’s also set custom metrics instead of using the defaults. Let’s compute RMSE, mean absolute error, and mean absolute percent error during tuning.</p>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="mlregression.html#cb243-1" aria-hidden="true" tabindex="-1"></a>final_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb243-2"><a href="mlregression.html#cb243-2" aria-hidden="true" tabindex="-1"></a>  tune_wf,</span>
-<span id="cb243-3"><a href="mlregression.html#cb243-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds,</span>
-<span id="cb243-4"><a href="mlregression.html#cb243-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> final_grid,</span>
-<span id="cb243-5"><a href="mlregression.html#cb243-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, mape),</span>
-<span id="cb243-6"><a href="mlregression.html#cb243-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb243-7"><a href="mlregression.html#cb243-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb243-8"><a href="mlregression.html#cb243-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb243-9"><a href="mlregression.html#cb243-9" aria-hidden="true" tabindex="-1"></a>final_rs</span></code></pre></div>
+<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="mlregression.html#cb245-1" aria-hidden="true" tabindex="-1"></a>final_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb245-2"><a href="mlregression.html#cb245-2" aria-hidden="true" tabindex="-1"></a>  tune_wf,</span>
+<span id="cb245-3"><a href="mlregression.html#cb245-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds,</span>
+<span id="cb245-4"><a href="mlregression.html#cb245-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> final_grid,</span>
+<span id="cb245-5"><a href="mlregression.html#cb245-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, mae, mape),</span>
+<span id="cb245-6"><a href="mlregression.html#cb245-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb245-7"><a href="mlregression.html#cb245-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb245-8"><a href="mlregression.html#cb245-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb245-9"><a href="mlregression.html#cb245-9" aria-hidden="true" tabindex="-1"></a>final_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 × 5
@@ -1571,18 +1570,18 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 <div id="regression-final-evaluation" class="section level3" number="6.9.4">
 <h3><span class="header-section-number">6.9.4</span> Evaluate the modeling</h3>
 <p>Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure <a href="mlregression.html#fig:scotusfinaltunevis">6.6</a> shows us the relationship between performance (as measured by the metrics we chose) and the number of tokens.</p>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="mlregression.html#cb245-1" aria-hidden="true" tabindex="-1"></a>final_rs <span class="sc">%&gt;%</span></span>
-<span id="cb245-2"><a href="mlregression.html#cb245-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb245-3"><a href="mlregression.html#cb245-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(max_tokens, mean, <span class="at">color =</span> .metric)) <span class="sc">+</span></span>
-<span id="cb245-4"><a href="mlregression.html#cb245-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb245-5"><a href="mlregression.html#cb245-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb245-6"><a href="mlregression.html#cb245-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>.metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb245-7"><a href="mlregression.html#cb245-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb245-8"><a href="mlregression.html#cb245-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb245-9"><a href="mlregression.html#cb245-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
-<span id="cb245-10"><a href="mlregression.html#cb245-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Linear SVM performance across number of tokens&quot;</span>,</span>
-<span id="cb245-11"><a href="mlregression.html#cb245-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance improves as we include more tokens&quot;</span></span>
-<span id="cb245-12"><a href="mlregression.html#cb245-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="mlregression.html#cb247-1" aria-hidden="true" tabindex="-1"></a>final_rs <span class="sc">%&gt;%</span></span>
+<span id="cb247-2"><a href="mlregression.html#cb247-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb247-3"><a href="mlregression.html#cb247-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(max_tokens, mean, <span class="at">color =</span> .metric)) <span class="sc">+</span></span>
+<span id="cb247-4"><a href="mlregression.html#cb247-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb247-5"><a href="mlregression.html#cb247-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb247-6"><a href="mlregression.html#cb247-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>.metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb247-7"><a href="mlregression.html#cb247-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb247-8"><a href="mlregression.html#cb247-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb247-9"><a href="mlregression.html#cb247-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
+<span id="cb247-10"><a href="mlregression.html#cb247-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Linear SVM performance across number of tokens&quot;</span>,</span>
+<span id="cb247-11"><a href="mlregression.html#cb247-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Performance improves as we include more tokens&quot;</span></span>
+<span id="cb247-12"><a href="mlregression.html#cb247-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusfinaltunevis"></span>
 <img src="06_ml_regression_files/figure-html/scotusfinaltunevis-1.svg" alt="Performance improves significantly at about 4000 tokens" width="672" />
 <p class="caption">
@@ -1590,19 +1589,19 @@ FIGURE 6.6: Performance improves significantly at about 4000 tokens
 </p>
 </div>
 <p>Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model (which would be one of the ones with the most tokens in our situation here) or the simplest model within some limit around the numerically best result. In this situation, we likely want to choose a simpler model with fewer tokens that gives close-to-best performance.</p>
-<p>Let’s choose by percent loss compared to the best model, with the default 2% loss.</p>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="mlregression.html#cb246-1" aria-hidden="true" tabindex="-1"></a>chosen_mae <span class="ot">&lt;-</span> final_rs <span class="sc">%&gt;%</span></span>
-<span id="cb246-2"><a href="mlregression.html#cb246-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;mae&quot;</span>, max_tokens)</span>
-<span id="cb246-3"><a href="mlregression.html#cb246-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb246-4"><a href="mlregression.html#cb246-4" aria-hidden="true" tabindex="-1"></a>chosen_mae</span></code></pre></div>
+<p>Let’s choose by percent loss compared to the best model, with a limit of 3% loss.</p>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="mlregression.html#cb248-1" aria-hidden="true" tabindex="-1"></a>chosen_mae <span class="ot">&lt;-</span> final_rs <span class="sc">%&gt;%</span></span>
+<span id="cb248-2"><a href="mlregression.html#cb248-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;mae&quot;</span>, max_tokens, <span class="at">limit =</span> <span class="dv">3</span>)</span>
+<span id="cb248-3"><a href="mlregression.html#cb248-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb248-4"><a href="mlregression.html#cb248-4" aria-hidden="true" tabindex="-1"></a>chosen_mae</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 9
 #&gt;   max_tokens .metric .estimator  mean     n std_err .config          .best .loss
 #&gt;        &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1       5000 mae     standard    10.1    10  0.0680 Preprocessor5_M…  9.98 0.795</code></pre>
+#&gt; 1       3000 mae     standard    10.2    10  0.0664 Preprocessor3_M…  9.98  2.69</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb248-1"><a href="mlregression.html#cb248-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(tune_wf, chosen_mae)</span>
-<span id="cb248-2"><a href="mlregression.html#cb248-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb248-3"><a href="mlregression.html#cb248-3" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="mlregression.html#cb250-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(tune_wf, chosen_mae)</span>
+<span id="cb250-2"><a href="mlregression.html#cb250-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb250-3"><a href="mlregression.html#cb250-3" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: svm_linear()
@@ -1627,68 +1626,68 @@ Notice that this is the first time we have used our testing data during this ent
 </p>
 </div>
 <p>We can use the function <code>last_fit()</code> to <strong>fit</strong> our model one last time on our training data and <strong>evaluate</strong> it on our testing data. We only have to pass this function our finalized model/workflow and our data split.</p>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="mlregression.html#cb250-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, scotus_split)</span>
-<span id="cb250-2"><a href="mlregression.html#cb250-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb250-3"><a href="mlregression.html#cb250-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
+<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="mlregression.html#cb252-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, scotus_split)</span>
+<span id="cb252-2"><a href="mlregression.html#cb252-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb252-3"><a href="mlregression.html#cb252-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 × 4
 #&gt;   .metric .estimator .estimate .config             
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 rmse    standard      13.8   Preprocessor1_Model1
-#&gt; 2 rsq     standard       0.921 Preprocessor1_Model1</code></pre>
+#&gt; 1 rmse    standard      14.1   Preprocessor1_Model1
+#&gt; 2 rsq     standard       0.917 Preprocessor1_Model1</code></pre>
 <p>The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The RMSE of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.</p>
 <p>The output of <code>last_fit()</code> also contains a fitted model (a <code>workflow</code>, to be more specific), that has been trained on the <em>training</em> data. We can <code>tidy()</code> this final result to understand what the most important variables are in the predictions, shown in Figure <a href="mlregression.html#fig:scotusvip">6.7</a>.</p>
-<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb252-1"><a href="mlregression.html#cb252-1" aria-hidden="true" tabindex="-1"></a>scotus_fit <span class="ot">&lt;-</span> <span class="fu">pull_workflow_fit</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]])</span>
-<span id="cb252-2"><a href="mlregression.html#cb252-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb252-3"><a href="mlregression.html#cb252-3" aria-hidden="true" tabindex="-1"></a>scotus_fit <span class="sc">%&gt;%</span></span>
-<span id="cb252-4"><a href="mlregression.html#cb252-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb252-5"><a href="mlregression.html#cb252-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;Bias&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb252-6"><a href="mlregression.html#cb252-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb252-7"><a href="mlregression.html#cb252-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">sign =</span> <span class="fu">case_when</span>(estimate <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;Later (after mean year)&quot;</span>,</span>
-<span id="cb252-8"><a href="mlregression.html#cb252-8" aria-hidden="true" tabindex="-1"></a>                     <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Earlier (before mean year)&quot;</span>),</span>
-<span id="cb252-9"><a href="mlregression.html#cb252-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> <span class="fu">abs</span>(estimate),</span>
-<span id="cb252-10"><a href="mlregression.html#cb252-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">term =</span> <span class="fu">str_remove_all</span>(term, <span class="st">&quot;tfidf_text_&quot;</span>)</span>
-<span id="cb252-11"><a href="mlregression.html#cb252-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb252-12"><a href="mlregression.html#cb252-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sign) <span class="sc">%&gt;%</span></span>
-<span id="cb252-13"><a href="mlregression.html#cb252-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, estimate) <span class="sc">%&gt;%</span></span>
-<span id="cb252-14"><a href="mlregression.html#cb252-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb252-15"><a href="mlregression.html#cb252-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate,</span>
-<span id="cb252-16"><a href="mlregression.html#cb252-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">fct_reorder</span>(term, estimate),</span>
-<span id="cb252-17"><a href="mlregression.html#cb252-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> sign)) <span class="sc">+</span></span>
-<span id="cb252-18"><a href="mlregression.html#cb252-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb252-19"><a href="mlregression.html#cb252-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb252-20"><a href="mlregression.html#cb252-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sign, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
-<span id="cb252-21"><a href="mlregression.html#cb252-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb252-22"><a href="mlregression.html#cb252-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb252-23"><a href="mlregression.html#cb252-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Variable importance for predicting year of&quot;</span>,</span>
-<span id="cb252-24"><a href="mlregression.html#cb252-24" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Supreme Court opinions&quot;</span>),</span>
-<span id="cb252-25"><a href="mlregression.html#cb252-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;These features are the most importance&quot;</span>,</span>
-<span id="cb252-26"><a href="mlregression.html#cb252-26" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;in predicting the year of an opinion&quot;</span>)</span>
-<span id="cb252-27"><a href="mlregression.html#cb252-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="mlregression.html#cb254-1" aria-hidden="true" tabindex="-1"></a>scotus_fit <span class="ot">&lt;-</span> <span class="fu">pull_workflow_fit</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]])</span>
+<span id="cb254-2"><a href="mlregression.html#cb254-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb254-3"><a href="mlregression.html#cb254-3" aria-hidden="true" tabindex="-1"></a>scotus_fit <span class="sc">%&gt;%</span></span>
+<span id="cb254-4"><a href="mlregression.html#cb254-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb254-5"><a href="mlregression.html#cb254-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;Bias&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb254-6"><a href="mlregression.html#cb254-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb254-7"><a href="mlregression.html#cb254-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">sign =</span> <span class="fu">case_when</span>(estimate <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">&quot;Later (after mean year)&quot;</span>,</span>
+<span id="cb254-8"><a href="mlregression.html#cb254-8" aria-hidden="true" tabindex="-1"></a>                     <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Earlier (before mean year)&quot;</span>),</span>
+<span id="cb254-9"><a href="mlregression.html#cb254-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> <span class="fu">abs</span>(estimate),</span>
+<span id="cb254-10"><a href="mlregression.html#cb254-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">term =</span> <span class="fu">str_remove_all</span>(term, <span class="st">&quot;tfidf_text_&quot;</span>)</span>
+<span id="cb254-11"><a href="mlregression.html#cb254-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb254-12"><a href="mlregression.html#cb254-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sign) <span class="sc">%&gt;%</span></span>
+<span id="cb254-13"><a href="mlregression.html#cb254-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, estimate) <span class="sc">%&gt;%</span></span>
+<span id="cb254-14"><a href="mlregression.html#cb254-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb254-15"><a href="mlregression.html#cb254-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate,</span>
+<span id="cb254-16"><a href="mlregression.html#cb254-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">fct_reorder</span>(term, estimate),</span>
+<span id="cb254-17"><a href="mlregression.html#cb254-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> sign)) <span class="sc">+</span></span>
+<span id="cb254-18"><a href="mlregression.html#cb254-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb254-19"><a href="mlregression.html#cb254-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb254-20"><a href="mlregression.html#cb254-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>sign, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
+<span id="cb254-21"><a href="mlregression.html#cb254-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb254-22"><a href="mlregression.html#cb254-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb254-23"><a href="mlregression.html#cb254-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Variable importance for predicting year of&quot;</span>,</span>
+<span id="cb254-24"><a href="mlregression.html#cb254-24" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Supreme Court opinions&quot;</span>),</span>
+<span id="cb254-25"><a href="mlregression.html#cb254-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;These features are the most importance&quot;</span>,</span>
+<span id="cb254-26"><a href="mlregression.html#cb254-26" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;in predicting the year of an opinion&quot;</span>)</span>
+<span id="cb254-27"><a href="mlregression.html#cb254-27" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusvip"></span>
 <img src="06_ml_regression_files/figure-html/scotusvip-1.svg" alt="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier" width="672" />
 <p class="caption">
 FIGURE 6.7: Some words or bigrams increase a Supreme Court opinion’s probability of being written later (more recently) while some increase its probability of being written earlier
 </p>
 </div>
-<p>The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “the judges,” are associated with lower, earlier years for these Supreme Court opinions.</p>
+<p>The tokens (unigrams or bigrams) that contribute in the positive direction, like “court said” and “constitutionally,” are associated with higher, later years; those that contribute in the negative direction, like “ought” and “therefore,” are associated with lower, earlier years for these Supreme Court opinions.</p>
 <div class="rmdnote">
 <p>
 Some of these features are unigrams and some are bigrams, and stop words are included because we did not remove them from the model.
 </p>
 </div>
 <p>We can also examine how the true and predicted years compare for the testing set. Figure <a href="mlregression.html#fig:scotusfinalpredvis">6.8</a> shows us that, like for our earlier models on the resampled training data, we can predict the year of Supreme Court opinions for the testing data starting from about 1850. Predictions are less reliable before that year. This is an example of finding different error rates across sub-groups of observations, like we discussed in the overview to these chapters; these differences can lead to unfairness and algorithmic bias when models are applied in the real world.</p>
-<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb253-1"><a href="mlregression.html#cb253-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="sc">%&gt;%</span></span>
-<span id="cb253-2"><a href="mlregression.html#cb253-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb253-3"><a href="mlregression.html#cb253-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, .pred)) <span class="sc">+</span></span>
-<span id="cb253-4"><a href="mlregression.html#cb253-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;gray80&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb253-5"><a href="mlregression.html#cb253-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb253-6"><a href="mlregression.html#cb253-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb253-7"><a href="mlregression.html#cb253-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Truth&quot;</span>,</span>
-<span id="cb253-8"><a href="mlregression.html#cb253-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Predicted year&quot;</span>,</span>
-<span id="cb253-9"><a href="mlregression.html#cb253-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Predicted and true years for the testing set of&quot;</span>,</span>
-<span id="cb253-10"><a href="mlregression.html#cb253-10" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Supreme Court opinions&quot;</span>),</span>
-<span id="cb253-11"><a href="mlregression.html#cb253-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;For the testing set, predictions are more reliable after 1850&quot;</span></span>
-<span id="cb253-12"><a href="mlregression.html#cb253-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="mlregression.html#cb255-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="sc">%&gt;%</span></span>
+<span id="cb255-2"><a href="mlregression.html#cb255-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb255-3"><a href="mlregression.html#cb255-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(year, .pred)) <span class="sc">+</span></span>
+<span id="cb255-4"><a href="mlregression.html#cb255-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;gray80&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb255-5"><a href="mlregression.html#cb255-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb255-6"><a href="mlregression.html#cb255-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb255-7"><a href="mlregression.html#cb255-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Truth&quot;</span>,</span>
+<span id="cb255-8"><a href="mlregression.html#cb255-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Predicted year&quot;</span>,</span>
+<span id="cb255-9"><a href="mlregression.html#cb255-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">&quot;Predicted and true years for the testing set of&quot;</span>,</span>
+<span id="cb255-10"><a href="mlregression.html#cb255-10" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Supreme Court opinions&quot;</span>),</span>
+<span id="cb255-11"><a href="mlregression.html#cb255-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;For the testing set, predictions are more reliable after 1850&quot;</span></span>
+<span id="cb255-12"><a href="mlregression.html#cb255-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:scotusfinalpredvis"></span>
 <img src="06_ml_regression_files/figure-html/scotusfinalpredvis-1.svg" alt="Predicted and true years from a linear SVM regression model with bigrams and unigrams" width="672" />
 <p class="caption">
@@ -1696,27 +1695,27 @@ FIGURE 6.8: Predicted and true years from a linear SVM regression model with big
 </p>
 </div>
 <p>Finally, we can gain more insight into our model and how it is behaving by looking at observations from the test set that have been <em>mispredicted</em>. Let’s bind together the predictions on the test set with the original Supreme Court opinion test data and filter to observations with a prediction that is more than 25 years wrong.</p>
-<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb254-1"><a href="mlregression.html#cb254-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
-<span id="cb254-2"><a href="mlregression.html#cb254-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(scotus_test <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>year, <span class="sc">-</span>id)) <span class="sc">%&gt;%</span></span>
-<span id="cb254-3"><a href="mlregression.html#cb254-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">abs</span>(year <span class="sc">-</span> .pred) <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb256-1"><a href="mlregression.html#cb256-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
+<span id="cb256-2"><a href="mlregression.html#cb256-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(scotus_test <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>year, <span class="sc">-</span>id)) <span class="sc">%&gt;%</span></span>
+<span id="cb256-3"><a href="mlregression.html#cb256-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">abs</span>(year <span class="sc">-</span> .pred) <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div>
 <p>There isn’t too much training data to start with for the earliest years, so we are unlikely to quickly gain insight from looking at the oldest opinions. However, what do the more recent opinions that were predicted inaccurately look like?</p>
-<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb255-1"><a href="mlregression.html#cb255-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="sc">%&gt;%</span></span>
-<span id="cb255-2"><a href="mlregression.html#cb255-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span></span>
-<span id="cb255-3"><a href="mlregression.html#cb255-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, .pred, case_name, text)</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 168 × 4
-#&gt;     year .pred case_name                                text                    
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                                    &lt;chr&gt;                   
-#&gt;  1  2009 2055. Nijhawan v. Holder                       &quot;Supreme Court of Unite…
-#&gt;  2  2008 1957. Green v. Johnson                         &quot;                 Cite …
-#&gt;  3  2008 1952. Dalehite v. United States                &quot;Supreme Court of Unite…
-#&gt;  4  2008 1982. Preston v. Ferrer                        &quot;Supreme Court of Unite…
-#&gt;  5  2007 1876. Quebec Bank of Toronto v. Hellman        &quot;Supreme Court of Unite…
-#&gt;  6  2004 2035. Illinois v. Lidster                      &quot;No. 02-1060.\nPolice s…
-#&gt;  7  2002 1969. Borgner v. Florida Board of Dentistry    &quot;No. 02-165.\nCERTIORAR…
-#&gt;  8  2000 1974. Ohler v. United States                   &quot;OHLERv.UNITED STATES\n…
-#&gt;  9  2000 1955. Bush v. Palm Beach County Canvassing Bd. &quot;No. 00-836\nON WRIT OF…
-#&gt; 10  1999 1964. Dickinson v. Zurko                       &quot;No. 98 377\nQ. TODD DI…
-#&gt; # … with 158 more rows</code></pre>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb257-1"><a href="mlregression.html#cb257-1" aria-hidden="true" tabindex="-1"></a>scotus_bind <span class="sc">%&gt;%</span></span>
+<span id="cb257-2"><a href="mlregression.html#cb257-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>year) <span class="sc">%&gt;%</span></span>
+<span id="cb257-3"><a href="mlregression.html#cb257-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, .pred, case_name, text)</span></code></pre></div>
+<pre><code>#&gt; # A tibble: 157 × 4
+#&gt;     year .pred case_name                      text                              
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                          &lt;chr&gt;                             
+#&gt;  1  2009 2070. Nijhawan v. Holder             &quot;Supreme Court of United States.\…
+#&gt;  2  2008 1967. Green v. Johnson               &quot;                 Cite as: 553 U.…
+#&gt;  3  2008 1959. Dalehite v. United States      &quot;Supreme Court of United States.\…
+#&gt;  4  2007 1873. Quebec Bank of Toronto v. Hel… &quot;Supreme Court of United States.\…
+#&gt;  5  2004 2032. Illinois v. Lidster            &quot;No. 02-1060.\nPolice set up a hi…
+#&gt;  6  2000 1953. Bush v. Palm Beach County Can… &quot;No. 00-836\nON WRIT OF CERTIORAR…
+#&gt;  7  1999 1972. Dickinson v. Zurko             &quot;No. 98 377\nQ. TODD DICKINSON,  …
+#&gt;  8  1998 1960. Dooley v. Korean Air Lines Co. &quot;No. 97-704.\n\n        Syllabus\…
+#&gt;  9  1996 1953. United States v. State of Mai… &quot;No. 35, Original.\non exception …
+#&gt; 10  1996 1958. INS v. Yueh-Shaio Yang         &quot;United States Supreme Court.\n*2…
+#&gt; # … with 147 more rows</code></pre>
 <p>There are some interesting examples here where we can understand why the model would mispredict:</p>
 <ul>
 <li><p><em>Dalehite v. United States</em> was a case about a fertilizer explosion that is mislabeled in our dataset; it was decided in 1953, not 2008 as we see in our data, and we predict a year of 1952, very close to the true decision date.</p></li>
@@ -1812,7 +1811,6 @@ Weinberger, K., Dasgupta, A., Langford, J., Smola, A., and Attenberg, J. 2009. <
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1849,7 +1847,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {

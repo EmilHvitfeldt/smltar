@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-10-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="language.html"/>
 <link rel="next" href="stopwords.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -1016,11 +1016,11 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 × 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       77.1ms   85.6ms     11.3     4.58MB     1.26
-#&gt; 2 tokenizers   96.7ms  100.1ms      9.80    1.01MB     1.09
-#&gt; 3 text2vec     79.5ms   81.1ms     11.9    20.64MB     1.32
-#&gt; 4 quanteda    157.2ms  164.4ms      6.07     8.7MB     1.52
-#&gt; 5 base R      325.7ms  332.3ms      3.00   10.51MB     2.00</code></pre>
+#&gt; 1 corpus       75.8ms   78.9ms     11.8     4.58MB     1.31
+#&gt; 2 tokenizers   97.3ms  104.1ms      9.42    1.01MB     2.36
+#&gt; 3 text2vec     78.3ms   81.1ms     12.1       21MB     1.34
+#&gt; 4 quanteda    155.6ms  165.3ms      6.05     8.7MB     1.51
+#&gt; 5 base R      324.7ms  332.1ms      3.00   10.51MB     2.00</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
 <div id="tokensummary" class="section level2" number="2.7">
@@ -1084,7 +1084,6 @@ Wenfeng, Q., and Yanyi, W. 2019. <em><span class="nocase">jiebaR</span>: Chinese
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1121,7 +1120,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {
