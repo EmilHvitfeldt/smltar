@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Preface | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Preface | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Preface | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-10-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="index.html"/>
 <link rel="next" href="language.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -535,7 +535,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">bookdown</td>
-<td align="left">0.23</td>
+<td align="left">0.24</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -550,12 +550,12 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="odd">
 <td align="left">dials</td>
-<td align="left">0.0.9</td>
+<td align="left">0.0.10</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
 <td align="left">discrim</td>
-<td align="left">0.1.1</td>
+<td align="left">0.1.3</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -565,7 +565,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">glmnet</td>
-<td align="left">4.1-1</td>
+<td align="left">4.1-2</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -580,12 +580,12 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="odd">
 <td align="left">htmltools</td>
-<td align="left">0.5.1.1</td>
+<td align="left">0.5.2</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
 <td align="left">htmlwidgets</td>
-<td align="left">1.5.3</td>
+<td align="left">1.5.4</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -615,7 +615,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">keras</td>
-<td align="left">2.4.0</td>
+<td align="left">2.6.1</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -645,12 +645,12 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">parsnip</td>
-<td align="left">0.1.6</td>
+<td align="left">0.1.7</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
 <td align="left">prismatic</td>
-<td align="left">1.0.0</td>
+<td align="left">1.1.0</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
@@ -665,17 +665,17 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">recipes</td>
-<td align="left">0.1.16</td>
+<td align="left">0.1.17</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
 <td align="left">remotes</td>
-<td align="left">2.4.0</td>
+<td align="left">2.4.1</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
 <td align="left">reticulate</td>
-<td align="left">1.20</td>
+<td align="left">1.22</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -730,7 +730,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="odd">
 <td align="left">styler</td>
-<td align="left">1.5.1</td>
+<td align="left">1.6.2</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
@@ -765,12 +765,12 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">tidymodels</td>
-<td align="left">0.1.3</td>
+<td align="left">0.1.4</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
 <td align="left">tidytext</td>
-<td align="left">0.3.1</td>
+<td align="left">0.3.2</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="even">
@@ -795,7 +795,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">tune</td>
-<td align="left">0.1.5</td>
+<td align="left">0.1.6</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -815,7 +815,7 @@ Boxes marked with hexagons highlight information about specific R packages and h
 </tr>
 <tr class="even">
 <td align="left">workflows</td>
-<td align="left">0.2.3</td>
+<td align="left">0.2.4</td>
 <td align="left">CRAN (R 4.1.0)</td>
 </tr>
 <tr class="odd">
@@ -877,7 +877,6 @@ Wickham, H., and Hester, J. 2020. <em><span class="nocase">readr</span>: Read Re
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -914,7 +913,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {

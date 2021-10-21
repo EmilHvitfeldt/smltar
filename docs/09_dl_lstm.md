@@ -285,10 +285,10 @@ val_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3758
-#>     accuracy: 0.8234
-#>     val_loss: 0.616
-#> val_accuracy: 0.7365
+#>         loss: 0.3672
+#>     accuracy: 0.8296
+#>     val_loss: 0.6189
+#> val_accuracy: 0.7354
 ```
 
 The \index{overfitting}overfitting has been reduced, and Figure \@ref(fig:lstmvalhistory) shows that the difference between our model's performance on training and validation data is now smaller.
@@ -315,10 +315,10 @@ val_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.736
-#> 2 kap         binary         0.471
-#> 3 mn_log_loss binary         0.616
-#> 4 roc_auc     binary         0.805
+#> 1 accuracy    binary         0.735
+#> 2 kap         binary         0.469
+#> 3 mn_log_loss binary         0.619
+#> 4 roc_auc     binary         0.806
 ```
 
 
@@ -377,10 +377,10 @@ rnn_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4961
-#>     accuracy: 0.7678
-#>     val_loss: 0.5928
-#> val_accuracy: 0.7143
+#>         loss: 0.4986
+#>     accuracy: 0.765
+#>     val_loss: 0.5958
+#> val_accuracy: 0.7103
 ```
 
 Looks like more \index{overfitting}overfitting! We can see this by plotting the history as well in Figure \@ref(fig:rnnhistory).
@@ -442,10 +442,10 @@ bilstm_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3647
-#>     accuracy: 0.8322
-#>     val_loss: 0.6118
-#> val_accuracy: 0.7359
+#>         loss: 0.366
+#>     accuracy: 0.8311
+#>     val_loss: 0.6215
+#> val_accuracy: 0.7357
 ```
 
 The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well. 
@@ -461,12 +461,12 @@ bilstm_res %>% metrics(state, .pred_class, .pred_1)
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
 #> 1 accuracy    binary         0.736
-#> 2 kap         binary         0.471
-#> 3 mn_log_loss binary         0.612
+#> 2 kap         binary         0.469
+#> 3 mn_log_loss binary         0.622
 #> 4 roc_auc     binary         0.805
 ```
 
-This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736). 
+This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.735). 
 
 ## Case study: stacking LSTM layers
 
@@ -510,10 +510,10 @@ stacked_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.379
-#>     accuracy: 0.8244
-#>     val_loss: 0.6008
-#> val_accuracy: 0.7363
+#>         loss: 0.3793
+#>     accuracy: 0.8242
+#>     val_loss: 0.6086
+#> val_accuracy: 0.7347
 ```
 
 Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.
@@ -528,10 +528,10 @@ stacked_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.736
-#> 2 kap         binary         0.470
-#> 3 mn_log_loss binary         0.601
-#> 4 roc_auc     binary         0.804
+#> 1 accuracy    binary         0.735
+#> 2 kap         binary         0.467
+#> 3 mn_log_loss binary         0.609
+#> 4 roc_auc     binary         0.803
 ```
 
 We can gradually improve a model by changing and adding to its architecture.
@@ -606,10 +606,10 @@ padding_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4401
-#>     accuracy: 0.7816
-#>     val_loss: 0.603
-#> val_accuracy: 0.7105
+#>         loss: 0.4282
+#>     accuracy: 0.7921
+#>     val_loss: 0.5973
+#> val_accuracy: 0.7184
 ```
 
 This padding strategy results in noticeably worse performance than the default option!
@@ -624,13 +624,13 @@ padding_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.711
-#> 2 kap         binary         0.420
-#> 3 mn_log_loss binary         0.603
-#> 4 roc_auc     binary         0.784
+#> 1 accuracy    binary         0.718
+#> 2 kap         binary         0.436
+#> 3 mn_log_loss binary         0.597
+#> 4 roc_auc     binary         0.790
 ```
 
-The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.805; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
+The same model architecture with default padding preprocessing resulted in an accuracy of 0.735 and an AUC of 0.806; changing to `padding = "post"` has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM's hidden states being flushed out by the added zeroes, before getting to the text itself.
 
 <div class="rmdwarning">
 <p>Different preprocessing strategies have a huge impact on deep learning results.</p>
@@ -738,9 +738,9 @@ scotus_res %>% metrics(year, .pred)
 #> # A tibble: 3 × 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 rmse    standard      25.6  
-#> 2 rsq     standard       0.781
-#> 3 mae     standard      18.5
+#> 1 rmse    standard      27.3  
+#> 2 rsq     standard       0.766
+#> 3 mae     standard      19.8
 ```
 
 This is much worse than the final regularized linear model trained in Section \@ref(mlregressionfull), with an RMSE almost a decade worth of years worse. It's possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline. 
@@ -802,10 +802,10 @@ smaller_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.4684
-#>     accuracy: 0.769
-#>     val_loss: 0.5835
-#> val_accuracy: 0.7073
+#>         loss: 0.4674
+#>     accuracy: 0.7723
+#>     val_loss: 0.5853
+#> val_accuracy: 0.7089
 ```
 
 How did this smaller model, based on a smaller vocabulary in the model, perform?
@@ -820,13 +820,13 @@ smaller_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.707
-#> 2 kap         binary         0.412
-#> 3 mn_log_loss binary         0.584
-#> 4 roc_auc     binary         0.779
+#> 1 accuracy    binary         0.709
+#> 2 kap         binary         0.414
+#> 3 mn_log_loss binary         0.585
+#> 4 roc_auc     binary         0.780
 ```
 
-The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.805. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
+The original LSTM model with the larger vocabulary had an accuracy of 0.735 and an AUC of 0.806. Reducing the model's capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.
 
 <div class="rmdnote">
 <p>The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.</p>
@@ -912,10 +912,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.3315
-#>     accuracy: 0.8482
-#>     val_loss: 0.5448
-#> val_accuracy: 0.7679
+#>         loss: 0.3349
+#>     accuracy: 0.8486
+#>     val_loss: 0.5469
+#> val_accuracy: 0.769
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -932,9 +932,9 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.763
-#> 2 kap         binary         0.525
-#> 3 mn_log_loss binary         0.555
+#> 1 accuracy    binary         0.761
+#> 2 kap         binary         0.521
+#> 3 mn_log_loss binary         0.559
 #> 4 roc_auc     binary         0.834
 ```
 

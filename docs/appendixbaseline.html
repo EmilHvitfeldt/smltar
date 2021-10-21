@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-10-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="appendixdata.html"/>
 <link rel="next" href="references.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -460,11 +460,11 @@ div.csl-indent {
 <p>This machine learning analysis is presented with only minimal narrative; see Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> for more explanation and details.</p>
 <div id="read-in-the-data" class="section level2" number="13.1">
 <h2><span class="header-section-number">C.1</span> Read in the data</h2>
-<div class="sourceCode" id="cb690"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb690-1"><a href="appendixbaseline.html#cb690-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb690-2"><a href="appendixbaseline.html#cb690-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb690-3"><a href="appendixbaseline.html#cb690-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
-<span id="cb690-4"><a href="appendixbaseline.html#cb690-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb690-5"><a href="appendixbaseline.html#cb690-5" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
+<div class="sourceCode" id="cb692"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb692-1"><a href="appendixbaseline.html#cb692-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb692-2"><a href="appendixbaseline.html#cb692-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb692-3"><a href="appendixbaseline.html#cb692-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
+<span id="cb692-4"><a href="appendixbaseline.html#cb692-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb692-5"><a href="appendixbaseline.html#cb692-5" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 269,790 × 3
 #&gt;    blurb                                                        state created_at
 #&gt;    &lt;chr&gt;                                                        &lt;fct&gt; &lt;date&gt;    
@@ -482,18 +482,18 @@ div.csl-indent {
 </div>
 <div id="split-into-testtrain-and-create-resampling-folds" class="section level2" number="13.2">
 <h2><span class="header-section-number">C.2</span> Split into test/train and create resampling folds</h2>
-<div class="sourceCode" id="cb692"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb692-1"><a href="appendixbaseline.html#cb692-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb692-2"><a href="appendixbaseline.html#cb692-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb692-3"><a href="appendixbaseline.html#cb692-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
-<span id="cb692-4"><a href="appendixbaseline.html#cb692-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb692-5"><a href="appendixbaseline.html#cb692-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
-<span id="cb692-6"><a href="appendixbaseline.html#cb692-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb692-7"><a href="appendixbaseline.html#cb692-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
-<span id="cb692-8"><a href="appendixbaseline.html#cb692-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span>
-<span id="cb692-9"><a href="appendixbaseline.html#cb692-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb692-10"><a href="appendixbaseline.html#cb692-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb692-11"><a href="appendixbaseline.html#cb692-11" aria-hidden="true" tabindex="-1"></a>kickstarter_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train)</span>
-<span id="cb692-12"><a href="appendixbaseline.html#cb692-12" aria-hidden="true" tabindex="-1"></a>kickstarter_folds</span></code></pre></div>
+<div class="sourceCode" id="cb694"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb694-1"><a href="appendixbaseline.html#cb694-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb694-2"><a href="appendixbaseline.html#cb694-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb694-3"><a href="appendixbaseline.html#cb694-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
+<span id="cb694-4"><a href="appendixbaseline.html#cb694-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb694-5"><a href="appendixbaseline.html#cb694-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
+<span id="cb694-6"><a href="appendixbaseline.html#cb694-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb694-7"><a href="appendixbaseline.html#cb694-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
+<span id="cb694-8"><a href="appendixbaseline.html#cb694-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span>
+<span id="cb694-9"><a href="appendixbaseline.html#cb694-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb694-10"><a href="appendixbaseline.html#cb694-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb694-11"><a href="appendixbaseline.html#cb694-11" aria-hidden="true" tabindex="-1"></a>kickstarter_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train)</span>
+<span id="cb694-12"><a href="appendixbaseline.html#cb694-12" aria-hidden="true" tabindex="-1"></a>kickstarter_folds</span></code></pre></div>
 <pre><code>#&gt; #  10-fold cross-validation 
 #&gt; # A tibble: 10 × 2
 #&gt;    splits                 id    
@@ -511,15 +511,15 @@ div.csl-indent {
 </div>
 <div id="recipe-for-data-preprocessing" class="section level2" number="13.3">
 <h2><span class="header-section-number">C.3</span> Recipe for data preprocessing</h2>
-<div class="sourceCode" id="cb694"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb694-1"><a href="appendixbaseline.html#cb694-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
-<span id="cb694-2"><a href="appendixbaseline.html#cb694-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb694-3"><a href="appendixbaseline.html#cb694-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb694-4"><a href="appendixbaseline.html#cb694-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb694-5"><a href="appendixbaseline.html#cb694-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb694-6"><a href="appendixbaseline.html#cb694-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
-<span id="cb694-7"><a href="appendixbaseline.html#cb694-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb694-8"><a href="appendixbaseline.html#cb694-8" aria-hidden="true" tabindex="-1"></a>kickstarter_rec</span></code></pre></div>
-<pre><code>#&gt; Data Recipe
+<div class="sourceCode" id="cb696"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb696-1"><a href="appendixbaseline.html#cb696-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb696-2"><a href="appendixbaseline.html#cb696-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb696-3"><a href="appendixbaseline.html#cb696-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb696-4"><a href="appendixbaseline.html#cb696-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb696-5"><a href="appendixbaseline.html#cb696-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> <span class="fl">5e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb696-6"><a href="appendixbaseline.html#cb696-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(blurb)</span>
+<span id="cb696-7"><a href="appendixbaseline.html#cb696-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb696-8"><a href="appendixbaseline.html#cb696-8" aria-hidden="true" tabindex="-1"></a>kickstarter_rec</span></code></pre></div>
+<pre><code>#&gt; Recipe
 #&gt; 
 #&gt; Inputs:
 #&gt; 
@@ -535,11 +535,11 @@ div.csl-indent {
 </div>
 <div id="lasso-regularized-classification-model" class="section level2" number="13.4">
 <h2><span class="header-section-number">C.4</span> Lasso regularized classification model</h2>
-<div class="sourceCode" id="cb696"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb696-1"><a href="appendixbaseline.html#cb696-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb696-2"><a href="appendixbaseline.html#cb696-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb696-3"><a href="appendixbaseline.html#cb696-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
-<span id="cb696-4"><a href="appendixbaseline.html#cb696-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb696-5"><a href="appendixbaseline.html#cb696-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
+<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="appendixbaseline.html#cb698-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb698-2"><a href="appendixbaseline.html#cb698-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb698-3"><a href="appendixbaseline.html#cb698-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb698-4"><a href="appendixbaseline.html#cb698-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-5"><a href="appendixbaseline.html#cb698-5" aria-hidden="true" tabindex="-1"></a>lasso_spec</span></code></pre></div>
 <pre><code>#&gt; Logistic Regression Model Specification (classification)
 #&gt; 
 #&gt; Main Arguments:
@@ -551,11 +551,11 @@ div.csl-indent {
 <div id="a-model-workflow" class="section level2" number="13.5">
 <h2><span class="header-section-number">C.5</span> A model workflow</h2>
 <p>We need a few more components before we can tune our workflow. Let’s use a sparse data encoding (Section <a href="mlclassification.html#casestudysparseencoding">7.5</a>).</p>
-<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="appendixbaseline.html#cb698-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
-<span id="cb698-2"><a href="appendixbaseline.html#cb698-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb700"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb700-1"><a href="appendixbaseline.html#cb700-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
+<span id="cb700-2"><a href="appendixbaseline.html#cb700-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
 <p>Let’s create a grid of possible regularization penalties to try.</p>
-<div class="sourceCode" id="cb699"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb699-1"><a href="appendixbaseline.html#cb699-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
-<span id="cb699-2"><a href="appendixbaseline.html#cb699-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
+<div class="sourceCode" id="cb701"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb701-1"><a href="appendixbaseline.html#cb701-1" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
+<span id="cb701-2"><a href="appendixbaseline.html#cb701-2" aria-hidden="true" tabindex="-1"></a>lambda_grid</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 20 × 1
 #&gt;      penalty
 #&gt;        &lt;dbl&gt;
@@ -580,11 +580,11 @@ div.csl-indent {
 #&gt; 19 0.546    
 #&gt; 20 1</code></pre>
 <p>Now these can be combined in a tuneable <code>workflow()</code>.</p>
-<div class="sourceCode" id="cb701"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb701-1"><a href="appendixbaseline.html#cb701-1" aria-hidden="true" tabindex="-1"></a>kickstarter_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb701-2"><a href="appendixbaseline.html#cb701-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kickstarter_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
-<span id="cb701-3"><a href="appendixbaseline.html#cb701-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
-<span id="cb701-4"><a href="appendixbaseline.html#cb701-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb701-5"><a href="appendixbaseline.html#cb701-5" aria-hidden="true" tabindex="-1"></a>kickstarter_wf</span></code></pre></div>
+<div class="sourceCode" id="cb703"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb703-1"><a href="appendixbaseline.html#cb703-1" aria-hidden="true" tabindex="-1"></a>kickstarter_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb703-2"><a href="appendixbaseline.html#cb703-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(kickstarter_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
+<span id="cb703-3"><a href="appendixbaseline.html#cb703-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb703-4"><a href="appendixbaseline.html#cb703-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb703-5"><a href="appendixbaseline.html#cb703-5" aria-hidden="true" tabindex="-1"></a>kickstarter_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: logistic_reg()
@@ -607,14 +607,14 @@ div.csl-indent {
 </div>
 <div id="tune-the-workflow" class="section level2" number="13.6">
 <h2><span class="header-section-number">C.6</span> Tune the workflow</h2>
-<div class="sourceCode" id="cb703"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb703-1"><a href="appendixbaseline.html#cb703-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
-<span id="cb703-2"><a href="appendixbaseline.html#cb703-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb703-3"><a href="appendixbaseline.html#cb703-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
-<span id="cb703-4"><a href="appendixbaseline.html#cb703-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_folds,</span>
-<span id="cb703-5"><a href="appendixbaseline.html#cb703-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid</span>
-<span id="cb703-6"><a href="appendixbaseline.html#cb703-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb703-7"><a href="appendixbaseline.html#cb703-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb703-8"><a href="appendixbaseline.html#cb703-8" aria-hidden="true" tabindex="-1"></a>lasso_rs</span></code></pre></div>
+<div class="sourceCode" id="cb705"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb705-1"><a href="appendixbaseline.html#cb705-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
+<span id="cb705-2"><a href="appendixbaseline.html#cb705-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb705-3"><a href="appendixbaseline.html#cb705-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
+<span id="cb705-4"><a href="appendixbaseline.html#cb705-4" aria-hidden="true" tabindex="-1"></a>  kickstarter_folds,</span>
+<span id="cb705-5"><a href="appendixbaseline.html#cb705-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> lambda_grid</span>
+<span id="cb705-6"><a href="appendixbaseline.html#cb705-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb705-7"><a href="appendixbaseline.html#cb705-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb705-8"><a href="appendixbaseline.html#cb705-8" aria-hidden="true" tabindex="-1"></a>lasso_rs</span></code></pre></div>
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 × 4
@@ -631,7 +631,7 @@ div.csl-indent {
 #&gt;  9 &lt;split [181883/20209]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
 #&gt; 10 &lt;split [181883/20209]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
 <p>What are the best models?</p>
-<div class="sourceCode" id="cb705"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb705-1"><a href="appendixbaseline.html#cb705-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb707"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb707-1"><a href="appendixbaseline.html#cb707-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;     penalty .metric .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -640,7 +640,7 @@ div.csl-indent {
 #&gt; 3 0.000207  roc_auc binary     0.752    10 0.000849 Preprocessor1_Model06
 #&gt; 4 0.000113  roc_auc binary     0.752    10 0.000858 Preprocessor1_Model05
 #&gt; 5 0.0000616 roc_auc binary     0.752    10 0.000865 Preprocessor1_Model04</code></pre>
-<div class="sourceCode" id="cb707"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb707-1"><a href="appendixbaseline.html#cb707-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb709"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb709-1"><a href="appendixbaseline.html#cb709-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -649,7 +649,7 @@ div.csl-indent {
 #&gt; 3 0.000207  accuracy binary     0.685    10 0.00102  Preprocessor1_Model06
 #&gt; 4 0.000113  accuracy binary     0.685    10 0.000926 Preprocessor1_Model05
 #&gt; 5 0.0000616 accuracy binary     0.685    10 0.000947 Preprocessor1_Model04</code></pre>
-<div class="sourceCode" id="cb709"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb709-1"><a href="appendixbaseline.html#cb709-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
+<div class="sourceCode" id="cb711"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb711-1"><a href="appendixbaseline.html#cb711-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
 <p><img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" /></p>
 
 </div>
@@ -664,7 +664,6 @@ div.csl-indent {
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -701,7 +700,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {

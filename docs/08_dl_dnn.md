@@ -255,7 +255,7 @@ kick_rec
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
@@ -301,7 +301,7 @@ prep(small_spec)
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 
