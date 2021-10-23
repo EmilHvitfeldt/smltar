@@ -46,4 +46,4 @@ tidy_pmi <- nested_words %>%
   unite(window_id, complaint_id, window_id) %>%
   pairwise_pmi(word, window_id)
 
-save(tidy_pmi, file = "data/tidy_pmi.rda")
+save(tidy_pmi, file = "data/tidy_pmi.rda", compress = "xz")
