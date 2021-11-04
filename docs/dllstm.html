@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-23" />
+<meta name="date" content="2021-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -657,10 +657,10 @@ When we include some dropout, we temporarily remove some units together with the
 <span id="cb530-23"><a href="dllstm.html#cb530-23" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3672
-#&gt;     accuracy: 0.8296
-#&gt;     val_loss: 0.6189
-#&gt; val_accuracy: 0.7354</code></pre>
+#&gt;         loss: 0.377
+#&gt;     accuracy: 0.824
+#&gt;     val_loss: 0.6223
+#&gt; val_accuracy: 0.7327</code></pre>
 <p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.3</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
 <div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="dllstm.html#cb532-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmvalhistory"></span>
@@ -675,10 +675,10 @@ FIGURE 9.3: Training and validation metrics for LSTM with dropout
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.735
-#&gt; 2 kap         binary         0.469
-#&gt; 3 mn_log_loss binary         0.619
-#&gt; 4 roc_auc     binary         0.806</code></pre>
+#&gt; 1 accuracy    binary         0.733
+#&gt; 2 kap         binary         0.464
+#&gt; 3 mn_log_loss binary         0.622
+#&gt; 4 roc_auc     binary         0.803</code></pre>
 <p>A regularized linear model trained on this data set achieved results of accuracy of 0.686 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
 <div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="dllstm.html#cb535-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
 <span id="cb535-2"><a href="dllstm.html#cb535-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
@@ -725,10 +725,10 @@ Simple RNNs can only connect very recent information and structure in sequences,
 <span id="cb536-23"><a href="dllstm.html#cb536-23" aria-hidden="true" tabindex="-1"></a>rnn_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4986
-#&gt;     accuracy: 0.765
-#&gt;     val_loss: 0.5958
-#&gt; val_accuracy: 0.7103</code></pre>
+#&gt;         loss: 0.4956
+#&gt;     accuracy: 0.7672
+#&gt;     val_loss: 0.5897
+#&gt; val_accuracy: 0.7133</code></pre>
 <p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.5</a>.</p>
 <div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="dllstm.html#cb538-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:rnnhistory"></span>
@@ -776,10 +776,10 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 <span id="cb539-24"><a href="dllstm.html#cb539-24" aria-hidden="true" tabindex="-1"></a>bilstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.366
-#&gt;     accuracy: 0.8311
-#&gt;     val_loss: 0.6215
-#&gt; val_accuracy: 0.7357</code></pre>
+#&gt;         loss: 0.3627
+#&gt;     accuracy: 0.8323
+#&gt;     val_loss: 0.6169
+#&gt; val_accuracy: 0.7363</code></pre>
 <p>The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well.</p>
 <div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="dllstm.html#cb541-1" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bilstm_mod, kick_assess, state_assess)</span>
 <span id="cb541-2"><a href="dllstm.html#cb541-2" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
@@ -787,10 +787,10 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.736
-#&gt; 2 kap         binary         0.469
-#&gt; 3 mn_log_loss binary         0.622
-#&gt; 4 roc_auc     binary         0.805</code></pre>
-<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.735).</p>
+#&gt; 2 kap         binary         0.472
+#&gt; 3 mn_log_loss binary         0.617
+#&gt; 4 roc_auc     binary         0.806</code></pre>
+<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.733).</p>
 </div>
 <div id="case-study-stacking-lstm-layers" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Case study: stacking LSTM layers</h2>
@@ -828,20 +828,20 @@ Intermediate layers must be set up to return sequences (with <code>return_sequen
 <span id="cb543-25"><a href="dllstm.html#cb543-25" aria-hidden="true" tabindex="-1"></a>stacked_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3793
-#&gt;     accuracy: 0.8242
-#&gt;     val_loss: 0.6086
-#&gt; val_accuracy: 0.7347</code></pre>
+#&gt;         loss: 0.3825
+#&gt;     accuracy: 0.8226
+#&gt;     val_loss: 0.6021
+#&gt; val_accuracy: 0.7337</code></pre>
 <p>Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.</p>
 <div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="dllstm.html#cb545-1" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(stacked_mod, kick_assess, state_assess)</span>
 <span id="cb545-2"><a href="dllstm.html#cb545-2" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.735
-#&gt; 2 kap         binary         0.467
-#&gt; 3 mn_log_loss binary         0.609
-#&gt; 4 roc_auc     binary         0.803</code></pre>
+#&gt; 1 accuracy    binary         0.734
+#&gt; 2 kap         binary         0.465
+#&gt; 3 mn_log_loss binary         0.602
+#&gt; 4 roc_auc     binary         0.802</code></pre>
 <p>We can gradually improve a model by changing and adding to its architecture.</p>
 </div>
 <div id="lstmpadding" class="section level2" number="9.5">
@@ -894,21 +894,21 @@ It is possible to set up an LSTM network that works with sequences of varied len
 <span id="cb550-23"><a href="dllstm.html#cb550-23" aria-hidden="true" tabindex="-1"></a>padding_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4282
-#&gt;     accuracy: 0.7921
-#&gt;     val_loss: 0.5973
-#&gt; val_accuracy: 0.7184</code></pre>
+#&gt;         loss: 0.4378
+#&gt;     accuracy: 0.7839
+#&gt;     val_loss: 0.6034
+#&gt; val_accuracy: 0.7126</code></pre>
 <p>This padding strategy results in noticeably worse performance than the default option!</p>
 <div class="sourceCode" id="cb552"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb552-1"><a href="dllstm.html#cb552-1" aria-hidden="true" tabindex="-1"></a>padding_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(padding_mod, pad_assess, state_assess)</span>
 <span id="cb552-2"><a href="dllstm.html#cb552-2" aria-hidden="true" tabindex="-1"></a>padding_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.718
-#&gt; 2 kap         binary         0.436
-#&gt; 3 mn_log_loss binary         0.597
-#&gt; 4 roc_auc     binary         0.790</code></pre>
-<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.735 and an AUC of 0.806; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
+#&gt; 1 accuracy    binary         0.713
+#&gt; 2 kap         binary         0.425
+#&gt; 3 mn_log_loss binary         0.603
+#&gt; 4 roc_auc     binary         0.787</code></pre>
+<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.733 and an AUC of 0.803; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
 <div class="rmdwarning">
 <p>
 Different preprocessing strategies have a huge impact on deep learning results.
@@ -989,9 +989,9 @@ A good default loss function for regression is mean squared error, <code>“mse�
 <pre><code>#&gt; # A tibble: 3 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 rmse    standard      27.3  
+#&gt; 1 rmse    standard      26.3  
 #&gt; 2 rsq     standard       0.766
-#&gt; 3 mae     standard      19.8</code></pre>
+#&gt; 3 mae     standard      19.3</code></pre>
 <p>This is much worse than the final regularized linear model trained in Section <a href="mlregression.html#mlregressionfull">6.9</a>, with an RMSE almost a decade worth of years worse. It’s possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline.</p>
 <div class="rmdwarning">
 <p>
@@ -1041,21 +1041,21 @@ The main problem with this regression model is that there isn’t that much data
 <span id="cb562-23"><a href="dllstm.html#cb562-23" aria-hidden="true" tabindex="-1"></a>smaller_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4674
-#&gt;     accuracy: 0.7723
-#&gt;     val_loss: 0.5853
-#&gt; val_accuracy: 0.7089</code></pre>
+#&gt;         loss: 0.4693
+#&gt;     accuracy: 0.7715
+#&gt;     val_loss: 0.5795
+#&gt; val_accuracy: 0.7069</code></pre>
 <p>How did this smaller model, based on a smaller vocabulary in the model, perform?</p>
 <div class="sourceCode" id="cb564"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb564-1"><a href="dllstm.html#cb564-1" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(smaller_mod, kick_assess, state_assess)</span>
 <span id="cb564-2"><a href="dllstm.html#cb564-2" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.709
-#&gt; 2 kap         binary         0.414
-#&gt; 3 mn_log_loss binary         0.585
-#&gt; 4 roc_auc     binary         0.780</code></pre>
-<p>The original LSTM model with the larger vocabulary had an accuracy of 0.735 and an AUC of 0.806. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
+#&gt; 1 accuracy    binary         0.707
+#&gt; 2 kap         binary         0.411
+#&gt; 3 mn_log_loss binary         0.579
+#&gt; 4 roc_auc     binary         0.779</code></pre>
+<p>The original LSTM model with the larger vocabulary had an accuracy of 0.733 and an AUC of 0.803. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
 <div class="rmdnote">
 <p>
 The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.
@@ -1126,10 +1126,10 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb568-33"><a href="dllstm.html#cb568-33" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3349
-#&gt;     accuracy: 0.8486
-#&gt;     val_loss: 0.5469
-#&gt; val_accuracy: 0.769</code></pre>
+#&gt;         loss: 0.3355
+#&gt;     accuracy: 0.848
+#&gt;     val_loss: 0.5407
+#&gt; val_accuracy: 0.7712</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
 <div class="sourceCode" id="cb570"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb570-1"><a href="dllstm.html#cb570-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
 <span id="cb570-2"><a href="dllstm.html#cb570-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
@@ -1138,9 +1138,9 @@ The relationship between this hyperparameter and model performance is weak over 
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.761
-#&gt; 2 kap         binary         0.521
-#&gt; 3 mn_log_loss binary         0.559
+#&gt; 1 accuracy    binary         0.763
+#&gt; 2 kap         binary         0.523
+#&gt; 3 mn_log_loss binary         0.554
 #&gt; 4 roc_auc     binary         0.834</code></pre>
 <p>This is our best-performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.6</a>.</p>
 <div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb572-1"><a href="dllstm.html#cb572-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
