@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-23" />
+<meta name="date" content="2021-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1541,6 +1541,7 @@ There is <em>one</em> tunable parameter in this model, the maximum number of tok
 #&gt; 4       4000
 #&gt; 5       5000
 #&gt; 6       6000</code></pre>
+<p>Now it’s time for tuning. Instead of using <code>fit_resamples()</code> as we have throughout this chapter, we are going to use <code>tune_grid()</code>, a function that has a very similar set of arguments. We pass this function our workflow (which holds our preprocessing recipe and SVM model), our resampling folds, and also the grid of possible parameter values to try. Let’s save the predictions so we can explore them in more detail, and let’s also set custom metrics instead of using the defaults. Let’s compute RMSE, mean absolute error, and mean absolute percent error during tuning.</p>
 <div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="mlregression.html#cb245-1" aria-hidden="true" tabindex="-1"></a>final_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb245-2"><a href="mlregression.html#cb245-2" aria-hidden="true" tabindex="-1"></a>  tune_wf,</span>
 <span id="cb245-3"><a href="mlregression.html#cb245-3" aria-hidden="true" tabindex="-1"></a>  scotus_folds,</span>
