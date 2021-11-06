@@ -869,9 +869,6 @@ Lemmatization is, like choices around n-grams and stop words, part of data prepr
 spacyr::spacy_initialize(entity = FALSE)
 ```
 
-```
-#> NULL
-```
 
 ```r
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
