@@ -613,7 +613,7 @@ explanation
 
 The output comes in a tibble format where `feature` and `feature_weight` are included, but fortunately lime contains some functions to visualize these weights. Figure \@ref(fig:limeplotfeatures) shows the result of using `plot_features()`, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Bars in the positive direction (darker) indicate that the weights _support_ the prediction and bars in the negative direction (lighter) indicate _contradictions_. This chart is great for finding the most prominent features in an observation.
 
-```{r}
+```{r, eval=FALSE}
 plot_features(explanation)
 ```
 
@@ -626,7 +626,7 @@ plot_features(explanation) +
 
 \index{models!explainability}Figure \@ref(fig:limeplottextexplanations) shows the weights by highlighting the words directly in the text. This gives us a way to see if any local patterns contain a lot of weight.
 
-```{r}
+```{r, eval=FALSE}
 plot_text_explanations(explanation)
 ```
 
@@ -689,7 +689,7 @@ explanation <- explain(
 
 Explanations based on these two sentences are fairly similar as we can see in Figure \@ref(fig:robustlimeplottextexplanations). However, notice how the removal of the word "whole" affects the weights of the other words in the examples, in some cases switching the sign from supporting to contradicting.
 
-```{r}
+```{r, eval=FALSE}
 plot_text_explanations(explanation)
 ```
 
