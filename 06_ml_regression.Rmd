@@ -624,9 +624,11 @@ Using lemmatization\index{lemma} instead of a more straightforward tokenization 
 
 Lemmatization is, like choices around n-grams and stop words, part of data preprocessing\index{preprocessing} so we define how to set up lemmatization as part of our preprocessing recipe. We use `engine = "spacyr"` for tokenization (instead of the default) and add `step_lemma()` to our preprocessing. This step extracts the lemmas from the parsing done by the tokenization engine.
 
-```{r lemmarec, dependson=c("lemmatb", "scotussplit"), message=FALSE}
+```{r lemmarecspacy, dependson=c("lemmatb", "scotussplit"), results='hide'}
 spacyr::spacy_initialize(entity = FALSE)
+```
 
+```{r lemmarec, dependson=c("lemmatb", "scotussplit"), message=FALSE}
 lemma_rec <- recipe(year ~ text, data = scotus_train) %>%
   step_tokenize(text, engine = "spacyr") %>%
   step_lemma(text) %>%
