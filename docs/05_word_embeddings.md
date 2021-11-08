@@ -166,7 +166,7 @@ slide_windows <- function(tbl, window_size) {
   out <- map2(skipgrams,
               1:length(skipgrams),
               ~ safe_mutate(.x, window_id = .y))
-
+  
   out %>%
     transpose() %>%
     pluck("result") %>%
@@ -280,9 +280,9 @@ nearest_neighbors <- function(df, token) {
         y <- .[rep(token, nrow(.)), ]
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
-
+        
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
-        },
+      },
       sort = TRUE
     )(item1, dimension, value) %>%
     select(-item2)
@@ -296,7 +296,7 @@ What words are closest to `"error"` in the data set of CFPB complaints, as deter
 
 ```r
 tidy_word_vectors %>%
-    nearest_neighbors("error")
+  nearest_neighbors("error")
 ```
 
 ```
@@ -316,6 +316,8 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
+
+
 Mistakes, problems, glitches -- sounds bad!
 
 What is closest to the word `"month"`?
@@ -323,7 +325,7 @@ What is closest to the word `"month"`?
 
 ```r
 tidy_word_vectors %>%
-    nearest_neighbors("month")
+  nearest_neighbors("month")
 ```
 
 ```
@@ -343,6 +345,9 @@ tidy_word_vectors %>%
 #> # … with 7,465 more rows
 ```
 
+
+
+
 We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter \@ref(stemming)), but the word embeddings learned that "month", "months", and "monthly" belong together.
 
 What words are closest in this embedding space to `"fee"`?
@@ -350,7 +355,7 @@ What words are closest in this embedding space to `"fee"`?
 
 ```r
 tidy_word_vectors %>%
-    nearest_neighbors("fee")
+  nearest_neighbors("fee")
 ```
 
 ```
@@ -396,30 +401,36 @@ tidy_word_vectors %>%
 #> # … with 7,037 more rows
 ```
 
+
+
+
 We now find words about overdrafts and charges. The top two words are "fee" and "fees"; word embeddings can learn that singular and plural\index{singular versus plural} forms of words are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter \@ref(stemming)) but more reliably and less arbitrarily.
 
 Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD\index{SVD} used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each _original_ dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.
 
 
+
+
+
 ```r
 tidy_word_vectors %>%
-    filter(dimension <= 24) %>%
-    group_by(dimension) %>%
-    top_n(12, abs(value)) %>%
-    ungroup %>%
-    mutate(item1 = reorder_within(item1, value, dimension)) %>%
-    ggplot(aes(item1, value, fill = dimension)) +
-    geom_col(alpha = 0.8, show.legend = FALSE) +
-    facet_wrap(~dimension, scales = "free_y", ncol = 4) +
-    scale_x_reordered() +
-    coord_flip() +
-    labs(
-      x = NULL,
-      y = "Value",
-      title = "First 24 principal components for text of CFPB complaints",
-      subtitle = paste("Top words contributing to the components that explain",
-                       "the most variation")
-    )
+  filter(dimension <= 24) %>%
+  group_by(dimension) %>%
+  top_n(12, abs(value)) %>%
+  ungroup() %>%
+  mutate(item1 = reorder_within(item1, value, dimension)) %>%
+  ggplot(aes(item1, value, fill = dimension)) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~dimension, scales = "free_y", ncol = 4) +
+  scale_x_reordered() +
+  coord_flip() +
+  labs(
+    x = NULL,
+    y = "Value",
+    title = "First 24 principal components for text of CFPB complaints",
+    subtitle = paste("Top words contributing to the components that explain",
+                     "the most variation")
+  )
 ```
 
 <div class="figure" style="text-align: center">
@@ -540,7 +551,7 @@ nearest_neighbors <- function(df, token) {
         res <- rowSums(. * y) / 
           (sqrt(rowSums(. ^ 2)) * sqrt(sum(.[token, ] ^ 2)))
         matrix(res, ncol = 1, dimnames = list(x = names(res)))
-        },
+      },
       sort = TRUE,
       maximum_size = NULL
     )(item1, dimension, value) %>%
@@ -553,7 +564,7 @@ nearest_neighbors <- function(df, token) {
 
 ```r
 tidy_glove %>%
-    nearest_neighbors("error")
+  nearest_neighbors("error")
 ```
 
 ```
@@ -573,14 +584,16 @@ tidy_glove %>%
 #> # … with 399,990 more rows
 ```
 
-Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
+
+
+Instead of the more specific clerical mistakes and discrepancies in the CFPB embeddings, we now see more general words about being correct or incorrect. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word "error".
 
 What is closest to the word `"month"` in these pre-trained \index{embeddings!GloVe}GloVe embeddings?\index{embeddings!pre-trained}
 
 
 ```r
 tidy_glove %>%
-    nearest_neighbors("month")
+  nearest_neighbors("month")
 ```
 
 ```
@@ -600,6 +613,8 @@ tidy_glove %>%
 #> # … with 399,990 more rows
 ```
 
+
+
 Instead of words about payments, the GloVe results here focus on different time periods only.
 
 What words are closest in the \index{embeddings!GloVe}GloVe embedding space to `"fee"`?
@@ -607,7 +622,7 @@ What words are closest in the \index{embeddings!GloVe}GloVe embedding space to `
 
 ```r
 tidy_glove %>%
-    nearest_neighbors("fee")
+  nearest_neighbors("fee")
 ```
 
 ```
@@ -626,6 +641,8 @@ tidy_glove %>%
 #> 10 expenses     0.619
 #> # … with 399,990 more rows
 ```
+
+
 
 The most similar words are, like with the CPFB embeddings, generally financial, but they are largely about salary and pay instead of about charges and overdrafts.
 
@@ -674,7 +691,7 @@ Since these GloVe embeddings\index{embeddings!GloVe} had the same number of dime
 ## Fairness and word embeddings {#fairnessembeddings}
 
 Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias.\index{bias}
- 
+
 \index{corpus}
 <div class="rmdwarning">
 <p>Embeddings are trained or learned from a large corpus of text data, and whatever human prejudice or bias exists in the corpus becomes imprinted into the vector data of the embeddings.</p>

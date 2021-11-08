@@ -266,6 +266,7 @@ Notice how the words in the trigrams overlap so that the word "down" appears in 
 It is important to choose the right value for `n` when using n-grams for the question we want to answer. Using unigrams is faster and more efficient, but we don't capture information about word order. Using a higher value for `n` keeps more information, but the vector space of tokens increases dramatically, corresponding to a reduction in token counts. A sensible starting point in most cases is three. However, if you don't have a large vocabulary in your data set, consider starting at two instead of three and experimenting from there. Figure \@ref(fig:ngramtokens) demonstrates how token frequency starts to decrease dramatically for trigrams and higher-order n-grams. 
 
 ```{r ngramtokens, echo=FALSE, fig.cap="Using longer n-grams results in a higher number of unique tokens with fewer counts. Note that the color maps to counts on a logarithmic scale."}
+set.seed(1234)
 length_and_max <- function(x) {
   tab <- table(x)
   paste(length(tab), max(tab), sep = "-")
@@ -404,6 +405,7 @@ Another thing to consider is the degree of compression each type of tokenization
 Figure \@ref(fig:tokendists) illustrates these points. Each of the fairy tales from **hcandersenr** has been tokenized in five different ways and the number of distinct tokens has been plotted along the x-axis (note that the x-axis is logarithmic). We see that the number of distinct tokens decreases if we convert words to lowercase or extract word stems (see Chapter \@ref(stemming) for more on stemming). Second, notice that the distributions of distinct tokens for character tokenizers are quite narrow; these texts use all or most of the letters in the English alphabet.
 
 ```{r tokendists, echo=FALSE, fig.cap="The number of distinct tokens can vary enormously for different tokenizers"}
+set.seed(1234)
 tokendist_chars_no_alpnum <- function(data) {
   tokenize_characters(data) %>% map_int(~table(.x) %>% length())
 }
