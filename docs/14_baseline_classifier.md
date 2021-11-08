@@ -84,7 +84,7 @@ kickstarter_rec
 ```
 
 ```
-#> Data Recipe
+#> Recipe
 #> 
 #> Inputs:
 #> 

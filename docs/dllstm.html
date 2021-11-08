@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="dldnn.html"/>
 <link rel="next" href="dlcnn.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -460,10 +460,10 @@ div.csl-indent {
 <div id="firstlstm" class="section level2" number="9.1">
 <h2><span class="header-section-number">9.1</span> A first LSTM model</h2>
 <p>We will be using the same data from the previous chapter, described in Sections <a href="dldnn.html#kickstarter">8.1</a> and <a href="appendixdata.html#kickstarter-blurbs">B.4</a>. This data contains short text blurbs for prospective crowdfunding campaigns and whether those campaigns were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let’s start by splitting our data into training and testing sets.</p>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="dllstm.html#cb509-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb509-2"><a href="dllstm.html#cb509-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb509-3"><a href="dllstm.html#cb509-3" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>)</span>
-<span id="cb509-4"><a href="dllstm.html#cb509-4" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="dllstm.html#cb511-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb511-2"><a href="dllstm.html#cb511-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb511-3"><a href="dllstm.html#cb511-3" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>)</span>
+<span id="cb511-4"><a href="dllstm.html#cb511-4" aria-hidden="true" tabindex="-1"></a>kickstarter</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 269,790 × 3
 #&gt;    blurb                                                        state created_at
 #&gt;    &lt;chr&gt;                                                        &lt;dbl&gt; &lt;date&gt;    
@@ -478,25 +478,25 @@ div.csl-indent {
 #&gt;  9 Post Card don’t set out to simply decorate stories. Our goa…     0 2015-06-25
 #&gt; 10 My name is Siu Lon Liu and I am an illustrator seeking fund…     0 2014-07-19
 #&gt; # … with 269,780 more rows</code></pre>
-<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="dllstm.html#cb511-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb511-2"><a href="dllstm.html#cb511-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb511-3"><a href="dllstm.html#cb511-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
-<span id="cb511-4"><a href="dllstm.html#cb511-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb511-5"><a href="dllstm.html#cb511-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.integer</span>(state)) <span class="sc">%&gt;%</span></span>
-<span id="cb511-6"><a href="dllstm.html#cb511-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
-<span id="cb511-7"><a href="dllstm.html#cb511-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb511-8"><a href="dllstm.html#cb511-8" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
-<span id="cb511-9"><a href="dllstm.html#cb511-9" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span></code></pre></div>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="dllstm.html#cb513-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb513-2"><a href="dllstm.html#cb513-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb513-3"><a href="dllstm.html#cb513-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
+<span id="cb513-4"><a href="dllstm.html#cb513-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(blurb) <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb513-5"><a href="dllstm.html#cb513-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.integer</span>(state)) <span class="sc">%&gt;%</span></span>
+<span id="cb513-6"><a href="dllstm.html#cb513-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>()</span>
+<span id="cb513-7"><a href="dllstm.html#cb513-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb513-8"><a href="dllstm.html#cb513-8" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
+<span id="cb513-9"><a href="dllstm.html#cb513-9" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span></code></pre></div>
 <p>Just as described in Chapter <a href="dldnn.html#dldnn">8</a>, the preprocessing needed for deep learning network architectures is somewhat different than for the models we used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. The first step is still to tokenize the text, as described in Chapter <a href="tokenization.html#tokenization">2</a>. After we tokenize, we filter to keep only how many words we’ll include in the analysis; <code>step_tokenfilter()</code> keeps the top tokens based on frequency in this data set.</p>
-<div class="sourceCode" id="cb512"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb512-1"><a href="dllstm.html#cb512-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
-<span id="cb512-2"><a href="dllstm.html#cb512-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb512-3"><a href="dllstm.html#cb512-3" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
-<span id="cb512-4"><a href="dllstm.html#cb512-4" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb512-5"><a href="dllstm.html#cb512-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb512-6"><a href="dllstm.html#cb512-6" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb512-7"><a href="dllstm.html#cb512-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb512-8"><a href="dllstm.html#cb512-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb512-9"><a href="dllstm.html#cb512-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span></code></pre></div>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="dllstm.html#cb514-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb514-2"><a href="dllstm.html#cb514-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb514-3"><a href="dllstm.html#cb514-3" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
+<span id="cb514-4"><a href="dllstm.html#cb514-4" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb514-5"><a href="dllstm.html#cb514-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb514-6"><a href="dllstm.html#cb514-6" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb514-7"><a href="dllstm.html#cb514-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb514-8"><a href="dllstm.html#cb514-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb514-9"><a href="dllstm.html#cb514-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span></code></pre></div>
 <p>After tokenizing, the preprocessing is different. We use <code>step_sequence_onehot()</code> to encode the sequences of words as integers representing each token in the vocabulary of 20,000 words, as described in detail in Section <a href="dldnn.html#onehotsequence">8.2.2</a>. This is different than the representations we used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>, mainly because information about word sequence is encoded in this representation.</p>
 
 <div class="rmdnote">
@@ -509,10 +509,10 @@ Like we discussed in the last chapter, we are using <strong>recipes</strong> and
 </p>
 </div>
 <p>We could have applied these <code>prep()</code> and <code>bake()</code> functions to any preprocessing recipes throughout this book, but we typically didn’t need to because our modeling workflows automated these steps.</p>
-<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="dllstm.html#cb513-1" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb513-2"><a href="dllstm.html#cb513-2" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb513-3"><a href="dllstm.html#cb513-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb513-4"><a href="dllstm.html#cb513-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="dllstm.html#cb515-1" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb515-2"><a href="dllstm.html#cb515-2" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb515-3"><a href="dllstm.html#cb515-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb515-4"><a href="dllstm.html#cb515-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 <p>Here we use <code>composition = "matrix"</code> because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.</p>
 <div id="building-an-lstm" class="section level3" number="9.1.1">
@@ -528,14 +528,14 @@ FIGURE 9.1: High-level diagram of an unrolled recurrent neural network. The recu
 </div>
 <p>The exact shape and function of network <span class="math inline">\(A\)</span> are beyond the reach of this book. For further study, Christopher Olah’s blog post <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">“Understanding LSTM Networks”</a> gives a more technical overview of how LSTM networks work.</p>
 <p>The Keras library has convenient functions for broadly-used architectures like LSTMs so we don’t have to build it from scratch using layers; we can instead use <code>layer_lstm()</code>. This comes <em>after</em> an embedding layer that makes dense vectors from our word sequences and <em>before</em> a densely-connected layer for output.</p>
-<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="dllstm.html#cb515-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
-<span id="cb515-2"><a href="dllstm.html#cb515-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb515-3"><a href="dllstm.html#cb515-3" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb515-4"><a href="dllstm.html#cb515-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb515-5"><a href="dllstm.html#cb515-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb515-6"><a href="dllstm.html#cb515-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb515-7"><a href="dllstm.html#cb515-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb515-8"><a href="dllstm.html#cb515-8" aria-hidden="true" tabindex="-1"></a>lstm_mod</span></code></pre></div>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="dllstm.html#cb517-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb517-2"><a href="dllstm.html#cb517-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb517-3"><a href="dllstm.html#cb517-3" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb517-4"><a href="dllstm.html#cb517-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb517-5"><a href="dllstm.html#cb517-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb517-6"><a href="dllstm.html#cb517-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb517-7"><a href="dllstm.html#cb517-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb517-8"><a href="dllstm.html#cb517-8" aria-hidden="true" tabindex="-1"></a>lstm_mod</span></code></pre></div>
 <pre><code>#&gt; Model
 #&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
@@ -561,28 +561,28 @@ Notice the number of parameters in this LSTM model, about twice as many as the d
 <div class="rmdnote">
 A good default optimizer for many problems is <code>"adam"</code> <span class="citation">(<a href="#ref-kingma2017adam" role="doc-biblioref">Kingma and Ba 2017</a>)</span>, and a good loss function for binary classification is <code>"binary_crossentropy"</code>.
 </div>
-<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="dllstm.html#cb517-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb517-2"><a href="dllstm.html#cb517-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb517-3"><a href="dllstm.html#cb517-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb517-4"><a href="dllstm.html#cb517-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb517-5"><a href="dllstm.html#cb517-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb517-6"><a href="dllstm.html#cb517-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="dllstm.html#cb519-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb519-2"><a href="dllstm.html#cb519-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb519-3"><a href="dllstm.html#cb519-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb519-4"><a href="dllstm.html#cb519-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb519-5"><a href="dllstm.html#cb519-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb519-6"><a href="dllstm.html#cb519-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 
 <div class="rmdwarning">
 As we noted in Chapter <a href="dldnn.html#dldnn">8</a>, the neural network model is modified <strong>in place</strong>; the object <code>lstm_mod</code> is different after we compile it, even though we didn’t assign the object to anything. This is different from how most objects in R work, so pay special attention to the state of your model objects.
 </div>
 <p>After the model is compiled, we can fit it. The <code>fit()</code> method for Keras models has an argument <code>validation_split</code> that will set apart a fraction of the training data for evaluation and assessment. The performance metrics are evaluated on the validation set at the <em>end</em> of each epoch.</p>
-<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="dllstm.html#cb518-1" aria-hidden="true" tabindex="-1"></a>lstm_history <span class="ot">&lt;-</span> lstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb518-2"><a href="dllstm.html#cb518-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb518-3"><a href="dllstm.html#cb518-3" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
-<span id="cb518-4"><a href="dllstm.html#cb518-4" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
-<span id="cb518-5"><a href="dllstm.html#cb518-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb518-6"><a href="dllstm.html#cb518-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.25</span>,</span>
-<span id="cb518-7"><a href="dllstm.html#cb518-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb518-8"><a href="dllstm.html#cb518-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb518-9"><a href="dllstm.html#cb518-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb518-10"><a href="dllstm.html#cb518-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb518-11"><a href="dllstm.html#cb518-11" aria-hidden="true" tabindex="-1"></a>lstm_history</span></code></pre></div>
+<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="dllstm.html#cb520-1" aria-hidden="true" tabindex="-1"></a>lstm_history <span class="ot">&lt;-</span> lstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb520-2"><a href="dllstm.html#cb520-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb520-3"><a href="dllstm.html#cb520-3" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
+<span id="cb520-4"><a href="dllstm.html#cb520-4" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
+<span id="cb520-5"><a href="dllstm.html#cb520-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb520-6"><a href="dllstm.html#cb520-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.25</span>,</span>
+<span id="cb520-7"><a href="dllstm.html#cb520-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb520-8"><a href="dllstm.html#cb520-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb520-9"><a href="dllstm.html#cb520-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb520-10"><a href="dllstm.html#cb520-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb520-11"><a href="dllstm.html#cb520-11" aria-hidden="true" tabindex="-1"></a>lstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
 #&gt;         loss: 0.257
@@ -590,7 +590,7 @@ As we noted in Chapter <a href="dldnn.html#dldnn">8</a>, the neural network mode
 #&gt;     val_loss: 0.7724
 #&gt; val_accuracy: 0.7555</code></pre>
 <p>The loss on the training data (called <code>loss</code> here) is much better than the loss on the validation data (<code>val_loss</code>), indicating that we are overfitting pretty dramatically. We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:firstlstmhistory">9.2</a>.</p>
-<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="dllstm.html#cb520-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="dllstm.html#cb522-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:firstlstmhistory"></span>
 <img src="09_dl_lstm_files/figure-html/firstlstmhistory-1.svg" alt="Training and validation metrics for LSTM" width="672" />
 <p class="caption">
@@ -607,62 +607,62 @@ Remember that lower loss indicates a better fitting model, and higher accuracy (
 <div id="lstmevaluation" class="section level3" number="9.1.2">
 <h3><span class="header-section-number">9.1.2</span> Evaluation</h3>
 <p>We used some Keras defaults for model evaluation in the previous section, but just like we demonstrated in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a>, we can take more control if we want or need to. Instead of using the <code>validation_split</code> argument, we can use the <code>validation_data</code> argument and send in our own validation set creating with rsample.</p>
-<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="dllstm.html#cb521-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
-<span id="cb521-2"><a href="dllstm.html#cb521-2" aria-hidden="true" tabindex="-1"></a>kick_val <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(kickstarter_train, <span class="at">strata =</span> state)</span>
-<span id="cb521-3"><a href="dllstm.html#cb521-3" aria-hidden="true" tabindex="-1"></a>kick_val</span></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="dllstm.html#cb523-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
+<span id="cb523-2"><a href="dllstm.html#cb523-2" aria-hidden="true" tabindex="-1"></a>kick_val <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(kickstarter_train, <span class="at">strata =</span> state)</span>
+<span id="cb523-3"><a href="dllstm.html#cb523-3" aria-hidden="true" tabindex="-1"></a>kick_val</span></code></pre></div>
 <pre><code>#&gt; # Validation Set Split (0.75/0.25)  using stratification 
 #&gt; # A tibble: 1 × 2
 #&gt;   splits                 id        
 #&gt;   &lt;list&gt;                 &lt;chr&gt;     
 #&gt; 1 &lt;split [151568/50524]&gt; validation</code></pre>
 <p>We can access the two data sets specified by this <code>split</code> via the functions <code>analysis()</code> (the analog to training) and <code>assessment()</code> (the analog to testing). We need to apply our prepped preprocessing recipe <code>kick_prep</code> to both to transform this data to the appropriate format for our neural network architecture.</p>
-<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="dllstm.html#cb523-1" aria-hidden="true" tabindex="-1"></a>kick_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb523-2"><a href="dllstm.html#cb523-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb523-3"><a href="dllstm.html#cb523-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_analysis)</span></code></pre></div>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="dllstm.html#cb525-1" aria-hidden="true" tabindex="-1"></a>kick_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb525-2"><a href="dllstm.html#cb525-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb525-3"><a href="dllstm.html#cb525-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_analysis)</span></code></pre></div>
 <pre><code>#&gt; [1] 151568     30</code></pre>
-<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="dllstm.html#cb525-1" aria-hidden="true" tabindex="-1"></a>kick_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb525-2"><a href="dllstm.html#cb525-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb525-3"><a href="dllstm.html#cb525-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_assess)</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="dllstm.html#cb527-1" aria-hidden="true" tabindex="-1"></a>kick_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb527-2"><a href="dllstm.html#cb527-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb527-3"><a href="dllstm.html#cb527-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_assess)</span></code></pre></div>
 <pre><code>#&gt; [1] 50524    30</code></pre>
 <p>These are each matrices appropriate for a Keras model. We will also need the outcome variables for both sets.</p>
-<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="dllstm.html#cb527-1" aria-hidden="true" tabindex="-1"></a>state_analysis <span class="ot">&lt;-</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
-<span id="cb527-2"><a href="dllstm.html#cb527-2" aria-hidden="true" tabindex="-1"></a>state_assess <span class="ot">&lt;-</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="dllstm.html#cb529-1" aria-hidden="true" tabindex="-1"></a>state_analysis <span class="ot">&lt;-</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span>
+<span id="cb529-2"><a href="dllstm.html#cb529-2" aria-hidden="true" tabindex="-1"></a>state_assess <span class="ot">&lt;-</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(state)</span></code></pre></div>
 <p>Let’s also think about our LSTM model architecture. We saw evidence for significant overfitting with our first LSTM, and we can counteract that by including dropout, both in the regular sense (<code>dropout</code>) and in the feedback loops (<code>recurrent_dropout</code>).</p>
 
 <div class="rmdwarning">
 When we include some dropout, we temporarily remove some units together with their connections from the network. The purpose of this is typically to reduce overfitting <span class="citation">(<a href="#ref-Srivastava2014" role="doc-biblioref">Srivastava et al. 2014</a>)</span>. Dropout is not exclusive to LSTM models, and can also be used in many other kinds of network architectures. Another way to add dropout to a network is with <code>layer_dropout()</code>.
 </div>
-<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="dllstm.html#cb528-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb528-2"><a href="dllstm.html#cb528-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb528-3"><a href="dllstm.html#cb528-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb528-4"><a href="dllstm.html#cb528-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb528-5"><a href="dllstm.html#cb528-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb528-6"><a href="dllstm.html#cb528-6" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb528-7"><a href="dllstm.html#cb528-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb528-8"><a href="dllstm.html#cb528-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb528-9"><a href="dllstm.html#cb528-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb528-10"><a href="dllstm.html#cb528-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb528-11"><a href="dllstm.html#cb528-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb528-12"><a href="dllstm.html#cb528-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb528-13"><a href="dllstm.html#cb528-13" aria-hidden="true" tabindex="-1"></a>val_history <span class="ot">&lt;-</span> lstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb528-14"><a href="dllstm.html#cb528-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb528-15"><a href="dllstm.html#cb528-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
-<span id="cb528-16"><a href="dllstm.html#cb528-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb528-17"><a href="dllstm.html#cb528-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb528-18"><a href="dllstm.html#cb528-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
-<span id="cb528-19"><a href="dllstm.html#cb528-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb528-20"><a href="dllstm.html#cb528-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb528-21"><a href="dllstm.html#cb528-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb528-22"><a href="dllstm.html#cb528-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb528-23"><a href="dllstm.html#cb528-23" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="dllstm.html#cb530-1" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb530-2"><a href="dllstm.html#cb530-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb530-3"><a href="dllstm.html#cb530-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb530-4"><a href="dllstm.html#cb530-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb530-5"><a href="dllstm.html#cb530-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb530-6"><a href="dllstm.html#cb530-6" aria-hidden="true" tabindex="-1"></a>lstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb530-7"><a href="dllstm.html#cb530-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb530-8"><a href="dllstm.html#cb530-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb530-9"><a href="dllstm.html#cb530-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb530-10"><a href="dllstm.html#cb530-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb530-11"><a href="dllstm.html#cb530-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb530-12"><a href="dllstm.html#cb530-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb530-13"><a href="dllstm.html#cb530-13" aria-hidden="true" tabindex="-1"></a>val_history <span class="ot">&lt;-</span> lstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb530-14"><a href="dllstm.html#cb530-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb530-15"><a href="dllstm.html#cb530-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
+<span id="cb530-16"><a href="dllstm.html#cb530-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb530-17"><a href="dllstm.html#cb530-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb530-18"><a href="dllstm.html#cb530-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
+<span id="cb530-19"><a href="dllstm.html#cb530-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb530-20"><a href="dllstm.html#cb530-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb530-21"><a href="dllstm.html#cb530-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb530-22"><a href="dllstm.html#cb530-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb530-23"><a href="dllstm.html#cb530-23" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3758
-#&gt;     accuracy: 0.8234
-#&gt;     val_loss: 0.616
-#&gt; val_accuracy: 0.7365</code></pre>
+#&gt;         loss: 0.377
+#&gt;     accuracy: 0.824
+#&gt;     val_loss: 0.6223
+#&gt; val_accuracy: 0.7327</code></pre>
 <p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.3</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
-<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="dllstm.html#cb530-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="dllstm.html#cb532-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmvalhistory"></span>
 <img src="09_dl_lstm_files/figure-html/lstmvalhistory-1.svg" alt="Training and validation metrics for LSTM with dropout" width="672" />
 <p class="caption">
@@ -670,19 +670,19 @@ FIGURE 9.3: Training and validation metrics for LSTM with dropout
 </p>
 </div>
 <p>Remember that this is specific validation data that we have chosen ahead of time, so we can evaluate metrics flexibly in any way we need to, for example, using yardstick functions. We can create a tibble with the true and predicted values for the validation set.</p>
-<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="dllstm.html#cb531-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(lstm_mod, kick_assess, state_assess)</span>
-<span id="cb531-2"><a href="dllstm.html#cb531-2" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="dllstm.html#cb533-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(lstm_mod, kick_assess, state_assess)</span>
+<span id="cb533-2"><a href="dllstm.html#cb533-2" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.736
-#&gt; 2 kap         binary         0.471
-#&gt; 3 mn_log_loss binary         0.616
-#&gt; 4 roc_auc     binary         0.805</code></pre>
+#&gt; 1 accuracy    binary         0.733
+#&gt; 2 kap         binary         0.464
+#&gt; 3 mn_log_loss binary         0.622
+#&gt; 4 roc_auc     binary         0.803</code></pre>
 <p>A regularized linear model trained on this data set achieved results of accuracy of 0.686 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
-<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="dllstm.html#cb533-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
-<span id="cb533-2"><a href="dllstm.html#cb533-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
-<span id="cb533-3"><a href="dllstm.html#cb533-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="dllstm.html#cb535-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
+<span id="cb535-2"><a href="dllstm.html#cb535-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb535-3"><a href="dllstm.html#cb535-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmvalroc"></span>
 <img src="09_dl_lstm_files/figure-html/lstmvalroc-1.svg" alt="ROC curve for LSTM with dropout predictions of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -700,37 +700,37 @@ Simple RNNs can only connect very recent information and structure in sequences,
 </p>
 </div>
 <p>Let’s train an RNN to see how it compares to the LSTM.</p>
-<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="dllstm.html#cb534-1" aria-hidden="true" tabindex="-1"></a>rnn_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb534-2"><a href="dllstm.html#cb534-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb534-3"><a href="dllstm.html#cb534-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_simple_rnn</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb534-4"><a href="dllstm.html#cb534-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb534-5"><a href="dllstm.html#cb534-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb534-6"><a href="dllstm.html#cb534-6" aria-hidden="true" tabindex="-1"></a>rnn_mod <span class="sc">%&gt;%</span></span>
-<span id="cb534-7"><a href="dllstm.html#cb534-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb534-8"><a href="dllstm.html#cb534-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb534-9"><a href="dllstm.html#cb534-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb534-10"><a href="dllstm.html#cb534-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb534-11"><a href="dllstm.html#cb534-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb534-12"><a href="dllstm.html#cb534-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb534-13"><a href="dllstm.html#cb534-13" aria-hidden="true" tabindex="-1"></a>rnn_history <span class="ot">&lt;-</span> rnn_mod <span class="sc">%&gt;%</span></span>
-<span id="cb534-14"><a href="dllstm.html#cb534-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb534-15"><a href="dllstm.html#cb534-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
-<span id="cb534-16"><a href="dllstm.html#cb534-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb534-17"><a href="dllstm.html#cb534-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb534-18"><a href="dllstm.html#cb534-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
-<span id="cb534-19"><a href="dllstm.html#cb534-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb534-20"><a href="dllstm.html#cb534-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb534-21"><a href="dllstm.html#cb534-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb534-22"><a href="dllstm.html#cb534-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb534-23"><a href="dllstm.html#cb534-23" aria-hidden="true" tabindex="-1"></a>rnn_history</span></code></pre></div>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="dllstm.html#cb536-1" aria-hidden="true" tabindex="-1"></a>rnn_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb536-2"><a href="dllstm.html#cb536-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb536-3"><a href="dllstm.html#cb536-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_simple_rnn</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb536-4"><a href="dllstm.html#cb536-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb536-5"><a href="dllstm.html#cb536-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb536-6"><a href="dllstm.html#cb536-6" aria-hidden="true" tabindex="-1"></a>rnn_mod <span class="sc">%&gt;%</span></span>
+<span id="cb536-7"><a href="dllstm.html#cb536-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb536-8"><a href="dllstm.html#cb536-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb536-9"><a href="dllstm.html#cb536-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb536-10"><a href="dllstm.html#cb536-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb536-11"><a href="dllstm.html#cb536-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb536-12"><a href="dllstm.html#cb536-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb536-13"><a href="dllstm.html#cb536-13" aria-hidden="true" tabindex="-1"></a>rnn_history <span class="ot">&lt;-</span> rnn_mod <span class="sc">%&gt;%</span></span>
+<span id="cb536-14"><a href="dllstm.html#cb536-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb536-15"><a href="dllstm.html#cb536-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
+<span id="cb536-16"><a href="dllstm.html#cb536-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb536-17"><a href="dllstm.html#cb536-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb536-18"><a href="dllstm.html#cb536-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
+<span id="cb536-19"><a href="dllstm.html#cb536-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb536-20"><a href="dllstm.html#cb536-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb536-21"><a href="dllstm.html#cb536-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb536-22"><a href="dllstm.html#cb536-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb536-23"><a href="dllstm.html#cb536-23" aria-hidden="true" tabindex="-1"></a>rnn_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4961
-#&gt;     accuracy: 0.7678
-#&gt;     val_loss: 0.5928
-#&gt; val_accuracy: 0.7143</code></pre>
+#&gt;         loss: 0.4956
+#&gt;     accuracy: 0.7672
+#&gt;     val_loss: 0.5897
+#&gt; val_accuracy: 0.7133</code></pre>
 <p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.5</a>.</p>
-<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="dllstm.html#cb536-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
+<div class="sourceCode" id="cb538"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb538-1"><a href="dllstm.html#cb538-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:rnnhistory"></span>
 <img src="09_dl_lstm_files/figure-html/rnnhistory-1.svg" alt="Training and validation metrics for RNN" width="672" />
 <p class="caption">
@@ -750,47 +750,47 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 </p>
 </div>
 <p>The input sequences are passed through the network in two directions, both forward and backward, allowing the network to learn more context, structures, and dependencies.</p>
-<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="dllstm.html#cb537-1" aria-hidden="true" tabindex="-1"></a>bilstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb537-2"><a href="dllstm.html#cb537-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb537-3"><a href="dllstm.html#cb537-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>,</span>
-<span id="cb537-4"><a href="dllstm.html#cb537-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb537-5"><a href="dllstm.html#cb537-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb537-6"><a href="dllstm.html#cb537-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb537-7"><a href="dllstm.html#cb537-7" aria-hidden="true" tabindex="-1"></a>bilstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb537-8"><a href="dllstm.html#cb537-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb537-9"><a href="dllstm.html#cb537-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb537-10"><a href="dllstm.html#cb537-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb537-11"><a href="dllstm.html#cb537-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb537-12"><a href="dllstm.html#cb537-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb537-13"><a href="dllstm.html#cb537-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb537-14"><a href="dllstm.html#cb537-14" aria-hidden="true" tabindex="-1"></a>bilstm_history <span class="ot">&lt;-</span> bilstm_mod <span class="sc">%&gt;%</span></span>
-<span id="cb537-15"><a href="dllstm.html#cb537-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb537-16"><a href="dllstm.html#cb537-16" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
-<span id="cb537-17"><a href="dllstm.html#cb537-17" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb537-18"><a href="dllstm.html#cb537-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb537-19"><a href="dllstm.html#cb537-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
-<span id="cb537-20"><a href="dllstm.html#cb537-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb537-21"><a href="dllstm.html#cb537-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb537-22"><a href="dllstm.html#cb537-22" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb537-23"><a href="dllstm.html#cb537-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb537-24"><a href="dllstm.html#cb537-24" aria-hidden="true" tabindex="-1"></a>bilstm_history</span></code></pre></div>
+<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="dllstm.html#cb539-1" aria-hidden="true" tabindex="-1"></a>bilstm_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb539-2"><a href="dllstm.html#cb539-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb539-3"><a href="dllstm.html#cb539-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>,</span>
+<span id="cb539-4"><a href="dllstm.html#cb539-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb539-5"><a href="dllstm.html#cb539-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb539-6"><a href="dllstm.html#cb539-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-7"><a href="dllstm.html#cb539-7" aria-hidden="true" tabindex="-1"></a>bilstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb539-8"><a href="dllstm.html#cb539-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb539-9"><a href="dllstm.html#cb539-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb539-10"><a href="dllstm.html#cb539-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb539-11"><a href="dllstm.html#cb539-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb539-12"><a href="dllstm.html#cb539-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb539-13"><a href="dllstm.html#cb539-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-14"><a href="dllstm.html#cb539-14" aria-hidden="true" tabindex="-1"></a>bilstm_history <span class="ot">&lt;-</span> bilstm_mod <span class="sc">%&gt;%</span></span>
+<span id="cb539-15"><a href="dllstm.html#cb539-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb539-16"><a href="dllstm.html#cb539-16" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
+<span id="cb539-17"><a href="dllstm.html#cb539-17" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb539-18"><a href="dllstm.html#cb539-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb539-19"><a href="dllstm.html#cb539-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
+<span id="cb539-20"><a href="dllstm.html#cb539-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb539-21"><a href="dllstm.html#cb539-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb539-22"><a href="dllstm.html#cb539-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb539-23"><a href="dllstm.html#cb539-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb539-24"><a href="dllstm.html#cb539-24" aria-hidden="true" tabindex="-1"></a>bilstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3647
-#&gt;     accuracy: 0.8322
-#&gt;     val_loss: 0.6118
-#&gt; val_accuracy: 0.7359</code></pre>
+#&gt;         loss: 0.3627
+#&gt;     accuracy: 0.8323
+#&gt;     val_loss: 0.6169
+#&gt; val_accuracy: 0.7363</code></pre>
 <p>The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well.</p>
-<div class="sourceCode" id="cb539"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb539-1"><a href="dllstm.html#cb539-1" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bilstm_mod, kick_assess, state_assess)</span>
-<span id="cb539-2"><a href="dllstm.html#cb539-2" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="dllstm.html#cb541-1" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bilstm_mod, kick_assess, state_assess)</span>
+<span id="cb541-2"><a href="dllstm.html#cb541-2" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.736
-#&gt; 2 kap         binary         0.471
-#&gt; 3 mn_log_loss binary         0.612
-#&gt; 4 roc_auc     binary         0.805</code></pre>
-<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736).</p>
+#&gt; 2 kap         binary         0.472
+#&gt; 3 mn_log_loss binary         0.617
+#&gt; 4 roc_auc     binary         0.806</code></pre>
+<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.733).</p>
 </div>
 <div id="case-study-stacking-lstm-layers" class="section level2" number="9.4">
 <h2><span class="header-section-number">9.4</span> Case study: stacking LSTM layers</h2>
@@ -801,47 +801,47 @@ Intermediate layers must be set up to return sequences (with <code>return_sequen
 </p>
 </div>
 <p>Let’s start by adding one single additional layer.</p>
-<div class="sourceCode" id="cb541"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb541-1"><a href="dllstm.html#cb541-1" aria-hidden="true" tabindex="-1"></a>stacked_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb541-2"><a href="dllstm.html#cb541-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb541-3"><a href="dllstm.html#cb541-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
-<span id="cb541-4"><a href="dllstm.html#cb541-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">return_sequences =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb541-5"><a href="dllstm.html#cb541-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb541-6"><a href="dllstm.html#cb541-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb541-7"><a href="dllstm.html#cb541-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb541-8"><a href="dllstm.html#cb541-8" aria-hidden="true" tabindex="-1"></a>stacked_mod <span class="sc">%&gt;%</span></span>
-<span id="cb541-9"><a href="dllstm.html#cb541-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb541-10"><a href="dllstm.html#cb541-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb541-11"><a href="dllstm.html#cb541-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb541-12"><a href="dllstm.html#cb541-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb541-13"><a href="dllstm.html#cb541-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb541-14"><a href="dllstm.html#cb541-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb541-15"><a href="dllstm.html#cb541-15" aria-hidden="true" tabindex="-1"></a>stacked_history <span class="ot">&lt;-</span> stacked_mod <span class="sc">%&gt;%</span></span>
-<span id="cb541-16"><a href="dllstm.html#cb541-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb541-17"><a href="dllstm.html#cb541-17" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
-<span id="cb541-18"><a href="dllstm.html#cb541-18" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb541-19"><a href="dllstm.html#cb541-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb541-20"><a href="dllstm.html#cb541-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
-<span id="cb541-21"><a href="dllstm.html#cb541-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb541-22"><a href="dllstm.html#cb541-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb541-23"><a href="dllstm.html#cb541-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb541-24"><a href="dllstm.html#cb541-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb541-25"><a href="dllstm.html#cb541-25" aria-hidden="true" tabindex="-1"></a>stacked_history</span></code></pre></div>
+<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="dllstm.html#cb543-1" aria-hidden="true" tabindex="-1"></a>stacked_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb543-2"><a href="dllstm.html#cb543-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb543-3"><a href="dllstm.html#cb543-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
+<span id="cb543-4"><a href="dllstm.html#cb543-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">return_sequences =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb543-5"><a href="dllstm.html#cb543-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb543-6"><a href="dllstm.html#cb543-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb543-7"><a href="dllstm.html#cb543-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb543-8"><a href="dllstm.html#cb543-8" aria-hidden="true" tabindex="-1"></a>stacked_mod <span class="sc">%&gt;%</span></span>
+<span id="cb543-9"><a href="dllstm.html#cb543-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb543-10"><a href="dllstm.html#cb543-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb543-11"><a href="dllstm.html#cb543-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb543-12"><a href="dllstm.html#cb543-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb543-13"><a href="dllstm.html#cb543-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb543-14"><a href="dllstm.html#cb543-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb543-15"><a href="dllstm.html#cb543-15" aria-hidden="true" tabindex="-1"></a>stacked_history <span class="ot">&lt;-</span> stacked_mod <span class="sc">%&gt;%</span></span>
+<span id="cb543-16"><a href="dllstm.html#cb543-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb543-17"><a href="dllstm.html#cb543-17" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
+<span id="cb543-18"><a href="dllstm.html#cb543-18" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb543-19"><a href="dllstm.html#cb543-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb543-20"><a href="dllstm.html#cb543-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
+<span id="cb543-21"><a href="dllstm.html#cb543-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb543-22"><a href="dllstm.html#cb543-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb543-23"><a href="dllstm.html#cb543-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb543-24"><a href="dllstm.html#cb543-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb543-25"><a href="dllstm.html#cb543-25" aria-hidden="true" tabindex="-1"></a>stacked_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.379
-#&gt;     accuracy: 0.8244
-#&gt;     val_loss: 0.6008
-#&gt; val_accuracy: 0.7363</code></pre>
+#&gt;         loss: 0.3825
+#&gt;     accuracy: 0.8226
+#&gt;     val_loss: 0.6021
+#&gt; val_accuracy: 0.7337</code></pre>
 <p>Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.</p>
-<div class="sourceCode" id="cb543"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb543-1"><a href="dllstm.html#cb543-1" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(stacked_mod, kick_assess, state_assess)</span>
-<span id="cb543-2"><a href="dllstm.html#cb543-2" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="dllstm.html#cb545-1" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(stacked_mod, kick_assess, state_assess)</span>
+<span id="cb545-2"><a href="dllstm.html#cb545-2" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.736
-#&gt; 2 kap         binary         0.470
-#&gt; 3 mn_log_loss binary         0.601
-#&gt; 4 roc_auc     binary         0.804</code></pre>
+#&gt; 1 accuracy    binary         0.734
+#&gt; 2 kap         binary         0.465
+#&gt; 3 mn_log_loss binary         0.602
+#&gt; 4 roc_auc     binary         0.802</code></pre>
 <p>We can gradually improve a model by changing and adding to its architecture.</p>
 </div>
 <div id="lstmpadding" class="section level2" number="9.5">
@@ -854,61 +854,61 @@ It is possible to set up an LSTM network that works with sequences of varied len
 </p>
 </div>
 <p>The default in textrecipes, as well as most deep learning for text, is <code>padding = "pre"</code>, where zeroes are added at the beginning, and <code>truncating = "pre"</code>, where values at the beginning are removed. What happens if we change one of these defaults?</p>
-<div class="sourceCode" id="cb545"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb545-1"><a href="dllstm.html#cb545-1" aria-hidden="true" tabindex="-1"></a>padding_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb545-2"><a href="dllstm.html#cb545-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb545-3"><a href="dllstm.html#cb545-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb545-4"><a href="dllstm.html#cb545-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length, <span class="at">padding =</span> <span class="st">&quot;post&quot;</span>)</span>
-<span id="cb545-5"><a href="dllstm.html#cb545-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb545-6"><a href="dllstm.html#cb545-6" aria-hidden="true" tabindex="-1"></a>padding_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(padding_rec)</span>
-<span id="cb545-7"><a href="dllstm.html#cb545-7" aria-hidden="true" tabindex="-1"></a>padding_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb545-8"><a href="dllstm.html#cb545-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(padding_matrix)</span></code></pre></div>
+<div class="sourceCode" id="cb547"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb547-1"><a href="dllstm.html#cb547-1" aria-hidden="true" tabindex="-1"></a>padding_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb547-2"><a href="dllstm.html#cb547-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb547-3"><a href="dllstm.html#cb547-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb547-4"><a href="dllstm.html#cb547-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length, <span class="at">padding =</span> <span class="st">&quot;post&quot;</span>)</span>
+<span id="cb547-5"><a href="dllstm.html#cb547-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb547-6"><a href="dllstm.html#cb547-6" aria-hidden="true" tabindex="-1"></a>padding_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(padding_rec)</span>
+<span id="cb547-7"><a href="dllstm.html#cb547-7" aria-hidden="true" tabindex="-1"></a>padding_matrix <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb547-8"><a href="dllstm.html#cb547-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(padding_matrix)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 <p>This matrix has the same dimensions as <code>kick_train</code> but instead of padding with zeroes at the beginning of these Kickstarter blurbs, this matrix is padded with zeroes at the end. (This preprocessing strategy still truncates longer sequences in the same way.)</p>
-<div class="sourceCode" id="cb547"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb547-1"><a href="dllstm.html#cb547-1" aria-hidden="true" tabindex="-1"></a>pad_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb547-2"><a href="dllstm.html#cb547-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb547-3"><a href="dllstm.html#cb547-3" aria-hidden="true" tabindex="-1"></a>pad_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb547-4"><a href="dllstm.html#cb547-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb549"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb549-1"><a href="dllstm.html#cb549-1" aria-hidden="true" tabindex="-1"></a>pad_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb549-2"><a href="dllstm.html#cb549-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb549-3"><a href="dllstm.html#cb549-3" aria-hidden="true" tabindex="-1"></a>pad_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(padding_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb549-4"><a href="dllstm.html#cb549-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
 <p>Now, let’s create and fit an LSTM to this preprocessed data.</p>
-<div class="sourceCode" id="cb548"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb548-1"><a href="dllstm.html#cb548-1" aria-hidden="true" tabindex="-1"></a>padding_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb548-2"><a href="dllstm.html#cb548-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb548-3"><a href="dllstm.html#cb548-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb548-4"><a href="dllstm.html#cb548-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb548-5"><a href="dllstm.html#cb548-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb548-6"><a href="dllstm.html#cb548-6" aria-hidden="true" tabindex="-1"></a>padding_mod <span class="sc">%&gt;%</span></span>
-<span id="cb548-7"><a href="dllstm.html#cb548-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb548-8"><a href="dllstm.html#cb548-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb548-9"><a href="dllstm.html#cb548-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb548-10"><a href="dllstm.html#cb548-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb548-11"><a href="dllstm.html#cb548-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb548-12"><a href="dllstm.html#cb548-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb548-13"><a href="dllstm.html#cb548-13" aria-hidden="true" tabindex="-1"></a>padding_history <span class="ot">&lt;-</span> padding_mod <span class="sc">%&gt;%</span></span>
-<span id="cb548-14"><a href="dllstm.html#cb548-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb548-15"><a href="dllstm.html#cb548-15" aria-hidden="true" tabindex="-1"></a>    pad_analysis,</span>
-<span id="cb548-16"><a href="dllstm.html#cb548-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb548-17"><a href="dllstm.html#cb548-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb548-18"><a href="dllstm.html#cb548-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(pad_assess, state_assess),</span>
-<span id="cb548-19"><a href="dllstm.html#cb548-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb548-20"><a href="dllstm.html#cb548-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb548-21"><a href="dllstm.html#cb548-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb548-22"><a href="dllstm.html#cb548-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb548-23"><a href="dllstm.html#cb548-23" aria-hidden="true" tabindex="-1"></a>padding_history</span></code></pre></div>
+<div class="sourceCode" id="cb550"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb550-1"><a href="dllstm.html#cb550-1" aria-hidden="true" tabindex="-1"></a>padding_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb550-2"><a href="dllstm.html#cb550-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb550-3"><a href="dllstm.html#cb550-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb550-4"><a href="dllstm.html#cb550-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb550-5"><a href="dllstm.html#cb550-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb550-6"><a href="dllstm.html#cb550-6" aria-hidden="true" tabindex="-1"></a>padding_mod <span class="sc">%&gt;%</span></span>
+<span id="cb550-7"><a href="dllstm.html#cb550-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb550-8"><a href="dllstm.html#cb550-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb550-9"><a href="dllstm.html#cb550-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb550-10"><a href="dllstm.html#cb550-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb550-11"><a href="dllstm.html#cb550-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb550-12"><a href="dllstm.html#cb550-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb550-13"><a href="dllstm.html#cb550-13" aria-hidden="true" tabindex="-1"></a>padding_history <span class="ot">&lt;-</span> padding_mod <span class="sc">%&gt;%</span></span>
+<span id="cb550-14"><a href="dllstm.html#cb550-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb550-15"><a href="dllstm.html#cb550-15" aria-hidden="true" tabindex="-1"></a>    pad_analysis,</span>
+<span id="cb550-16"><a href="dllstm.html#cb550-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb550-17"><a href="dllstm.html#cb550-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb550-18"><a href="dllstm.html#cb550-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(pad_assess, state_assess),</span>
+<span id="cb550-19"><a href="dllstm.html#cb550-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb550-20"><a href="dllstm.html#cb550-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb550-21"><a href="dllstm.html#cb550-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb550-22"><a href="dllstm.html#cb550-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb550-23"><a href="dllstm.html#cb550-23" aria-hidden="true" tabindex="-1"></a>padding_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4401
-#&gt;     accuracy: 0.7816
-#&gt;     val_loss: 0.603
-#&gt; val_accuracy: 0.7105</code></pre>
+#&gt;         loss: 0.4378
+#&gt;     accuracy: 0.7839
+#&gt;     val_loss: 0.6034
+#&gt; val_accuracy: 0.7126</code></pre>
 <p>This padding strategy results in noticeably worse performance than the default option!</p>
-<div class="sourceCode" id="cb550"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb550-1"><a href="dllstm.html#cb550-1" aria-hidden="true" tabindex="-1"></a>padding_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(padding_mod, pad_assess, state_assess)</span>
-<span id="cb550-2"><a href="dllstm.html#cb550-2" aria-hidden="true" tabindex="-1"></a>padding_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb552"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb552-1"><a href="dllstm.html#cb552-1" aria-hidden="true" tabindex="-1"></a>padding_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(padding_mod, pad_assess, state_assess)</span>
+<span id="cb552-2"><a href="dllstm.html#cb552-2" aria-hidden="true" tabindex="-1"></a>padding_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.711
-#&gt; 2 kap         binary         0.420
+#&gt; 1 accuracy    binary         0.713
+#&gt; 2 kap         binary         0.425
 #&gt; 3 mn_log_loss binary         0.603
-#&gt; 4 roc_auc     binary         0.784</code></pre>
-<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.805; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
+#&gt; 4 roc_auc     binary         0.787</code></pre>
+<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.733 and an AUC of 0.803; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
 <div class="rmdwarning">
 <p>
 Different preprocessing strategies have a huge impact on deep learning results.
@@ -918,40 +918,40 @@ Different preprocessing strategies have a huge impact on deep learning results.
 <div id="case-study-training-a-regression-model" class="section level2" number="9.6">
 <h2><span class="header-section-number">9.6</span> Case study: training a regression model</h2>
 <p>All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, classification is more common than regression tasks with text data, but these techniques can be used for either kind of supervised machine learning question. Let’s return to the regression problem of Chapter <a href="mlregression.html#mlregression">6</a> and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.</p>
-<div class="sourceCode" id="cb552"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb552-1"><a href="dllstm.html#cb552-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
-<span id="cb552-2"><a href="dllstm.html#cb552-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb552-3"><a href="dllstm.html#cb552-3" aria-hidden="true" tabindex="-1"></a>scotus_split <span class="ot">&lt;-</span> scotus_filtered <span class="sc">%&gt;%</span></span>
-<span id="cb552-4"><a href="dllstm.html#cb552-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb552-5"><a href="dllstm.html#cb552-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> (<span class="fu">as.numeric</span>(year) <span class="sc">-</span> <span class="dv">1920</span>) <span class="sc">/</span> <span class="dv">50</span>,</span>
-<span id="cb552-6"><a href="dllstm.html#cb552-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">str_remove_all</span>(text, <span class="st">&quot;&#39;&quot;</span>)</span>
-<span id="cb552-7"><a href="dllstm.html#cb552-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb552-8"><a href="dllstm.html#cb552-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>(<span class="at">strata =</span> year)</span>
-<span id="cb552-9"><a href="dllstm.html#cb552-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb552-10"><a href="dllstm.html#cb552-10" aria-hidden="true" tabindex="-1"></a>scotus_train <span class="ot">&lt;-</span> <span class="fu">training</span>(scotus_split)</span>
-<span id="cb552-11"><a href="dllstm.html#cb552-11" aria-hidden="true" tabindex="-1"></a>scotus_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(scotus_split)</span></code></pre></div>
+<div class="sourceCode" id="cb554"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb554-1"><a href="dllstm.html#cb554-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
+<span id="cb554-2"><a href="dllstm.html#cb554-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb554-3"><a href="dllstm.html#cb554-3" aria-hidden="true" tabindex="-1"></a>scotus_split <span class="ot">&lt;-</span> scotus_filtered <span class="sc">%&gt;%</span></span>
+<span id="cb554-4"><a href="dllstm.html#cb554-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb554-5"><a href="dllstm.html#cb554-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> (<span class="fu">as.numeric</span>(year) <span class="sc">-</span> <span class="dv">1920</span>) <span class="sc">/</span> <span class="dv">50</span>,</span>
+<span id="cb554-6"><a href="dllstm.html#cb554-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">str_remove_all</span>(text, <span class="st">&quot;&#39;&quot;</span>)</span>
+<span id="cb554-7"><a href="dllstm.html#cb554-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb554-8"><a href="dllstm.html#cb554-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">initial_split</span>(<span class="at">strata =</span> year)</span>
+<span id="cb554-9"><a href="dllstm.html#cb554-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb554-10"><a href="dllstm.html#cb554-10" aria-hidden="true" tabindex="-1"></a>scotus_train <span class="ot">&lt;-</span> <span class="fu">training</span>(scotus_split)</span>
+<span id="cb554-11"><a href="dllstm.html#cb554-11" aria-hidden="true" tabindex="-1"></a>scotus_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(scotus_split)</span></code></pre></div>
 <div class="rmdwarning">
 <p>
 Notice that we also shifted (subtracted) and scaled (divided) the <code>year</code> outcome by constant factors so all the values are centered around zero and not too large. Neural networks for regression problems typically behave better when dealing with outcomes that are roughly between −1 and 1.
 </p>
 </div>
 <p>Next, let’s build a preprocessing recipe for these Supreme Court decisions. These documents are much longer than the Kickstarter blurbs, many thousands of words long instead of just a handful. Let’s try keeping the size of our vocabulary the same (<code>max_words</code>) but we will need to increase the sequence length information we store (<code>max_length</code>) by a great deal.</p>
-<div class="sourceCode" id="cb553"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb553-1"><a href="dllstm.html#cb553-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
-<span id="cb553-2"><a href="dllstm.html#cb553-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="fl">1e3</span></span>
-<span id="cb553-3"><a href="dllstm.html#cb553-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb553-4"><a href="dllstm.html#cb553-4" aria-hidden="true" tabindex="-1"></a>scotus_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
-<span id="cb553-5"><a href="dllstm.html#cb553-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text) <span class="sc">%&gt;%</span></span>
-<span id="cb553-6"><a href="dllstm.html#cb553-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb553-7"><a href="dllstm.html#cb553-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(text, <span class="at">sequence_length =</span> max_length)</span>
-<span id="cb553-8"><a href="dllstm.html#cb553-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb553-9"><a href="dllstm.html#cb553-9" aria-hidden="true" tabindex="-1"></a>scotus_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(scotus_rec)</span>
-<span id="cb553-10"><a href="dllstm.html#cb553-10" aria-hidden="true" tabindex="-1"></a>scotus_train_baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(scotus_prep,</span>
-<span id="cb553-11"><a href="dllstm.html#cb553-11" aria-hidden="true" tabindex="-1"></a>                           <span class="at">new_data =</span> scotus_train,</span>
-<span id="cb553-12"><a href="dllstm.html#cb553-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb553-13"><a href="dllstm.html#cb553-13" aria-hidden="true" tabindex="-1"></a>scotus_test_baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(scotus_prep,</span>
-<span id="cb553-14"><a href="dllstm.html#cb553-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">new_data =</span> scotus_test,</span>
-<span id="cb553-15"><a href="dllstm.html#cb553-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb555"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb555-1"><a href="dllstm.html#cb555-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
+<span id="cb555-2"><a href="dllstm.html#cb555-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="fl">1e3</span></span>
+<span id="cb555-3"><a href="dllstm.html#cb555-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb555-4"><a href="dllstm.html#cb555-4" aria-hidden="true" tabindex="-1"></a>scotus_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> text, <span class="at">data =</span> scotus_train) <span class="sc">%&gt;%</span></span>
+<span id="cb555-5"><a href="dllstm.html#cb555-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text) <span class="sc">%&gt;%</span></span>
+<span id="cb555-6"><a href="dllstm.html#cb555-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(text, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb555-7"><a href="dllstm.html#cb555-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(text, <span class="at">sequence_length =</span> max_length)</span>
+<span id="cb555-8"><a href="dllstm.html#cb555-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb555-9"><a href="dllstm.html#cb555-9" aria-hidden="true" tabindex="-1"></a>scotus_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(scotus_rec)</span>
+<span id="cb555-10"><a href="dllstm.html#cb555-10" aria-hidden="true" tabindex="-1"></a>scotus_train_baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(scotus_prep,</span>
+<span id="cb555-11"><a href="dllstm.html#cb555-11" aria-hidden="true" tabindex="-1"></a>                           <span class="at">new_data =</span> scotus_train,</span>
+<span id="cb555-12"><a href="dllstm.html#cb555-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb555-13"><a href="dllstm.html#cb555-13" aria-hidden="true" tabindex="-1"></a>scotus_test_baked <span class="ot">&lt;-</span> <span class="fu">bake</span>(scotus_prep,</span>
+<span id="cb555-14"><a href="dllstm.html#cb555-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">new_data =</span> scotus_test,</span>
+<span id="cb555-15"><a href="dllstm.html#cb555-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
 <p>What does our training data look like now?</p>
-<div class="sourceCode" id="cb554"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb554-1"><a href="dllstm.html#cb554-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_train_baked)</span></code></pre></div>
+<div class="sourceCode" id="cb556"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb556-1"><a href="dllstm.html#cb556-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(scotus_train_baked)</span></code></pre></div>
 <pre><code>#&gt; [1] 7498 1000</code></pre>
 <p>We only have 7498 rows of training data, and because these documents are so long and we want to keep more of each sequence, the training data has 1000 columns. You are probably starting to guess that we are going to run into problems.</p>
 <p>Let’s create an LSTM and see what we can do. We will need to use higher-dimensional embeddings, since our sequences are much longer (we may want to increase the number of <code>units</code> as well, but will leave that out for the time being). Because we are training a regression model, there is no activation function for the last layer; we want to fit and predict to arbitrary values for the year.</p>
@@ -960,38 +960,38 @@ Notice that we also shifted (subtracted) and scaled (divided) the <code>year</co
 A good default loss function for regression is mean squared error, <code>“mse”</code>.
 </p>
 </div>
-<div class="sourceCode" id="cb556"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb556-1"><a href="dllstm.html#cb556-1" aria-hidden="true" tabindex="-1"></a>scotus_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb556-2"><a href="dllstm.html#cb556-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">64</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb556-3"><a href="dllstm.html#cb556-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb556-4"><a href="dllstm.html#cb556-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>)</span>
-<span id="cb556-5"><a href="dllstm.html#cb556-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb556-6"><a href="dllstm.html#cb556-6" aria-hidden="true" tabindex="-1"></a>scotus_mod <span class="sc">%&gt;%</span></span>
-<span id="cb556-7"><a href="dllstm.html#cb556-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb556-8"><a href="dllstm.html#cb556-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb556-9"><a href="dllstm.html#cb556-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;mse&quot;</span>,</span>
-<span id="cb556-10"><a href="dllstm.html#cb556-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;mean_squared_error&quot;</span>)</span>
-<span id="cb556-11"><a href="dllstm.html#cb556-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb556-12"><a href="dllstm.html#cb556-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb556-13"><a href="dllstm.html#cb556-13" aria-hidden="true" tabindex="-1"></a>scotus_history <span class="ot">&lt;-</span> scotus_mod <span class="sc">%&gt;%</span></span>
-<span id="cb556-14"><a href="dllstm.html#cb556-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb556-15"><a href="dllstm.html#cb556-15" aria-hidden="true" tabindex="-1"></a>    scotus_train_baked,</span>
-<span id="cb556-16"><a href="dllstm.html#cb556-16" aria-hidden="true" tabindex="-1"></a>    scotus_train<span class="sc">$</span>year,</span>
-<span id="cb556-17"><a href="dllstm.html#cb556-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb556-18"><a href="dllstm.html#cb556-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.25</span>,</span>
-<span id="cb556-19"><a href="dllstm.html#cb556-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb556-20"><a href="dllstm.html#cb556-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb558"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb558-1"><a href="dllstm.html#cb558-1" aria-hidden="true" tabindex="-1"></a>scotus_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb558-2"><a href="dllstm.html#cb558-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">64</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb558-3"><a href="dllstm.html#cb558-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb558-4"><a href="dllstm.html#cb558-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>)</span>
+<span id="cb558-5"><a href="dllstm.html#cb558-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-6"><a href="dllstm.html#cb558-6" aria-hidden="true" tabindex="-1"></a>scotus_mod <span class="sc">%&gt;%</span></span>
+<span id="cb558-7"><a href="dllstm.html#cb558-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb558-8"><a href="dllstm.html#cb558-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb558-9"><a href="dllstm.html#cb558-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;mse&quot;</span>,</span>
+<span id="cb558-10"><a href="dllstm.html#cb558-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;mean_squared_error&quot;</span>)</span>
+<span id="cb558-11"><a href="dllstm.html#cb558-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb558-12"><a href="dllstm.html#cb558-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb558-13"><a href="dllstm.html#cb558-13" aria-hidden="true" tabindex="-1"></a>scotus_history <span class="ot">&lt;-</span> scotus_mod <span class="sc">%&gt;%</span></span>
+<span id="cb558-14"><a href="dllstm.html#cb558-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb558-15"><a href="dllstm.html#cb558-15" aria-hidden="true" tabindex="-1"></a>    scotus_train_baked,</span>
+<span id="cb558-16"><a href="dllstm.html#cb558-16" aria-hidden="true" tabindex="-1"></a>    scotus_train<span class="sc">$</span>year,</span>
+<span id="cb558-17"><a href="dllstm.html#cb558-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb558-18"><a href="dllstm.html#cb558-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.25</span>,</span>
+<span id="cb558-19"><a href="dllstm.html#cb558-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb558-20"><a href="dllstm.html#cb558-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <p>How does this model perform on the test data? Let’s transform back to real values for <code>year</code> so our metrics will be on the same scale as in Chapter <a href="mlregression.html#mlregression">6</a>.</p>
-<div class="sourceCode" id="cb557"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb557-1"><a href="dllstm.html#cb557-1" aria-hidden="true" tabindex="-1"></a>scotus_res <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">year =</span> scotus_test<span class="sc">$</span>year,</span>
-<span id="cb557-2"><a href="dllstm.html#cb557-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">.pred =</span> <span class="fu">predict</span>(scotus_mod, scotus_test_baked)[, <span class="dv">1</span>]) <span class="sc">%&gt;%</span></span>
-<span id="cb557-3"><a href="dllstm.html#cb557-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> . <span class="sc">*</span> <span class="dv">50</span> <span class="sc">+</span> <span class="dv">1920</span>))</span>
-<span id="cb557-4"><a href="dllstm.html#cb557-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb557-5"><a href="dllstm.html#cb557-5" aria-hidden="true" tabindex="-1"></a>scotus_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(year, .pred)</span></code></pre></div>
+<div class="sourceCode" id="cb559"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb559-1"><a href="dllstm.html#cb559-1" aria-hidden="true" tabindex="-1"></a>scotus_res <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">year =</span> scotus_test<span class="sc">$</span>year,</span>
+<span id="cb559-2"><a href="dllstm.html#cb559-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">.pred =</span> <span class="fu">predict</span>(scotus_mod, scotus_test_baked)[, <span class="dv">1</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb559-3"><a href="dllstm.html#cb559-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> . <span class="sc">*</span> <span class="dv">50</span> <span class="sc">+</span> <span class="dv">1920</span>))</span>
+<span id="cb559-4"><a href="dllstm.html#cb559-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb559-5"><a href="dllstm.html#cb559-5" aria-hidden="true" tabindex="-1"></a>scotus_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(year, .pred)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 3 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 rmse    standard      25.6  
-#&gt; 2 rsq     standard       0.781
-#&gt; 3 mae     standard      18.5</code></pre>
+#&gt; 1 rmse    standard      26.3  
+#&gt; 2 rsq     standard       0.766
+#&gt; 3 mae     standard      19.3</code></pre>
 <p>This is much worse than the final regularized linear model trained in Section <a href="mlregression.html#mlregressionfull">6.9</a>, with an RMSE almost a decade worth of years worse. It’s possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline.</p>
 <div class="rmdwarning">
 <p>
@@ -1002,60 +1002,60 @@ The main problem with this regression model is that there isn’t that much data
 <div id="case-study-vocabulary-size" class="section level2" number="9.7">
 <h2><span class="header-section-number">9.7</span> Case study: vocabulary size</h2>
 <p>In this chapter so far, we’ve worked with a vocabulary of 20,000 words or tokens. This is a <em>hyperparameter</em> of the model, and could be tuned, as we show in detail in Section <a href="dlcnn.html#keras-hyperparameter">10.6</a>. Instead of tuning in this chapter, let’s try a smaller value, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance.</p>
-<div class="sourceCode" id="cb559"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb559-1"><a href="dllstm.html#cb559-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
-<span id="cb559-2"><a href="dllstm.html#cb559-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb559-3"><a href="dllstm.html#cb559-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb559-4"><a href="dllstm.html#cb559-4" aria-hidden="true" tabindex="-1"></a>smaller_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb559-5"><a href="dllstm.html#cb559-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb559-6"><a href="dllstm.html#cb559-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb559-7"><a href="dllstm.html#cb559-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
-<span id="cb559-8"><a href="dllstm.html#cb559-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb559-9"><a href="dllstm.html#cb559-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(smaller_rec)</span>
-<span id="cb559-10"><a href="dllstm.html#cb559-10" aria-hidden="true" tabindex="-1"></a>kick_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb559-11"><a href="dllstm.html#cb559-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb559-12"><a href="dllstm.html#cb559-12" aria-hidden="true" tabindex="-1"></a>kick_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
-<span id="cb559-13"><a href="dllstm.html#cb559-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb561"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb561-1"><a href="dllstm.html#cb561-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
+<span id="cb561-2"><a href="dllstm.html#cb561-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb561-3"><a href="dllstm.html#cb561-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb561-4"><a href="dllstm.html#cb561-4" aria-hidden="true" tabindex="-1"></a>smaller_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb561-5"><a href="dllstm.html#cb561-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb561-6"><a href="dllstm.html#cb561-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb561-7"><a href="dllstm.html#cb561-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
+<span id="cb561-8"><a href="dllstm.html#cb561-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb561-9"><a href="dllstm.html#cb561-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(smaller_rec)</span>
+<span id="cb561-10"><a href="dllstm.html#cb561-10" aria-hidden="true" tabindex="-1"></a>kick_analysis <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">analysis</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb561-11"><a href="dllstm.html#cb561-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb561-12"><a href="dllstm.html#cb561-12" aria-hidden="true" tabindex="-1"></a>kick_assess <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="fu">assessment</span>(kick_val<span class="sc">$</span>splits[[<span class="dv">1</span>]]),</span>
+<span id="cb561-13"><a href="dllstm.html#cb561-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
 <p>Once our preprocessing is done and applied to our validation split <code>kick_val</code>, we can set up our model, another straightforward LSTM neural network.</p>
-<div class="sourceCode" id="cb560"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb560-1"><a href="dllstm.html#cb560-1" aria-hidden="true" tabindex="-1"></a>smaller_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb560-2"><a href="dllstm.html#cb560-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb560-3"><a href="dllstm.html#cb560-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb560-4"><a href="dllstm.html#cb560-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb560-5"><a href="dllstm.html#cb560-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb560-6"><a href="dllstm.html#cb560-6" aria-hidden="true" tabindex="-1"></a>smaller_mod <span class="sc">%&gt;%</span></span>
-<span id="cb560-7"><a href="dllstm.html#cb560-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb560-8"><a href="dllstm.html#cb560-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb560-9"><a href="dllstm.html#cb560-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb560-10"><a href="dllstm.html#cb560-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb560-11"><a href="dllstm.html#cb560-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb560-12"><a href="dllstm.html#cb560-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb560-13"><a href="dllstm.html#cb560-13" aria-hidden="true" tabindex="-1"></a>smaller_history <span class="ot">&lt;-</span> smaller_mod <span class="sc">%&gt;%</span></span>
-<span id="cb560-14"><a href="dllstm.html#cb560-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb560-15"><a href="dllstm.html#cb560-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
-<span id="cb560-16"><a href="dllstm.html#cb560-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
-<span id="cb560-17"><a href="dllstm.html#cb560-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb560-18"><a href="dllstm.html#cb560-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
-<span id="cb560-19"><a href="dllstm.html#cb560-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb560-20"><a href="dllstm.html#cb560-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb560-21"><a href="dllstm.html#cb560-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb560-22"><a href="dllstm.html#cb560-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb560-23"><a href="dllstm.html#cb560-23" aria-hidden="true" tabindex="-1"></a>smaller_history</span></code></pre></div>
+<div class="sourceCode" id="cb562"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb562-1"><a href="dllstm.html#cb562-1" aria-hidden="true" tabindex="-1"></a>smaller_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb562-2"><a href="dllstm.html#cb562-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb562-3"><a href="dllstm.html#cb562-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb562-4"><a href="dllstm.html#cb562-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb562-5"><a href="dllstm.html#cb562-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-6"><a href="dllstm.html#cb562-6" aria-hidden="true" tabindex="-1"></a>smaller_mod <span class="sc">%&gt;%</span></span>
+<span id="cb562-7"><a href="dllstm.html#cb562-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb562-8"><a href="dllstm.html#cb562-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb562-9"><a href="dllstm.html#cb562-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb562-10"><a href="dllstm.html#cb562-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb562-11"><a href="dllstm.html#cb562-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb562-12"><a href="dllstm.html#cb562-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-13"><a href="dllstm.html#cb562-13" aria-hidden="true" tabindex="-1"></a>smaller_history <span class="ot">&lt;-</span> smaller_mod <span class="sc">%&gt;%</span></span>
+<span id="cb562-14"><a href="dllstm.html#cb562-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb562-15"><a href="dllstm.html#cb562-15" aria-hidden="true" tabindex="-1"></a>    kick_analysis,</span>
+<span id="cb562-16"><a href="dllstm.html#cb562-16" aria-hidden="true" tabindex="-1"></a>    state_analysis,</span>
+<span id="cb562-17"><a href="dllstm.html#cb562-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb562-18"><a href="dllstm.html#cb562-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_data =</span> <span class="fu">list</span>(kick_assess, state_assess),</span>
+<span id="cb562-19"><a href="dllstm.html#cb562-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb562-20"><a href="dllstm.html#cb562-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb562-21"><a href="dllstm.html#cb562-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb562-22"><a href="dllstm.html#cb562-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb562-23"><a href="dllstm.html#cb562-23" aria-hidden="true" tabindex="-1"></a>smaller_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4684
-#&gt;     accuracy: 0.769
-#&gt;     val_loss: 0.5835
-#&gt; val_accuracy: 0.7073</code></pre>
+#&gt;         loss: 0.4693
+#&gt;     accuracy: 0.7715
+#&gt;     val_loss: 0.5795
+#&gt; val_accuracy: 0.7069</code></pre>
 <p>How did this smaller model, based on a smaller vocabulary in the model, perform?</p>
-<div class="sourceCode" id="cb562"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb562-1"><a href="dllstm.html#cb562-1" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(smaller_mod, kick_assess, state_assess)</span>
-<span id="cb562-2"><a href="dllstm.html#cb562-2" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb564"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb564-1"><a href="dllstm.html#cb564-1" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(smaller_mod, kick_assess, state_assess)</span>
+<span id="cb564-2"><a href="dllstm.html#cb564-2" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.707
-#&gt; 2 kap         binary         0.412
-#&gt; 3 mn_log_loss binary         0.584
+#&gt; 2 kap         binary         0.411
+#&gt; 3 mn_log_loss binary         0.579
 #&gt; 4 roc_auc     binary         0.779</code></pre>
-<p>The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.805. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
+<p>The original LSTM model with the larger vocabulary had an accuracy of 0.733 and an AUC of 0.803. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
 <div class="rmdnote">
 <p>
 The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.
@@ -1068,18 +1068,18 @@ The relationship between this hyperparameter and model performance is weak over 
 <div id="lstmfullpreprocess" class="section level3" number="9.8.1">
 <h3><span class="header-section-number">9.8.1</span> Preprocess the data</h3>
 <p>We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.</p>
-<div class="sourceCode" id="cb564"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb564-1"><a href="dllstm.html#cb564-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
-<span id="cb564-2"><a href="dllstm.html#cb564-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb564-3"><a href="dllstm.html#cb564-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb564-4"><a href="dllstm.html#cb564-4" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
-<span id="cb564-5"><a href="dllstm.html#cb564-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
-<span id="cb564-6"><a href="dllstm.html#cb564-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
-<span id="cb564-7"><a href="dllstm.html#cb564-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
-<span id="cb564-8"><a href="dllstm.html#cb564-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb564-9"><a href="dllstm.html#cb564-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
-<span id="cb564-10"><a href="dllstm.html#cb564-10" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb564-11"><a href="dllstm.html#cb564-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb564-12"><a href="dllstm.html#cb564-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
+<div class="sourceCode" id="cb566"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb566-1"><a href="dllstm.html#cb566-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
+<span id="cb566-2"><a href="dllstm.html#cb566-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb566-3"><a href="dllstm.html#cb566-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb566-4"><a href="dllstm.html#cb566-4" aria-hidden="true" tabindex="-1"></a>kick_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
+<span id="cb566-5"><a href="dllstm.html#cb566-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(blurb) <span class="sc">%&gt;%</span></span>
+<span id="cb566-6"><a href="dllstm.html#cb566-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(blurb, <span class="at">max_tokens =</span> max_words) <span class="sc">%&gt;%</span></span>
+<span id="cb566-7"><a href="dllstm.html#cb566-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(blurb, <span class="at">sequence_length =</span> max_length)</span>
+<span id="cb566-8"><a href="dllstm.html#cb566-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb566-9"><a href="dllstm.html#cb566-9" aria-hidden="true" tabindex="-1"></a>kick_prep <span class="ot">&lt;-</span> <span class="fu">prep</span>(kick_rec)</span>
+<span id="cb566-10"><a href="dllstm.html#cb566-10" aria-hidden="true" tabindex="-1"></a>kick_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb566-11"><a href="dllstm.html#cb566-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb566-12"><a href="dllstm.html#cb566-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 </div>
 <div id="lstmfullmodel" class="section level3" number="9.8.2">
@@ -1091,61 +1091,61 @@ The relationship between this hyperparameter and model performance is weak over 
 <li><p>The bidirectional LSTM performed better than the regular LSTM, so let’s set up each LSTM layer to be able to learn sequences in both directions.</p></li>
 </ul>
 <p>Instead of using specific validation data that we can then compute performance metrics for, let’s go back to specifying <code>validation_split = 0.1</code> and let the Keras model choose the validation set.</p>
-<div class="sourceCode" id="cb566"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb566-1"><a href="dllstm.html#cb566-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb566-2"><a href="dllstm.html#cb566-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb566-3"><a href="dllstm.html#cb566-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
-<span id="cb566-4"><a href="dllstm.html#cb566-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
-<span id="cb566-5"><a href="dllstm.html#cb566-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">return_sequences =</span> <span class="cn">TRUE</span></span>
-<span id="cb566-6"><a href="dllstm.html#cb566-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb566-7"><a href="dllstm.html#cb566-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
-<span id="cb566-8"><a href="dllstm.html#cb566-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
-<span id="cb566-9"><a href="dllstm.html#cb566-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">return_sequences =</span> <span class="cn">TRUE</span></span>
-<span id="cb566-10"><a href="dllstm.html#cb566-10" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb566-11"><a href="dllstm.html#cb566-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
-<span id="cb566-12"><a href="dllstm.html#cb566-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span></span>
-<span id="cb566-13"><a href="dllstm.html#cb566-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb566-14"><a href="dllstm.html#cb566-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
-<span id="cb566-15"><a href="dllstm.html#cb566-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb566-16"><a href="dllstm.html#cb566-16" aria-hidden="true" tabindex="-1"></a>final_mod <span class="sc">%&gt;%</span></span>
-<span id="cb566-17"><a href="dllstm.html#cb566-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
-<span id="cb566-18"><a href="dllstm.html#cb566-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
-<span id="cb566-19"><a href="dllstm.html#cb566-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
-<span id="cb566-20"><a href="dllstm.html#cb566-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb566-21"><a href="dllstm.html#cb566-21" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb566-22"><a href="dllstm.html#cb566-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb566-23"><a href="dllstm.html#cb566-23" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
-<span id="cb566-24"><a href="dllstm.html#cb566-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb566-25"><a href="dllstm.html#cb566-25" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
-<span id="cb566-26"><a href="dllstm.html#cb566-26" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
-<span id="cb566-27"><a href="dllstm.html#cb566-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
-<span id="cb566-28"><a href="dllstm.html#cb566-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
-<span id="cb566-29"><a href="dllstm.html#cb566-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
-<span id="cb566-30"><a href="dllstm.html#cb566-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb566-31"><a href="dllstm.html#cb566-31" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb566-32"><a href="dllstm.html#cb566-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb566-33"><a href="dllstm.html#cb566-33" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
+<div class="sourceCode" id="cb568"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb568-1"><a href="dllstm.html#cb568-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb568-2"><a href="dllstm.html#cb568-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">32</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb568-3"><a href="dllstm.html#cb568-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
+<span id="cb568-4"><a href="dllstm.html#cb568-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
+<span id="cb568-5"><a href="dllstm.html#cb568-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">return_sequences =</span> <span class="cn">TRUE</span></span>
+<span id="cb568-6"><a href="dllstm.html#cb568-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb568-7"><a href="dllstm.html#cb568-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
+<span id="cb568-8"><a href="dllstm.html#cb568-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span>,</span>
+<span id="cb568-9"><a href="dllstm.html#cb568-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">return_sequences =</span> <span class="cn">TRUE</span></span>
+<span id="cb568-10"><a href="dllstm.html#cb568-10" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb568-11"><a href="dllstm.html#cb568-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bidirectional</span>(<span class="fu">layer_lstm</span>(</span>
+<span id="cb568-12"><a href="dllstm.html#cb568-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">units =</span> <span class="dv">32</span>, <span class="at">dropout =</span> <span class="fl">0.4</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.4</span></span>
+<span id="cb568-13"><a href="dllstm.html#cb568-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb568-14"><a href="dllstm.html#cb568-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
+<span id="cb568-15"><a href="dllstm.html#cb568-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb568-16"><a href="dllstm.html#cb568-16" aria-hidden="true" tabindex="-1"></a>final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb568-17"><a href="dllstm.html#cb568-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(</span>
+<span id="cb568-18"><a href="dllstm.html#cb568-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> <span class="st">&quot;adam&quot;</span>,</span>
+<span id="cb568-19"><a href="dllstm.html#cb568-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">loss =</span> <span class="st">&quot;binary_crossentropy&quot;</span>,</span>
+<span id="cb568-20"><a href="dllstm.html#cb568-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb568-21"><a href="dllstm.html#cb568-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb568-22"><a href="dllstm.html#cb568-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb568-23"><a href="dllstm.html#cb568-23" aria-hidden="true" tabindex="-1"></a>final_history <span class="ot">&lt;-</span> final_mod <span class="sc">%&gt;%</span></span>
+<span id="cb568-24"><a href="dllstm.html#cb568-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb568-25"><a href="dllstm.html#cb568-25" aria-hidden="true" tabindex="-1"></a>    kick_train,</span>
+<span id="cb568-26"><a href="dllstm.html#cb568-26" aria-hidden="true" tabindex="-1"></a>    kickstarter_train<span class="sc">$</span>state,</span>
+<span id="cb568-27"><a href="dllstm.html#cb568-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">epochs =</span> <span class="dv">10</span>,</span>
+<span id="cb568-28"><a href="dllstm.html#cb568-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_split =</span> <span class="fl">0.1</span>,</span>
+<span id="cb568-29"><a href="dllstm.html#cb568-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb568-30"><a href="dllstm.html#cb568-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb568-31"><a href="dllstm.html#cb568-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb568-32"><a href="dllstm.html#cb568-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb568-33"><a href="dllstm.html#cb568-33" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3315
-#&gt;     accuracy: 0.8482
-#&gt;     val_loss: 0.5448
-#&gt; val_accuracy: 0.7679</code></pre>
+#&gt;         loss: 0.3355
+#&gt;     accuracy: 0.848
+#&gt;     val_loss: 0.5407
+#&gt; val_accuracy: 0.7712</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
-<div class="sourceCode" id="cb568"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb568-1"><a href="dllstm.html#cb568-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
-<span id="cb568-2"><a href="dllstm.html#cb568-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb568-3"><a href="dllstm.html#cb568-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_test, kickstarter_test<span class="sc">$</span>state)</span>
-<span id="cb568-4"><a href="dllstm.html#cb568-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
+<div class="sourceCode" id="cb570"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb570-1"><a href="dllstm.html#cb570-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
+<span id="cb570-2"><a href="dllstm.html#cb570-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb570-3"><a href="dllstm.html#cb570-3" aria-hidden="true" tabindex="-1"></a>final_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(final_mod, kick_test, kickstarter_test<span class="sc">$</span>state)</span>
+<span id="cb570-4"><a href="dllstm.html#cb570-4" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.763
-#&gt; 2 kap         binary         0.525
-#&gt; 3 mn_log_loss binary         0.555
+#&gt; 2 kap         binary         0.523
+#&gt; 3 mn_log_loss binary         0.554
 #&gt; 4 roc_auc     binary         0.834</code></pre>
 <p>This is our best-performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.6</a>.</p>
-<div class="sourceCode" id="cb570"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb570-1"><a href="dllstm.html#cb570-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
-<span id="cb570-2"><a href="dllstm.html#cb570-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
-<span id="cb570-3"><a href="dllstm.html#cb570-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb572"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb572-1"><a href="dllstm.html#cb572-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb572-2"><a href="dllstm.html#cb572-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
+<span id="cb572-3"><a href="dllstm.html#cb572-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmfinalroc"></span>
 <img src="09_dl_lstm_files/figure-html/lstmfinalroc-1.svg" alt="ROC curve for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -1153,9 +1153,9 @@ FIGURE 9.6: ROC curve for final LSTM model predictions on testing set of Kicksta
 </p>
 </div>
 <p>We have been able to incrementally improve our model by adding to the structure and making good choices about preprocessing. We can visualize this final LSTM model’s performance using a confusion matrix as well, in Figure <a href="dllstm.html#fig:lstmheatmap">9.7</a>.</p>
-<div class="sourceCode" id="cb571"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb571-1"><a href="dllstm.html#cb571-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
-<span id="cb571-2"><a href="dllstm.html#cb571-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb571-3"><a href="dllstm.html#cb571-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb573"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb573-1"><a href="dllstm.html#cb573-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
+<span id="cb573-2"><a href="dllstm.html#cb573-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(state, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb573-3"><a href="dllstm.html#cb573-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmheatmap"></span>
 <img src="09_dl_lstm_files/figure-html/lstmheatmap-1.svg" alt="Confusion matrix for final LSTM model predictions on testing set of Kickstarter campaign success" width="672" />
 <p class="caption">
@@ -1222,7 +1222,6 @@ Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., and Salakhutdinov, R.
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1259,7 +1258,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {

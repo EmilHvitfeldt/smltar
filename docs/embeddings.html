@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.23 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-10-17" />
+<meta name="date" content="2021-11-04" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="stemming.html"/>
 <link rel="next" href="mloverview.html"/>
-<script src="libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,12 +51,11 @@
 
 
 
-
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
 <link href="libs/plot_text_explanations-0.1.0/plot_text_explanations.css" rel="stylesheet" />
 <script src="libs/plot_text_explanations-binding-0.5.2/plot_text_explanations.js"></script>
 
@@ -589,7 +589,7 @@ Modern word embeddings are based on a statistical approach to modeling language,
 <span id="cb117-12"><a href="embeddings.html#cb117-12" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">map2</span>(skipgrams,</span>
 <span id="cb117-13"><a href="embeddings.html#cb117-13" aria-hidden="true" tabindex="-1"></a>              <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(skipgrams),</span>
 <span id="cb117-14"><a href="embeddings.html#cb117-14" aria-hidden="true" tabindex="-1"></a>              <span class="sc">~</span> <span class="fu">safe_mutate</span>(.x, <span class="at">window_id =</span> .y))</span>
-<span id="cb117-15"><a href="embeddings.html#cb117-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb117-15"><a href="embeddings.html#cb117-15" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb117-16"><a href="embeddings.html#cb117-16" aria-hidden="true" tabindex="-1"></a>  out <span class="sc">%&gt;%</span></span>
 <span id="cb117-17"><a href="embeddings.html#cb117-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transpose</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb117-18"><a href="embeddings.html#cb117-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pluck</span>(<span class="st">&quot;result&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -682,9 +682,9 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <span id="cb122-5"><a href="embeddings.html#cb122-5" aria-hidden="true" tabindex="-1"></a>        y <span class="ot">&lt;-</span> .[<span class="fu">rep</span>(token, <span class="fu">nrow</span>(.)), ]</span>
 <span id="cb122-6"><a href="embeddings.html#cb122-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
 <span id="cb122-7"><a href="embeddings.html#cb122-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
-<span id="cb122-8"><a href="embeddings.html#cb122-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb122-8"><a href="embeddings.html#cb122-8" aria-hidden="true" tabindex="-1"></a>        </span>
 <span id="cb122-9"><a href="embeddings.html#cb122-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
-<span id="cb122-10"><a href="embeddings.html#cb122-10" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb122-10"><a href="embeddings.html#cb122-10" aria-hidden="true" tabindex="-1"></a>      },</span>
 <span id="cb122-11"><a href="embeddings.html#cb122-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span></span>
 <span id="cb122-12"><a href="embeddings.html#cb122-12" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
 <span id="cb122-13"><a href="embeddings.html#cb122-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>item2)</span>
@@ -692,7 +692,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <p>This function takes the tidy word embeddings as input, along with a word (or token, more strictly) as a string. It uses matrix multiplication and sums to calculate the cosine similarity between the word and all the words in the embedding to find which words are closer or farther to the input word, and returns a dataframe sorted by similarity.</p>
 <p>What words are closest to <code>"error"</code> in the data set of CFPB complaints, as determined by our word embeddings?</p>
 <div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="embeddings.html#cb123-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb123-2"><a href="embeddings.html#cb123-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
+<span id="cb123-2"><a href="embeddings.html#cb123-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 × 2
 #&gt;    item1            value
 #&gt;    &lt;chr&gt;            &lt;dbl&gt;
@@ -710,7 +710,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <p>Mistakes, problems, glitches – sounds bad!</p>
 <p>What is closest to the word <code>"month"</code>?</p>
 <div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="embeddings.html#cb125-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb125-2"><a href="embeddings.html#cb125-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
+<span id="cb125-2"><a href="embeddings.html#cb125-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 × 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
@@ -728,7 +728,7 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <p>We see words about installments and payments, along with other time periods such as years and weeks. Notice that we did not stem this text data (see Chapter <a href="stemming.html#stemming">4</a>), but the word embeddings learned that “month,” “months,” and “monthly” belong together.</p>
 <p>What words are closest in this embedding space to <code>"fee"</code>?</p>
 <div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="embeddings.html#cb127-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb127-2"><a href="embeddings.html#cb127-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
+<span id="cb127-2"><a href="embeddings.html#cb127-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 7,475 × 2
 #&gt;    item1     value
 #&gt;    &lt;chr&gt;     &lt;dbl&gt;
@@ -764,23 +764,23 @@ Each word can be represented as a numeric vector in this new feature space. A si
 <p>We now find words about overdrafts and charges. The top two words are “fee” and “fees”; word embeddings can learn that singular and plural forms of words are related and belong together. In fact, word embeddings can accomplish many of the same goals of tasks like stemming (Chapter <a href="stemming.html#stemming">4</a>) but more reliably and less arbitrarily.</p>
 <p>Since we have found word embeddings via singular value decomposition, we can use these vectors to understand what principal components explain the most variation in the CFPB complaints. The orthogonal axes that SVD used to represent our data were chosen so that the first axis accounts for the most variance, the second axis accounts for the next most variance, and so on. We can now explore which and how much each <em>original</em> dimension (tokens in this case) contributed to each of the resulting principal components produced using SVD.</p>
 <div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="embeddings.html#cb131-1" aria-hidden="true" tabindex="-1"></a>tidy_word_vectors <span class="sc">%&gt;%</span></span>
-<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(dimension <span class="sc">&lt;=</span> <span class="dv">24</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb131-3"><a href="embeddings.html#cb131-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(dimension) <span class="sc">%&gt;%</span></span>
-<span id="cb131-4"><a href="embeddings.html#cb131-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">12</span>, <span class="fu">abs</span>(value)) <span class="sc">%&gt;%</span></span>
-<span id="cb131-5"><a href="embeddings.html#cb131-5" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
-<span id="cb131-6"><a href="embeddings.html#cb131-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">item1 =</span> <span class="fu">reorder_within</span>(item1, value, dimension)) <span class="sc">%&gt;%</span></span>
-<span id="cb131-7"><a href="embeddings.html#cb131-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> dimension)) <span class="sc">+</span></span>
-<span id="cb131-8"><a href="embeddings.html#cb131-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb131-9"><a href="embeddings.html#cb131-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>dimension, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb131-10"><a href="embeddings.html#cb131-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_reordered</span>() <span class="sc">+</span></span>
-<span id="cb131-11"><a href="embeddings.html#cb131-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb131-12"><a href="embeddings.html#cb131-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb131-13"><a href="embeddings.html#cb131-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb131-14"><a href="embeddings.html#cb131-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">&quot;Value&quot;</span>,</span>
-<span id="cb131-15"><a href="embeddings.html#cb131-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">&quot;First 24 principal components for text of CFPB complaints&quot;</span>,</span>
-<span id="cb131-16"><a href="embeddings.html#cb131-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;Top words contributing to the components that explain&quot;</span>,</span>
-<span id="cb131-17"><a href="embeddings.html#cb131-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">&quot;the most variation&quot;</span>)</span>
-<span id="cb131-18"><a href="embeddings.html#cb131-18" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div>
+<span id="cb131-2"><a href="embeddings.html#cb131-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(dimension <span class="sc">&lt;=</span> <span class="dv">24</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb131-3"><a href="embeddings.html#cb131-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(dimension) <span class="sc">%&gt;%</span></span>
+<span id="cb131-4"><a href="embeddings.html#cb131-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">12</span>, <span class="fu">abs</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb131-5"><a href="embeddings.html#cb131-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb131-6"><a href="embeddings.html#cb131-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">item1 =</span> <span class="fu">reorder_within</span>(item1, value, dimension)) <span class="sc">%&gt;%</span></span>
+<span id="cb131-7"><a href="embeddings.html#cb131-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(item1, value, <span class="at">fill =</span> dimension)) <span class="sc">+</span></span>
+<span id="cb131-8"><a href="embeddings.html#cb131-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb131-9"><a href="embeddings.html#cb131-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>dimension, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb131-10"><a href="embeddings.html#cb131-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reordered</span>() <span class="sc">+</span></span>
+<span id="cb131-11"><a href="embeddings.html#cb131-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb131-12"><a href="embeddings.html#cb131-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb131-13"><a href="embeddings.html#cb131-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb131-14"><a href="embeddings.html#cb131-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Value&quot;</span>,</span>
+<span id="cb131-15"><a href="embeddings.html#cb131-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;First 24 principal components for text of CFPB complaints&quot;</span>,</span>
+<span id="cb131-16"><a href="embeddings.html#cb131-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;Top words contributing to the components that explain&quot;</span>,</span>
+<span id="cb131-17"><a href="embeddings.html#cb131-17" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;the most variation&quot;</span>)</span>
+<span id="cb131-18"><a href="embeddings.html#cb131-18" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:embeddingpca"></span>
 <img src="05_word_embeddings_files/figure-html/embeddingpca-1.svg" alt="Word embeddings for Consumer Finance Protection Bureau complaints" width="768" />
 <p class="caption">
@@ -871,7 +871,7 @@ How small is too small? It is hard to make definitive statements because being a
 <span id="cb138-6"><a href="embeddings.html#cb138-6" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(. <span class="sc">*</span> y) <span class="sc">/</span> </span>
 <span id="cb138-7"><a href="embeddings.html#cb138-7" aria-hidden="true" tabindex="-1"></a>          (<span class="fu">sqrt</span>(<span class="fu">rowSums</span>(. <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(.[token, ] <span class="sc">^</span> <span class="dv">2</span>)))</span>
 <span id="cb138-8"><a href="embeddings.html#cb138-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">matrix</span>(res, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="fu">names</span>(res)))</span>
-<span id="cb138-9"><a href="embeddings.html#cb138-9" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb138-9"><a href="embeddings.html#cb138-9" aria-hidden="true" tabindex="-1"></a>      },</span>
 <span id="cb138-10"><a href="embeddings.html#cb138-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">sort =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb138-11"><a href="embeddings.html#cb138-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">maximum_size =</span> <span class="cn">NULL</span></span>
 <span id="cb138-12"><a href="embeddings.html#cb138-12" aria-hidden="true" tabindex="-1"></a>    )(item1, dimension, value) <span class="sc">%&gt;%</span></span>
@@ -879,7 +879,7 @@ How small is too small? It is hard to make definitive statements because being a
 <span id="cb138-14"><a href="embeddings.html#cb138-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Pre-trained word embeddings are trained on very large, general purpose English language data sets. Commonly used <a href="https://code.google.com/archive/p/word2vec/">word2vec embeddings</a> are based on the Google News data set, and  <a href="https://nlp.stanford.edu/projects/glove/">GloVe embeddings</a> (what we are using here) and <a href="https://fasttext.cc/docs/en/english-vectors.html">FastText embeddings</a> are learned from the text of Wikipedia plus other sources. Keeping that in mind, what words are closest to <code>"error"</code> in the GloVe embeddings?</p>
 <div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="embeddings.html#cb139-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb139-2"><a href="embeddings.html#cb139-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
+<span id="cb139-2"><a href="embeddings.html#cb139-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;error&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 × 2
 #&gt;    item1       value
 #&gt;    &lt;chr&gt;       &lt;dbl&gt;
@@ -894,10 +894,10 @@ How small is too small? It is hard to make definitive statements because being a
 #&gt;  9 calculation 0.584
 #&gt; 10 probability 0.583
 #&gt; # … with 399,990 more rows</code></pre>
-<p>Instead of problems and mistakes like in the CFPB embeddings, we now see words related to sports, especially baseball, where an error is a certain kind of act recorded in statistics. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word “error.”</p>
+<p>Instead of the more specific clerical mistakes and discrepancies in the CFPB embeddings, we now see more general words about being correct or incorrect. This could present a challenge for using the GloVe embeddings with the CFPB text data. Remember that different senses or uses of the same word are conflated in word embeddings; the high-dimensional space of any set of word embeddings cannot distinguish between different uses of a word, such as the word “error.”</p>
 <p>What is closest to the word <code>"month"</code> in these pre-trained GloVe embeddings?</p>
 <div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="embeddings.html#cb141-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb141-2"><a href="embeddings.html#cb141-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
+<span id="cb141-2"><a href="embeddings.html#cb141-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;month&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 × 2
 #&gt;    item1    value
 #&gt;    &lt;chr&gt;    &lt;dbl&gt;
@@ -915,7 +915,7 @@ How small is too small? It is hard to make definitive statements because being a
 <p>Instead of words about payments, the GloVe results here focus on different time periods only.</p>
 <p>What words are closest in the GloVe embedding space to <code>"fee"</code>?</p>
 <div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="embeddings.html#cb143-1" aria-hidden="true" tabindex="-1"></a>tidy_glove <span class="sc">%&gt;%</span></span>
-<span id="cb143-2"><a href="embeddings.html#cb143-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
+<span id="cb143-2"><a href="embeddings.html#cb143-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nearest_neighbors</span>(<span class="st">&quot;fee&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 400,000 × 2
 #&gt;    item1        value
 #&gt;    &lt;chr&gt;        &lt;dbl&gt;
@@ -1125,7 +1125,6 @@ Wagner, C., Graells-Garrido, E., Garcia, D., and Menczer, F. 2016. <span>“Wome
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1162,7 +1161,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {
