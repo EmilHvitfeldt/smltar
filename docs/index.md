@@ -1,7 +1,7 @@
 --- 
 title: "Supervised Machine Learning for Text Analysis in R"
 author: "Emil Hvitfeldt and Julia Silge"
-date: "2021-11-04"
+date: "2021-11-11"
 site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [book.bib]
@@ -114,67 +114,67 @@ Note box icons by Smashicons from flaticon.com.
 
 This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdown**](https://bookdown.org). The [website](https://smltar.com) is hosted via [GitHub Pages](https://pages.github.com), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) has been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
-This version of the book was built with R version 4.1.0 (2021-05-18) and the following packages:
+This version of the book was built with R version 4.1.1 (2021-08-10) and the following packages:
 
 
 |package        |version |source                        |
 |:--------------|:-------|:-----------------------------|
 |bench          |1.1.1   |CRAN (R 4.1.0)                |
-|bookdown       |0.24    |CRAN (R 4.1.0)                |
+|bookdown       |0.24    |CRAN (R 4.1.1)                |
 |broom          |0.7.9   |CRAN (R 4.1.0)                |
 |corpus         |0.10.2  |CRAN (R 4.1.0)                |
-|dials          |0.0.10  |CRAN (R 4.1.0)                |
+|dials          |0.0.10  |CRAN (R 4.1.1)                |
 |discrim        |0.1.3   |CRAN (R 4.1.0)                |
 |doParallel     |1.0.16  |CRAN (R 4.1.0)                |
 |glmnet         |4.1-2   |CRAN (R 4.1.0)                |
-|gt             |0.3.1   |CRAN (R 4.1.0)                |
+|gt             |0.3.1   |CRAN (R 4.1.1)                |
 |hcandersenr    |0.2.0   |CRAN (R 4.1.0)                |
-|htmltools      |0.5.2   |CRAN (R 4.1.0)                |
-|htmlwidgets    |1.5.4   |CRAN (R 4.1.0)                |
+|htmltools      |0.5.2   |CRAN (R 4.1.1)                |
+|htmlwidgets    |1.5.4   |CRAN (R 4.1.1)                |
 |hunspell       |3.0.1   |CRAN (R 4.1.0)                |
 |irlba          |2.3.3   |CRAN (R 4.1.0)                |
 |jiebaR         |0.11    |CRAN (R 4.1.0)                |
 |jsonlite       |1.7.2   |CRAN (R 4.1.0)                |
-|kableExtra     |1.3.4   |CRAN (R 4.1.0)                |
-|keras          |2.6.1   |CRAN (R 4.1.0)                |
+|kableExtra     |1.3.4   |CRAN (R 4.1.1)                |
+|keras          |2.6.1   |CRAN (R 4.1.1)                |
 |klaR           |0.6-15  |CRAN (R 4.1.0)                |
 |LiblineaR      |2.10-12 |CRAN (R 4.1.0)                |
-|lime           |0.5.2   |CRAN (R 4.1.0)                |
+|lime           |0.5.2   |CRAN (R 4.1.1)                |
 |lobstr         |1.1.1   |CRAN (R 4.1.0)                |
 |naivebayes     |0.9.7   |CRAN (R 4.1.0)                |
 |parsnip        |0.1.7   |CRAN (R 4.1.0)                |
-|prismatic      |1.1.0   |CRAN (R 4.1.0)                |
-|quanteda       |3.1.0   |CRAN (R 4.1.0)                |
+|prismatic      |1.1.0   |CRAN (R 4.1.1)                |
+|quanteda       |3.1.0   |CRAN (R 4.1.1)                |
 |ranger         |0.13.1  |CRAN (R 4.1.0)                |
-|recipes        |0.1.17  |CRAN (R 4.1.0)                |
-|remotes        |2.4.1   |CRAN (R 4.1.0)                |
-|reticulate     |1.22    |CRAN (R 4.1.0)                |
-|rsample        |0.1.0   |CRAN (R 4.1.0)                |
+|recipes        |0.1.17  |CRAN (R 4.1.1)                |
+|remotes        |2.4.1   |CRAN (R 4.1.1)                |
+|reticulate     |1.22    |CRAN (R 4.1.1)                |
+|rsample        |0.1.0   |CRAN (R 4.1.1)                |
 |rsparse        |0.4.0   |CRAN (R 4.1.0)                |
 |scico          |1.2.0   |CRAN (R 4.1.0)                |
 |scotus         |1.0.0   |Github (EmilHvitfeldt/scotus) |
-|servr          |0.23    |CRAN (R 4.1.0)                |
+|servr          |0.23    |CRAN (R 4.1.1)                |
 |sessioninfo    |1.1.1   |CRAN (R 4.1.0)                |
 |slider         |0.2.2   |CRAN (R 4.1.0)                |
 |SnowballC      |0.7.0   |CRAN (R 4.1.0)                |
 |spacyr         |1.2.1   |CRAN (R 4.1.0)                |
 |stopwords      |2.2     |CRAN (R 4.1.0)                |
-|styler         |1.6.2   |CRAN (R 4.1.0)                |
+|styler         |1.6.2   |CRAN (R 4.1.1)                |
 |text2vec       |0.6     |CRAN (R 4.1.0)                |
 |textdata       |0.4.1   |CRAN (R 4.1.0)                |
 |textfeatures   |0.3.3   |CRAN (R 4.1.0)                |
 |textrecipes    |0.4.1   |CRAN (R 4.1.0)                |
 |tfruns         |1.5.0   |CRAN (R 4.1.0)                |
 |themis         |0.1.4   |CRAN (R 4.1.0)                |
-|tidymodels     |0.1.4   |CRAN (R 4.1.0)                |
-|tidytext       |0.3.2   |CRAN (R 4.1.0)                |
+|tidymodels     |0.1.4   |CRAN (R 4.1.1)                |
+|tidytext       |0.3.2   |CRAN (R 4.1.1)                |
 |tidyverse      |1.3.1   |CRAN (R 4.1.0)                |
 |tokenizers     |0.2.1   |CRAN (R 4.1.0)                |
 |tokenizers.bpe |0.1.0   |CRAN (R 4.1.0)                |
 |tufte          |0.10    |CRAN (R 4.1.0)                |
 |tune           |0.1.6   |CRAN (R 4.1.0)                |
-|UpSetR         |1.4.0   |CRAN (R 4.1.0)                |
+|UpSetR         |1.4.0   |CRAN (R 4.1.1)                |
 |vip            |0.3.2   |CRAN (R 4.1.0)                |
-|widyr          |0.1.4   |CRAN (R 4.1.0)                |
-|workflows      |0.2.4   |CRAN (R 4.1.0)                |
+|widyr          |0.1.4   |CRAN (R 4.1.1)                |
+|workflows      |0.2.4   |CRAN (R 4.1.1)                |
 |yardstick      |0.0.8   |CRAN (R 4.1.0)                |

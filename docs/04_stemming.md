@@ -485,9 +485,6 @@ Section \@ref(mlregressionlemmatization) demonstrates how to use textrecipes wit
 Let's briefly walk through how to use spacyr.
 
 
-
-
-
 ```r
 library(spacyr)
 spacy_initialize(entity = FALSE)

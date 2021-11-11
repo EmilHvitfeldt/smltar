@@ -2,8 +2,6 @@
 
 
 
-
-
 The first neural networks\index{network architecture} we built in Chapter \@ref(dldnn) did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter \@ref(dllstm) were especially suited to learning long-range dependencies. In this final chapter, we will focus on \index{neural network!convolutional} **convolutional neural network** (CNN) architecture [@kim2014], which can learn local, spatial structure within data.
 
 CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures\index{language!structure} in the data.
@@ -74,7 +72,7 @@ simple_cnn_model
 
 ```
 #> Model
-#> Model: "sequential"
+#> Model: "sequential_1"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -141,18 +139,18 @@ val_res
 
 ```
 #> # A tibble: 50,524 × 3
-#>         .pred_1 .pred_class state
-#>           <dbl> <fct>       <fct>
-#>  1 0.00171      0           0    
-#>  2 0.000167     0           0    
-#>  3 0.00200      0           0    
-#>  4 0.811        1           0    
-#>  5 0.999        1           1    
-#>  6 1.00         1           1    
-#>  7 0.0000000185 0           0    
-#>  8 0.00142      0           0    
-#>  9 0.958        1           1    
-#> 10 0.998        1           1    
+#>        .pred_1 .pred_class state
+#>          <dbl> <fct>       <fct>
+#>  1 0.000116    0           0    
+#>  2 0.000598    0           0    
+#>  3 0.00102     0           0    
+#>  4 0.0000224   0           0    
+#>  5 0.996       1           1    
+#>  6 0.998       1           1    
+#>  7 0.000000850 0           0    
+#>  8 0.00101     0           0    
+#>  9 0.639       1           1    
+#> 10 0.999       1           1    
 #> # … with 50,514 more rows
 ```
 
@@ -167,10 +165,10 @@ metrics(val_res, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.812
-#> 2 kap         binary         0.625
-#> 3 mn_log_loss binary         0.942
-#> 4 roc_auc     binary         0.862
+#> 1 accuracy    binary         0.811
+#> 2 kap         binary         0.621
+#> 3 mn_log_loss binary         0.959
+#> 4 roc_auc     binary         0.861
 ```
 
 We already see improvement over the densely connected network from Chapter \@ref(dldnn), our best performing model on the Kickstarter data so far.
@@ -242,7 +240,7 @@ cnn_double_dense
 
 ```
 #> Model
-#> Model: "sequential_1"
+#> Model: "sequential_2"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -298,9 +296,9 @@ metrics(val_res_double_dense, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.805
-#> 2 kap         binary         0.608
-#> 3 mn_log_loss binary         1.05 
+#> 1 accuracy    binary         0.808
+#> 2 kap         binary         0.615
+#> 3 mn_log_loss binary         1.01 
 #> 4 roc_auc     binary         0.858
 ```
 
@@ -329,7 +327,7 @@ cnn_double_conv
 
 ```
 #> Model
-#> Model: "sequential_2"
+#> Model: "sequential_3"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -402,10 +400,10 @@ metrics(val_res_double_conv, state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.806
-#> 2 kap         binary         0.610
-#> 3 mn_log_loss binary         1.06 
-#> 4 roc_auc     binary         0.853
+#> 1 accuracy    binary         0.805
+#> 2 kap         binary         0.608
+#> 3 mn_log_loss binary         1.03 
+#> 4 roc_auc     binary         0.852
 ```
 
 This model also performs well compared to earlier results. Let us extract the the prediction using `keras_predict()` we defined in Section \@ref(evaluate-dnn).
@@ -423,18 +421,18 @@ all_cnn_model_predictions
 
 ```
 #> # A tibble: 151,572 × 4
-#>         .pred_1 .pred_class state model    
-#>           <dbl> <fct>       <fct> <chr>    
-#>  1 0.00171      0           0     Basic CNN
-#>  2 0.000167     0           0     Basic CNN
-#>  3 0.00200      0           0     Basic CNN
-#>  4 0.811        1           0     Basic CNN
-#>  5 0.999        1           1     Basic CNN
-#>  6 1.00         1           1     Basic CNN
-#>  7 0.0000000185 0           0     Basic CNN
-#>  8 0.00142      0           0     Basic CNN
-#>  9 0.958        1           1     Basic CNN
-#> 10 0.998        1           1     Basic CNN
+#>        .pred_1 .pred_class state model    
+#>          <dbl> <fct>       <fct> <chr>    
+#>  1 0.000116    0           0     Basic CNN
+#>  2 0.000598    0           0     Basic CNN
+#>  3 0.00102     0           0     Basic CNN
+#>  4 0.0000224   0           0     Basic CNN
+#>  5 0.996       1           1     Basic CNN
+#>  6 0.998       1           1     Basic CNN
+#>  7 0.000000850 0           0     Basic CNN
+#>  8 0.00101     0           0     Basic CNN
+#>  9 0.639       1           1     Basic CNN
+#> 10 0.999       1           1     Basic CNN
 #> # … with 151,562 more rows
 ```
 
@@ -451,17 +449,17 @@ all_cnn_model_predictions %>%
 #> # A tibble: 12 × 4
 #>    model        .metric     .estimator .estimate
 #>    <chr>        <chr>       <chr>          <dbl>
-#>  1 Basic CNN    accuracy    binary         0.812
-#>  2 Double Conv  accuracy    binary         0.806
-#>  3 Double Dense accuracy    binary         0.805
-#>  4 Basic CNN    kap         binary         0.625
-#>  5 Double Conv  kap         binary         0.610
-#>  6 Double Dense kap         binary         0.608
-#>  7 Basic CNN    mn_log_loss binary         0.942
-#>  8 Double Conv  mn_log_loss binary         1.06 
-#>  9 Double Dense mn_log_loss binary         1.05 
-#> 10 Basic CNN    roc_auc     binary         0.862
-#> 11 Double Conv  roc_auc     binary         0.853
+#>  1 Basic CNN    accuracy    binary         0.811
+#>  2 Double Conv  accuracy    binary         0.805
+#>  3 Double Dense accuracy    binary         0.808
+#>  4 Basic CNN    kap         binary         0.621
+#>  5 Double Conv  kap         binary         0.608
+#>  6 Double Dense kap         binary         0.615
+#>  7 Basic CNN    mn_log_loss binary         0.959
+#>  8 Double Conv  mn_log_loss binary         1.03 
+#>  9 Double Dense mn_log_loss binary         1.01 
+#> 10 Basic CNN    roc_auc     binary         0.861
+#> 11 Double Conv  roc_auc     binary         0.852
 #> 12 Double Dense roc_auc     binary         0.858
 ```
 
@@ -612,7 +610,7 @@ cnn_bpe
 
 ```
 #> Model
-#> Model: "sequential_3"
+#> Model: "sequential_4"
 #> ________________________________________________________________________________
 #> Layer (type)                        Output Shape                    Param #     
 #> ================================================================================
@@ -656,10 +654,10 @@ bpe_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03548
-#>     accuracy: 0.9936
-#>     val_loss: 0.963
-#> val_accuracy: 0.8115
+#>         loss: 0.03396
+#>     accuracy: 0.9944
+#>     val_loss: 0.9696
+#> val_accuracy: 0.8117
 ```
 
 The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher-detail tokenizer.
@@ -815,25 +813,25 @@ explanation
 #> # A tibble: 19 × 13
 #>    model_type    case label label_prob model_r2 model_intercept model_prediction
 #>  * <chr>        <int> <chr>      <dbl>    <dbl>           <dbl>            <dbl>
-#>  1 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  2 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  3 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  4 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  5 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  6 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  7 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  8 classificat…     1 1          0.930    0.582           0.208            0.909
-#>  9 classificat…     1 1          0.930    0.582           0.208            0.909
-#> 10 classificat…     1 1          0.930    0.582           0.208            0.909
-#> 11 classificat…     1 1          0.930    0.582           0.208            0.909
-#> 12 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 13 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 14 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 15 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 16 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 17 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 18 classificat…     2 1          0.987    0.743           0.226            0.930
-#> 19 classificat…     2 1          0.987    0.743           0.226            0.930
+#>  1 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  2 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  3 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  4 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  5 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  6 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  7 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  8 classificat…     1 1          0.998    0.255           0.759            1.02 
+#>  9 classificat…     1 1          0.998    0.255           0.759            1.02 
+#> 10 classificat…     1 1          0.998    0.255           0.759            1.02 
+#> 11 classificat…     1 1          0.998    0.255           0.759            1.02 
+#> 12 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 13 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 14 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 15 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 16 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 17 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 18 classificat…     2 1          0.992    0.458           0.235            0.700
+#> 19 classificat…     2 1          0.992    0.458           0.235            0.700
 #> # … with 6 more variables: feature <chr>, feature_value <chr>,
 #> #   feature_weight <dbl>, feature_desc <chr>, data <chr>, prediction <list>
 ```
@@ -886,7 +884,7 @@ plot_text_explanations(explanation)
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-13f58313103bd40f0be8" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-13f58313103bd40f0be8">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='positive_1'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='positive_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_2'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_2'>practical<\/span>! <\/br> <sub>Label predicted: 1 (92.97%)<br/>Explainer fit: 0.58<\/sub> <\/p><br/><p> <span class='negative_1'>Happiness<\/span> <span class='positive_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_3'>jar<\/span> <span class='positive_1'>has<\/span> <span class='negative_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='positive_1'>reached<\/span>. <\/br> <sub>Label predicted: 1 (98.68%)<br/>Explainer fit: 0.74<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-13f58313103bd40f0be8">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='positive_1'>new<\/span> <span class='positive_2'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='positive_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.82%)<br/>Explainer fit: 0.26<\/sub> <\/p><br/><p> <span class='negative_1'>Happiness<\/span> <span class='negative_1'>in<\/span> <span class='negative_1'>a<\/span> <span class='positive_2'>jar<\/span> <span class='positive_2'>has<\/span> <span class='positive_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='negative_1'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.15%)<br/>Explainer fit: 0.46<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:limeplottextexplanations)Feature highlighting of words for two examples explained by a CNN model.</p>
@@ -957,7 +955,7 @@ plot_text_explanations(explanation)
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-4167fb03a98835d92965" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4167fb03a98835d92965">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='positive_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='negative_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.84%)<br/>Explainer fit: 0.89<\/sub> <\/p><br/><p> <span class='positive_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='negative_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.92%)<br/>Explainer fit: 0.92<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-4167fb03a98835d92965">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_5'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.97%)<br/>Explainer fit: 0.94<\/sub> <\/p><br/><p> <span class='positive_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_4'>dice<\/span> <span class='positive_1'>game<\/span> <span class='negative_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.97%)<br/>Explainer fit: 0.91<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 ```
 
 <p class="caption">(\#fig:robustlimeplottextexplanations)Feature highlighting of words in two examples explained by a CNN model.</p>
@@ -1249,25 +1247,25 @@ cv_fitted %>%
 #> # A tibble: 20 × 5
 #>    splits                 id    .metric     .estimator .estimate
 #>    <list>                 <chr> <chr>       <chr>          <dbl>
-#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.822
-#>  2 <split [161673/40419]> Fold1 kap         binary         0.644
-#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.916
-#>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.870
-#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.822
+#>  1 <split [161673/40419]> Fold1 accuracy    binary         0.824
+#>  2 <split [161673/40419]> Fold1 kap         binary         0.647
+#>  3 <split [161673/40419]> Fold1 mn_log_loss binary         0.897
+#>  4 <split [161673/40419]> Fold1 roc_auc     binary         0.872
+#>  5 <split [161673/40419]> Fold2 accuracy    binary         0.823
 #>  6 <split [161673/40419]> Fold2 kap         binary         0.644
-#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.893
-#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.872
-#>  9 <split [161674/40418]> Fold3 accuracy    binary         0.826
-#> 10 <split [161674/40418]> Fold3 kap         binary         0.652
-#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.877
-#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.875
+#>  7 <split [161673/40419]> Fold2 mn_log_loss binary         0.904
+#>  8 <split [161673/40419]> Fold2 roc_auc     binary         0.870
+#>  9 <split [161674/40418]> Fold3 accuracy    binary         0.823
+#> 10 <split [161674/40418]> Fold3 kap         binary         0.646
+#> 11 <split [161674/40418]> Fold3 mn_log_loss binary         0.897
+#> 12 <split [161674/40418]> Fold3 roc_auc     binary         0.870
 #> 13 <split [161674/40418]> Fold4 accuracy    binary         0.824
 #> 14 <split [161674/40418]> Fold4 kap         binary         0.647
-#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.919
-#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.870
-#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.826
-#> 18 <split [161674/40418]> Fold5 kap         binary         0.651
-#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.867
+#> 15 <split [161674/40418]> Fold4 mn_log_loss binary         0.878
+#> 16 <split [161674/40418]> Fold4 roc_auc     binary         0.871
+#> 17 <split [161674/40418]> Fold5 accuracy    binary         0.828
+#> 18 <split [161674/40418]> Fold5 kap         binary         0.655
+#> 19 <split [161674/40418]> Fold5 mn_log_loss binary         0.870
 #> 20 <split [161674/40418]> Fold5 roc_auc     binary         0.875
 ```
 
@@ -1289,10 +1287,10 @@ cv_fitted %>%
 #> # A tibble: 4 × 4
 #>   .metric      mean     n  std_err
 #>   <chr>       <dbl> <int>    <dbl>
-#> 1 accuracy    0.824     5 0.000821
-#> 2 kap         0.647     5 0.00170 
-#> 3 mn_log_loss 0.894     5 0.0104  
-#> 4 roc_auc     0.872     5 0.00111
+#> 1 accuracy    0.824     5 0.000982
+#> 2 kap         0.648     5 0.00186 
+#> 3 mn_log_loss 0.889     5 0.00651 
+#> 4 roc_auc     0.872     5 0.000953
 ```
 
 The metrics have little variance just like they did last time, which is reassuring; our model is robust with respect to the evaluation metrics. 
@@ -1370,10 +1368,10 @@ final_history
 ```
 #> 
 #> Final epoch (plot to see history):
-#>         loss: 0.03233
-#>     accuracy: 0.9932
-#>     val_loss: 0.7422
-#> val_accuracy: 0.8575
+#>         loss: 0.03215
+#>     accuracy: 0.9935
+#>     val_loss: 0.7677
+#> val_accuracy: 0.8511
 ```
 
 This looks promising! Let's finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.
@@ -1390,10 +1388,10 @@ final_res %>% metrics(state, .pred_class, .pred_1)
 #> # A tibble: 4 × 3
 #>   .metric     .estimator .estimate
 #>   <chr>       <chr>          <dbl>
-#> 1 accuracy    binary         0.852
-#> 2 kap         binary         0.703
-#> 3 mn_log_loss binary         0.781
-#> 4 roc_auc     binary         0.895
+#> 1 accuracy    binary         0.850
+#> 2 kap         binary         0.700
+#> 3 mn_log_loss binary         0.778
+#> 4 roc_auc     binary         0.894
 ```
 
 This is our best-performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure \@ref(fig:cnnfinalroc).
