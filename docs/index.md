@@ -26,7 +26,7 @@ graphics: yes
 
 # Welcome to Supervised Machine Learning for Text Analysis in R {-}
 
-This is the [website](https://smltar.com/) for *Supervised Machine Learning for Text Analysis in R*! Visit the [GitHub repository for this site](https://github.com/EmilHvitfeldt/smltar). 
+This is the [website](https://smltar.com/) for *Supervised Machine Learning for Text Analysis in R*! Visit the [GitHub repository for this site](https://github.com/EmilHvitfeldt/smltar), or buy a physical copy from [CRC Press](https://doi.org/10.1201/9781003093459), [Bookshop.org](https://bookshop.org/books/supervised-machine-learning-for-text-analysis-in-r-9780367554194/9780367554194), or [Amazon](https://amzn.to/3DaHzjF). 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This online work by [Emil Hvitfeldt](https://www.hvitfeldt.me/) and [Julia Silge](http://juliasilge.com/) is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
 
