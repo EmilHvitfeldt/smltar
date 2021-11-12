@@ -114,6 +114,10 @@ Note box icons by Smashicons from flaticon.com.
 
 This book was written in [RStudio](https://www.rstudio.com/ide/) using [**bookdown**](https://bookdown.org). The [website](https://smltar.com) is hosted via [GitHub Pages](https://pages.github.com), and the complete source is available on [GitHub](https://github.com/EmilHvitfeldt/smltar). We generated all plots in this book using [**ggplot2**](https://ggplot2.tidyverse.org) and its light theme (`theme_light()`). The `autoplot()` method for [`conf_mat()`](https://yardstick.tidymodels.org/reference/conf_mat.html) has been modified slightly to allow colors; modified code can be found [online](https://github.com/EmilHvitfeldt/smltar/blob/master/_common.R).
 
+<div class="rmdwarning">
+<p>Because of changes in package versions since the publication of the first edition, you may notice slight differences in some results when comparing this online work and the published paper edition.</p>
+</div>
+
 This version of the book was built with R version 4.1.1 (2021-08-10) and the following packages:
 
 
