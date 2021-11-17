@@ -349,8 +349,8 @@ nb_rs_metrics
 #> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n std_err .config             
 #>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 accuracy binary     0.802    10 0.00434 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.881    10 0.00150 Preprocessor1_Model1
+#> 1 accuracy binary     0.802    10 0.00446 Preprocessor1_Model1
+#> 2 roc_auc  binary     0.881    10 0.00168 Preprocessor1_Model1
 ```
 
 The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.2%.
@@ -1197,7 +1197,7 @@ multi_lasso_rs
 #>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [1 × 1]> <tibble [175,…
 #>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
 #>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [1 × 1]> <tibble [175,…
+#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
 #>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
 #>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
 #>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
@@ -1220,11 +1220,11 @@ best_acc
 #> # A tibble: 5 × 7
 #>    penalty .metric  .estimator  mean     n std_err .config              
 #>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1 0.00234  accuracy multiclass 0.753    10 0.00145 Preprocessor1_Model10
+#> 1 0.00234  accuracy multiclass 0.753    10 0.00148 Preprocessor1_Model10
 #> 2 0.00428  accuracy multiclass 0.750    10 0.00132 Preprocessor1_Model11
-#> 3 0.00127  accuracy multiclass 0.748    10 0.00117 Preprocessor1_Model09
+#> 3 0.00127  accuracy multiclass 0.747    10 0.00142 Preprocessor1_Model09
 #> 4 0.00785  accuracy multiclass 0.739    10 0.00151 Preprocessor1_Model12
-#> 5 0.000695 accuracy multiclass 0.737    10 0.00179 Preprocessor1_Model08
+#> 5 0.000695 accuracy multiclass 0.735    10 0.00214 Preprocessor1_Model08
 ```
 
 The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
@@ -1905,15 +1905,15 @@ nb_rs_predictions %>%
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
 #>  1 Fold01 recall  binary         0.694
-#>  2 Fold02 recall  binary         0.725
+#>  2 Fold02 recall  binary         0.728
 #>  3 Fold03 recall  binary         0.673
 #>  4 Fold04 recall  binary         0.660
-#>  5 Fold05 recall  binary         0.705
-#>  6 Fold06 recall  binary         0.602
-#>  7 Fold07 recall  binary         0.741
-#>  8 Fold08 recall  binary         0.702
-#>  9 Fold09 recall  binary         0.775
-#> 10 Fold10 recall  binary         0.601
+#>  5 Fold05 recall  binary         0.704
+#>  6 Fold06 recall  binary         0.604
+#>  7 Fold07 recall  binary         0.740
+#>  8 Fold08 recall  binary         0.703
+#>  9 Fold09 recall  binary         0.774
+#> 10 Fold10 recall  binary         0.597
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
@@ -1926,8 +1926,8 @@ conf_mat_resampled(nb_rs, tidy = FALSE)
 
 ```
 #>        Credit  Other
-#> Credit 2865.6  440.4
-#> Other  1301.2 4183.8
+#> Credit 2865.9  442.0
+#> Other  1300.9 4182.2
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.

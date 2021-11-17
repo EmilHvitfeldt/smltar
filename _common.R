@@ -87,8 +87,6 @@ columnize <- function(words, ncol = 5) {
   
 }
 
-julias_computer <- FALSE
-
 sparse_bp <- hardhat::default_recipe_blueprint(composition = "dgCMatrix")
 
 ## for Keras chapters
