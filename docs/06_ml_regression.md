@@ -928,7 +928,7 @@ collect_metrics(lemma_rs)
 The best value for RMSE at 14.2 shows us that using lemmatization\index{lemma} can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section \@ref(firstregressionevaluation). The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding `step_lemma()` to our preprocessing increases the overall time to train the workflow by over 10-fold.\index{computational speed}
 
 <div class="rmdnote">
-<p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
+<p>We can use <code>engine = "spacyr"</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.emilhvitfeldt.com/post/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.</p>
 </div>
 \index{part of speech}
 
@@ -1080,7 +1080,7 @@ scotus_hash %>%
 ```
 
 By using `step_texthash()` we can quickly generate machine-ready data with a consistent number of variables.
-This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this [**textrecipes** blogpost](https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/).
+This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this [**textrecipes** blogpost](https://www.emilhvitfeldt.com/post/textrecipes-series-featurehashing/).
 
 ### Text normalization
 
