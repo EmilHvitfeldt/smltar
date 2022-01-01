@@ -1229,7 +1229,7 @@ FIGURE 6.5: Comparing model performance for predicting the year of Supreme Court
 <p>The best value for RMSE at 14.2 shows us that using lemmatization can have a significant benefit for model performance, compared to 15.6 from fitting a non-lemmatized linear SVM model in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>. The best model using lemmatization is better than the best model without. However, this comes at a cost of much slower training because of the procedure involved in identifying lemmas; adding <code>step_lemma()</code> to our preprocessing increases the overall time to train the workflow by over 10-fold.</p>
 <div class="rmdnote">
 <p>
-We can use <code>engine = “spacyr”</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.hvitfeldt.me/blog/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.
+We can use <code>engine = “spacyr”</code> to assign part-of-speech tags to the tokens during tokenization, and this information can be used in various useful ways in text modeling. One approach is to filter tokens to only retain a certain part of speech, like nouns. An example of how to do this is illustrated in this <a href="https://www.emilhvitfeldt.com/post/tidytuesday-pos-textrecipes-the-office/"><strong>textrecipes</strong> blogpost</a> and can be performed with <code>step_pos_filter()</code>.
 </p>
 </div>
 <p></p>
@@ -1339,7 +1339,7 @@ This feature hashing method is used because of its speed and scalability, not be
 #&gt; $ text_hash008 &lt;dbl&gt; -8, 3, 1, 1, 1, 0, -19, 0, 1, 0, 1, -1, 1, 1, -2, 1, -8, …
 #&gt; $ text_hash009 &lt;dbl&gt; -2, 0, -1, 1, 0, 0, 0, -1, -1, -1, 0, -1, -1, -1, 0, 0, -…</code></pre>
 <p>By using <code>step_texthash()</code> we can quickly generate machine-ready data with a consistent number of variables.
-This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this <a href="https://www.hvitfeldt.me/blog/textrecipes-series-featurehashing/"><strong>textrecipes</strong> blogpost</a>.</p>
+This typically results in a slight loss of performance compared to using a traditional bag-of-words representation. An example of this loss is illustrated in this <a href="https://www.emilhvitfeldt.com/post/textrecipes-series-featurehashing/"><strong>textrecipes</strong> blogpost</a>.</p>
 <div id="text-normalization" class="section level3" number="6.7.1">
 <h3><span class="header-section-number">6.7.1</span> Text normalization</h3>
 <p>When working with text, you will inevitably run into problems with encodings and related irregularities.
