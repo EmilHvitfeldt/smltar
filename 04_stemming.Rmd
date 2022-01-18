@@ -89,7 +89,7 @@ tidy_by_lang %>%
   group_by(language) %>%
   count(stem) %>%
   top_n(20, n) %>%
-  ungroup %>%
+  ungroup() %>%
   ggplot(aes(n, fct_reorder(stem, n), fill = language)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~language, scales = "free_y", ncol = 2) +
@@ -278,7 +278,7 @@ stemming %>%
   count(Type, Result) %>%
   group_by(Type) %>%
   top_n(20, n) %>%
-  ungroup %>%
+  ungroup() %>%
   ggplot(aes(fct_reorder(Result, n),
              n, fill = Type)) +
   geom_col(show.legend = FALSE) +
