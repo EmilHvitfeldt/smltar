@@ -30,11 +30,11 @@ Let's build our first regression model using this sample of Supreme Court opinio
 ```{r scotushist, dependson="scotussample", fig.cap="Supreme Court opinions per decade in sample"}
 scotus_filtered %>%
   mutate(year = as.numeric(year),
-         year = 10 * (year %/% 10)) %>%
-  count(year) %>%
-  ggplot(aes(year, n)) +
+         decade = 10 * (year %/% 10)) %>%
+  count(decade) %>%
+  ggplot(aes(decade, n)) +
   geom_col() +
-  labs(x = "Year", y = "Number of opinions per decade")
+  labs(x = "Decade", y = "Number of opinions per decade")
 ```
 
 This sample of opinions reflects the distribution over time of available opinions for analysis; there are many more opinions per year in this data set after about 1850 than before. This is an example of bias already in our data, as we discussed in the overview to these chapters, and we will need to account for that in choosing a model and understanding our results.
