@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 10 Convolutional neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="dllstm.html"/>
 <link rel="next" href="text-models-in-the-real-world.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="dlcnn" class="section level1" number="10">
-<h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks</h1>
+<div id="dlcnn" class="section level1 hasAnchor" number="10">
+<h1><span class="header-section-number">Chapter 10</span> Convolutional neural networks<a href="dlcnn.html#dlcnn" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>The first neural networks we built in Chapter <a href="dldnn.html#dldnn">8</a> did not have the capacity to learn much about structure, sequences, or long-range dependencies in our text data. The LSTM networks we trained in Chapter <a href="dllstm.html#dllstm">9</a> were especially suited to learning long-range dependencies. In this final chapter, we will focus on  <strong>convolutional neural network</strong> (CNN) architecture <span class="citation">(<a href="#ref-kim2014" role="doc-biblioref">Yoon Kim 2014</a>)</span>, which can learn local, spatial structure within data.</p>
 <p>CNNs can be well-suited for modeling text data because text often contains quite a lot of local structure. A CNN does not learn long-range structure within a sequence like an LSTM, but instead detects local patterns. A CNN network layer takes data (like text) as input and then hopefully produces output that represents specific structures in the data.</p>
 <div class="rmdnote">
@@ -463,8 +462,8 @@ div.csl-indent {
 Let’s take more time with CNNs in this chapter to explore their construction, different features, and the hyperparameters we can tune.
 </p>
 </div>
-<div id="what-are-cnns" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> What are CNNs?</h2>
+<div id="what-are-cnns" class="section level2 hasAnchor" number="10.1">
+<h2><span class="header-section-number">10.1</span> What are CNNs?<a href="dlcnn.html#what-are-cnns" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>CNNs can work with data of different dimensions (like two-dimensional images or three-dimensional video), but for text modeling, we typically work in one dimension. The illustrations and explanations in this chapter use only one dimension to match the text use case.
 Figure <a href="dlcnn.html#fig:cnn-architecture">10.1</a> illustrates a typical CNN architecture.
 A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small data cube that we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.</p>
@@ -476,15 +475,15 @@ FIGURE 10.1: A template CNN architecture for one-dimensional input data. A seque
 </div>
 <p>This figure isn’t entirely accurate because we technically don’t feed characters into a CNN, but instead use one-hot sequence encoding (Section <a href="dldnn.html#onehotsequence">8.2.2</a>) with a possible word embedding.
 Let’s talk about two of the most important CNN concepts, <strong>kernels</strong> and <strong>kernel size</strong>.</p>
-<div id="kernel" class="section level3" number="10.1.1">
-<h3><span class="header-section-number">10.1.1</span> Kernel</h3>
+<div id="kernel" class="section level3 hasAnchor" number="10.1.1">
+<h3><span class="header-section-number">10.1.1</span> Kernel<a href="dlcnn.html#kernel" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The kernel is a small vector that slides along the input. When it is sliding, it performs element-wise multiplication of the values in the input and its own weights, and then sums up the values to get a single value.
 Sometimes an activation function is applied as well.
 It is these weights that are trained via gradient descent to find the best fit.
 In Keras, the <code>filters</code> represent how many different kernels are trained in each layer. You typically start with fewer <code>filters</code> at the beginning of your network and then increase them as you go along.</p>
 </div>
-<div id="kernel-size" class="section level3" number="10.1.2">
-<h3><span class="header-section-number">10.1.2</span> Kernel size</h3>
+<div id="kernel-size" class="section level3 hasAnchor" number="10.1.2">
+<h3><span class="header-section-number">10.1.2</span> Kernel size<a href="dlcnn.html#kernel-size" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The most prominent hyperparameter is the kernel size.
 The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels can capture local information similarly to how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as shown in Figure <a href="dlcnn.html#fig:cnn-kernel-size">10.2</a>.</p>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:cnn-kernel-size"></span>
@@ -499,8 +498,8 @@ For character tokenization, a kernel size of 5 will (in early layers) find patte
 By contrast, a kernel size of 5 with word tokenization will learn patterns within sentences instead.</p>
 </div>
 </div>
-<div id="firstcnn" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> A first CNN model</h2>
+<div id="firstcnn" class="section level2 hasAnchor" number="10.2">
+<h2><span class="header-section-number">10.2</span> A first CNN model<a href="dlcnn.html#firstcnn" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We will be using the same data, which we examine in Sections <a href="dldnn.html#kickstarter">8.1</a> and <a href="appendixdata.html#kickstarter-blurbs">B.4</a> and use throughout Chapters <a href="dldnn.html#dldnn">8</a> and <a href="dllstm.html#dllstm">9</a>. This data set contains short text blurbs for prospective crowdfunding campaigns on Kickstarter, along with if they were successful. Our goal of this modeling is to predict successful campaigns from the text contained in the blurb. We will also use the same preprocessing and feature engineering recipe that we created and described in Sections <a href="dldnn.html#dnnrecipe">8.2.1</a> and <a href="dllstm.html#firstlstm">9.1</a>.</p>
 <p>Our first CNN will look a lot like what is shown in Figure <a href="dlcnn.html#fig:cnn-architecture">10.1</a>.
 We start with an embedding layer, followed by a single one-dimensional convolution layer <code>layer_conv_1d()</code>, then a global max pooling layer <code>layer_global_max_pooling_1d()</code>, a densely connected layer, and end with a dense layer with a sigmoid activation function to give us one value between 0 and 1 to use in our binary classification task.</p>
@@ -515,8 +514,7 @@ We start with an embedding layer, followed by a single one-dimensional convoluti
 <span id="cb573-9"><a href="dlcnn.html#cb573-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb573-10"><a href="dlcnn.html#cb573-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb573-11"><a href="dlcnn.html#cb573-11" aria-hidden="true" tabindex="-1"></a>simple_cnn_model</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential&quot;
+<pre><code>#&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -569,28 +567,28 @@ We are using the <code>“adam”</code> optimizer since it performs well for ma
 <div class="sourceCode" id="cb576"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb576-1"><a href="dlcnn.html#cb576-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(simple_cnn_model, kick_assess, state_assess)</span>
 <span id="cb576-2"><a href="dlcnn.html#cb576-2" aria-hidden="true" tabindex="-1"></a>val_res</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 50,524 × 3
-#&gt;        .pred_1 .pred_class state
-#&gt;          &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
-#&gt;  1 0.0102      0           0    
-#&gt;  2 0.000000299 0           0    
-#&gt;  3 0.00101     0           0    
-#&gt;  4 0.0104      0           0    
-#&gt;  5 1.00        1           1    
-#&gt;  6 1.00        1           1    
-#&gt;  7 0.00405     0           0    
-#&gt;  8 0.000103    0           0    
-#&gt;  9 0.0355      0           1    
-#&gt; 10 1.00        1           1    
+#&gt;     .pred_1 .pred_class state
+#&gt;       &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
+#&gt;  1 0.0550   0           0    
+#&gt;  2 0.00495  0           0    
+#&gt;  3 0.000920 0           0    
+#&gt;  4 0.252    0           0    
+#&gt;  5 1        1           1    
+#&gt;  6 0.999    1           1    
+#&gt;  7 0.000249 0           0    
+#&gt;  8 0.0217   0           0    
+#&gt;  9 0.258    0           1    
+#&gt; 10 1        1           1    
 #&gt; # … with 50,514 more rows</code></pre>
 <p>We can calculate some standard metrics with <code>metrics()</code>.</p>
 <div class="sourceCode" id="cb578"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb578-1"><a href="dlcnn.html#cb578-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(val_res, state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.810
-#&gt; 2 kap         binary         0.619
-#&gt; 3 mn_log_loss binary         0.960
-#&gt; 4 roc_auc     binary         0.860</code></pre>
+#&gt; 1 accuracy    binary         0.811
+#&gt; 2 kap         binary         0.623
+#&gt; 3 mn_log_loss binary         0.936
+#&gt; 4 roc_auc     binary         0.864</code></pre>
 <p>We already see improvement over the densely connected network from Chapter <a href="dldnn.html#dldnn">8</a>, our best performing model on the Kickstarter data so far.</p>
 <p>The heatmap in Figure <a href="dlcnn.html#fig:cnnheatmap">10.3</a> shows that the model performs about the same for the two classes, success and failure for the crowdfunding campaigns; we are getting fairly good results from a baseline CNN model!</p>
 <div class="sourceCode" id="cb580"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb580-1"><a href="dlcnn.html#cb580-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
@@ -616,8 +614,8 @@ FIGURE 10.4: ROC curve for first CNN model predictions of Kickstarter campaign s
 </p>
 </div>
 </div>
-<div id="case-study-adding-more-layers" class="section level2" number="10.3">
-<h2><span class="header-section-number">10.3</span> Case study: adding more layers</h2>
+<div id="case-study-adding-more-layers" class="section level2 hasAnchor" number="10.3">
+<h2><span class="header-section-number">10.3</span> Case study: adding more layers<a href="dlcnn.html#case-study-adding-more-layers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now that we know how our basic CNN performs, we can see what happens when we apply some common modifications to it.
 This case study will examine:</p>
 <ul>
@@ -643,8 +641,7 @@ When working with CNNs, the different layers perform different tasks. A convolut
 <span id="cb582-8"><a href="dlcnn.html#cb582-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb582-9"><a href="dlcnn.html#cb582-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb582-10"><a href="dlcnn.html#cb582-10" aria-hidden="true" tabindex="-1"></a>cnn_double_dense</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential_1&quot;
+<pre><code>#&gt; Model: &quot;sequential_1&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -688,10 +685,10 @@ When working with CNNs, the different layers perform different tasks. A convolut
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.804
-#&gt; 2 kap         binary         0.607
+#&gt; 1 accuracy    binary         0.810
+#&gt; 2 kap         binary         0.620
 #&gt; 3 mn_log_loss binary         1.01 
-#&gt; 4 roc_auc     binary         0.856</code></pre>
+#&gt; 4 roc_auc     binary         0.858</code></pre>
 <p>This model performs well, but it is not entirely clear that it is working much better than the first CNN model we tried. This could be an indication that the original model had enough fully connected layers for the amount of training data we have available.</p>
 <div class="rmdwarning">
 <p>
@@ -710,8 +707,7 @@ If we have two models with nearly identical performance, we should choose the le
 <span id="cb587-9"><a href="dlcnn.html#cb587-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb587-10"><a href="dlcnn.html#cb587-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb587-11"><a href="dlcnn.html#cb587-11" aria-hidden="true" tabindex="-1"></a>cnn_double_conv</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential_2&quot;
+<pre><code>#&gt; Model: &quot;sequential_2&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -770,9 +766,9 @@ This is another parameter you can tinker with when you are designing the network
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.801
-#&gt; 2 kap         binary         0.603
-#&gt; 3 mn_log_loss binary         1.05 
-#&gt; 4 roc_auc     binary         0.851</code></pre>
+#&gt; 2 kap         binary         0.600
+#&gt; 3 mn_log_loss binary         1.04 
+#&gt; 4 roc_auc     binary         0.852</code></pre>
 <p>This model also performs well compared to earlier results. Let us extract the the prediction using <code>keras_predict()</code> we defined in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a>.</p>
 <div class="sourceCode" id="cb592"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb592-1"><a href="dlcnn.html#cb592-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
 <span id="cb592-2"><a href="dlcnn.html#cb592-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(val_res, <span class="at">model =</span> <span class="st">&quot;Basic CNN&quot;</span>),</span>
@@ -782,18 +778,18 @@ This is another parameter you can tinker with when you are designing the network
 <span id="cb592-6"><a href="dlcnn.html#cb592-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb592-7"><a href="dlcnn.html#cb592-7" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 151,572 × 4
-#&gt;        .pred_1 .pred_class state model    
-#&gt;          &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;    
-#&gt;  1 0.0102      0           0     Basic CNN
-#&gt;  2 0.000000299 0           0     Basic CNN
-#&gt;  3 0.00101     0           0     Basic CNN
-#&gt;  4 0.0104      0           0     Basic CNN
-#&gt;  5 1.00        1           1     Basic CNN
-#&gt;  6 1.00        1           1     Basic CNN
-#&gt;  7 0.00405     0           0     Basic CNN
-#&gt;  8 0.000103    0           0     Basic CNN
-#&gt;  9 0.0355      0           1     Basic CNN
-#&gt; 10 1.00        1           1     Basic CNN
+#&gt;     .pred_1 .pred_class state model    
+#&gt;       &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;    
+#&gt;  1 0.0550   0           0     Basic CNN
+#&gt;  2 0.00495  0           0     Basic CNN
+#&gt;  3 0.000920 0           0     Basic CNN
+#&gt;  4 0.252    0           0     Basic CNN
+#&gt;  5 1        1           1     Basic CNN
+#&gt;  6 0.999    1           1     Basic CNN
+#&gt;  7 0.000249 0           0     Basic CNN
+#&gt;  8 0.0217   0           0     Basic CNN
+#&gt;  9 0.258    0           1     Basic CNN
+#&gt; 10 1        1           1     Basic CNN
 #&gt; # … with 151,562 more rows</code></pre>
 <p>Now that the results are combined in <code>all_cnn_model_predictions</code> we can calculate group-wise evaluation statistics by grouping them by the <code>model</code> variable.</p>
 <div class="sourceCode" id="cb594"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb594-1"><a href="dlcnn.html#cb594-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
@@ -802,18 +798,18 @@ This is another parameter you can tinker with when you are designing the network
 <pre><code>#&gt; # A tibble: 12 × 4
 #&gt;    model        .metric     .estimator .estimate
 #&gt;    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 Basic CNN    accuracy    binary         0.810
+#&gt;  1 Basic CNN    accuracy    binary         0.811
 #&gt;  2 Double Conv  accuracy    binary         0.801
-#&gt;  3 Double Dense accuracy    binary         0.804
-#&gt;  4 Basic CNN    kap         binary         0.619
-#&gt;  5 Double Conv  kap         binary         0.603
-#&gt;  6 Double Dense kap         binary         0.607
-#&gt;  7 Basic CNN    mn_log_loss binary         0.960
-#&gt;  8 Double Conv  mn_log_loss binary         1.05 
+#&gt;  3 Double Dense accuracy    binary         0.810
+#&gt;  4 Basic CNN    kap         binary         0.623
+#&gt;  5 Double Conv  kap         binary         0.600
+#&gt;  6 Double Dense kap         binary         0.620
+#&gt;  7 Basic CNN    mn_log_loss binary         0.936
+#&gt;  8 Double Conv  mn_log_loss binary         1.04 
 #&gt;  9 Double Dense mn_log_loss binary         1.01 
-#&gt; 10 Basic CNN    roc_auc     binary         0.860
-#&gt; 11 Double Conv  roc_auc     binary         0.851
-#&gt; 12 Double Dense roc_auc     binary         0.856</code></pre>
+#&gt; 10 Basic CNN    roc_auc     binary         0.864
+#&gt; 11 Double Conv  roc_auc     binary         0.852
+#&gt; 12 Double Dense roc_auc     binary         0.858</code></pre>
 <p>We can also compute ROC curves for all our models so far. Figure <a href="dlcnn.html#fig:allcnnroccurve">10.5</a> shows the three different ROC curves together in one chart.</p>
 <div class="sourceCode" id="cb596"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb596-1"><a href="dlcnn.html#cb596-1" aria-hidden="true" tabindex="-1"></a>all_cnn_model_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb596-2"><a href="dlcnn.html#cb596-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(model) <span class="sc">%&gt;%</span></span>
@@ -831,8 +827,8 @@ FIGURE 10.5: ROC curve for three CNN variants’ predictions of Kickstarter camp
 <p>The curves are <em>very</em> close in this chart, indicating that we don’t have much to gain by adding more layers and that they don’t improve performance substantively.
 This doesn’t mean that we are done with CNNs! There are still many things we can explore, like different tokenization approaches and hyperparameters that can be trained.</p>
 </div>
-<div id="case-study-byte-pair-encoding" class="section level2" number="10.4">
-<h2><span class="header-section-number">10.4</span> Case study: byte pair encoding</h2>
+<div id="case-study-byte-pair-encoding" class="section level2 hasAnchor" number="10.4">
+<h2><span class="header-section-number">10.4</span> Case study: byte pair encoding<a href="dlcnn.html#case-study-byte-pair-encoding" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In our models in this chapter so far we have used words as the token of interest. We saw in Section <a href="mlregression.html#casestudyngrams">6.5</a> how n-grams can be used in modeling as well.
 One of the reasons why the Kickstarter data set is hard to work with is because the text is quite short so we don’t have that many individual tokens to work with in a given blurb.
 Another choice of token is <em>subwords</em>, where we split the text into smaller units than words; longer words especially will be broken into multiple subword units. One way to tokenize text into subword units is <em>byte pair encoding</em> <span class="citation">(<a href="#ref-Gage1994ANA" role="doc-biblioref">Gage 1994</a>)</span>.
@@ -927,8 +923,7 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 <span id="cb602-7"><a href="dlcnn.html#cb602-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb602-8"><a href="dlcnn.html#cb602-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb602-9"><a href="dlcnn.html#cb602-9" aria-hidden="true" tabindex="-1"></a>cnn_bpe</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential_3&quot;
+<pre><code>#&gt; Model: &quot;sequential_3&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -964,10 +959,10 @@ FIGURE 10.6: Distribution of subword count for Kickstarter campaign blurbs for d
 <span id="cb604-15"><a href="dlcnn.html#cb604-15" aria-hidden="true" tabindex="-1"></a>bpe_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.03322
-#&gt;     accuracy: 0.9944
-#&gt;     val_loss: 0.9545
-#&gt; val_accuracy: 0.8119</code></pre>
+#&gt;         loss: 0.03079
+#&gt;     accuracy: 0.9949
+#&gt;     val_loss: 0.9939
+#&gt; val_accuracy: 0.8111</code></pre>
 <p>The performance is doing quite well, which is a pleasant surprise! This is what we hoped would happen if we switched to a higher-detail tokenizer.</p>
 <p>The confusion matrix in Figure <a href="dlcnn.html#fig:bpeheatmap">10.7</a> also clearly shows that there isn’t much bias between the two classes with this new tokenizer.</p>
 <div class="sourceCode" id="cb606"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb606-1"><a href="dlcnn.html#cb606-1" aria-hidden="true" tabindex="-1"></a>val_res_bpe <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(cnn_bpe, bpe_assess, state_assess)</span>
@@ -1018,8 +1013,8 @@ Examining the longest subword tokens gives you a good sense of the data you are 
 </p>
 </div>
 </div>
-<div id="lime" class="section level2" number="10.5">
-<h2><span class="header-section-number">10.5</span> Case study: explainability with LIME</h2>
+<div id="lime" class="section level2 hasAnchor" number="10.5">
+<h2><span class="header-section-number">10.5</span> Case study: explainability with LIME<a href="dlcnn.html#lime" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>
 
 We noted in Section <a href="dldnn.html#dllimitations">8.7</a> that one of the significant limitations of deep learning models is that they are hard to reason about. One of the ways to understand a predictive model, even a “black box” one, is using an algorithm for observation-level variable importance like the <em>Local Interpretable Model-Agnostic Explanations</em> <span class="citation">(<a href="#ref-ribeiro2016why" role="doc-biblioref">Ribeiro, Singh, and Guestrin 2016</a>)</span> algorithm, or <strong>LIME</strong> for short.</p>
@@ -1080,25 +1075,25 @@ Be sure that the preprocessing function <em>matches</em> the preprocessing that 
 <pre><code>#&gt; # A tibble: 19 × 13
 #&gt;    model_type    case label label_prob model_r2 model_intercept model_prediction
 #&gt;  * &lt;chr&gt;        &lt;int&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt;  1 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  2 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  3 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  4 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  5 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  6 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  7 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  8 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt;  9 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt; 10 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt; 11 classificat…     1 1           1.00    0.402           0.618             1.08
-#&gt; 12 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 13 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 14 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 15 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 16 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 17 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 18 classificat…     2 1           1.00    0.603           0.415             1.01
-#&gt; 19 classificat…     2 1           1.00    0.603           0.415             1.01
+#&gt;  1 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  2 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  3 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  4 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  5 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  6 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  7 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  8 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt;  9 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt; 10 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt; 11 classificat…     1 1          0.993    0.322           0.773            0.775
+#&gt; 12 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 13 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 14 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 15 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 16 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 17 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 18 classificat…     2 1          0.996    0.437           0.518            0.960
+#&gt; 19 classificat…     2 1          0.996    0.437           0.518            0.960
 #&gt; # … with 6 more variables: feature &lt;chr&gt;, feature_value &lt;chr&gt;,
 #&gt; #   feature_weight &lt;dbl&gt;, feature_desc &lt;chr&gt;, data &lt;chr&gt;, prediction &lt;list&gt;</code></pre>
 <p>The output comes in a tibble format where <code>feature</code> and <code>feature_weight</code> are included, but fortunately lime contains some functions to visualize these weights. Figure <a href="dlcnn.html#fig:limeplotfeatures">10.8</a> shows the result of using <code>plot_features()</code>, with each facet containing an observation-label pair and the bars showing the weight of the different tokens. Bars in the positive direction (darker) indicate that the weights <em>support</em> the prediction and bars in the negative direction (lighter) indicate <em>contradictions</em>. This chart is great for finding the most prominent features in an observation.</p>
@@ -1138,7 +1133,7 @@ FIGURE 10.8: Plot of most important features for a CNN model predicting two obse
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-13f58313103bd40f0be8" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-13f58313103bd40f0be8">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='positive_1'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_1'>learning<\/span> <span class='positive_1'>English<\/span> <span class='positive_1'>made<\/span> <span class='positive_1'>simple<\/span>, <span class='positive_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (100%)<br/>Explainer fit: 0.4<\/sub> <\/p><br/><p> <span class='negative_2'>Happiness<\/span> <span class='positive_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_1'>jar<\/span> <span class='positive_1'>has<\/span> <span class='positive_1'>finally<\/span> <span class='positive_1'>been<\/span> <span class='positive_2'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.99%)<br/>Explainer fit: 0.6<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-13f58313103bd40f0be8">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>The<\/span> <span class='negative_1'>new<\/span> <span class='negative_1'>way<\/span> <span class='positive_1'>of<\/span> <span class='positive_2'>learning<\/span> <span class='positive_2'>English<\/span> <span class='negative_1'>made<\/span> <span class='negative_1'>simple<\/span>, <span class='negative_1'>interesting<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>practical<\/span>! <\/br> <sub>Label predicted: 1 (99.29%)<br/>Explainer fit: 0.32<\/sub> <\/p><br/><p> <span class='negative_1'>Happiness<\/span> <span class='positive_1'>in<\/span> <span class='positive_1'>a<\/span> <span class='positive_2'>jar<\/span> <span class='positive_1'>has<\/span> <span class='positive_1'>finally<\/span> <span class='negative_1'>been<\/span> <span class='negative_1'>reached<\/span>. <\/br> <sub>Label predicted: 1 (99.59%)<br/>Explainer fit: 0.44<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 10.9: Feature highlighting of words for two examples explained by a CNN model.
 </p>
@@ -1196,7 +1191,7 @@ The following example shows this effect. We have created two very similar senten
     background-color: #D5FFF7FF;} .plot_text_explanations .negative_5 {
     background-color: #FFFFB2FF;}</style>
 <div id="htmlwidget-4167fb03a98835d92965" style="width:100%;height:auto;" class="plot_text_explanations html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4167fb03a98835d92965">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_2'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='positive_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.8%)<br/>Explainer fit: 0.39<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='negative_1'>exciting<\/span> <span class='positive_3'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.87%)<br/>Explainer fit: 0.3<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-4167fb03a98835d92965">{"x":{"html":"<div style=\"overflow-y:scroll;font-family:sans-serif;height:100%\"> <p> <span class='negative_1'>Fun<\/span> <span class='positive_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_3'>dice<\/span> <span class='positive_1'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='positive_1'>whole<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.99%)<br/>Explainer fit: 0.79<\/sub> <\/p><br/><p> <span class='negative_1'>Fun<\/span> <span class='negative_1'>and<\/span> <span class='positive_1'>exciting<\/span> <span class='positive_3'>dice<\/span> <span class='positive_2'>game<\/span> <span class='positive_1'>for<\/span> <span class='positive_1'>the<\/span> <span class='negative_1'>family<\/span> <\/br> <sub>Label predicted: 2 (99.97%)<br/>Explainer fit: 0.77<\/sub> <\/p> <\/div>"},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 FIGURE 10.10: Feature highlighting of words in two examples explained by a CNN model.
 </p>
@@ -1208,8 +1203,8 @@ The LIME algorithm and <strong>lime</strong> R package are not limited to explai
 </p>
 </div>
 </div>
-<div id="keras-hyperparameter" class="section level2" number="10.6">
-<h2><span class="header-section-number">10.6</span> Case study: hyperparameter search</h2>
+<div id="keras-hyperparameter" class="section level2 hasAnchor" number="10.6">
+<h2><span class="header-section-number">10.6</span> Case study: hyperparameter search<a href="dlcnn.html#keras-hyperparameter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>So far in all our deep learning models, we have only used one configuration of hyperparameters. Sometimes we want to try different hyperparameters out and find what works best for our model like we did in Sections <a href="mlregression.html#mlregressionfull">6.9</a> and <a href="mlclassification.html#mlclassificationfull">7.11</a> using the <strong>tune</strong> package. We can use the <a href="https://tensorflow.rstudio.com/tools/tfruns/overview/"><strong>tfruns</strong></a> package to run multiple Keras models and compare the results.</p>
 <p>This workflow will be a little different than what we have seen in the book so far since we will have to create a <code>.R</code> file that contains the necessary modeling steps and then use that file to fit multiple models. Such an example file named <code>cnn-spec.R</code> used for the following models is available <a href="https://raw.githubusercontent.com/EmilHvitfeldt/smltar/master/cnn-spec.R">on GitHub</a>. The first thing we need to do is specify what hyperparameters we want to vary. By convention, this object is named <code>FLAGS</code> and it is created using the <code>flags()</code> function. For each parameter we want to tune, we add a corresponding <code>flag_*()</code> function, which can be <code>flag_integer()</code>, <code>flag_boolean()</code>, <code>flag_numeric()</code>, or <code>flag_string()</code> depending on what we need to tune.</p>
 <div class="rmdwarning">
@@ -1277,44 +1272,36 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb625-6"><a href="dlcnn.html#cb625-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb625-7"><a href="dlcnn.html#cb625-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb625-8"><a href="dlcnn.html#cb625-8" aria-hidden="true" tabindex="-1"></a>runs_results <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(<span class="fu">ls_runs</span>())</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 9 × 27
+<pre><code>#&gt; # A tibble: 6 × 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/2…  1.03       0.0321           0.993           1.03             0.803
-#&gt; 2 _tuning/2…  1.01       0.0348           0.992           1.01             0.810
-#&gt; 3 _tuning/2…  0.992      0.044            0.989           0.992            0.804
-#&gt; 4 _tuning/2…  0.972      0.0286           0.995           0.972            0.814
-#&gt; 5 _tuning/2…  0.924      0.037            0.992           0.924            0.815
-#&gt; 6 _tuning/2…  0.967      0.0414           0.990           0.966            0.810
-#&gt; 7 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; 8 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; 9 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; # … with 21 more variables: flag_kernel_size1 &lt;dbl&gt;, flag_strides1 &lt;dbl&gt;,
-#&gt; #   steps_completed &lt;dbl&gt;, epochs &lt;dbl&gt;, epochs_completed &lt;dbl&gt;, metrics &lt;chr&gt;,
-#&gt; #   model &lt;chr&gt;, loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;,
-#&gt; #   script &lt;chr&gt;, start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;,
-#&gt; #   error_message &lt;chr&gt;, error_traceback &lt;chr&gt;, source_code &lt;chr&gt;,
+#&gt; 1 _tuning/20… 1.03       0.0321           0.993           1.03             0.803
+#&gt; 2 _tuning/20… 1.01       0.0348           0.992           1.01             0.810
+#&gt; 3 _tuning/20… 0.992      0.044            0.989           0.992            0.804
+#&gt; 4 _tuning/20… 0.972      0.0286           0.995           0.972            0.814
+#&gt; 5 _tuning/20… 0.924      0.037            0.992           0.924            0.815
+#&gt; 6 _tuning/20… 0.967      0.0414           0.990           0.966            0.810
+#&gt; # … with 18 more variables: flag_kernel_size1 &lt;dbl&gt;, flag_strides1 &lt;dbl&gt;,
+#&gt; #   epochs &lt;dbl&gt;, epochs_completed &lt;dbl&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
+#&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
+#&gt; #   start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;, source_code &lt;chr&gt;,
 #&gt; #   context &lt;chr&gt;, type &lt;chr&gt;, NA. &lt;dbl&gt;</code></pre>
 <p>You don’t have to, but we have manually specified the <code>runs_dir</code> argument, which is where the results of the tuning will be saved.</p>
 <p>A summary of all the runs in the folder can be retrieved with <code>ls_runs()</code>; here we use <code>as_tibble()</code> to get the results as a tibble.</p>
 <div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="dlcnn.html#cb627-1" aria-hidden="true" tabindex="-1"></a>runs_results</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 9 × 27
+<pre><code>#&gt; # A tibble: 6 × 24
 #&gt;   run_dir     eval_ metric_loss metric_accuracy metric_val_loss metric_val_accu…
 #&gt;   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-#&gt; 1 _tuning/2…  1.03       0.0321           0.993           1.03             0.803
-#&gt; 2 _tuning/2…  1.01       0.0348           0.992           1.01             0.810
-#&gt; 3 _tuning/2…  0.992      0.044            0.989           0.992            0.804
-#&gt; 4 _tuning/2…  0.972      0.0286           0.995           0.972            0.814
-#&gt; 5 _tuning/2…  0.924      0.037            0.992           0.924            0.815
-#&gt; 6 _tuning/2…  0.967      0.0414           0.990           0.966            0.810
-#&gt; 7 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; 8 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; 9 _tuning/2… NA         NA               NA              NA               NA    
-#&gt; # … with 21 more variables: flag_kernel_size1 &lt;dbl&gt;, flag_strides1 &lt;dbl&gt;,
-#&gt; #   steps_completed &lt;dbl&gt;, epochs &lt;dbl&gt;, epochs_completed &lt;dbl&gt;, metrics &lt;chr&gt;,
-#&gt; #   model &lt;chr&gt;, loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;,
-#&gt; #   script &lt;chr&gt;, start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;,
-#&gt; #   error_message &lt;chr&gt;, error_traceback &lt;chr&gt;, source_code &lt;chr&gt;,
+#&gt; 1 _tuning/20… 1.03       0.0321           0.993           1.03             0.803
+#&gt; 2 _tuning/20… 1.01       0.0348           0.992           1.01             0.810
+#&gt; 3 _tuning/20… 0.992      0.044            0.989           0.992            0.804
+#&gt; 4 _tuning/20… 0.972      0.0286           0.995           0.972            0.814
+#&gt; 5 _tuning/20… 0.924      0.037            0.992           0.924            0.815
+#&gt; 6 _tuning/20… 0.967      0.0414           0.990           0.966            0.810
+#&gt; # … with 18 more variables: flag_kernel_size1 &lt;dbl&gt;, flag_strides1 &lt;dbl&gt;,
+#&gt; #   epochs &lt;dbl&gt;, epochs_completed &lt;dbl&gt;, metrics &lt;chr&gt;, model &lt;chr&gt;,
+#&gt; #   loss_function &lt;chr&gt;, optimizer &lt;chr&gt;, learning_rate &lt;dbl&gt;, script &lt;chr&gt;,
+#&gt; #   start &lt;dttm&gt;, end &lt;dttm&gt;, completed &lt;lgl&gt;, output &lt;chr&gt;, source_code &lt;chr&gt;,
 #&gt; #   context &lt;chr&gt;, type &lt;chr&gt;, NA. &lt;dbl&gt;</code></pre>
 <p>We can condense the results down a little bit by only pulling out the flags we are looking at and arranging them according to their performance.</p>
 <div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="dlcnn.html#cb629-1" aria-hidden="true" tabindex="-1"></a>best_runs <span class="ot">&lt;-</span> runs_results <span class="sc">%&gt;%</span></span>
@@ -1322,7 +1309,7 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <span id="cb629-3"><a href="dlcnn.html#cb629-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(metric_val_accuracy))</span>
 <span id="cb629-4"><a href="dlcnn.html#cb629-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb629-5"><a href="dlcnn.html#cb629-5" aria-hidden="true" tabindex="-1"></a>best_runs</span></code></pre></div>
-<pre><code>#&gt; # A tibble: 9 × 3
+<pre><code>#&gt; # A tibble: 6 × 3
 #&gt;   metric_val_accuracy flag_kernel_size1 flag_strides1
 #&gt;                 &lt;dbl&gt;             &lt;dbl&gt;         &lt;dbl&gt;
 #&gt; 1               0.815                 5             1
@@ -1330,14 +1317,11 @@ This is a small selection of hyperparameters and ranges. There is much more room
 #&gt; 3               0.810                 3             1
 #&gt; 4               0.810                 5             2
 #&gt; 5               0.804                 3             2
-#&gt; 6               0.803                 7             2
-#&gt; 7              NA                     3             1
-#&gt; 8              NA                     3             1
-#&gt; 9              NA                     3             1</code></pre>
+#&gt; 6               0.803                 7             2</code></pre>
 <p>There isn’t much performance difference between the different choices but using kernel size of 5 and stride length of 1 narrowly came out on top.</p>
 </div>
-<div id="cross-validation-for-evaluation" class="section level2" number="10.7">
-<h2><span class="header-section-number">10.7</span> Cross-validation for evaluation</h2>
+<div id="cross-validation-for-evaluation" class="section level2 hasAnchor" number="10.7">
+<h2><span class="header-section-number">10.7</span> Cross-validation for evaluation<a href="dlcnn.html#cross-validation-for-evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In Section <a href="dldnn.html#dnncross">8.5</a>, we saw how we can use resampling to create cross-validation folds for evaluation. The Kickstarter data set we are using is big enough that we have ample data for a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. However, it is important to understand how to implement other resampling strategies for situations when your data budget may not be as plentiful or when you need to compute performance metrics that are more precise.</p>
 <div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="dlcnn.html#cb631-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
 <span id="cb631-2"><a href="dlcnn.html#cb631-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
@@ -1412,26 +1396,26 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 20 × 5
 #&gt;    splits                 id    .metric     .estimator .estimate
 #&gt;    &lt;list&gt;                 &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 &lt;split [161673/40419]&gt; Fold1 accuracy    binary         0.823
-#&gt;  2 &lt;split [161673/40419]&gt; Fold1 kap         binary         0.646
-#&gt;  3 &lt;split [161673/40419]&gt; Fold1 mn_log_loss binary         0.886
-#&gt;  4 &lt;split [161673/40419]&gt; Fold1 roc_auc     binary         0.873
+#&gt;  1 &lt;split [161673/40419]&gt; Fold1 accuracy    binary         0.824
+#&gt;  2 &lt;split [161673/40419]&gt; Fold1 kap         binary         0.648
+#&gt;  3 &lt;split [161673/40419]&gt; Fold1 mn_log_loss binary         0.908
+#&gt;  4 &lt;split [161673/40419]&gt; Fold1 roc_auc     binary         0.872
 #&gt;  5 &lt;split [161673/40419]&gt; Fold2 accuracy    binary         0.824
 #&gt;  6 &lt;split [161673/40419]&gt; Fold2 kap         binary         0.647
-#&gt;  7 &lt;split [161673/40419]&gt; Fold2 mn_log_loss binary         0.891
-#&gt;  8 &lt;split [161673/40419]&gt; Fold2 roc_auc     binary         0.873
-#&gt;  9 &lt;split [161674/40418]&gt; Fold3 accuracy    binary         0.826
-#&gt; 10 &lt;split [161674/40418]&gt; Fold3 kap         binary         0.651
-#&gt; 11 &lt;split [161674/40418]&gt; Fold3 mn_log_loss binary         0.874
-#&gt; 12 &lt;split [161674/40418]&gt; Fold3 roc_auc     binary         0.872
-#&gt; 13 &lt;split [161674/40418]&gt; Fold4 accuracy    binary         0.823
-#&gt; 14 &lt;split [161674/40418]&gt; Fold4 kap         binary         0.645
-#&gt; 15 &lt;split [161674/40418]&gt; Fold4 mn_log_loss binary         0.903
-#&gt; 16 &lt;split [161674/40418]&gt; Fold4 roc_auc     binary         0.870
+#&gt;  7 &lt;split [161673/40419]&gt; Fold2 mn_log_loss binary         0.899
+#&gt;  8 &lt;split [161673/40419]&gt; Fold2 roc_auc     binary         0.872
+#&gt;  9 &lt;split [161674/40418]&gt; Fold3 accuracy    binary         0.827
+#&gt; 10 &lt;split [161674/40418]&gt; Fold3 kap         binary         0.653
+#&gt; 11 &lt;split [161674/40418]&gt; Fold3 mn_log_loss binary         0.899
+#&gt; 12 &lt;split [161674/40418]&gt; Fold3 roc_auc     binary         0.877
+#&gt; 13 &lt;split [161674/40418]&gt; Fold4 accuracy    binary         0.824
+#&gt; 14 &lt;split [161674/40418]&gt; Fold4 kap         binary         0.647
+#&gt; 15 &lt;split [161674/40418]&gt; Fold4 mn_log_loss binary         0.910
+#&gt; 16 &lt;split [161674/40418]&gt; Fold4 roc_auc     binary         0.872
 #&gt; 17 &lt;split [161674/40418]&gt; Fold5 accuracy    binary         0.827
-#&gt; 18 &lt;split [161674/40418]&gt; Fold5 kap         binary         0.653
-#&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         0.882
-#&gt; 20 &lt;split [161674/40418]&gt; Fold5 roc_auc     binary         0.874</code></pre>
+#&gt; 18 &lt;split [161674/40418]&gt; Fold5 kap         binary         0.651
+#&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         0.912
+#&gt; 20 &lt;split [161674/40418]&gt; Fold5 roc_auc     binary         0.875</code></pre>
 <p>We can summarize the unnested results to match what we normally would get from <code>collect_metrics()</code></p>
 <div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="dlcnn.html#cb638-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
 <span id="cb638-2"><a href="dlcnn.html#cb638-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(validation) <span class="sc">%&gt;%</span></span>
@@ -1444,14 +1428,14 @@ This is a small selection of hyperparameters and ranges. There is much more room
 <pre><code>#&gt; # A tibble: 4 × 4
 #&gt;   .metric      mean     n  std_err
 #&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
-#&gt; 1 accuracy    0.825     5 0.000735
-#&gt; 2 kap         0.649     5 0.00145 
-#&gt; 3 mn_log_loss 0.887     5 0.00479 
-#&gt; 4 roc_auc     0.873     5 0.000674</code></pre>
+#&gt; 1 accuracy    0.825     5 0.000694
+#&gt; 2 kap         0.649     5 0.00125 
+#&gt; 3 mn_log_loss 0.906     5 0.00277 
+#&gt; 4 roc_auc     0.874     5 0.00101</code></pre>
 <p>The metrics have little variance just like they did last time, which is reassuring; our model is robust with respect to the evaluation metrics.</p>
 </div>
-<div id="cnnfull" class="section level2" number="10.8">
-<h2><span class="header-section-number">10.8</span> The full game: CNN</h2>
+<div id="cnnfull" class="section level2 hasAnchor" number="10.8">
+<h2><span class="header-section-number">10.8</span> The full game: CNN<a href="dlcnn.html#cnnfull" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We’ve come a long way in this chapter, and looked at the many different modifications to the simple CNN model we started with. Most of the alterations didn’t add much so this final model is not going to be much different than what we have seen so far.</p>
 <p></p>
 <div class="rmdwarning">
@@ -1459,8 +1443,8 @@ This is a small selection of hyperparameters and ranges. There is much more room
 There are an incredible number of ways to change a deep learning network architecture, but in most realistic situations, the benefit in model performance from such changes is modest.
 </p>
 </div>
-<div id="cnnfullpreprocess" class="section level3" number="10.8.1">
-<h3><span class="header-section-number">10.8.1</span> Preprocess the data</h3>
+<div id="cnnfullpreprocess" class="section level3 hasAnchor" number="10.8.1">
+<h3><span class="header-section-number">10.8.1</span> Preprocess the data<a href="dlcnn.html#cnnfullpreprocess" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For this final model, we are not going to use our separate validation data again, so we only need to preprocess the training data.</p>
 <div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="dlcnn.html#cb640-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
 <span id="cb640-2"><a href="dlcnn.html#cb640-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
@@ -1476,8 +1460,8 @@ There are an incredible number of ways to change a deep learning network archite
 <span id="cb640-12"><a href="dlcnn.html#cb640-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_matrix)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 </div>
-<div id="cnnfullmodel" class="section level3" number="10.8.2">
-<h3><span class="header-section-number">10.8.2</span> Specify the model</h3>
+<div id="cnnfullmodel" class="section level3 hasAnchor" number="10.8.2">
+<h3><span class="header-section-number">10.8.2</span> Specify the model<a href="dlcnn.html#cnnfullmodel" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Instead of using specific validation data that we can then compute performance metrics for, let’s go back to specifying <code>validation_split = 0.1</code> and let the Keras model choose the validation set.</p>
 <div class="sourceCode" id="cb642"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb642-1"><a href="dlcnn.html#cb642-1" aria-hidden="true" tabindex="-1"></a>final_mod <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb642-2"><a href="dlcnn.html#cb642-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_words <span class="sc">+</span> <span class="dv">1</span>, <span class="at">output_dim =</span> <span class="dv">16</span>,</span>
@@ -1508,10 +1492,10 @@ There are an incredible number of ways to change a deep learning network archite
 <span id="cb642-27"><a href="dlcnn.html#cb642-27" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.031
-#&gt;     accuracy: 0.9939
-#&gt;     val_loss: 0.7518
-#&gt; val_accuracy: 0.853</code></pre>
+#&gt;         loss: 0.0295
+#&gt;     accuracy: 0.994
+#&gt;     val_loss: 0.7687
+#&gt; val_accuracy: 0.8555</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
 <div class="sourceCode" id="cb644"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb644-1"><a href="dlcnn.html#cb644-1" aria-hidden="true" tabindex="-1"></a>kick_matrix_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
 <span id="cb644-2"><a href="dlcnn.html#cb644-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
@@ -1520,9 +1504,9 @@ There are an incredible number of ways to change a deep learning network archite
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.852
-#&gt; 2 kap         binary         0.703
-#&gt; 3 mn_log_loss binary         0.768
+#&gt; 1 accuracy    binary         0.851
+#&gt; 2 kap         binary         0.702
+#&gt; 3 mn_log_loss binary         0.773
 #&gt; 4 roc_auc     binary         0.895</code></pre>
 <p>This is our best-performing model in this chapter on CNN models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dlcnn.html#fig:cnnfinalroc">10.11</a>.</p>
 <div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="dlcnn.html#cb646-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
@@ -1552,11 +1536,11 @@ For this particular data set of short text blurbs, a CNN model able to learn loc
 </div>
 </div>
 </div>
-<div id="dlcnnsummary" class="section level2" number="10.9">
-<h2><span class="header-section-number">10.9</span> Summary</h2>
+<div id="dlcnnsummary" class="section level2 hasAnchor" number="10.9">
+<h2><span class="header-section-number">10.9</span> Summary<a href="dlcnn.html#dlcnnsummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>CNNs are a type of neural network that can learn local spatial patterns. They essentially perform feature extraction, which can then be used efficiently in later layers of a network. Their simplicity and fast running time, compared to models like LSTMs, makes them excellent candidates for supervised models for text.</p>
-<div id="in-this-chapter-you-learned-9" class="section level3" number="10.9.1">
-<h3><span class="header-section-number">10.9.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-9" class="section level3 hasAnchor" number="10.9.1">
+<h3><span class="header-section-number">10.9.1</span> In this chapter, you learned:<a href="dlcnn.html#in-this-chapter-you-learned-9" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>how to preprocess text data for CNN models</p></li>
 <li><p>about CNN network architectures</p></li>
@@ -1572,7 +1556,7 @@ For this particular data set of short text blurbs, a CNN model able to learn loc
 
 
 
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Gage1994ANA" class="csl-entry">
 Gage, P. 1994. <span>“A New Algorithm for Data Compression.”</span> <em>The C Users Journal Archive</em> 12: 23–38.

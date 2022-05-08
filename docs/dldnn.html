@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 8 Dense neural networks | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="dloverview.html"/>
 <link rel="next" href="dllstm.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="dldnn" class="section level1" number="8">
-<h1><span class="header-section-number">Chapter 8</span> Dense neural networks</h1>
+<div id="dldnn" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">Chapter 8</span> Dense neural networks<a href="dldnn.html#dldnn" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Like we discussed in the previous overview, these three chapters on deep learning for text are organized by network architecture, rather than by outcome type as we did in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.
 We’ll use Keras with its Tensorflow backend for these deep learning models; Keras is a well-established framework for deep learning with bindings in Python and, via reticulate <span class="citation">(<a href="#ref-R-reticulate" role="doc-biblioref">Ushey, Allaire, and Tang 2021</a>)</span>, R.
 Keras provides an extensive, high-level API for creating and training many kinds of neural networks, but less support for resampling and preprocessing. Throughout this and the next chapters, we will demonstrate how to use tidymodels packages together with Keras to address these tasks.</p>
@@ -473,8 +472,8 @@ FIGURE 8.1: A high-level diagram of a feed-forward neural network. The lines con
 </p>
 </div>
 <p>Figure <a href="dldnn.html#fig:dnndiag">8.1</a> shows the input units with words, but this is not an entirely accurate representation of a neural network. These words will in practice be represented by embedding vectors because these networks can only work with numeric variables.</p>
-<div id="kickstarter" class="section level2" number="8.1">
-<h2><span class="header-section-number">8.1</span> Kickstarter data</h2>
+<div id="kickstarter" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> Kickstarter data<a href="dldnn.html#kickstarter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>For all our chapters on deep learning, we will build binary classification models, much like we did in Chapter <a href="mlclassification.html#mlclassification">7</a>, but we will use neural networks instead of shallow learning models. As we discussed in the overview to these deep learning chapters, much of the overall model process will look the same, but we will use a different kind of algorithm. We will use a data set of descriptions or “blurbs” for campaigns from the crowdfunding platform <a href="https://www.kickstarter.com/">Kickstarter</a>.</p>
 <div class="sourceCode" id="cb415"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb415-1"><a href="dldnn.html#cb415-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb415-2"><a href="dldnn.html#cb415-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -583,8 +582,8 @@ FIGURE 8.3: Distribution of character count for Kickstarter campaign blurbs over
 #&gt; 1 2010-10-20</code></pre>
 <p>We can’t say for sure if the change happened on 2010-10-20, but that is the last day a campaign was launched with more than 135 characters.</p>
 </div>
-<div id="firstdlclassification" class="section level2" number="8.2">
-<h2><span class="header-section-number">8.2</span> A first deep learning model</h2>
+<div id="firstdlclassification" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> A first deep learning model<a href="dldnn.html#firstdlclassification" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Like all our previous modeling, our first step is to split our data into training and testing sets. We will still use our training set to build models and save the testing set for a final estimate of how our model will perform on new data.</p>
 
 <div class="rmdwarning">
@@ -602,8 +601,8 @@ It is very easy to overfit deep learning models, so an unbiased estimate of futu
 <span id="cb427-7"><a href="dldnn.html#cb427-7" aria-hidden="true" tabindex="-1"></a>kickstarter_train <span class="ot">&lt;-</span> <span class="fu">training</span>(kickstarter_split)</span>
 <span id="cb427-8"><a href="dldnn.html#cb427-8" aria-hidden="true" tabindex="-1"></a>kickstarter_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(kickstarter_split)</span></code></pre></div>
 <p>There are 202,092 blurbs in the training set and 67,365 in the testing set.</p>
-<div id="dnnrecipe" class="section level3" number="8.2.1">
-<h3><span class="header-section-number">8.2.1</span> Preprocessing for deep learning</h3>
+<div id="dnnrecipe" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Preprocessing for deep learning<a href="dldnn.html#dnnrecipe" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Preprocessing for deep learning models is different from preprocessing for most other text models. These neural networks model <em>sequences</em>, so we have to choose the length of sequences we would like to include. Documents that are longer than this length are truncated (information is thrown away), and documents that are shorter than this length are padded with zeroes (an empty, non-informative value) to get to the chosen sequence length. This sequence length is a hyperparameter of the model, and we need to select this value such that we don’t:</p>
 <ul>
 <li><p>overshoot and introduce a lot of padded zeroes, which would make the model hard to train, or</p></li>
@@ -654,8 +653,8 @@ We will use the <strong>recipes</strong> and <strong>textrecipes</strong> packag
 <p>The formula used to specify this recipe <code>~ blurb</code> does not have an outcome, because we are using <strong>recipes</strong> and <strong>textrecipes</strong> functions on their own, outside of the rest of the tidymodels framework; we don’t need to know about the outcome here.
 This preprocessing recipe tokenizes our text (Chapter <a href="tokenization.html#tokenization">2</a>) and filters to keep only the top 20,000 words, but then it transforms the tokenized text in a new way to prepare for deep learning that we have not used in this book before, using <code>step_sequence_onehot()</code>.</p>
 </div>
-<div id="onehotsequence" class="section level3" number="8.2.2">
-<h3><span class="header-section-number">8.2.2</span> One-hot sequence embedding of text</h3>
+<div id="onehotsequence" class="section level3 hasAnchor" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> One-hot sequence embedding of text<a href="dldnn.html#onehotsequence" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The function <code>step_sequence_onehot()</code> transforms tokens into a numeric format appropriate for modeling, like <code>step_tf()</code> and <code>step_tfidf()</code>. However, it is different in that it takes into account the order of the tokens, unlike <code>step_tf()</code> and <code>step_tfidf()</code>, which do not take order into account.</p>
 <div class="rmdnote">
 <p>
@@ -768,8 +767,8 @@ When we <code>bake()</code> a prepped recipe, we apply the preprocessing to a da
 <pre><code>#&gt; [1] 202092     30</code></pre>
 <p>The matrix <code>kick_train</code> has 202,092 rows, corresponding to the rows of the training data, and 30 columns, corresponding to our chosen sequence length.</p>
 </div>
-<div id="simple-flattened-dense-network" class="section level3" number="8.2.3">
-<h3><span class="header-section-number">8.2.3</span> Simple flattened dense network</h3>
+<div id="simple-flattened-dense-network" class="section level3 hasAnchor" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> Simple flattened dense network<a href="dldnn.html#simple-flattened-dense-network" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Our first deep learning model embeds these Kickstarter blurbs in sequences of vectors, flattens them, and then trains a dense network layer to predict whether the campaign was successful or not.</p>
 <div class="sourceCode" id="cb443"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb443-1"><a href="dldnn.html#cb443-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
 <span id="cb443-2"><a href="dldnn.html#cb443-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -782,8 +781,7 @@ When we <code>bake()</code> a prepped recipe, we apply the preprocessing to a da
 <span id="cb443-9"><a href="dldnn.html#cb443-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb443-10"><a href="dldnn.html#cb443-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb443-11"><a href="dldnn.html#cb443-11" aria-hidden="true" tabindex="-1"></a>dense_model</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential&quot;
+<pre><code>#&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -854,8 +852,8 @@ We have dealt with accuracy in other chapters; remember that a higher value (a v
 </div>
 <p>The loss and accuracy both improve with more training epochs on the training data; this dense network more and more closely learns the characteristics of the training data as its trains longer. The same is not true of the validation data, the held-out 25% specified by <code>validation_split = 0.25</code>. The performance is worse on the validation data than the testing data, and <em>degrades</em> somewhat as training continues. If we wanted to use this model, we would want to only train it about 7 or 8 epochs.</p>
 </div>
-<div id="evaluate-dnn" class="section level3" number="8.2.4">
-<h3><span class="header-section-number">8.2.4</span> Evaluation</h3>
+<div id="evaluate-dnn" class="section level3 hasAnchor" number="8.2.4">
+<h3><span class="header-section-number">8.2.4</span> Evaluation<a href="dldnn.html#evaluate-dnn" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>For our first deep learning model, we used the Keras defaults for creating a validation split and tracking metrics, but we can use tidymodels functions to be more specific about these model characteristics. Instead of using the <code>validation_split</code> argument to <code>fit()</code>, we can create our own validation set using tidymodels and use <code>validation_data</code> argument for <code>fit()</code>. We create our validation split from the <em>training</em> set.</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="dldnn.html#cb448-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
 <span id="cb448-2"><a href="dldnn.html#cb448-2" aria-hidden="true" tabindex="-1"></a>kick_val <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(kickstarter_train, <span class="at">strata =</span> state)</span>
@@ -905,9 +903,9 @@ We have dealt with accuracy in other chapters; remember that a higher value (a v
 <span id="cb456-11"><a href="dldnn.html#cb456-11" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.03619
+#&gt;         loss: 0.03612
 #&gt;     accuracy: 0.9917
-#&gt;     val_loss: 1.055
+#&gt;     val_loss: 1.056
 #&gt; val_accuracy: 0.8072</code></pre>
 <p>Figure <a href="dldnn.html#fig:valhistoryplot">8.6</a> still shows significant overfitting at 10 epochs.</p>
 <div class="sourceCode" id="cb458"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb458-1"><a href="dldnn.html#cb458-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
@@ -942,14 +940,14 @@ This function only works with binary classification models that take a preproces
 <pre><code>#&gt; # A tibble: 50,524 × 3
 #&gt;         .pred_1 .pred_class state
 #&gt;           &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;
-#&gt;  1 0.0230       0           0    
-#&gt;  2 0.00813      0           0    
-#&gt;  3 0.0000998    0           0    
-#&gt;  4 0.0000651    0           0    
+#&gt;  1 0.0225       0           0    
+#&gt;  2 0.00753      0           0    
+#&gt;  3 0.0000775    0           0    
+#&gt;  4 0.0000660    0           0    
 #&gt;  5 1.00         1           1    
 #&gt;  6 0.996        1           1    
-#&gt;  7 0.0000000460 0           0    
-#&gt;  8 0.00153      0           0    
+#&gt;  7 0.0000000455 0           0    
+#&gt;  8 0.00155      0           0    
 #&gt;  9 0.979        1           1    
 #&gt; 10 1.00         1           1    
 #&gt; # … with 50,514 more rows</code></pre>
@@ -987,8 +985,8 @@ FIGURE 8.8: ROC curve for first DNN model predictions of Kickstarter campaign su
 </div>
 </div>
 </div>
-<div id="using-bag-of-words-features" class="section level2" number="8.3">
-<h2><span class="header-section-number">8.3</span> Using bag-of-words features</h2>
+<div id="using-bag-of-words-features" class="section level2 hasAnchor" number="8.3">
+<h2><span class="header-section-number">8.3</span> Using bag-of-words features<a href="dldnn.html#using-bag-of-words-features" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Before we move on with neural networks and this new way to represent the text sequences, let’s explore what happens if we use the <em>same</em> preprocessing as in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. We will employ a bag-of-words preprocessing and input word counts only to the neural network. This model will not use any location-based information about the tokens, just the counts.</p>
 <p>For this, we need to create a new recipe to transform the data into counts.</p>
 <div class="rmdnote">
@@ -1037,10 +1035,10 @@ The objects in this chapter are named using <code>bow</code> to indicate that th
 <span id="cb469-11"><a href="dldnn.html#cb469-11" aria-hidden="true" tabindex="-1"></a>bow_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3289
-#&gt;     accuracy: 0.8579
-#&gt;     val_loss: 0.6699
-#&gt; val_accuracy: 0.7229</code></pre>
+#&gt;         loss: 0.3288
+#&gt;     accuracy: 0.8574
+#&gt;     val_loss: 0.6662
+#&gt; val_accuracy: 0.724</code></pre>
 <p>We use <code>keras_predict()</code> again to get predictions, and calculate the standard metrics with <code>metrics()</code>.</p>
 <div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="dldnn.html#cb471-1" aria-hidden="true" tabindex="-1"></a>bow_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bow_model, kick_bow_assess, state_assess)</span>
 <span id="cb471-2"><a href="dldnn.html#cb471-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1048,13 +1046,13 @@ The objects in this chapter are named using <code>bow</code> to indicate that th
 <pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy binary         0.723
-#&gt; 2 kap      binary         0.444</code></pre>
+#&gt; 1 accuracy binary         0.724
+#&gt; 2 kap      binary         0.446</code></pre>
 <p>This model does not perform as well as the model we used in Section <a href="dldnn.html#firstdlclassification">8.2</a>. This suggests that a model incorporating more than word counts alone is useful here. This model did outperform a baseline linear model (shown in Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>), which achieved an accuracy of 0.686; that linear baseline is a regularized linear model trained on the same data set, using tf-idf weights and 5000 tokens.</p>
 <p>This simpler model does not outperform our initial model in this chapter, but it is typically worthwhile to investigate if a simpler model can rival or beat a model we are working with.</p>
 </div>
-<div id="using-pre-trained-word-embeddings" class="section level2" number="8.4">
-<h2><span class="header-section-number">8.4</span> Using pre-trained word embeddings</h2>
+<div id="using-pre-trained-word-embeddings" class="section level2 hasAnchor" number="8.4">
+<h2><span class="header-section-number">8.4</span> Using pre-trained word embeddings<a href="dldnn.html#using-pre-trained-word-embeddings" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The models in Section <a href="dldnn.html#firstdlclassification">8.2</a> included an embedding layer to make dense vectors from our word sequences that the model learned, along with the rest of the model as a whole. This is not the only way to handle this task. In Chapter <a href="embeddings.html#embeddings">5</a>, we examined how word embeddings are created and how they are used. Instead of having the embedding layer start randomly and be trained alongside the other parameters, let’s try to <em>provide</em> the embeddings.</p>
 <div class="rmdwarning">
 <p>
@@ -1108,8 +1106,8 @@ This section serves to show how to use pre-trained word embeddings, but in most 
 <p>We can then use <code>left_join()</code> to combine these tokens to the <code>glove6b</code> embedding tibble and only keep the tokens of interest. We replace any tokens from the vocabulary not found in <code>glove6b</code> with 0 using <code>mutate_all()</code> and <code>replace_na()</code>. We can transform the results into a matrix, and add a row of zeroes at the top of the matrix to account for the out-of-vocabulary words.</p>
 <div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="dldnn.html#cb479-1" aria-hidden="true" tabindex="-1"></a>glove6b_matrix <span class="ot">&lt;-</span> <span class="fu">tidy</span>(kick_prep, <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb479-2"><a href="dldnn.html#cb479-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(token) <span class="sc">%&gt;%</span></span>
-<span id="cb479-3"><a href="dldnn.html#cb479-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(glove6b, <span class="at">by =</span> <span class="st">&quot;token&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb479-4"><a href="dldnn.html#cb479-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_all</span>(replace_na, <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb479-3"><a href="dldnn.html#cb479-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(glove6b, <span class="at">by =</span> <span class="st">&quot;token&quot;</span>,) <span class="sc">%&gt;%</span></span>
+<span id="cb479-4"><a href="dldnn.html#cb479-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">!</span>token, replace_na, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb479-5"><a href="dldnn.html#cb479-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>token) <span class="sc">%&gt;%</span></span>
 <span id="cb479-6"><a href="dldnn.html#cb479-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb479-7"><a href="dldnn.html#cb479-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(<span class="dv">0</span>, .)</span></code></pre></div>
@@ -1151,18 +1149,18 @@ Freezing the weights stops them from being updated during the training loop.
 <span id="cb482-17"><a href="dldnn.html#cb482-17" aria-hidden="true" tabindex="-1"></a>dense_pte_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.5992
-#&gt;     accuracy: 0.6742
-#&gt;     val_loss: 0.6656
-#&gt; val_accuracy: 0.6149</code></pre>
+#&gt;         loss: 0.5954
+#&gt;     accuracy: 0.68
+#&gt;     val_loss: 0.6702
+#&gt; val_accuracy: 0.613</code></pre>
 <p>This model is not performing well at all! We can confirm by computing metrics on our validation set.</p>
 <div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="dldnn.html#cb484-1" aria-hidden="true" tabindex="-1"></a>pte_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(dense_model_pte, kick_assess, state_assess)</span>
 <span id="cb484-2"><a href="dldnn.html#cb484-2" aria-hidden="true" tabindex="-1"></a><span class="fu">metrics</span>(pte_res, state, .pred_class)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy binary         0.615
-#&gt; 2 kap      binary         0.227</code></pre>
+#&gt; 1 accuracy binary         0.613
+#&gt; 2 kap      binary         0.222</code></pre>
 <p>Why did this happen? Part of the training loop for a model like this one typically <em>adjusts</em> the weights in the network.
 When we froze the weights in this network, we froze them at values that did not perform very well.
 These pre-trained GloVe embeddings <span class="citation">(<a href="#ref-Pennington2014" role="doc-biblioref">Pennington, Socher, and Manning 2014</a>)</span> are trained on a Wikipedia dump and <a href="https://catalog.ldc.upenn.edu/LDC2011T07">Gigaword 5</a>, a comprehensive archive of newswire text.
@@ -1212,16 +1210,16 @@ This allows the model to adjust the weights to better fit the data. The intentio
 <pre><code>#&gt; # A tibble: 2 × 3
 #&gt;   .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy binary         0.764
-#&gt; 2 kap      binary         0.528</code></pre>
+#&gt; 1 accuracy binary         0.766
+#&gt; 2 kap      binary         0.532</code></pre>
 <p>This performs quite a bit better than when we froze the weights, although not as well as when we did not use pre-trained embeddings at all.</p>
 
 <div class="rmdnote">
 If you have enough text data in the field you are working in, then it is worth considering training a word embedding yourself that better captures the structure of the domain you are trying to work with, both for the reasons laid out here and for the issues highlighted in Section <a href="embeddings.html#fairnessembeddings">5.5</a>.
 </div>
 </div>
-<div id="dnncross" class="section level2" number="8.5">
-<h2><span class="header-section-number">8.5</span> Cross-validation for deep learning models</h2>
+<div id="dnncross" class="section level2 hasAnchor" number="8.5">
+<h2><span class="header-section-number">8.5</span> Cross-validation for deep learning models<a href="dldnn.html#dnncross" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The Kickstarter data set we are using is big enough that we have adequate data to use a single training set, validation set, and testing set that all contain enough observations in them to give reliable performance metrics. In some situations, you may not have that much data or you may want to compute more precise performance metrics. In those cases, it is time to turn to resampling. For example, we can create cross-validation folds.</p>
 <div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="dldnn.html#cb491-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
 <span id="cb491-2"><a href="dldnn.html#cb491-2" aria-hidden="true" tabindex="-1"></a>kick_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(kickstarter_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
@@ -1297,23 +1295,23 @@ If you have enough text data in the field you are working in, then it is worth c
 #&gt;    &lt;list&gt;                 &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt;  1 &lt;split [161673/40419]&gt; Fold1 accuracy    binary         0.818
 #&gt;  2 &lt;split [161673/40419]&gt; Fold1 kap         binary         0.636
-#&gt;  3 &lt;split [161673/40419]&gt; Fold1 mn_log_loss binary         1.06 
+#&gt;  3 &lt;split [161673/40419]&gt; Fold1 mn_log_loss binary         1.07 
 #&gt;  4 &lt;split [161673/40419]&gt; Fold1 roc_auc     binary         0.856
 #&gt;  5 &lt;split [161673/40419]&gt; Fold2 accuracy    binary         0.819
-#&gt;  6 &lt;split [161673/40419]&gt; Fold2 kap         binary         0.637
+#&gt;  6 &lt;split [161673/40419]&gt; Fold2 kap         binary         0.638
 #&gt;  7 &lt;split [161673/40419]&gt; Fold2 mn_log_loss binary         1.02 
 #&gt;  8 &lt;split [161673/40419]&gt; Fold2 roc_auc     binary         0.857
 #&gt;  9 &lt;split [161674/40418]&gt; Fold3 accuracy    binary         0.820
 #&gt; 10 &lt;split [161674/40418]&gt; Fold3 kap         binary         0.640
-#&gt; 11 &lt;split [161674/40418]&gt; Fold3 mn_log_loss binary         0.976
+#&gt; 11 &lt;split [161674/40418]&gt; Fold3 mn_log_loss binary         0.983
 #&gt; 12 &lt;split [161674/40418]&gt; Fold3 roc_auc     binary         0.858
-#&gt; 13 &lt;split [161674/40418]&gt; Fold4 accuracy    binary         0.817
+#&gt; 13 &lt;split [161674/40418]&gt; Fold4 accuracy    binary         0.818
 #&gt; 14 &lt;split [161674/40418]&gt; Fold4 kap         binary         0.634
-#&gt; 15 &lt;split [161674/40418]&gt; Fold4 mn_log_loss binary         1.02 
+#&gt; 15 &lt;split [161674/40418]&gt; Fold4 mn_log_loss binary         1.03 
 #&gt; 16 &lt;split [161674/40418]&gt; Fold4 roc_auc     binary         0.855
 #&gt; 17 &lt;split [161674/40418]&gt; Fold5 accuracy    binary         0.820
-#&gt; 18 &lt;split [161674/40418]&gt; Fold5 kap         binary         0.640
-#&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         0.993
+#&gt; 18 &lt;split [161674/40418]&gt; Fold5 kap         binary         0.639
+#&gt; 19 &lt;split [161674/40418]&gt; Fold5 mn_log_loss binary         1.00 
 #&gt; 20 &lt;split [161674/40418]&gt; Fold5 roc_auc     binary         0.862</code></pre>
 <p>We can summarize the unnested results to match what we normally would get from <code>collect_metrics()</code></p>
 <div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="dldnn.html#cb498-1" aria-hidden="true" tabindex="-1"></a>cv_fitted <span class="sc">%&gt;%</span></span>
@@ -1327,10 +1325,10 @@ If you have enough text data in the field you are working in, then it is worth c
 <pre><code>#&gt; # A tibble: 4 × 4
 #&gt;   .metric      mean     n  std_err
 #&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
-#&gt; 1 accuracy    0.819     5 0.000596
-#&gt; 2 kap         0.637     5 0.00121 
-#&gt; 3 mn_log_loss 1.01      5 0.0137  
-#&gt; 4 roc_auc     0.858     5 0.00109</code></pre>
+#&gt; 1 accuracy    0.819     5 0.000523
+#&gt; 2 kap         0.637     5 0.00106 
+#&gt; 3 mn_log_loss 1.02      5 0.0153  
+#&gt; 4 roc_auc     0.858     5 0.00110</code></pre>
 <p>This data set is large enough that we probably wouldn’t need to take this approach, and the fold-to-fold metrics have little variance. However, resampling can, at times, be an important piece of the modeling toolkit even for deep learning models.</p>
 
 <div class="rmdnote">
@@ -1339,8 +1337,8 @@ Training deep learning models typically takes more time than other kinds of mach
 </p>
 </div>
 </div>
-<div id="compare-and-evaluate-dnn-models" class="section level2" number="8.6">
-<h2><span class="header-section-number">8.6</span> Compare and evaluate DNN models</h2>
+<div id="compare-and-evaluate-dnn-models" class="section level2 hasAnchor" number="8.6">
+<h2><span class="header-section-number">8.6</span> Compare and evaluate DNN models<a href="dldnn.html#compare-and-evaluate-dnn-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Let’s return to the results we evaluated on a single validation set. We can combine all the predictions on these last three models to more easily compare the results between them.</p>
 <div class="sourceCode" id="cb500"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb500-1"><a href="dldnn.html#cb500-1" aria-hidden="true" tabindex="-1"></a>all_dense_model_res <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
 <span id="cb500-2"><a href="dldnn.html#cb500-2" aria-hidden="true" tabindex="-1"></a>  val_res <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;dense&quot;</span>),</span>
@@ -1355,10 +1353,10 @@ Training deep learning models typically takes more time than other kinds of mach
 #&gt;   model                    .metric  .estimator .estimate
 #&gt;   &lt;chr&gt;                    &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 dense                    accuracy binary         0.807
-#&gt; 2 pte (locked weights)     accuracy binary         0.615
+#&gt; 2 pte (locked weights)     accuracy binary         0.614
 #&gt; 3 pte (not locked weights) accuracy binary         0.764
 #&gt; 4 dense                    kap      binary         0.613
-#&gt; 5 pte (locked weights)     kap      binary         0.227
+#&gt; 5 pte (locked weights)     kap      binary         0.225
 #&gt; 6 pte (not locked weights) kap      binary         0.528</code></pre>
 <p>We can also do this for ROC curves. Figure <a href="dldnn.html#fig:alldnnroccurve">8.9</a> shows the three different ROC curves together in one chart. As we know, the model using pre-trained word embeddings with locked weights didn’t perform very well at all and its ROC curve is the lowest of the three. The other two models perform more similarly but the model using an embedding learned from scratch ends up being the best.</p>
 <div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="dldnn.html#cb503-1" aria-hidden="true" tabindex="-1"></a>all_dense_model_res <span class="sc">%&gt;%</span></span>
@@ -1393,8 +1391,8 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.807
-#&gt; 2 kap         binary         0.613
-#&gt; 3 mn_log_loss binary         1.04 
+#&gt; 2 kap         binary         0.612
+#&gt; 3 mn_log_loss binary         1.06 
 #&gt; 4 roc_auc     binary         0.848</code></pre>
 <p>The metrics we see here are about the same as what we achieved in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a> on the validation data, so we can be confident that we have not overfit during our training or model choosing process.</p>
 <p>Just like we did toward the end of both Sections <a href="mlregression.html#regression-final-evaluation">6.9.4</a> and <a href="mlclassification.html#classification-final-evaluation">7.11.3</a>, we can look at some examples of test set observations that our model did a bad job at predicting. Let’s bind together the predictions on the test set with the original <code>kickstarter_test</code> data. Then let’s look at blurbs that were successful but that our final model thought had a low probability of being successful.</p>
@@ -1408,16 +1406,16 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 <pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    blurb                                                                        
 #&gt;    &lt;chr&gt;                                                                        
-#&gt;  1 &quot;Libby is on edge. A year out of high school, still working at her family&#39;s …
+#&gt;  1 &quot;A struggling writer has a chance encounter with a mysterious man whose life…
 #&gt;  2 &quot;Help support Ryan to start his project on healing foods with his trip to Du…
-#&gt;  3 &quot;&#39;Moments of Silence&#39; is noir genre fever dream interspersed with vignettes …
-#&gt;  4 &quot;Seattle-based band The West is making a music video for their song, \&quot;It wa…
-#&gt;  5 &quot;Ghosts run rampant and Inspectre Pickle is our best hope. Hold on, it will …
-#&gt;  6 &quot;Award-winning NYU grads producing a 5-part web series about a country singe…
+#&gt;  3 &quot;A box set of media celebrating EarthBound and the fans who have kept it ali…
+#&gt;  4 &quot;We want to take our music to the next level by recording our two latest sin…
+#&gt;  5 &quot;So far I&#39;ve only written five reasons, so I&#39;m going to write seven more. Al…
+#&gt;  6 &quot;The prequel episode for Season 2 bridges the events of Season 1. More effec…
 #&gt;  7 &quot;Emmanuel Odhiambo aka huthead is a musician from Kenya, discovered by Peace…
-#&gt;  8 &quot;Think Harry Potter meets Avatar in the center of the ocean with a young gir…
+#&gt;  8 &quot;The stories behind the remaking of New York&#39;s most populous borough.&quot;       
 #&gt;  9 &quot;More than just an awesome t-shirt: A revolutionary way to support victims o…
-#&gt; 10 &quot;William Dewey&#39;s third novel is the first major publication for maybeparade …</code></pre>
+#&gt; 10 &quot;Bring Plasma Frequency magazine back after they faced devastating bank frau…</code></pre>
 <p>What about misclassifications in the other direction, observations in the test set that were <em>not</em> successful but that our final model gave a high probability of being successful?</p>
 <div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb508-1"><a href="dldnn.html#cb508-1" aria-hidden="true" tabindex="-1"></a>kickstarter_bind <span class="sc">%&gt;%</span></span>
 <span id="cb508-2"><a href="dldnn.html#cb508-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">==</span> <span class="dv">0</span>, .pred_1 <span class="sc">&gt;</span> <span class="fl">0.8</span>) <span class="sc">%&gt;%</span></span>
@@ -1426,20 +1424,20 @@ Using pre-trained embeddings is not the only way to take advantage of ready-to-u
 <pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    blurb                                                                        
 #&gt;    &lt;chr&gt;                                                                        
-#&gt;  1 &quot;A Progressive House and Hip Hop inspired 10-track LP featuring up-and-comin…
+#&gt;  1 &quot;Please help me record my first solo album!! It will blow your mind!  Check …
 #&gt;  2 &quot;We are designing and building a new adaptive housing model for aging Americ…
 #&gt;  3 &quot;Big in Britain--a funny,modern,sexy love-story.&quot;                            
-#&gt;  4 &quot;A group of paranormal enthusiasts visit an abandon insane asylum. They quic…
-#&gt;  5 &quot;ClassRealm is a customizable classroom management system built on role play…
-#&gt;  6 &quot;Help us connect amazing players and fans by supporting this compilation and…
-#&gt;  7 &quot;A Kingdom goes topsy-turvy when an overambitious prince applies a new scien…
-#&gt;  8 &quot;A photographic and documentary film odyssey of Che Guevara&#39;s secret mission…
-#&gt;  9 &quot;Help Phil and Phil fund their first feature!&quot;                               
+#&gt;  4 &quot;Hope&#39;s Wish is the story of Hope Stout who raised over $1MM to grant the wi…
+#&gt;  5 &quot;The third game in the classic The 7th Guest series from Trilobyte Games.&quot;   
+#&gt;  6 &quot;Do, It. Do it now. MASTER MIND ALLIANCE PUBLISHING, 2013. DO IT FOO.  :))))…
+#&gt;  7 &quot;Carl The Comet is an educational kids picture book yet also entertainment, …
+#&gt;  8 &quot;Help rehabilitation counselors, John and Jessica Freeborn, develop and publ…
+#&gt;  9 &quot;As the title says, this is a project to destroy iphones in different ways, …
 #&gt; 10 &quot;S.S.U.C drops their second single \&quot;She Bad\&quot; April 2013.  Help us showcase…</code></pre>
 <p>Notice that although some steps for model fitting are different now that we are using deep learning, model evaluation is much the same as it was in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.</p>
 </div>
-<div id="dllimitations" class="section level2" number="8.7">
-<h2><span class="header-section-number">8.7</span> Limitations of deep learning</h2>
+<div id="dllimitations" class="section level2 hasAnchor" number="8.7">
+<h2><span class="header-section-number">8.7</span> Limitations of deep learning<a href="dldnn.html#dllimitations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Deep learning models achieve excellent performance on many tasks; the flexibility and potential complexity of their architecture is part of the reason why. One of the main downsides of deep learning models is that the interpretability of the models themselves is poor.</p>
 <div class="rmdwarning">
 <p>
@@ -1454,16 +1452,16 @@ This is a problem since it can hide biases from the training set that may lead t
 <p>Practitioners have built approaches to understand local feature importance for deep learning models, which we demonstrate in Section <a href="dlcnn.html#lime">10.5</a>, but these are limited tools compared to the interpretability of other kinds of models.
 Lastly, deep learning models tend to require more training data than traditional statistical machine learning methods. This means that it can be hard to train a deep learning model if you have a very small data set <span class="citation">(<a href="#ref-lampinen2018oneshot" role="doc-biblioref">Lampinen and McClelland 2018</a>)</span>.</p>
 </div>
-<div id="dldnnsummary" class="section level2" number="8.8">
-<h2><span class="header-section-number">8.8</span> Summary</h2>
+<div id="dldnnsummary" class="section level2 hasAnchor" number="8.8">
+<h2><span class="header-section-number">8.8</span> Summary<a href="dldnn.html#dldnnsummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>You can use deep learning to build classification models to predict labels or categorical variables from a data set, including data sets that include text.
 Dense neural networks are the most straightforward network architecture that can be used to fit classification models for text features and are a good bridge for understanding the more complex model architectures that are used more often in practice for text modeling.
 These models have many parameters compared to the models we trained in earlier chapters, and require different preprocessing than those models.
 We can tokenize and create features for modeling that capture the order of the tokens in the original text. Doing this can allow a model to learn from patterns in sequences and order, something not possible in the models we saw in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>.
 We gave up some of the fine control over feature engineering, such as hand-crafting features using domain knowledge, in the hope that the network could learn important features on its own.
 However, feature engineering is not completely out of our hands as practitioners, since we still make decisions about tokenization and normalization before the tokens are passed into the network.</p>
-<div id="in-this-chapter-you-learned-7" class="section level3" number="8.8.1">
-<h3><span class="header-section-number">8.8.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-7" class="section level3 hasAnchor" number="8.8.1">
+<h3><span class="header-section-number">8.8.1</span> In this chapter, you learned:<a href="dldnn.html#in-this-chapter-you-learned-7" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>that you can tokenize and preprocess text to retain the order of the tokens</p></li>
 <li><p>how to build and train a dense neural network with Keras</p></li>
@@ -1477,13 +1475,13 @@ However, feature engineering is not completely out of our hands as practitioners
 </div>
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-guidotti2018survey" class="csl-entry">
 Guidotti, R., Monreale, A., Ruggieri, S., Turini, F., Giannotti, F., and Pedreschi, D. 2018. <span>“A Survey of Methods for Explaining Black Box Models.”</span> <em>ACM Computing Surveys</em> 51 (5). New York, NY: Association for Computing Machinery. <a href="https://doi.org/10.1145/3236009">https://doi.org/10.1145/3236009</a>.
 </div>
 <div id="ref-lampinen2018oneshot" class="csl-entry">
-Lampinen, A. K., and McClelland, J. L. 2018. <span>“One-Shot and Few-Shot Learning of Word Embeddings.”</span> <a href="http://arxiv.org/abs/1710.10280">http://arxiv.org/abs/1710.10280</a>.
+Lampinen, A. K., and McClelland, J. L. 2018. <span>“One-Shot and Few-Shot Learning of Word Embeddings.”</span> <a href="https://arxiv.org/abs/1710.10280">https://arxiv.org/abs/1710.10280</a>.
 </div>
 <div id="ref-Pennington2014" class="csl-entry">
 Pennington, J., Socher, R., and Manning, C. 2014. <span>“<span>G</span>lo<span>V</span>e: Global Vectors for Word Representation.”</span> In <em>Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (<span>EMNLP</span>)</em>, 1532–1543. Doha, Qatar: Association for Computational Linguistics. <a href="https://www.aclweb.org/anthology/D14-1162">https://www.aclweb.org/anthology/D14-1162</a>.
@@ -1492,7 +1490,7 @@ Pennington, J., Socher, R., and Manning, C. 2014. <span>“<span>G</span>lo<span
 Shrikumar, A., Greenside, P., and Kundaje, A. 2017. <span>“Learning Important Features Through Propagating Activation Differences.”</span> In <em>Proceedings of the 34th International Conference on Machine Learning - Volume 70</em>, 3145–3153. ICML’17. Sydney, NSW, Australia: JMLR.org.
 </div>
 <div id="ref-shwartzziv2017opening" class="csl-entry">
-Shwartz-Ziv, R., and Tishby, N. 2017. <span>“Opening the Black Box of Deep Neural Networks via Information.”</span> <a href="http://arxiv.org/abs/1703.00810">http://arxiv.org/abs/1703.00810</a>.
+Shwartz-Ziv, R., and Tishby, N. 2017. <span>“Opening the Black Box of Deep Neural Networks via Information.”</span> <a href="https://arxiv.org/abs/1703.00810">https://arxiv.org/abs/1703.00810</a>.
 </div>
 <div id="ref-R-reticulate" class="csl-entry">
 Ushey, K., Allaire, J., and Tang, Y. 2021. <em><span class="nocase">reticulate</span>: Interface to <span>‘Python’</span></em>. R package version 1.20. <a href="https://CRAN.R-project.org/package=reticulate">https://CRAN.R-project.org/package=reticulate</a>.

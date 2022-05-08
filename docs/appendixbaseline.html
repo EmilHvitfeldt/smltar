@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="C Baseline linear classifier | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="appendixdata.html"/>
 <link rel="next" href="references.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,12 +453,12 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="appendixbaseline" class="section level1" number="13">
-<h1><span class="header-section-number">C</span> Baseline linear classifier</h1>
+<div id="appendixbaseline" class="section level1 hasAnchor" number="13">
+<h1><span class="header-section-number">C</span> Baseline linear classifier<a href="appendixbaseline.html#appendixbaseline" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In Chapters <a href="dldnn.html#dldnn">8</a>, <a href="dllstm.html#dllstm">9</a>, and <a href="dlcnn.html#dlcnn">10</a> we demonstrate in detail how to train and evaluate different kinds of deep learning classifiers for the Kickstarter data set of campaign blurbs and whether each campaign was successful or not. This appendix shows a baseline linear classification model for this data set using machine learning techniques like those used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. It serves the purpose of comparison with the deep learning techniques, and also as a succinct summary of a basic supervised machine learning analysis for text.</p>
 <p>This machine learning analysis is presented with only minimal narrative; see Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a> for more explanation and details.</p>
-<div id="read-in-the-data" class="section level2" number="13.1">
-<h2><span class="header-section-number">C.1</span> Read in the data</h2>
+<div id="read-in-the-data" class="section level2 hasAnchor" number="13.1">
+<h2><span class="header-section-number">C.1</span> Read in the data<a href="appendixbaseline.html#read-in-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb691"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb691-1"><a href="appendixbaseline.html#cb691-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb691-2"><a href="appendixbaseline.html#cb691-2" aria-hidden="true" tabindex="-1"></a>kickstarter <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/kickstarter.csv.gz&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb691-3"><a href="appendixbaseline.html#cb691-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">as.factor</span>(state))</span>
@@ -480,8 +479,8 @@ div.csl-indent {
 #&gt; 10 My name is Siu Lon Liu and I am an illustrator seeking fund… 0     2014-07-19
 #&gt; # … with 269,780 more rows</code></pre>
 </div>
-<div id="split-into-testtrain-and-create-resampling-folds" class="section level2" number="13.2">
-<h2><span class="header-section-number">C.2</span> Split into test/train and create resampling folds</h2>
+<div id="split-into-testtrain-and-create-resampling-folds" class="section level2 hasAnchor" number="13.2">
+<h2><span class="header-section-number">C.2</span> Split into test/train and create resampling folds<a href="appendixbaseline.html#split-into-testtrain-and-create-resampling-folds" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb693"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb693-1"><a href="appendixbaseline.html#cb693-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb693-2"><a href="appendixbaseline.html#cb693-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb693-3"><a href="appendixbaseline.html#cb693-3" aria-hidden="true" tabindex="-1"></a>kickstarter_split <span class="ot">&lt;-</span> kickstarter <span class="sc">%&gt;%</span></span>
@@ -509,8 +508,8 @@ div.csl-indent {
 #&gt;  9 &lt;split [181883/20209]&gt; Fold09
 #&gt; 10 &lt;split [181883/20209]&gt; Fold10</code></pre>
 </div>
-<div id="recipe-for-data-preprocessing" class="section level2" number="13.3">
-<h2><span class="header-section-number">C.3</span> Recipe for data preprocessing</h2>
+<div id="recipe-for-data-preprocessing" class="section level2 hasAnchor" number="13.3">
+<h2><span class="header-section-number">C.3</span> Recipe for data preprocessing<a href="appendixbaseline.html#recipe-for-data-preprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb695"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb695-1"><a href="appendixbaseline.html#cb695-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
 <span id="cb695-2"><a href="appendixbaseline.html#cb695-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb695-3"><a href="appendixbaseline.html#cb695-3" aria-hidden="true" tabindex="-1"></a>kickstarter_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(state <span class="sc">~</span> blurb, <span class="at">data =</span> kickstarter_train) <span class="sc">%&gt;%</span></span>
@@ -533,8 +532,8 @@ div.csl-indent {
 #&gt; Text filtering for blurb
 #&gt; Term frequency-inverse document frequency with blurb</code></pre>
 </div>
-<div id="lasso-regularized-classification-model" class="section level2" number="13.4">
-<h2><span class="header-section-number">C.4</span> Lasso regularized classification model</h2>
+<div id="lasso-regularized-classification-model" class="section level2 hasAnchor" number="13.4">
+<h2><span class="header-section-number">C.4</span> Lasso regularized classification model<a href="appendixbaseline.html#lasso-regularized-classification-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb697"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb697-1"><a href="appendixbaseline.html#cb697-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb697-2"><a href="appendixbaseline.html#cb697-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb697-3"><a href="appendixbaseline.html#cb697-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
@@ -548,8 +547,8 @@ div.csl-indent {
 #&gt; 
 #&gt; Computational engine: glmnet</code></pre>
 </div>
-<div id="a-model-workflow" class="section level2" number="13.5">
-<h2><span class="header-section-number">C.5</span> A model workflow</h2>
+<div id="a-model-workflow" class="section level2 hasAnchor" number="13.5">
+<h2><span class="header-section-number">C.5</span> A model workflow<a href="appendixbaseline.html#a-model-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We need a few more components before we can tune our workflow. Let’s use a sparse data encoding (Section <a href="mlclassification.html#casestudysparseencoding">7.5</a>).</p>
 <div class="sourceCode" id="cb699"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb699-1"><a href="appendixbaseline.html#cb699-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hardhat)</span>
 <span id="cb699-2"><a href="appendixbaseline.html#cb699-2" aria-hidden="true" tabindex="-1"></a>sparse_bp <span class="ot">&lt;-</span> <span class="fu">default_recipe_blueprint</span>(<span class="at">composition =</span> <span class="st">&quot;dgCMatrix&quot;</span>)</span></code></pre></div>
@@ -605,8 +604,8 @@ div.csl-indent {
 #&gt; 
 #&gt; Computational engine: glmnet</code></pre>
 </div>
-<div id="tune-the-workflow" class="section level2" number="13.6">
-<h2><span class="header-section-number">C.6</span> Tune the workflow</h2>
+<div id="tune-the-workflow" class="section level2 hasAnchor" number="13.6">
+<h2><span class="header-section-number">C.6</span> Tune the workflow<a href="appendixbaseline.html#tune-the-workflow" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb704"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb704-1"><a href="appendixbaseline.html#cb704-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
 <span id="cb704-2"><a href="appendixbaseline.html#cb704-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb704-3"><a href="appendixbaseline.html#cb704-3" aria-hidden="true" tabindex="-1"></a>  kickstarter_wf,</span>
@@ -620,35 +619,35 @@ div.csl-indent {
 #&gt; # A tibble: 10 × 4
 #&gt;    splits                 id     .metrics          .notes          
 #&gt;    &lt;list&gt;                 &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
-#&gt;  1 &lt;split [181882/20210]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  2 &lt;split [181882/20210]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  3 &lt;split [181883/20209]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  4 &lt;split [181883/20209]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  5 &lt;split [181883/20209]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  6 &lt;split [181883/20209]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  7 &lt;split [181883/20209]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  8 &lt;split [181883/20209]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  9 &lt;split [181883/20209]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt; 10 &lt;split [181883/20209]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+#&gt;  1 &lt;split [181882/20210]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  2 &lt;split [181882/20210]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  3 &lt;split [181883/20209]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  4 &lt;split [181883/20209]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  5 &lt;split [181883/20209]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  6 &lt;split [181883/20209]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  7 &lt;split [181883/20209]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  8 &lt;split [181883/20209]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  9 &lt;split [181883/20209]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt; 10 &lt;split [181883/20209]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
 <p>What are the best models?</p>
 <div class="sourceCode" id="cb706"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb706-1"><a href="appendixbaseline.html#cb706-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;     penalty .metric .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000695  roc_auc binary     0.753    10 0.000824 Preprocessor1_Model08
-#&gt; 2 0.000379  roc_auc binary     0.753    10 0.000842 Preprocessor1_Model07
-#&gt; 3 0.000207  roc_auc binary     0.752    10 0.000849 Preprocessor1_Model06
-#&gt; 4 0.000113  roc_auc binary     0.752    10 0.000858 Preprocessor1_Model05
-#&gt; 5 0.0000616 roc_auc binary     0.752    10 0.000865 Preprocessor1_Model04</code></pre>
+#&gt; 1 0.000695  roc_auc binary     0.753    10 0.000825 Preprocessor1_Model08
+#&gt; 2 0.000379  roc_auc binary     0.753    10 0.000844 Preprocessor1_Model07
+#&gt; 3 0.000207  roc_auc binary     0.753    10 0.000852 Preprocessor1_Model06
+#&gt; 4 0.000113  roc_auc binary     0.752    10 0.000862 Preprocessor1_Model05
+#&gt; 5 0.0000616 roc_auc binary     0.752    10 0.000870 Preprocessor1_Model04</code></pre>
 <div class="sourceCode" id="cb708"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb708-1"><a href="appendixbaseline.html#cb708-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(lasso_rs, <span class="st">&quot;accuracy&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000379  accuracy binary     0.686    10 0.00111  Preprocessor1_Model07
-#&gt; 2 0.000695  accuracy binary     0.686    10 0.00112  Preprocessor1_Model08
-#&gt; 3 0.000207  accuracy binary     0.685    10 0.00102  Preprocessor1_Model06
-#&gt; 4 0.000113  accuracy binary     0.685    10 0.000926 Preprocessor1_Model05
-#&gt; 5 0.0000616 accuracy binary     0.685    10 0.000947 Preprocessor1_Model04</code></pre>
+#&gt; 1 0.000695  accuracy binary     0.686    10 0.00108  Preprocessor1_Model08
+#&gt; 2 0.000379  accuracy binary     0.686    10 0.00108  Preprocessor1_Model07
+#&gt; 3 0.000207  accuracy binary     0.685    10 0.00106  Preprocessor1_Model06
+#&gt; 4 0.000113  accuracy binary     0.685    10 0.000957 Preprocessor1_Model05
+#&gt; 5 0.0000616 accuracy binary     0.685    10 0.000989 Preprocessor1_Model04</code></pre>
 <div class="sourceCode" id="cb710"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb710-1"><a href="appendixbaseline.html#cb710-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lasso_rs)</span></code></pre></div>
 <p><img src="14_baseline_classifier_files/figure-html/unnamed-chunk-10-1.svg" width="672" style="display: block; margin: auto;" /></p>
 
