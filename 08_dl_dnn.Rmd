@@ -592,8 +592,8 @@ We can then use `left_join()` to combine these tokens to the `glove6b` embedding
 ```{r glove6b_matrix, dependson=c("glove6b12d", "prepped_recipe")}
 glove6b_matrix <- tidy(kick_prep, 3) %>%
   select(token) %>%
-  left_join(glove6b, by = "token") %>%
-  mutate_all(replace_na, 0) %>%
+  left_join(glove6b, by = "token",) %>%
+  mutate(across(!token, replace_na, 0)) %>%
   select(-token) %>%
   as.matrix() %>%
   rbind(0, .)
