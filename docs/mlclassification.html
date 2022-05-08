@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 7 Classification | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="mlregression.html"/>
 <link rel="next" href="dloverview.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="mlclassification" class="section level1" number="7">
-<h1><span class="header-section-number">Chapter 7</span> Classification</h1>
+<div id="mlclassification" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Chapter 7</span> Classification<a href="mlclassification.html#mlclassification" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In Chapter <a href="mlregression.html#mlregression">6</a>, we focused on modeling to predict <em>continuous values</em> for documents, such as what year a Supreme Court opinion was published. This is an example of a regression model. We can also use machine learning to predict <em>labels</em> on documents using a classification model. For both types of prediction questions, we develop a learner or model to describe the relationship between a target or outcome variable and our input features; what is different about a classification model is the nature of that outcome.</p>
 <ul>
 <li><p>A <strong>regression model</strong> predicts a numeric or continuous value.</p></li>
@@ -488,8 +487,8 @@ how and when it was filed, and the response from the bureau.</p>
 #&gt; $ consumer_disputed            &lt;chr&gt; &quot;N/A&quot;, &quot;N/A&quot;, &quot;N/A&quot;, &quot;N/A&quot;, &quot;N/A&quot;, &quot;N/A&quot;,…
 #&gt; $ complaint_id                 &lt;dbl&gt; 3384392, 3417821, 3433198, 3366475, 33853…</code></pre>
 <p>In this chapter, we will build classification models to predict what type of financial <code>product</code> the complaints are referring to, i.e., a label or categorical variable. The goal of predictive modeling with text input features and a categorical outcome is to learn and model the relationship between those input features, typically created through steps as outlined in Chapters <a href="language.html#language">1</a> through <a href="embeddings.html#embeddings">5</a>, and the class label or categorical outcome. Most classification models do predict the probability of a class (a numeric output), but the particular characteristics of this output make classification models different enough from regression models that we handle them differently.</p>
-<div id="classfirstattemptlookatdata" class="section level2" number="7.1">
-<h2><span class="header-section-number">7.1</span> A first classification model</h2>
+<div id="classfirstattemptlookatdata" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> A first classification model<a href="mlclassification.html#classfirstattemptlookatdata" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>For our first model, let’s build a binary classification model to predict whether a submitted complaint is about “Credit reporting, credit repair services, or other personal consumer reports” or not.</p>
 <div class="rmdnote">
 <p>
@@ -561,8 +560,8 @@ balance. My correct balance is XXXX&quot;</code></pre>
 #&gt; [[6]]
 #&gt; [1] &quot;{$650.00}&quot;</code></pre>
 <p>In Section <a href="mlclassification.html#customfeatures">7.9</a>, we will use an approach like this for custom feature engineering from the text.</p>
-<div id="classfirstmodel" class="section level3" number="7.1.1">
-<h3><span class="header-section-number">7.1.1</span> Building our first classification model</h3>
+<div id="classfirstmodel" class="section level3 hasAnchor" number="7.1.1">
+<h3><span class="header-section-number">7.1.1</span> Building our first classification model<a href="mlclassification.html#classfirstmodel" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>This data set includes more possible predictors than the text alone, but for this first model we will only use the text variable <code>consumer_complaint_narrative</code>.
 Let’s create a factor outcome variable <code>product</code> with two levels, “Credit” and “Other.”
 Then, we split the data into training and testing data sets.
@@ -626,8 +625,8 @@ In <strong>tidymodels</strong>, the package for creating model specifications is
 <span id="cb275-3"><a href="mlclassification.html#cb275-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> complaints_train)</span></code></pre></div>
 <p>We have trained our first classification model!</p>
 </div>
-<div id="evaluation" class="section level3" number="7.1.2">
-<h3><span class="header-section-number">7.1.2</span> Evaluation</h3>
+<div id="evaluation" class="section level3 hasAnchor" number="7.1.2">
+<h3><span class="header-section-number">7.1.2</span> Evaluation<a href="mlclassification.html#evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Like we discussed in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a>, we should not use the test set to compare models or different model parameters. The test set is a precious resource that should only be used at the end of the model training process to estimate performance on new data. Instead, we will use <em>resampling</em> methods to evaluate our model.</p>
 <p>Let’s use resampling to estimate the performance of the naive Bayes classification model we just fit. We can do this using resampled data sets built from the training set. Let’s create 10-fold cross-validation sets, and use these resampled sets for performance estimates.</p>
 <div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb276-1"><a href="mlclassification.html#cb276-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
@@ -689,9 +688,9 @@ Using a <code>workflow()</code> isn’t required (you can fit or tune a model pl
 <pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric  .estimator  mean     n std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary     0.802    10 0.00446 Preprocessor1_Model1
-#&gt; 2 roc_auc  binary     0.881    10 0.00168 Preprocessor1_Model1</code></pre>
-<p>The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.2%.</p>
+#&gt; 1 accuracy binary     0.807    10 0.00469 Preprocessor1_Model1
+#&gt; 2 roc_auc  binary     0.884    10 0.00177 Preprocessor1_Model1</code></pre>
+<p>The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.7%.</p>
 
 
 
@@ -743,8 +742,8 @@ One metric alone cannot give you a complete picture of how well your classificat
 <p>This is real data from a government agency, and these kinds of performance metrics must be interpreted in the context of how such a model would be used. What happens if the model we trained gets a classification wrong for a consumer complaint? What impact will it have if more “Other” complaints are correctly identified than “Credit” complaints, either for consumers or for policymakers?</p>
 </div>
 </div>
-<div id="classnull" class="section level2" number="7.2">
-<h2><span class="header-section-number">7.2</span> Compare to the null model</h2>
+<div id="classnull" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Compare to the null model<a href="mlclassification.html#classnull" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Like we did in Section <a href="mlregression.html#regnull">6.2</a>, we can assess a model like this one by comparing its performance to a “null model” or baseline model, a simple, non-informative model that always predicts the largest class for classification. Such a model is perhaps the simplest heuristic or rule-based alternative that we can consider as we assess our modeling efforts.</p>
 <p>We can build a classification <code>null_model()</code> specification and add it to a <code>workflow()</code> with the same preprocessing recipe we used in the previous section, to estimate performance.</p>
 <div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="mlclassification.html#cb286-1" aria-hidden="true" tabindex="-1"></a>null_classification <span class="ot">&lt;-</span> <span class="fu">null_model</span>() <span class="sc">%&gt;%</span></span>
@@ -767,8 +766,8 @@ One metric alone cannot give you a complete picture of how well your classificat
 #&gt; 2 roc_auc  binary     0.5      10 0       Preprocessor1_Model1</code></pre>
 <p>The accuracy and ROC AUC indicate that this null model is, like in the regression case, dramatically worse than even our first model. The text of the CFPB complaints is predictive relative to the category we are building models for.</p>
 </div>
-<div id="comparetolasso" class="section level2" number="7.3">
-<h2><span class="header-section-number">7.3</span> Compare to a lasso classification model</h2>
+<div id="comparetolasso" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Compare to a lasso classification model<a href="mlclassification.html#comparetolasso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Regularized linear models are a class of statistical model that can be used in regression and classification tasks. Linear models are not considered cutting edge in NLP research, but are a workhorse in real-world practice. Here we will use a lasso regularized model <span class="citation">(<a href="#ref-Tibshirani1996" role="doc-biblioref">Tibshirani 1996</a>)</span>, where the regularization method also performs variable selection. In text analysis, we typically have many tokens, which are the features in our machine learning problem.</p>
 <div class="rmdnote">
 <p>
@@ -829,8 +828,8 @@ Using regularization helps us choose a simpler model that we expect to generaliz
 <pre><code>#&gt; # A tibble: 2 × 6
 #&gt;   .metric  .estimator  mean     n  std_err .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
-#&gt; 1 accuracy binary     0.870    10 0.00124  Preprocessor1_Model1
-#&gt; 2 roc_auc  binary     0.939    10 0.000646 Preprocessor1_Model1</code></pre>
+#&gt; 1 accuracy binary     0.870    10 0.00126  Preprocessor1_Model1
+#&gt; 2 roc_auc  binary     0.939    10 0.000641 Preprocessor1_Model1</code></pre>
 <p>This looks pretty promising, considering we haven’t yet done any tuning of the lasso hyperparameters.
 Figure <a href="mlclassification.html#fig:lassoroccurve">7.3</a> shows the ROC curves for this regularized model on each of the resampled data sets.</p>
 <div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb297-1"><a href="mlclassification.html#cb297-1" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="sc">%&gt;%</span></span>
@@ -859,8 +858,8 @@ FIGURE 7.4: Confusion matrix for a lasso regularized classifier, with more symme
 </p>
 </div>
 </div>
-<div id="tunelasso" class="section level2" number="7.4">
-<h2><span class="header-section-number">7.4</span> Tuning lasso hyperparameters</h2>
+<div id="tunelasso" class="section level2 hasAnchor" number="7.4">
+<h2><span class="header-section-number">7.4</span> Tuning lasso hyperparameters<a href="mlclassification.html#tunelasso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The value <code>penalty = 0.01</code> for regularization in Section <a href="mlclassification.html#comparetolasso">7.3</a> was picked somewhat arbitrarily. How do we know the <em>right</em> or <em>best</em> regularization parameter penalty? This is a model hyperparameter, and we cannot learn its best value during model training, but we can estimate the best value by training many models on resampled data sets and exploring how well all these models perform. Let’s build a new model specification for <strong>model tuning</strong>.</p>
 <div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="mlclassification.html#cb299-1" aria-hidden="true" tabindex="-1"></a>tune_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb299-2"><a href="mlclassification.html#cb299-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -921,18 +920,18 @@ In <strong>tidymodels</strong>, the package for tuning is called <strong>tune</s
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 × 5
-#&gt;    splits               id     .metrics          .notes           .predictions  
-#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;        
-#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…
-#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [263,…</code></pre>
+#&gt;    splits               id     .metrics          .notes           .predictions
+#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;      
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [60 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;</code></pre>
 <div class="rmdwarning">
 <p>
 Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use multiple cores or multiple machines via parallel processing, because the resampled data sets and possible parameters are independent of each other. A discussion of parallel processing for all possible operating systems is beyond the scope of this book, but it is well worth your time to learn how to parallelize your machine learning tasks on <em>your</em> system.
@@ -944,16 +943,16 @@ Like when we used <code>fit_resamples()</code>, tuning in tidymodels can use mul
 <pre><code>#&gt; # A tibble: 60 × 7
 #&gt;     penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;       &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt;  1 1   e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model01
-#&gt;  2 1   e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model01
-#&gt;  3 2.21e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model02
-#&gt;  4 2.21e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model02
-#&gt;  5 4.89e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model03
-#&gt;  6 4.89e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model03
-#&gt;  7 1.08e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model04
-#&gt;  8 1.08e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model04
-#&gt;  9 2.40e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model05
-#&gt; 10 2.40e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model05
+#&gt;  1 1   e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model01
+#&gt;  2 1   e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model01
+#&gt;  3 2.21e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model02
+#&gt;  4 2.21e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model02
+#&gt;  5 4.89e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model03
+#&gt;  6 4.89e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model03
+#&gt;  7 1.08e- 9 accuracy binary     0.890    10 0.000834 Preprocessor1_Model04
+#&gt;  8 1.08e- 9 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model04
+#&gt;  9 2.40e- 9 accuracy binary     0.890    10 0.000834 Preprocessor1_Model05
+#&gt; 10 2.40e- 9 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model05
 #&gt; # … with 50 more rows</code></pre>
 <p>Let’s visualize these metrics, accuracy and ROC AUC, in Figure <a href="mlclassification.html#fig:complaintstunevis">7.5</a> to see what the best model is.</p>
 <div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="mlclassification.html#cb307-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tune_rs) <span class="sc">+</span></span>
@@ -973,11 +972,11 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;        penalty .metric .estimator  mean     n  std_err .config              
 #&gt;          &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000788     roc_auc binary     0.953    10 0.000505 Preprocessor1_Model21
-#&gt; 2 0.000356     roc_auc binary     0.953    10 0.000510 Preprocessor1_Model20
-#&gt; 3 0.000161     roc_auc binary     0.953    10 0.000517 Preprocessor1_Model19
-#&gt; 4 0.0000728    roc_auc binary     0.953    10 0.000520 Preprocessor1_Model18
-#&gt; 5 0.0000000001 roc_auc binary     0.953    10 0.000522 Preprocessor1_Model01</code></pre>
+#&gt; 1 0.000788     roc_auc binary     0.953    10 0.000502 Preprocessor1_Model21
+#&gt; 2 0.000356     roc_auc binary     0.953    10 0.000504 Preprocessor1_Model20
+#&gt; 3 0.000161     roc_auc binary     0.953    10 0.000511 Preprocessor1_Model19
+#&gt; 4 0.0000728    roc_auc binary     0.953    10 0.000516 Preprocessor1_Model18
+#&gt; 5 0.0000000001 roc_auc binary     0.953    10 0.000517 Preprocessor1_Model01</code></pre>
 <p>The best value for ROC AUC from this tuning run is 0.953. We can extract the best regularization parameter for this value of ROC AUC from our tuning results with <code>select_best()</code>, or a simpler model with higher regularization with <code>select_by_pct_loss()</code> or <code>select_by_one_std_err()</code> Let’s choose the model with the best ROC AUC within one standard error of the numerically best model <span class="citation">(<a href="#ref-Breiman1984" role="doc-biblioref">Breiman et al. 1984</a>)</span>.</p>
 <div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="mlclassification.html#cb310-1" aria-hidden="true" tabindex="-1"></a>chosen_auc <span class="ot">&lt;-</span> tune_rs <span class="sc">%&gt;%</span></span>
 <span id="cb310-2"><a href="mlclassification.html#cb310-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_one_std_err</span>(<span class="at">metric =</span> <span class="st">&quot;roc_auc&quot;</span>, <span class="sc">-</span>penalty)</span>
@@ -986,7 +985,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <pre><code>#&gt; # A tibble: 1 × 9
 #&gt;    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;
-#&gt; 1 0.000788 roc_auc binary     0.953    10 0.000505 Preprocessor1_M… 0.953  0.953</code></pre>
+#&gt; 1 0.000788 roc_auc binary     0.953    10 0.000502 Preprocessor1_M… 0.953  0.953</code></pre>
 <p>Next, let’s finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.</p>
 <div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="mlclassification.html#cb312-1" aria-hidden="true" tabindex="-1"></a>final_lasso <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(tune_wf, chosen_auc)</span>
 <span id="cb312-2"><a href="mlclassification.html#cb312-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1012,9 +1011,9 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 #&gt; Computational engine: glmnet</code></pre>
 <p>Instead of <code>penalty = tune()</code> like before, now our workflow has finalized values for all arguments. The preprocessing recipe has been evaluated on the training data, and we tuned the regularization penalty so that we have a penalty value of 0.00079. This workflow is ready to go! It can now be fit to our training data.</p>
 <div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="mlclassification.html#cb314-1" aria-hidden="true" tabindex="-1"></a>fitted_lasso <span class="ot">&lt;-</span> <span class="fu">fit</span>(final_lasso, complaints_train)</span></code></pre></div>
-<p>What does the result look like? We can access the fit using <code>pull_workflow_fit()</code>, and even <code>tidy()</code> the model coefficient results into a convenient dataframe format.</p>
+<p>What does the result look like? We can access the fit using <code>extract_fit_parsnip()</code>, and even <code>tidy()</code> the model coefficient results into a convenient dataframe format.</p>
 <div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="mlclassification.html#cb315-1" aria-hidden="true" tabindex="-1"></a>fitted_lasso <span class="sc">%&gt;%</span></span>
-<span id="cb315-2"><a href="mlclassification.html#cb315-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb315-2"><a href="mlclassification.html#cb315-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb315-3"><a href="mlclassification.html#cb315-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb315-4"><a href="mlclassification.html#cb315-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>estimate)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1,001 × 3
@@ -1034,7 +1033,7 @@ FIGURE 7.5: We can identify the best regularization penalty from model performan
 <p>We see here, for the penalty we chose, what terms contribute the most to a complaint <em>not</em> being about credit. The words are largely about mortgages and other financial products.</p>
 <p>What terms contribute to a complaint being about credit reporting, for this tuned model? Here we see the names of the credit reporting agencies and words about credit inquiries.</p>
 <div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="mlclassification.html#cb317-1" aria-hidden="true" tabindex="-1"></a>fitted_lasso <span class="sc">%&gt;%</span></span>
-<span id="cb317-2"><a href="mlclassification.html#cb317-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb317-2"><a href="mlclassification.html#cb317-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb317-3"><a href="mlclassification.html#cb317-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb317-4"><a href="mlclassification.html#cb317-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(estimate)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1,001 × 3
@@ -1057,8 +1056,8 @@ Since we are using a linear model, the model coefficients are directly interpret
 </p>
 </div>
 </div>
-<div id="casestudysparseencoding" class="section level2" number="7.5">
-<h2><span class="header-section-number">7.5</span> Case study: sparse encoding</h2>
+<div id="casestudysparseencoding" class="section level2 hasAnchor" number="7.5">
+<h2><span class="header-section-number">7.5</span> Case study: sparse encoding<a href="mlclassification.html#casestudysparseencoding" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We can change how our text data is represented to take advantage of its sparsity, especially for models like lasso regularized models. The regularized regression model we have been training in previous sections used <code>set_engine("glmnet")</code>; this computational engine can be more efficient when text data is transformed to a sparse matrix (Section <a href="embeddings.html#motivatingsparse">5.1</a>), rather than a dense dataframe or tibble representation.</p>
 <p>To keep our text data sparse throughout modeling and use the sparse capabilities of <code>set_engine("glmnet")</code>, we need to explicitly set a non-default preprocessing blueprint, using the package <strong>hardhat</strong> <span class="citation">(<a href="#ref-R-hardhat" role="doc-biblioref">Vaughan and Kuhn 2020</a>)</span>.</p>
 <div class="rmdpackage">
@@ -1133,27 +1132,27 @@ The <strong>hardhat</strong> package is used by other tidymodels packages like r
 #&gt; # A tibble: 10 × 4
 #&gt;    splits               id     .metrics          .notes          
 #&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;          
-#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;
-#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt;</code></pre>
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
 <p>How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of <code>set_engine("glmnet")</code>?</p>
 <div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="mlclassification.html#cb326-1" aria-hidden="true" tabindex="-1"></a>sparse_rs <span class="sc">%&gt;%</span></span>
 <span id="cb326-2"><a href="mlclassification.html#cb326-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000506 Preprocessor1_Model08
-#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000510 Preprocessor1_Model07
-#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model06
-#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000504 Preprocessor1_Model09
-#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000519 Preprocessor1_Model05</code></pre>
+#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000502 Preprocessor1_Model08
+#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000504 Preprocessor1_Model07
+#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000508 Preprocessor1_Model06
+#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000501 Preprocessor1_Model09
+#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model05</code></pre>
 <p>The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.953. The best regularization parameter (<code>penalty</code>) is a little different (the best value in Section <a href="mlclassification.html#tunelasso">7.4</a> was 0.00079), but we used a different grid so didn’t try out exactly the same values. We ended up with nearly the same performance and best tuned model.</p>
 <p>Importantly, this tuning also took a bit less time to complete.</p>
 <ul>
@@ -1167,8 +1166,8 @@ Since our model performance is about the same and we see gains in training time,
 </p>
 </div>
 </div>
-<div id="mlmulticlass" class="section level2" number="7.6">
-<h2><span class="header-section-number">7.6</span> Two-class or multiclass?</h2>
+<div id="mlmulticlass" class="section level2 hasAnchor" number="7.6">
+<h2><span class="header-section-number">7.6</span> Two-class or multiclass?<a href="mlclassification.html#mlmulticlass" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Most of this chapter focuses on binary classification, where we have two classes in our outcome variable (such as “Credit” and “Other”) and each observation can either be one or the other. This is a simple scenario with straightforward evaluation strategies because the results only have a two-by-two contingency matrix.
 However, it is not always possible to limit a modeling question to two classes. Let’s explore how to deal with situations where we have more than two classes.
 The CFPB complaints data set in this chapter has nine different <code>product</code> classes. In decreasing frequency, they are:</p>
@@ -1290,32 +1289,38 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <pre><code>#&gt; # Tuning results
 #&gt; # 10-fold cross-validation 
 #&gt; # A tibble: 10 × 5
-#&gt;    splits               id     .metrics          .notes           .predictions  
-#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;        
-#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 1]&gt; &lt;tibble [175,…
-#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 1]&gt; &lt;tibble [175,…
-#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 1]&gt; &lt;tibble [175,…</code></pre>
+#&gt;    splits               id     .metrics          .notes           .predictions
+#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;      
+#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
+#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
+#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
+#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
+#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+#&gt; 
+#&gt; There were issues with some computations:
+#&gt; 
+#&gt;   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...
+#&gt; 
+#&gt; Use `collect_notes(object)` for more information.</code></pre>
 <p>What do we see, in terms of performance metrics?</p>
 <div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="mlclassification.html#cb339-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
 <span id="cb339-2"><a href="mlclassification.html#cb339-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
 <span id="cb339-3"><a href="mlclassification.html#cb339-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb339-4"><a href="mlclassification.html#cb339-4" aria-hidden="true" tabindex="-1"></a>best_acc</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
-#&gt;    penalty .metric  .estimator  mean     n std_err .config              
-#&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.00234  accuracy multiclass 0.753    10 0.00148 Preprocessor1_Model10
-#&gt; 2 0.00428  accuracy multiclass 0.750    10 0.00132 Preprocessor1_Model11
-#&gt; 3 0.00127  accuracy multiclass 0.747    10 0.00142 Preprocessor1_Model09
-#&gt; 4 0.00785  accuracy multiclass 0.739    10 0.00151 Preprocessor1_Model12
-#&gt; 5 0.000695 accuracy multiclass 0.735    10 0.00214 Preprocessor1_Model08</code></pre>
-<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
+#&gt;    penalty .metric  .estimator  mean     n  std_err .config              
+#&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+#&gt; 1 0.00234  accuracy multiclass 0.756    10 0.00166  Preprocessor1_Model10
+#&gt; 2 0.00428  accuracy multiclass 0.751    10 0.00148  Preprocessor1_Model11
+#&gt; 3 0.00127  accuracy multiclass 0.750    10 0.000920 Preprocessor1_Model09
+#&gt; 4 0.00785  accuracy multiclass 0.741    10 0.00207  Preprocessor1_Model12
+#&gt; 5 0.000695 accuracy multiclass 0.741    10 0.00239  Preprocessor1_Model08</code></pre>
+<p>The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.6%, significantly lower than for the binary case in Section <a href="mlclassification.html#tunelasso">7.4</a>. This is expected since multiclass classification is a harder task than binary classification.</p>
 <div class="rmdwarning">
 <p>
 In binary classification, there is one right answer and one wrong answer; in this multiclass case, there is one right answer and <em>eight</em> wrong answers.
@@ -1361,8 +1366,8 @@ The next step for improving our model is to revisit the data preprocessing steps
 We can look at different models or model engines that might be able to more easily separate the classes.</p>
 <p>Now that we have an idea of where the model isn’t working, we can look more closely at the data and attempt to create features that could distinguish between these classes. In Section <a href="mlclassification.html#customfeatures">7.9</a> we will demonstrate how you can create your own custom features.</p>
 </div>
-<div id="case-study-including-non-text-data" class="section level2" number="7.7">
-<h2><span class="header-section-number">7.7</span> Case study: including non-text data</h2>
+<div id="case-study-including-non-text-data" class="section level2 hasAnchor" number="7.7">
+<h2><span class="header-section-number">7.7</span> Case study: including non-text data<a href="mlclassification.html#case-study-including-non-text-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We are building a model from a data set that includes more than text data alone. Annotations and labels have been added by the CFPB that we can use during modeling, but we need to ensure that only information that would be available at the time of prediction is included in the model.
 Otherwise we will be very disappointed once our model is used to predict on new data!
 The variables we identify as available for use as predictors are:</p>
@@ -1445,16 +1450,16 @@ Categorical variables like the month can be stored as strings or factors, but fo
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
-#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model08
-#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model07
-#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model06
-#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000511 Preprocessor1_Model09
-#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05</code></pre>
+#&gt; 1 0.000695 roc_auc binary     0.953    10 0.000509 Preprocessor1_Model08
+#&gt; 2 0.000379 roc_auc binary     0.953    10 0.000510 Preprocessor1_Model07
+#&gt; 3 0.000207 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model06
+#&gt; 4 0.00127  roc_auc binary     0.953    10 0.000507 Preprocessor1_Model09
+#&gt; 5 0.000113 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model05</code></pre>
 <p>We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 and is about the same here. We can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
 <div class="sourceCode" id="cb352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb352-1"><a href="mlclassification.html#cb352-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
 <span id="cb352-2"><a href="mlclassification.html#cb352-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb352-3"><a href="mlclassification.html#cb352-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(complaints_train) <span class="sc">%&gt;%</span></span>
-<span id="cb352-4"><a href="mlclassification.html#cb352-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb352-4"><a href="mlclassification.html#cb352-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb352-5"><a href="mlclassification.html#cb352-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb352-6"><a href="mlclassification.html#cb352-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span><span class="fu">abs</span>(estimate)) <span class="sc">%&gt;%</span> </span>
 <span id="cb352-7"><a href="mlclassification.html#cb352-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
@@ -1480,8 +1485,8 @@ This whole book focuses on supervised machine learning for text data, but models
 </p>
 </div>
 </div>
-<div id="case-study-data-censoring" class="section level2" number="7.8">
-<h2><span class="header-section-number">7.8</span> Case study: data censoring</h2>
+<div id="case-study-data-censoring" class="section level2 hasAnchor" number="7.8">
+<h2><span class="header-section-number">7.8</span> Case study: data censoring<a href="mlclassification.html#case-study-data-censoring" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The complaints data set already has sensitive information (PII) censored or protected using strings such as “XXXX” and “XX.”
 This data censoring can be viewed as data <em>annotation</em>; specific account numbers and birthdays are protected, but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.</p>
 <p>Figure <a href="mlclassification.html#fig:censoredtrigram">7.8</a> shows the most frequent trigrams (Section <a href="tokenization.html#tokenizingngrams">2.2.3</a>) in our training data set.</p>
@@ -1621,8 +1626,8 @@ It’s a good idea to use a “word” that won’t be accidentally broken up by
 The practice of data re-identification or de-anonymization, where seemingly or partially “anonymized” data sets are mined to identify individuals, is out of scope for this section and our book. However, this is a significant and important issue for any data practitioner dealing with PII, and we encourage readers to familiarize themselves with results such as <span class="citation"><a href="#ref-Sweeney2000" role="doc-biblioref">Sweeney</a> (<a href="#ref-Sweeney2000" role="doc-biblioref">2000</a>)</span> and current best practices to protect against such mining.
 </div>
 </div>
-<div id="customfeatures" class="section level2" number="7.9">
-<h2><span class="header-section-number">7.9</span> Case study: custom features</h2>
+<div id="customfeatures" class="section level2 hasAnchor" number="7.9">
+<h2><span class="header-section-number">7.9</span> Case study: custom features<a href="mlclassification.html#customfeatures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Most of what we have looked at so far has boiled down to counting tokens and weighting them in one way or another.
 This approach is quite broad and domain agnostic, but you as a data practitioner often have specific knowledge about your data set that you should use in feature engineering.
 Your domain knowledge allows you to build more predictive features than the naive search of simple tokens.
@@ -1641,8 +1646,8 @@ They can also be more engineered, such as the percentage of capitalization, whet
 <li><p>calculate percentage censoring, and</p></li>
 <li><p>detect monetary amounts.</p></li>
 </ul>
-<div id="detect-credit-cards" class="section level3" number="7.9.1">
-<h3><span class="header-section-number">7.9.1</span> Detect credit cards</h3>
+<div id="detect-credit-cards" class="section level3 hasAnchor" number="7.9.1">
+<h3><span class="header-section-number">7.9.1</span> Detect credit cards<a href="mlclassification.html#detect-credit-cards" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A credit card number is represented as four groups of four capital Xs in this data set.
 Since the data is fairly well processed we are fairly sure that spacing will not be an issue and all credit cards will be represented as “XXXX XXXX XXXX XXXX.”
 A first naive attempt may be to use <code>str_detect()</code> with “XXXX XXXX XXXX XXXX” to find all the credit cards.</p>
@@ -1690,8 +1695,8 @@ We can extract the presence of a credit card with <code>str_detect()</code> and 
 <div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="mlclassification.html#cb370-1" aria-hidden="true" tabindex="-1"></a><span class="fu">creditcard_count</span>(credit_cards)</span></code></pre></div>
 <pre><code>#&gt; [1] 2 1 0 0</code></pre>
 </div>
-<div id="calculate-percentage-censoring" class="section level3" number="7.9.2">
-<h3><span class="header-section-number">7.9.2</span> Calculate percentage censoring</h3>
+<div id="calculate-percentage-censoring" class="section level3 hasAnchor" number="7.9.2">
+<h3><span class="header-section-number">7.9.2</span> Calculate percentage censoring<a href="mlclassification.html#calculate-percentage-censoring" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Some of the complaints contain a high proportion of censoring, and we can build a feature to measure the percentage of the text that is censored.</p>
 <div class="rmdwarning">
 <p>
@@ -1714,8 +1719,8 @@ There are often many ways to get to the same solution when working with regular 
 <span id="cb378-5"><a href="mlclassification.html#cb378-5" aria-hidden="true" tabindex="-1"></a><span class="fu">percent_censoring</span>(credit_cards)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.7272727 0.5333333 0.2352941 0.7142857</code></pre>
 </div>
-<div id="detect-monetary-amounts" class="section level3" number="7.9.3">
-<h3><span class="header-section-number">7.9.3</span> Detect monetary amounts</h3>
+<div id="detect-monetary-amounts" class="section level3 hasAnchor" number="7.9.3">
+<h3><span class="header-section-number">7.9.3</span> Detect monetary amounts<a href="mlclassification.html#detect-monetary-amounts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We have already constructed a regular expression that detects the monetary amount from the text in Section <a href="mlclassification.html#classfirstattemptlookatdata">7.1</a>, so now we can look at how to use this information.
 Let’s start by creating a little example and see what we can extract.</p>
 <div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="mlclassification.html#cb380-1" aria-hidden="true" tabindex="-1"></a>dollar_texts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;That will be {$20.00}&quot;</span>,</span>
@@ -1757,8 +1762,8 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <p>Now that we have created some feature engineering functions, we can use them to (hopefully) make our classification model better.</p>
 </div>
 </div>
-<div id="what-evaluation-metrics-are-appropriate-1" class="section level2" number="7.10">
-<h2><span class="header-section-number">7.10</span> What evaluation metrics are appropriate?</h2>
+<div id="what-evaluation-metrics-are-appropriate-1" class="section level2 hasAnchor" number="7.10">
+<h2><span class="header-section-number">7.10</span> What evaluation metrics are appropriate?<a href="mlclassification.html#what-evaluation-metrics-are-appropriate-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We have focused on using accuracy and ROC AUC as metrics for our classification models so far. These are not the only classification metrics available, and your choice will often depend on how much you care about false positives compared to false negatives.</p>
 <p>If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to <code>metric_set()</code>. Let’s set up a tuning grid for two new classification metrics, <code>recall</code> and <code>precision</code>, that focuses not on the overall proportion of observations that are predicted correctly but instead on false positives and false negatives.</p>
 <div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="mlclassification.html#cb386-1" aria-hidden="true" tabindex="-1"></a>nb_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
@@ -1773,7 +1778,7 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 recall  binary         0.688</code></pre>
+#&gt; 1 recall  binary         0.694</code></pre>
 <p>We can also compute the recall for each resample using <code>group_by()</code>.</p>
 <div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="mlclassification.html#cb389-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
 <span id="cb389-2"><a href="mlclassification.html#cb389-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
@@ -1781,22 +1786,22 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt;  1 Fold01 recall  binary         0.694
-#&gt;  2 Fold02 recall  binary         0.728
-#&gt;  3 Fold03 recall  binary         0.673
-#&gt;  4 Fold04 recall  binary         0.660
-#&gt;  5 Fold05 recall  binary         0.704
-#&gt;  6 Fold06 recall  binary         0.604
-#&gt;  7 Fold07 recall  binary         0.740
-#&gt;  8 Fold08 recall  binary         0.703
-#&gt;  9 Fold09 recall  binary         0.774
-#&gt; 10 Fold10 recall  binary         0.597</code></pre>
+#&gt;  1 Fold01 recall  binary         0.701
+#&gt;  2 Fold02 recall  binary         0.730
+#&gt;  3 Fold03 recall  binary         0.682
+#&gt;  4 Fold04 recall  binary         0.669
+#&gt;  5 Fold05 recall  binary         0.710
+#&gt;  6 Fold06 recall  binary         0.608
+#&gt;  7 Fold07 recall  binary         0.748
+#&gt;  8 Fold08 recall  binary         0.714
+#&gt;  9 Fold09 recall  binary         0.776
+#&gt; 10 Fold10 recall  binary         0.604</code></pre>
 <p>Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates.
 The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.</p>
 <div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="mlclassification.html#cb391-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>#&gt;        Credit  Other
-#&gt; Credit 2865.9  442.0
-#&gt; Other  1300.9 4182.2</code></pre>
+#&gt; Credit 2892.1  420.1
+#&gt; Other  1274.7 4204.1</code></pre>
 <p>It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.</p>
 <div class="rmdnote">
 <p>
@@ -1804,8 +1809,8 @@ For the full set of classification metric options, see the <a href="https://yard
 </p>
 </div>
 </div>
-<div id="mlclassificationfull" class="section level2" number="7.11">
-<h2><span class="header-section-number">7.11</span> The full game: classification</h2>
+<div id="mlclassificationfull" class="section level2 hasAnchor" number="7.11">
+<h2><span class="header-section-number">7.11</span> The full game: classification<a href="mlclassification.html#mlclassificationfull" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We have come a long way from our first classification model in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, and it is time to see how we can use what we have learned to improve it.
 We started this chapter with a simple naive Bayes model and token counts.
 Since then have we looked at different models, preprocessing techniques, and domain-specific feature engineering.
@@ -1818,8 +1823,8 @@ For our final model, let’s use some of the domain-specific features we develop
 <li><p>include custom-engineered features,</p></li>
 <li><p>finally evaluate on the testing set, which we have not touched at all yet.</p></li>
 </ul>
-<div id="feature-selection" class="section level3" number="7.11.1">
-<h3><span class="header-section-number">7.11.1</span> Feature selection</h3>
+<div id="feature-selection" class="section level3 hasAnchor" number="7.11.1">
+<h3><span class="header-section-number">7.11.1</span> Feature selection<a href="mlclassification.html#feature-selection" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We start by creating a new preprocessing recipe, using only the text of the complaints for feature engineering.</p>
 <div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="mlclassification.html#cb393-1" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span></span>
 <span id="cb393-2"><a href="mlclassification.html#cb393-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(product <span class="sc">~</span> consumer_complaint_narrative, <span class="at">data =</span> complaints_train)</span></code></pre></div>
@@ -1849,8 +1854,8 @@ This data set has many more than 100 of even the most common 5000 or more tokens
 <span id="cb395-4"><a href="mlclassification.html#cb395-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">max_tokens =</span> <span class="fu">tune</span>(), <span class="at">min_times =</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb395-5"><a href="mlclassification.html#cb395-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(consumer_complaint_narrative)</span></code></pre></div>
 </div>
-<div id="specify-the-model-1" class="section level3" number="7.11.2">
-<h3><span class="header-section-number">7.11.2</span> Specify the model</h3>
+<div id="specify-the-model-1" class="section level3 hasAnchor" number="7.11.2">
+<h3><span class="header-section-number">7.11.2</span> Specify the model<a href="mlclassification.html#specify-the-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We use a lasso regularized classifier since it performed well throughout this chapter. We can reuse parts of the old workflow <code>sparse_wf</code> from Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and update the recipe specification.</p>
 <div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="mlclassification.html#cb396-1" aria-hidden="true" tabindex="-1"></a>sparse_wf_v2 <span class="ot">&lt;-</span> sparse_wf <span class="sc">%&gt;%</span></span>
 <span id="cb396-2"><a href="mlclassification.html#cb396-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_recipe</span>(complaints_rec_v2, <span class="at">blueprint =</span> sparse_bp)</span>
@@ -1919,8 +1924,8 @@ We used <code>grid_regular()</code> here where we fit a model at every combinati
 <span id="cb400-7"><a href="mlclassification.html#cb400-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We have fitted these classification models!</p>
 </div>
-<div id="classification-final-evaluation" class="section level3" number="7.11.3">
-<h3><span class="header-section-number">7.11.3</span> Evaluate the modeling</h3>
+<div id="classification-final-evaluation" class="section level3 hasAnchor" number="7.11.3">
+<h3><span class="header-section-number">7.11.3</span> Evaluate the modeling<a href="mlclassification.html#classification-final-evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure <a href="mlclassification.html#fig:complaintsfinaltunevis">7.11</a> shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization.</p>
 <div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="mlclassification.html#cb401-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tune_rs) <span class="sc">+</span></span>
 <span id="cb401-2"><a href="mlclassification.html#cb401-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
@@ -1942,7 +1947,7 @@ FIGURE 7.11: Model performance is similar for the higher token options so we can
 <pre><code>#&gt; # A tibble: 1 × 10
 #&gt;   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #&gt;     &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1 0.00483       1000 accuracy binary     0.882    10 0.00101 Prepro… 0.898  1.75</code></pre>
+#&gt; 1 0.00483       1000 accuracy binary     0.882    10 0.00100 Prepro… 0.898  1.74</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
 <div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="mlclassification.html#cb404-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(sparse_wf_v2, choose_acc)</span>
 <span id="cb404-2"><a href="mlclassification.html#cb404-2" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
@@ -2012,7 +2017,7 @@ FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 <p>The output of <code>last_fit()</code> also contains a fitted model (a <code>workflow</code>, to be more specific) that has been trained on the <em>training</em> data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure <a href="mlclassification.html#fig:complaintsvip">7.14</a>.</p>
 <div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="mlclassification.html#cb410-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span>
 <span id="cb410-2"><a href="mlclassification.html#cb410-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb410-3"><a href="mlclassification.html#cb410-3" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="ot">&lt;-</span> <span class="fu">pull_workflow_fit</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span></span>
+<span id="cb410-3"><a href="mlclassification.html#cb410-3" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="ot">&lt;-</span> <span class="fu">extract_fit_parsnip</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span></span>
 <span id="cb410-4"><a href="mlclassification.html#cb410-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>(<span class="at">lambda =</span> choose_acc<span class="sc">$</span>penalty)</span>
 <span id="cb410-5"><a href="mlclassification.html#cb410-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb410-6"><a href="mlclassification.html#cb410-6" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="sc">%&gt;%</span></span>
@@ -2063,14 +2068,14 @@ The top features we see here are all tokens learned directly from the text. None
 #&gt;    &lt;chr&gt;                                                                        
 #&gt;  1 &quot;I am writing this complaint due to the lack of communication on the constru…
 #&gt;  2 &quot;Enhanced recovery is trying to collect on another account that does not bel…
-#&gt;  3 &quot;XXXX XXXX and XXXX is claiming ownership of a student loan debt that they a…
-#&gt;  4 &quot;While  in loan be notification with usbank they put foreclosure on my credi…
+#&gt;  3 &quot;I am trying to get a mortgage for a house and one of the things they told m…
+#&gt;  4 &quot;I subscribed to trans-union for a one month period on their website. They d…
 #&gt;  5 &quot;I moved out of the apartment I rented before lease expiration date as it wa…
 #&gt;  6 &quot;I have asked both XXXX  and XXXX the collection Agency Riddled with thousan…
 #&gt;  7 &quot;I have used my XXXX XXXX credit  card  since XX/XX/XXXX, but closed this ac…
 #&gt;  8 &quot;I am looking for a refund on a fraudulent credit card payment with Capital …
 #&gt;  9 &quot;Since acquiring my mortgage about 8 months following bankruptcy, the collec…
-#&gt; 10 &quot;XXXX XXXX XXXX notified the credit agency and XXXX XXXX XXXX that they were…</code></pre>
+#&gt; 10 &quot;Old debt is sold or reassigned to another agency at the end of the seven ye…</code></pre>
 <p>We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.</p>
 <p>What about misclassifications in the other direction, observations in the test set that were <em>not</em> labeled as about credit reporting but that our final model gave a high probability of being about credit reporting?</p>
 <div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb413-1"><a href="mlclassification.html#cb413-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
@@ -2093,15 +2098,15 @@ The top features we see here are all tokens learned directly from the text. None
 <p>Again, these are “mistakes” on the part of the model that we can understand based on the content of these complaints. The original labeling on the complaints looks to be not entirely correct or consistent, typical of real data from the real world.</p>
 </div>
 </div>
-<div id="mlclassificationsummary" class="section level2" number="7.12">
-<h2><span class="header-section-number">7.12</span> Summary</h2>
+<div id="mlclassificationsummary" class="section level2 hasAnchor" number="7.12">
+<h2><span class="header-section-number">7.12</span> Summary<a href="mlclassification.html#mlclassificationsummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>You can use classification modeling to predict labels or categorical variables from a data set, including data sets that include text.
 Naive Bayes models can perform well with text data since each feature is handled independently and thus large numbers of features are computational feasible.
 This is important as bag-of-word text models can involve thousands of tokens.
 We also saw that regularized linear models, such as lasso, often work well for text data sets.
 Your own domain knowledge about your text data is valuable, and using that knowledge in careful engineering of custom features can improve your model in some cases.</p>
-<div id="in-this-chapter-you-learned-6" class="section level3" number="7.12.1">
-<h3><span class="header-section-number">7.12.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-6" class="section level3 hasAnchor" number="7.12.1">
+<h3><span class="header-section-number">7.12.1</span> In this chapter, you learned:<a href="mlclassification.html#in-this-chapter-you-learned-6" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>how text data can be used in a classification model</p></li>
 <li><p>to tune hyperparameters of a model</p></li>
@@ -2117,7 +2122,7 @@ Your own domain knowledge about your text data is valuable, and using that knowl
 
 
 
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-R-Matrix" class="csl-entry">
 Bates, D., and Maechler, M. 2021. <em>Matrix: Sparse and Dense Matrix Classes and Methods</em>. R package version 1.3-2. <a href="https://CRAN.R-project.org/package=Matrix">https://CRAN.R-project.org/package=Matrix</a>.

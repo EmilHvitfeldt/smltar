@@ -349,11 +349,11 @@ nb_rs_metrics
 #> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n std_err .config             
 #>   <chr>    <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1 accuracy binary     0.802    10 0.00446 Preprocessor1_Model1
-#> 2 roc_auc  binary     0.881    10 0.00168 Preprocessor1_Model1
+#> 1 accuracy binary     0.807    10 0.00469 Preprocessor1_Model1
+#> 2 roc_auc  binary     0.884    10 0.00177 Preprocessor1_Model1
 ```
 
-The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.2%.
+The default performance parameters for binary classification are accuracy and ROC AUC (area under the receiver operator characteristic curve). For these resamples, the average accuracy is 80.7%.
 
 \index{accuracy}
 \index{ROC AUC}
@@ -543,8 +543,8 @@ lasso_rs_metrics
 #> # A tibble: 2 × 6
 #>   .metric  .estimator  mean     n  std_err .config             
 #>   <chr>    <chr>      <dbl> <int>    <dbl> <chr>               
-#> 1 accuracy binary     0.870    10 0.00124  Preprocessor1_Model1
-#> 2 roc_auc  binary     0.939    10 0.000646 Preprocessor1_Model1
+#> 1 accuracy binary     0.870    10 0.00126  Preprocessor1_Model1
+#> 2 roc_auc  binary     0.939    10 0.000641 Preprocessor1_Model1
 ```
 
 This looks pretty promising, considering we haven't yet done any tuning of the lasso hyperparameters.
@@ -668,18 +668,18 @@ tune_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 × 5
-#>    splits               id     .metrics          .notes           .predictions  
-#>    <list>               <chr>  <list>            <list>           <list>        
-#>  1 <split [79119/8791]> Fold01 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  2 <split [79119/8791]> Fold02 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  3 <split [79119/8791]> Fold03 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  4 <split [79119/8791]> Fold04 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  5 <split [79119/8791]> Fold05 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  6 <split [79119/8791]> Fold06 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  7 <split [79119/8791]> Fold07 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  8 <split [79119/8791]> Fold08 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#>  9 <split [79119/8791]> Fold09 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
-#> 10 <split [79119/8791]> Fold10 <tibble [60 × 5]> <tibble [0 × 1]> <tibble [263,…
+#>    splits               id     .metrics          .notes           .predictions
+#>    <list>               <chr>  <list>            <list>           <list>      
+#>  1 <split [79119/8791]> Fold01 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  2 <split [79119/8791]> Fold02 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  3 <split [79119/8791]> Fold03 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  4 <split [79119/8791]> Fold04 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  5 <split [79119/8791]> Fold05 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  6 <split [79119/8791]> Fold06 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  7 <split [79119/8791]> Fold07 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  8 <split [79119/8791]> Fold08 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#>  9 <split [79119/8791]> Fold09 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>    
+#> 10 <split [79119/8791]> Fold10 <tibble [60 × 5]> <tibble [0 × 3]> <tibble>
 ```
 
 <div class="rmdwarning">
@@ -698,16 +698,16 @@ collect_metrics(tune_rs)
 #> # A tibble: 60 × 7
 #>     penalty .metric  .estimator  mean     n  std_err .config              
 #>       <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
-#>  1 1   e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model01
-#>  2 1   e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model01
-#>  3 2.21e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model02
-#>  4 2.21e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model02
-#>  5 4.89e-10 accuracy binary     0.890    10 0.000820 Preprocessor1_Model03
-#>  6 4.89e-10 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model03
-#>  7 1.08e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model04
-#>  8 1.08e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model04
-#>  9 2.40e- 9 accuracy binary     0.890    10 0.000820 Preprocessor1_Model05
-#> 10 2.40e- 9 roc_auc  binary     0.953    10 0.000522 Preprocessor1_Model05
+#>  1 1   e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model01
+#>  2 1   e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model01
+#>  3 2.21e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model02
+#>  4 2.21e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model02
+#>  5 4.89e-10 accuracy binary     0.890    10 0.000834 Preprocessor1_Model03
+#>  6 4.89e-10 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model03
+#>  7 1.08e- 9 accuracy binary     0.890    10 0.000834 Preprocessor1_Model04
+#>  8 1.08e- 9 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model04
+#>  9 2.40e- 9 accuracy binary     0.890    10 0.000834 Preprocessor1_Model05
+#> 10 2.40e- 9 roc_auc  binary     0.953    10 0.000517 Preprocessor1_Model05
 #> # … with 50 more rows
 ```
 
@@ -739,11 +739,11 @@ tune_rs %>%
 #> # A tibble: 5 × 7
 #>        penalty .metric .estimator  mean     n  std_err .config              
 #>          <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000788     roc_auc binary     0.953    10 0.000505 Preprocessor1_Model21
-#> 2 0.000356     roc_auc binary     0.953    10 0.000510 Preprocessor1_Model20
-#> 3 0.000161     roc_auc binary     0.953    10 0.000517 Preprocessor1_Model19
-#> 4 0.0000728    roc_auc binary     0.953    10 0.000520 Preprocessor1_Model18
-#> 5 0.0000000001 roc_auc binary     0.953    10 0.000522 Preprocessor1_Model01
+#> 1 0.000788     roc_auc binary     0.953    10 0.000502 Preprocessor1_Model21
+#> 2 0.000356     roc_auc binary     0.953    10 0.000504 Preprocessor1_Model20
+#> 3 0.000161     roc_auc binary     0.953    10 0.000511 Preprocessor1_Model19
+#> 4 0.0000728    roc_auc binary     0.953    10 0.000516 Preprocessor1_Model18
+#> 5 0.0000000001 roc_auc binary     0.953    10 0.000517 Preprocessor1_Model01
 ```
 
 
@@ -762,7 +762,7 @@ chosen_auc
 #> # A tibble: 1 × 9
 #>    penalty .metric .estimator  mean     n  std_err .config          .best .bound
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>            <dbl>  <dbl>
-#> 1 0.000788 roc_auc binary     0.953    10 0.000505 Preprocessor1_M… 0.953  0.953
+#> 1 0.000788 roc_auc binary     0.953    10 0.000502 Preprocessor1_M… 0.953  0.953
 ```
 
 Next, let's finalize our tunable workflow with this particular regularization penalty. This is the regularization penalty that our tuning results indicate give us the best model.
@@ -803,12 +803,12 @@ Instead of `penalty = tune()` like before, now our workflow has finalized values
 fitted_lasso <- fit(final_lasso, complaints_train)
 ```
 
-What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+What does the result look like? We can access the fit using `extract_fit_parsnip()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
 
 ```r
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(-estimate)
 ```
@@ -837,7 +837,7 @@ What terms contribute to a complaint being about credit reporting, for this tune
 
 ```r
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(estimate)
 ```
@@ -966,16 +966,16 @@ sparse_rs
 #> # A tibble: 10 × 4
 #>    splits               id     .metrics          .notes          
 #>    <list>               <chr>  <list>            <list>          
-#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]>
-#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]>
-#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 1]>
+#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 3]>
+#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 3]>
+#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 3]>
 ```
 
 How did this model turn out, especially compared to the tuned model that did not use the sparse capabilities of `set_engine("glmnet")`?
@@ -990,11 +990,11 @@ sparse_rs %>%
 #> # A tibble: 5 × 7
 #>    penalty .metric .estimator  mean     n  std_err .config              
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000695 roc_auc binary     0.953    10 0.000506 Preprocessor1_Model08
-#> 2 0.000379 roc_auc binary     0.953    10 0.000510 Preprocessor1_Model07
-#> 3 0.000207 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model06
-#> 4 0.00127  roc_auc binary     0.953    10 0.000504 Preprocessor1_Model09
-#> 5 0.000113 roc_auc binary     0.953    10 0.000519 Preprocessor1_Model05
+#> 1 0.000695 roc_auc binary     0.953    10 0.000502 Preprocessor1_Model08
+#> 2 0.000379 roc_auc binary     0.953    10 0.000504 Preprocessor1_Model07
+#> 3 0.000207 roc_auc binary     0.953    10 0.000508 Preprocessor1_Model06
+#> 4 0.00127  roc_auc binary     0.953    10 0.000501 Preprocessor1_Model09
+#> 5 0.000113 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model05
 ```
 
 The best ROC AUC is nearly identical; the best ROC AUC for the non-sparse tuned lasso model in Section \@ref(tunelasso) was 0.953. The best regularization parameter (`penalty`) is a little different (the best value in Section \@ref(tunelasso) was 0.00079), but we used a different grid so didn't try out exactly the same values. We ended up with nearly the same performance and best tuned model.
@@ -1192,18 +1192,24 @@ multi_lasso_rs
 #> # Tuning results
 #> # 10-fold cross-validation 
 #> # A tibble: 10 × 5
-#>    splits               id     .metrics          .notes           .predictions  
-#>    <list>               <chr>  <list>            <list>           <list>        
-#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [1 × 1]> <tibble [175,…
-#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [0 × 1]> <tibble [175,…
-#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [1 × 1]> <tibble [175,…
+#>    splits               id     .metrics          .notes           .predictions
+#>    <list>               <chr>  <list>            <list>           <list>      
+#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
+#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
+#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
+#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
+#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
+#> 
+#> There were issues with some computations:
+#> 
+#>   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...
+#> 
+#> Use `collect_notes(object)` for more information.
 ```
 
 What do we see, in terms of performance metrics?
@@ -1218,16 +1224,16 @@ best_acc
 
 ```
 #> # A tibble: 5 × 7
-#>    penalty .metric  .estimator  mean     n std_err .config              
-#>      <dbl> <chr>    <chr>      <dbl> <int>   <dbl> <chr>                
-#> 1 0.00234  accuracy multiclass 0.753    10 0.00148 Preprocessor1_Model10
-#> 2 0.00428  accuracy multiclass 0.750    10 0.00132 Preprocessor1_Model11
-#> 3 0.00127  accuracy multiclass 0.747    10 0.00142 Preprocessor1_Model09
-#> 4 0.00785  accuracy multiclass 0.739    10 0.00151 Preprocessor1_Model12
-#> 5 0.000695 accuracy multiclass 0.735    10 0.00214 Preprocessor1_Model08
+#>    penalty .metric  .estimator  mean     n  std_err .config              
+#>      <dbl> <chr>    <chr>      <dbl> <int>    <dbl> <chr>                
+#> 1 0.00234  accuracy multiclass 0.756    10 0.00166  Preprocessor1_Model10
+#> 2 0.00428  accuracy multiclass 0.751    10 0.00148  Preprocessor1_Model11
+#> 3 0.00127  accuracy multiclass 0.750    10 0.000920 Preprocessor1_Model09
+#> 4 0.00785  accuracy multiclass 0.741    10 0.00207  Preprocessor1_Model12
+#> 5 0.000695 accuracy multiclass 0.741    10 0.00239  Preprocessor1_Model08
 ```
 
-The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.3%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
+The accuracy metric naturally extends to multiclass tasks, but even the very best value is quite low at 75.6%, significantly lower than for the binary case in Section \@ref(tunelasso). This is expected since multiclass classification is a harder task than binary classification. 
 
 <div class="rmdwarning">
 <p>In binary classification, there is one right answer and one wrong answer; in this multiclass case, there is one right answer and <em>eight</em> wrong answers.</p>
@@ -1412,11 +1418,11 @@ more_vars_rs %>%
 #> # A tibble: 5 × 7
 #>    penalty .metric .estimator  mean     n  std_err .config              
 #>      <dbl> <chr>   <chr>      <dbl> <int>    <dbl> <chr>                
-#> 1 0.000695 roc_auc binary     0.953    10 0.000514 Preprocessor1_Model08
-#> 2 0.000379 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model07
-#> 3 0.000207 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model06
-#> 4 0.00127  roc_auc binary     0.953    10 0.000511 Preprocessor1_Model09
-#> 5 0.000113 roc_auc binary     0.953    10 0.000525 Preprocessor1_Model05
+#> 1 0.000695 roc_auc binary     0.953    10 0.000509 Preprocessor1_Model08
+#> 2 0.000379 roc_auc binary     0.953    10 0.000510 Preprocessor1_Model07
+#> 3 0.000207 roc_auc binary     0.953    10 0.000515 Preprocessor1_Model06
+#> 4 0.00127  roc_auc binary     0.953    10 0.000507 Preprocessor1_Model09
+#> 5 0.000113 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model05
 ```
 
 We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section \@ref(casestudysparseencoding) and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section \@ref(casestudysparseencoding) was 0.0007 and is about the same here. We can use `tidy()` and some **dplyr** manipulation to find at what rank (`term_rank`) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.
@@ -1426,7 +1432,7 @@ We see here that including more predictors did not measurably improve our model 
 finalize_workflow(more_vars_wf, 
                   select_best(more_vars_rs, "roc_auc")) %>%
   fit(complaints_train) %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>% 
   arrange(-abs(estimate)) %>% 
   mutate(term_rank = row_number()) %>% 
@@ -1888,7 +1894,7 @@ nb_rs_predictions %>%
 #> # A tibble: 1 × 3
 #>   .metric .estimator .estimate
 #>   <chr>   <chr>          <dbl>
-#> 1 recall  binary         0.688
+#> 1 recall  binary         0.694
 ```
 
 We can also compute the recall for each resample using `group_by()`.
@@ -1904,16 +1910,16 @@ nb_rs_predictions %>%
 #> # A tibble: 10 × 4
 #>    id     .metric .estimator .estimate
 #>    <chr>  <chr>   <chr>          <dbl>
-#>  1 Fold01 recall  binary         0.694
-#>  2 Fold02 recall  binary         0.728
-#>  3 Fold03 recall  binary         0.673
-#>  4 Fold04 recall  binary         0.660
-#>  5 Fold05 recall  binary         0.704
-#>  6 Fold06 recall  binary         0.604
-#>  7 Fold07 recall  binary         0.740
-#>  8 Fold08 recall  binary         0.703
-#>  9 Fold09 recall  binary         0.774
-#> 10 Fold10 recall  binary         0.597
+#>  1 Fold01 recall  binary         0.701
+#>  2 Fold02 recall  binary         0.730
+#>  3 Fold03 recall  binary         0.682
+#>  4 Fold04 recall  binary         0.669
+#>  5 Fold05 recall  binary         0.710
+#>  6 Fold06 recall  binary         0.608
+#>  7 Fold07 recall  binary         0.748
+#>  8 Fold08 recall  binary         0.714
+#>  9 Fold09 recall  binary         0.776
+#> 10 Fold10 recall  binary         0.604
 ```
 
 Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates. 
@@ -1926,8 +1932,8 @@ conf_mat_resampled(nb_rs, tidy = FALSE)
 
 ```
 #>        Credit  Other
-#> Credit 2865.9  442.0
-#> Other  1300.9 4182.2
+#> Credit 2892.1  420.1
+#> Other  1274.7 4204.1
 ```
 
 It is possible with many data sets to achieve high accuracy just by predicting the majority class all the time, but such a model is not useful in the real world. Accuracy alone is often not a good way to assess the performance of classification models.
@@ -2122,7 +2128,7 @@ choose_acc
 #> # A tibble: 1 × 10
 #>   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #>     <dbl>      <int> <chr>    <chr>      <dbl> <int>   <dbl> <chr>   <dbl> <dbl>
-#> 1 0.00483       1000 accuracy binary     0.882    10 0.00101 Prepro… 0.898  1.75
+#> 1 0.00483       1000 accuracy binary     0.882    10 0.00100 Prepro… 0.898  1.74
 ```
 
 After we have those parameters, `penalty` and `max_tokens`, we can finalize our earlier tunable workflow, by updating it with this value.
@@ -2224,7 +2230,7 @@ The output of `last_fit()` also contains a fitted model (a `workflow`, to be mor
 ```r
 library(vip)
 
-complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
+complaints_imp <- extract_fit_parsnip(final_fitted$.workflow[[1]]) %>%
   vi(lambda = choose_acc$penalty)
 
 complaints_imp %>%
@@ -2282,14 +2288,14 @@ complaints_bind %>%
 #>    <chr>                                                                        
 #>  1 "I am writing this complaint due to the lack of communication on the constru…
 #>  2 "Enhanced recovery is trying to collect on another account that does not bel…
-#>  3 "XXXX XXXX and XXXX is claiming ownership of a student loan debt that they a…
-#>  4 "While  in loan be notification with usbank they put foreclosure on my credi…
+#>  3 "I am trying to get a mortgage for a house and one of the things they told m…
+#>  4 "I subscribed to trans-union for a one month period on their website. They d…
 #>  5 "I moved out of the apartment I rented before lease expiration date as it wa…
 #>  6 "I have asked both XXXX  and XXXX the collection Agency Riddled with thousan…
 #>  7 "I have used my XXXX XXXX credit  card  since XX/XX/XXXX, but closed this ac…
 #>  8 "I am looking for a refund on a fraudulent credit card payment with Capital …
 #>  9 "Since acquiring my mortgage about 8 months following bankruptcy, the collec…
-#> 10 "XXXX XXXX XXXX notified the credit agency and XXXX XXXX XXXX that they were…
+#> 10 "Old debt is sold or reassigned to another agency at the end of the seven ye…
 ```
 
 We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.

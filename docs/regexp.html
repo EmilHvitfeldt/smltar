@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>A Regular expressions | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="A Regular expressions | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="A Regular expressions | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="A Regular expressions | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="text-models-in-the-real-world.html"/>
 <link rel="next" href="appendixdata.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="regexp" class="section level1" number="11">
-<h1><span class="header-section-number">A</span> Regular expressions</h1>
+<div id="regexp" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">A</span> Regular expressions<a href="regexp.html#regexp" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <blockquote>
 Some people, when confronted with a problem, think: “I know, I’ll use regular expressions.” Now they have two problems.<br />
 
@@ -465,8 +464,8 @@ Some people, when confronted with a problem, think: “I know, I’ll use regula
 </blockquote>
 <p>This section will give a brief overview on how to write and use a regular expression), often abbreviated <em>regex</em>. Regular expressions are a way to specify or search for patterns of strings using a sequence of characters. By combining a selection of simple patterns, we can capture quite complicated strings.</p>
 <p>Many functions in R take advantage of regular expressions. Some examples from base R include <code>grep</code>, <code>grepl</code>, <code>regexpr</code>, <code>gregexpr</code>, <code>sub</code>, <code>gsub</code>, and <code>strsplit</code>, as well as <code>ls</code> and <code>list.files</code>. The <strong>stringr</strong> package <span class="citation">(<a href="#ref-Wickham19" role="doc-biblioref">Wickham 2019</a>)</span> uses regular expressions extensively; the regular expressions are passed as the <code>pattern =</code> argument. Regular expressions can be used to detect, locate, or extract parts of a string.</p>
-<div id="literal-characters" class="section level2" number="11.1">
-<h2><span class="header-section-number">A.1</span> Literal characters</h2>
+<div id="literal-characters" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">A.1</span> Literal characters<a href="regexp.html#literal-characters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The most basic regular expression consists of only a single character. Here let’s detect if each of the following strings in the character vector <code>animals</code> contains the letter “j.”</p>
 <div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="regexp.html#cb648-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
 <span id="cb648-2"><a href="regexp.html#cb648-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -495,8 +494,8 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 <div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="regexp.html#cb656-1" aria-hidden="true" tabindex="-1"></a>wows <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;wow&quot;</span>, <span class="st">&quot;WoW&quot;</span>, <span class="st">&quot;WOW&quot;</span>)</span>
 <span id="cb656-2"><a href="regexp.html#cb656-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(wows, <span class="st">&quot;wow&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE FALSE</code></pre>
-<div id="meta-characters" class="section level3" number="11.1.1">
-<h3><span class="header-section-number">A.1.1</span> Meta characters</h3>
+<div id="meta-characters" class="section level3 hasAnchor" number="11.1.1">
+<h3><span class="header-section-number">A.1.1</span> Meta characters<a href="regexp.html#meta-characters" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>There are 14 meta characters that carry special meaning inside regular expressions. We need to “escape” them with a backslash if we want to match the literal character (and backslashes need to be doubled in R). Think of “escaping” as stripping the character of its special meaning.</p>
 <p>The plus symbol <code>+</code> is one of the special meta characters for regular expressions.</p>
 <div class="sourceCode" id="cb658"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb658-1"><a href="regexp.html#cb658-1" aria-hidden="true" tabindex="-1"></a>math <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1 + 2&quot;</span>, <span class="st">&quot;14 + 5&quot;</span>, <span class="st">&quot;3 - 5&quot;</span>)</span>
@@ -573,8 +572,8 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 </table>
 </div>
 </div>
-<div id="full-stop-the-wildcard" class="section level2" number="11.2">
-<h2><span class="header-section-number">A.2</span> Full stop, the wildcard</h2>
+<div id="full-stop-the-wildcard" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">A.2</span> Full stop, the wildcard<a href="regexp.html#full-stop-the-wildcard" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Let’s start with the full stop/period/dot, which acts as a “wildcard.” This means that this character will match anything in place other then a newline character.</p>
 <div class="sourceCode" id="cb660"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb660-1"><a href="regexp.html#cb660-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;cat&quot;</span>, <span class="st">&quot;cut&quot;</span>, <span class="st">&quot;cue&quot;</span>)</span>
 <span id="cb660-2"><a href="regexp.html#cb660-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.&quot;</span>)</span></code></pre></div>
@@ -582,8 +581,8 @@ The functions <code>str_detect</code>, <code>str_extract</code>, and <code>str_l
 <div class="sourceCode" id="cb662"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb662-1"><a href="regexp.html#cb662-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(strings, <span class="st">&quot;c.t&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;cat&quot; &quot;cut&quot; NA</code></pre>
 </div>
-<div id="character-classes" class="section level2" number="11.3">
-<h2><span class="header-section-number">A.3</span> Character classes</h2>
+<div id="character-classes" class="section level2 hasAnchor" number="11.3">
+<h2><span class="header-section-number">A.3</span> Character classes<a href="regexp.html#character-classes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>So far we have only been able to match either exact characters or wildcards. <strong>Character classes</strong> (also called character sets) let us do more than that. A character class allows us to match a character specified inside the class. A character class is constructed with square brackets. The character class <code>[ac]</code> will match <em>either</em> an “a” or a “c.”</p>
 <div class="sourceCode" id="cb664"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb664-1"><a href="regexp.html#cb664-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
 <span id="cb664-2"><a href="regexp.html#cb664-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[ac]&quot;</span>)</span></code></pre></div>
@@ -609,8 +608,8 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="regexp.html#cb670-1" aria-hidden="true" tabindex="-1"></a>strings <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
 <span id="cb670-2"><a href="regexp.html#cb670-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(strings, <span class="st">&quot;[^ac]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE  TRUE FALSE</code></pre>
-<div id="shorthand-character-classes" class="section level3" number="11.3.1">
-<h3><span class="header-section-number">A.3.1</span> Shorthand character classes</h3>
+<div id="shorthand-character-classes" class="section level3 hasAnchor" number="11.3.1">
+<h3><span class="header-section-number">A.3.1</span> Shorthand character classes<a href="regexp.html#shorthand-character-classes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Certain character classes are so commonly used that they have been predefined with names. A couple of these character classes have even shorter shorthands. The class <code>[:digit:]</code> denotes all the digits 0, 1, 2, 3, 4, 5, 6, 7, 8, and 9 but it can also be described by <code>\\d</code>. Table <a href="regexp.html#tab:characterclasses">A.2</a> presents these useful predefined character classes.</p>
 <table>
 <caption><span id="tab:characterclasses">TABLE A.2: </span> All character classes</caption>
@@ -658,7 +657,7 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <td align="left">[:cntrl:]</td>
 </tr>
 <tr class="odd">
-<td align="left">Punctuation characters: !"#$%&amp;’()*+,-./:;&lt;=&gt;?@[]^_`{|}~</td>
+<td align="left">Punctuation characters: !“#$%&amp;’()*+,-./:;&lt;=&gt;?@[]^_`{|}~</td>
 <td align="left">[:punct:]</td>
 </tr>
 <tr class="even">
@@ -694,8 +693,8 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <p>Notice that these shorthands are locale specific. This means that the Danish character ø will be picked up in class <code>[:lower:]</code> but not in the class <code>[a-z]</code> as the character isn’t located between a and z.</p>
 </div>
 </div>
-<div id="quantifiers" class="section level2" number="11.4">
-<h2><span class="header-section-number">A.4</span> Quantifiers</h2>
+<div id="quantifiers" class="section level2 hasAnchor" number="11.4">
+<h2><span class="header-section-number">A.4</span> Quantifiers<a href="regexp.html#quantifiers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We can specify how many times we expect something to occur using quantifiers. If we want to find a digit with four numerals, we don’t have to write <code>[:digit:][:digit:][:digit:][:digit:]</code>. Table <a href="regexp.html#tab:greedyquantifiers">A.3</a> shows how to specify repetitions. Notice that <code>?</code> is shorthand for <code>{0,1}</code>, <code>*</code> is shorthand for <code>{0,}</code>, and <code>+</code> is shorthand for <code>{1,}</code> <span class="citation">(<a href="#ref-levithan2012regular" role="doc-biblioref">Levithan 2012</a>)</span>.</p>
 <table>
 <caption><span id="tab:greedyquantifiers">TABLE A.3: </span> Regular expression quantifiers</caption>
@@ -795,8 +794,8 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <div class="sourceCode" id="cb682"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb682-1"><a href="regexp.html#cb682-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract</span>(batman, <span class="st">&quot;(NA ){3,7}?&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;NA NA NA &quot;</code></pre>
 </div>
-<div id="anchors" class="section level2" number="11.5">
-<h2><span class="header-section-number">A.5</span> Anchors</h2>
+<div id="anchors" class="section level2 hasAnchor" number="11.5">
+<h2><span class="header-section-number">A.5</span> Anchors<a href="regexp.html#anchors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The meta characters <code>^</code> and <code>$</code> have special meaning in regular expressions. They force the engine to check the beginning and end of the string, respectively, hence the name <strong>anchor</strong>. A mnemonic device to remember this is “First you get the power(<code>^</code>) and then you get the money(<code>\$</code>).”</p>
 <div class="sourceCode" id="cb684"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb684-1"><a href="regexp.html#cb684-1" aria-hidden="true" tabindex="-1"></a>seasons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;The summer is hot this year&quot;</span>,</span>
 <span id="cb684-2"><a href="regexp.html#cb684-2" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;The spring is a lovely time&quot;</span>,</span>
@@ -811,8 +810,8 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 <span id="cb688-2"><a href="regexp.html#cb688-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(folder_names, <span class="st">&quot;^data$&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] FALSE FALSE  TRUE FALSE</code></pre>
 </div>
-<div id="additional-resources" class="section level2" number="11.6">
-<h2><span class="header-section-number">A.6</span> Additional resources</h2>
+<div id="additional-resources" class="section level2 hasAnchor" number="11.6">
+<h2><span class="header-section-number">A.6</span> Additional resources<a href="regexp.html#additional-resources" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This appendix covered some of the basics of getting started with (or refreshed about) regular expressions. If you want to learn more:</p>
 <ul>
 <li><p>RStudio maintains <a href="https://www.rstudio.com/resources/cheatsheets/">an excellent collection of cheat sheets</a>, some of which are related to regular expressions.</p></li>
@@ -824,7 +823,7 @@ Spaces inside character classes are meaningful as they are interpreted as litera
 
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-levithan2012regular" class="csl-entry">
 Levithan, J. G. S. 2012. <em>Regular Expressions Cookbook</em>. Sebastopol: O’Reilly Media, Inc.

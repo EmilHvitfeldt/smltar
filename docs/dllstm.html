@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 9 Long short-term memory (LSTM) networks | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="dldnn.html"/>
 <link rel="next" href="dlcnn.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,11 +453,11 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="dllstm" class="section level1" number="9">
-<h1><span class="header-section-number">Chapter 9</span> Long short-term memory (LSTM) networks</h1>
+<div id="dllstm" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Long short-term memory (LSTM) networks<a href="dllstm.html#dllstm" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In Chapter <a href="dldnn.html#dldnn">8</a>, we trained our first deep learning models with straightforward dense network architectures that provide a bridge for our understanding as we move from shallow learning algorithms to more complex network architectures. Those first neural network architectures are not simple compared to the kinds of models we used in Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>, but it is possible to build many more different and more complex kinds of networks for prediction with text data. This chapter will focus on the family of <strong>long short-term memory</strong> networks (LSTMs) <span class="citation">(<a href="#ref-Hochreiter1997" role="doc-biblioref">Hochreiter and Schmidhuber 1997</a>)</span>.</p>
-<div id="firstlstm" class="section level2" number="9.1">
-<h2><span class="header-section-number">9.1</span> A first LSTM model</h2>
+<div id="firstlstm" class="section level2 hasAnchor" number="9.1">
+<h2><span class="header-section-number">9.1</span> A first LSTM model<a href="dllstm.html#firstlstm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We will be using the same data from the previous chapter, described in Sections <a href="dldnn.html#kickstarter">8.1</a> and <a href="appendixdata.html#kickstarter-blurbs">B.4</a>. This data contains short text blurbs for prospective crowdfunding campaigns and whether those campaigns were successful. Our modeling goal is to predict whether a Kickstarter crowdfunding campaign was successful or not, based on the text blurb describing the campaign. Let’s start by splitting our data into training and testing sets.</p>
 <div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="dllstm.html#cb510-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb510-2"><a href="dllstm.html#cb510-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -515,8 +514,8 @@ Like we discussed in the last chapter, we are using <strong>recipes</strong> and
 <span id="cb514-4"><a href="dllstm.html#cb514-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 <p>Here we use <code>composition = "matrix"</code> because the Keras modeling functions operate on matrices, rather than a dataframe or tibble.</p>
-<div id="building-an-lstm" class="section level3" number="9.1.1">
-<h3><span class="header-section-number">9.1.1</span> Building an LSTM</h3>
+<div id="building-an-lstm" class="section level3 hasAnchor" number="9.1.1">
+<h3><span class="header-section-number">9.1.1</span> Building an LSTM<a href="dllstm.html#building-an-lstm" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An LSTM is a specific kind of network architecture with feedback loops that allow information to persist through steps<a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> and memory cells that can learn to “remember” and “forget” information through sequences. LSTMs are well-suited for text because of this ability to process text as a long sequence of words or characters, and can model structures within text like word dependencies. LSTMs are useful in text modeling because of this memory through long sequences; they are also used for time series, machine translation, and similar problems.</p>
 <p>Figure <a href="dllstm.html#fig:rnndiag">9.1</a> depicts a high-level diagram of how the LSTM unit of a network works. In the diagram, part of the neural network, <span class="math inline">\(A\)</span>, operates on some of the input and outputs a value. During this process, some information is held inside <span class="math inline">\(A\)</span> to make the network “remember” this updated network. Network <span class="math inline">\(A\)</span> is then applied to the next input where it predicts new output and its memory is updated.</p>
 
@@ -536,8 +535,7 @@ FIGURE 9.1: High-level diagram of an unrolled recurrent neural network. The recu
 <span id="cb516-6"><a href="dllstm.html#cb516-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&quot;sigmoid&quot;</span>)</span>
 <span id="cb516-7"><a href="dllstm.html#cb516-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb516-8"><a href="dllstm.html#cb516-8" aria-hidden="true" tabindex="-1"></a>lstm_mod</span></code></pre></div>
-<pre><code>#&gt; Model
-#&gt; Model: &quot;sequential&quot;
+<pre><code>#&gt; Model: &quot;sequential&quot;
 #&gt; ________________________________________________________________________________
 #&gt; Layer (type)                        Output Shape                    Param #     
 #&gt; ================================================================================
@@ -604,8 +602,8 @@ Remember that lower loss indicates a better fitting model, and higher accuracy (
 </div>
 <p>This model continues to improve epoch after epoch on the training data, but performs worse on the validation set than the training set after the first few epochs and eventually starts to exhibit <em>worsening</em> performance on the validation set as epochs pass, demonstrating how extremely it is overfitting to the training data. This is very common for powerful deep learning models, including LSTMs.</p>
 </div>
-<div id="lstmevaluation" class="section level3" number="9.1.2">
-<h3><span class="header-section-number">9.1.2</span> Evaluation</h3>
+<div id="lstmevaluation" class="section level3 hasAnchor" number="9.1.2">
+<h3><span class="header-section-number">9.1.2</span> Evaluation<a href="dllstm.html#lstmevaluation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We used some Keras defaults for model evaluation in the previous section, but just like we demonstrated in Section <a href="dldnn.html#evaluate-dnn">8.2.4</a>, we can take more control if we want or need to. Instead of using the <code>validation_split</code> argument, we can use the <code>validation_data</code> argument and send in our own validation set creating with rsample.</p>
 <div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="dllstm.html#cb522-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
 <span id="cb522-2"><a href="dllstm.html#cb522-2" aria-hidden="true" tabindex="-1"></a>kick_val <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(kickstarter_train, <span class="at">strata =</span> state)</span>
@@ -657,10 +655,10 @@ When we include some dropout, we temporarily remove some units together with the
 <span id="cb529-23"><a href="dllstm.html#cb529-23" aria-hidden="true" tabindex="-1"></a>val_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4058
-#&gt;     accuracy: 0.8121
-#&gt;     val_loss: 0.5987
-#&gt; val_accuracy: 0.7248</code></pre>
+#&gt;         loss: 0.3737
+#&gt;     accuracy: 0.8271
+#&gt;     val_loss: 0.6137
+#&gt; val_accuracy: 0.7357</code></pre>
 <p>The overfitting has been reduced, and Figure <a href="dllstm.html#fig:lstmvalhistory">9.3</a> shows that the difference between our model’s performance on training and validation data is now smaller.</p>
 <div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="dllstm.html#cb531-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(val_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lstmvalhistory"></span>
@@ -675,10 +673,10 @@ FIGURE 9.3: Training and validation metrics for LSTM with dropout
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.725
-#&gt; 2 kap         binary         0.448
-#&gt; 3 mn_log_loss binary         0.599
-#&gt; 4 roc_auc     binary         0.792</code></pre>
+#&gt; 1 accuracy    binary         0.736
+#&gt; 2 kap         binary         0.470
+#&gt; 3 mn_log_loss binary         0.614
+#&gt; 4 roc_auc     binary         0.805</code></pre>
 <p>A regularized linear model trained on this data set achieved results of accuracy of 0.686 and an AUC for the ROC curve of 0.752 (Appendix <a href="appendixbaseline.html#appendixbaseline">C</a>). This first LSTM with dropout is already performing better than such a linear model. We can plot the ROC curve in Figure <a href="dllstm.html#fig:lstmvalroc">9.4</a> to evaluate the performance across the range of thresholds.</p>
 <div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="dllstm.html#cb534-1" aria-hidden="true" tabindex="-1"></a>val_res <span class="sc">%&gt;%</span></span>
 <span id="cb534-2"><a href="dllstm.html#cb534-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
@@ -691,8 +689,8 @@ FIGURE 9.4: ROC curve for LSTM with dropout predictions of Kickstarter campaign 
 </div>
 </div>
 </div>
-<div id="compare-to-a-recurrent-neural-network" class="section level2" number="9.2">
-<h2><span class="header-section-number">9.2</span> Compare to a recurrent neural network</h2>
+<div id="compare-to-a-recurrent-neural-network" class="section level2 hasAnchor" number="9.2">
+<h2><span class="header-section-number">9.2</span> Compare to a recurrent neural network<a href="dllstm.html#compare-to-a-recurrent-neural-network" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>An LSTM is actually a specific kind of recurrent neural network (RNN) <span class="citation">(<a href="#ref-ELMAN1990179" role="doc-biblioref">Elman 1990</a>)</span>. Simple RNNs have feedback loops and hidden state that allow information to persist through steps but do not have memory cells like LSTMs. This difference between RNNs and LSTMs amounts to what happens in network <span class="math inline">\(A\)</span> in Figure <a href="dllstm.html#fig:rnndiag">9.1</a>. RNNs tend to have a very simple structure, typically just a single <code>tanh()</code> layer, much simpler than what happens in LSTMs.</p>
 <div class="rmdwarning">
 <p>
@@ -725,10 +723,10 @@ Simple RNNs can only connect very recent information and structure in sequences,
 <span id="cb535-23"><a href="dllstm.html#cb535-23" aria-hidden="true" tabindex="-1"></a>rnn_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.5414
-#&gt;     accuracy: 0.7251
-#&gt;     val_loss: 0.6292
-#&gt; val_accuracy: 0.6563</code></pre>
+#&gt;         loss: 0.4997
+#&gt;     accuracy: 0.7651
+#&gt;     val_loss: 0.5935
+#&gt; val_accuracy: 0.7136</code></pre>
 <p>Looks like more overfitting! We can see this by plotting the history as well in Figure <a href="dllstm.html#fig:rnnhistory">9.5</a>.</p>
 <div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="dllstm.html#cb537-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:rnnhistory"></span>
@@ -740,8 +738,8 @@ FIGURE 9.5: Training and validation metrics for RNN
 <p>These results are pretty disappointing overall, with worse performance than our first LSTM. Simple RNNs like the ones in this section can be challenging to train well, and just cranking up the number of embedding dimensions, units, or other network characteristics usually does not fix the problem. Often, RNNs just don’t work well compared to simpler deep learning architectures like the dense network introduced in Section <a href="dldnn.html#firstdlclassification">8.2</a> <span class="citation">(<a href="#ref-Minaee2020" role="doc-biblioref">Minaee et al. 2021</a>)</span>, or even other machine learning approaches like regularized linear models with good preprocessing.</p>
 <p>Fortunately, we can build on the ideas of a simple RNN with more complex architectures like LSTMs to build better-performing models.</p>
 </div>
-<div id="bilstm" class="section level2" number="9.3">
-<h2><span class="header-section-number">9.3</span> Case study: bidirectional LSTM</h2>
+<div id="bilstm" class="section level2 hasAnchor" number="9.3">
+<h2><span class="header-section-number">9.3</span> Case study: bidirectional LSTM<a href="dllstm.html#bilstm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The RNNs and LSTMs that we have fit so far have modeled text as sequences, specifically sequences where information and memory persists moving forward. These kinds of models can learn structures and dependencies moving forward <em>only</em>. In language, the structures move both directions, though; the words that come <em>after</em> a given structure or word can be just as important for understanding it as the ones that come before it.</p>
 <p>We can build this into our neural network architecture with a <strong>bidirectional</strong> wrapper for RNNs or LSTMs.</p>
 <div class="rmdnote">
@@ -776,24 +774,24 @@ A bidirectional LSTM allows the network to have both the forward and backward in
 <span id="cb538-24"><a href="dllstm.html#cb538-24" aria-hidden="true" tabindex="-1"></a>bilstm_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.3931
-#&gt;     accuracy: 0.8208
-#&gt;     val_loss: 0.5857
-#&gt; val_accuracy: 0.7265</code></pre>
+#&gt;         loss: 0.3562
+#&gt;     accuracy: 0.8369
+#&gt;     val_loss: 0.6246
+#&gt; val_accuracy: 0.7407</code></pre>
 <p>The bidirectional LSTM is more able to represent the data well, but with the same amount of dropout, we do see more dramatic overfitting. Still, there is some improvement on the validation set as well.</p>
 <div class="sourceCode" id="cb540"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb540-1"><a href="dllstm.html#cb540-1" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(bilstm_mod, kick_assess, state_assess)</span>
 <span id="cb540-2"><a href="dllstm.html#cb540-2" aria-hidden="true" tabindex="-1"></a>bilstm_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.727
-#&gt; 2 kap         binary         0.452
-#&gt; 3 mn_log_loss binary         0.586
-#&gt; 4 roc_auc     binary         0.792</code></pre>
-<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.725).</p>
+#&gt; 1 accuracy    binary         0.741
+#&gt; 2 kap         binary         0.480
+#&gt; 3 mn_log_loss binary         0.625
+#&gt; 4 roc_auc     binary         0.807</code></pre>
+<p>This bidirectional LSTM, able to learn both forward and backward text structures, provides some improvement over the regular LSTM on the validation set (which had an accuracy of 0.736).</p>
 </div>
-<div id="case-study-stacking-lstm-layers" class="section level2" number="9.4">
-<h2><span class="header-section-number">9.4</span> Case study: stacking LSTM layers</h2>
+<div id="case-study-stacking-lstm-layers" class="section level2 hasAnchor" number="9.4">
+<h2><span class="header-section-number">9.4</span> Case study: stacking LSTM layers<a href="dllstm.html#case-study-stacking-lstm-layers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Deep learning architectures can be built up to create extremely complex networks. For example, RNN and/or LSTM layers can be stacked on top of each other, or together with other kinds of layers. The idea of this stacking is to increase the ability of a network to represent the data well.</p>
 <div class="rmdwarning">
 <p>
@@ -828,24 +826,24 @@ Intermediate layers must be set up to return sequences (with <code>return_sequen
 <span id="cb542-25"><a href="dllstm.html#cb542-25" aria-hidden="true" tabindex="-1"></a>stacked_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4311
-#&gt;     accuracy: 0.8036
-#&gt;     val_loss: 0.5924
-#&gt; val_accuracy: 0.721</code></pre>
+#&gt;         loss: 0.3714
+#&gt;     accuracy: 0.8291
+#&gt;     val_loss: 0.607
+#&gt; val_accuracy: 0.7361</code></pre>
 <p>Adding another separate layer in the forward direction appears to have improved the network, about as much as extending the LSTM layer to handle information in the backward direction via the bidirectional LSTM.</p>
 <div class="sourceCode" id="cb544"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb544-1"><a href="dllstm.html#cb544-1" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(stacked_mod, kick_assess, state_assess)</span>
 <span id="cb544-2"><a href="dllstm.html#cb544-2" aria-hidden="true" tabindex="-1"></a>stacked_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.721
-#&gt; 2 kap         binary         0.441
-#&gt; 3 mn_log_loss binary         0.592
-#&gt; 4 roc_auc     binary         0.785</code></pre>
+#&gt; 1 accuracy    binary         0.736
+#&gt; 2 kap         binary         0.471
+#&gt; 3 mn_log_loss binary         0.607
+#&gt; 4 roc_auc     binary         0.806</code></pre>
 <p>We can gradually improve a model by changing and adding to its architecture.</p>
 </div>
-<div id="lstmpadding" class="section level2" number="9.5">
-<h2><span class="header-section-number">9.5</span> Case study: padding</h2>
+<div id="lstmpadding" class="section level2 hasAnchor" number="9.5">
+<h2><span class="header-section-number">9.5</span> Case study: padding<a href="dllstm.html#lstmpadding" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>One of the most important themes of this book is that text must be heavily preprocessed in order to be useful for machine learning algorithms, and these preprocessing decisions have big effects on model results. One decision that seems like it may not be all that important is how sequences are <em>padded</em> for a deep learning model. The matrix that is used as input for a neural network must be rectangular, but the training data documents are typically all different lengths. Sometimes, like in the case of the Supreme Court opinions, the lengths vary a lot; sometimes, like with the Kickstarter data, the lengths vary a little bit.</p>
 <p>Either way, the sequences that are too long must be truncated and the sequences that are too short must be padded, typically with zeroes. This does literally mean that words or tokens are thrown away for the long documents and zeroes are added to the shorter documents, with the goal of creating a rectangular matrix that can be used for computation.</p>
 <div class="rmdnote">
@@ -894,29 +892,29 @@ It is possible to set up an LSTM network that works with sequences of varied len
 <span id="cb549-23"><a href="dllstm.html#cb549-23" aria-hidden="true" tabindex="-1"></a>padding_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4503
-#&gt;     accuracy: 0.7931
-#&gt;     val_loss: 0.5823
-#&gt; val_accuracy: 0.7109</code></pre>
+#&gt;         loss: 0.417
+#&gt;     accuracy: 0.8031
+#&gt;     val_loss: 0.598
+#&gt; val_accuracy: 0.7238</code></pre>
 <p>This padding strategy results in noticeably worse performance than the default option!</p>
 <div class="sourceCode" id="cb551"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb551-1"><a href="dllstm.html#cb551-1" aria-hidden="true" tabindex="-1"></a>padding_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(padding_mod, pad_assess, state_assess)</span>
 <span id="cb551-2"><a href="dllstm.html#cb551-2" aria-hidden="true" tabindex="-1"></a>padding_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.711
-#&gt; 2 kap         binary         0.422
-#&gt; 3 mn_log_loss binary         0.582
-#&gt; 4 roc_auc     binary         0.776</code></pre>
-<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.725 and an AUC of 0.792; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
+#&gt; 1 accuracy    binary         0.724
+#&gt; 2 kap         binary         0.447
+#&gt; 3 mn_log_loss binary         0.598
+#&gt; 4 roc_auc     binary         0.793</code></pre>
+<p>The same model architecture with default padding preprocessing resulted in an accuracy of 0.736 and an AUC of 0.805; changing to <code>padding = "post"</code> has resulted in a remarkable degrading of predictive capacity. This result is typically attributed to the RNN/LSTM’s hidden states being flushed out by the added zeroes, before getting to the text itself.</p>
 <div class="rmdwarning">
 <p>
 Different preprocessing strategies have a huge impact on deep learning results.
 </p>
 </div>
 </div>
-<div id="case-study-training-a-regression-model" class="section level2" number="9.6">
-<h2><span class="header-section-number">9.6</span> Case study: training a regression model</h2>
+<div id="case-study-training-a-regression-model" class="section level2 hasAnchor" number="9.6">
+<h2><span class="header-section-number">9.6</span> Case study: training a regression model<a href="dllstm.html#case-study-training-a-regression-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>All our deep learning models for text so far have used the Kickstarter crowdfunding blurbs to predict whether the campaigns were successful or not, a classification problem. In our experience, classification is more common than regression tasks with text data, but these techniques can be used for either kind of supervised machine learning question. Let’s return to the regression problem of Chapter <a href="mlregression.html#mlregression">6</a> and predict the year of United States Supreme Court decisions, starting out by splitting into training and testing sets.</p>
 <div class="sourceCode" id="cb553"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb553-1"><a href="dllstm.html#cb553-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
 <span id="cb553-2"><a href="dllstm.html#cb553-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
@@ -989,9 +987,9 @@ A good default loss function for regression is mean squared error, <code>“mse�
 <pre><code>#&gt; # A tibble: 3 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 rmse    standard      36.9  
-#&gt; 2 rsq     standard       0.505
-#&gt; 3 mae     standard      26.6</code></pre>
+#&gt; 1 rmse    standard      25.8  
+#&gt; 2 rsq     standard       0.777
+#&gt; 3 mae     standard      18.8</code></pre>
 <p>This is much worse than the final regularized linear model trained in Section <a href="mlregression.html#mlregressionfull">6.9</a>, with an RMSE almost a decade worth of years worse. It’s possible we may be able to do a little better than this simple LSTM, but as this chapter has demonstrated, our improvements will likely not be enormous compared to the first LSTM baseline.</p>
 <div class="rmdwarning">
 <p>
@@ -999,8 +997,8 @@ The main problem with this regression model is that there isn’t that much data
 </p>
 </div>
 </div>
-<div id="case-study-vocabulary-size" class="section level2" number="9.7">
-<h2><span class="header-section-number">9.7</span> Case study: vocabulary size</h2>
+<div id="case-study-vocabulary-size" class="section level2 hasAnchor" number="9.7">
+<h2><span class="header-section-number">9.7</span> Case study: vocabulary size<a href="dllstm.html#case-study-vocabulary-size" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this chapter so far, we’ve worked with a vocabulary of 20,000 words or tokens. This is a <em>hyperparameter</em> of the model, and could be tuned, as we show in detail in Section <a href="dlcnn.html#keras-hyperparameter">10.6</a>. Instead of tuning in this chapter, let’s try a smaller value, corresponding to faster preprocessing and model fitting but a less powerful model, and explore whether and how much it affects model performance.</p>
 <div class="sourceCode" id="cb560"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb560-1"><a href="dllstm.html#cb560-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">1e4</span></span>
 <span id="cb560-2"><a href="dllstm.html#cb560-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
@@ -1041,10 +1039,10 @@ The main problem with this regression model is that there isn’t that much data
 <span id="cb561-23"><a href="dllstm.html#cb561-23" aria-hidden="true" tabindex="-1"></a>smaller_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4793
-#&gt;     accuracy: 0.7699
-#&gt;     val_loss: 0.5827
-#&gt; val_accuracy: 0.706</code></pre>
+#&gt;         loss: 0.4683
+#&gt;     accuracy: 0.7712
+#&gt;     val_loss: 0.5799
+#&gt; val_accuracy: 0.7059</code></pre>
 <p>How did this smaller model, based on a smaller vocabulary in the model, perform?</p>
 <div class="sourceCode" id="cb563"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb563-1"><a href="dllstm.html#cb563-1" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="ot">&lt;-</span> <span class="fu">keras_predict</span>(smaller_mod, kick_assess, state_assess)</span>
 <span id="cb563-2"><a href="dllstm.html#cb563-2" aria-hidden="true" tabindex="-1"></a>smaller_res <span class="sc">%&gt;%</span> <span class="fu">metrics</span>(state, .pred_class, .pred_1)</span></code></pre></div>
@@ -1052,21 +1050,21 @@ The main problem with this regression model is that there isn’t that much data
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 accuracy    binary         0.706
-#&gt; 2 kap         binary         0.410
-#&gt; 3 mn_log_loss binary         0.583
-#&gt; 4 roc_auc     binary         0.771</code></pre>
-<p>The original LSTM model with the larger vocabulary had an accuracy of 0.725 and an AUC of 0.792. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
+#&gt; 2 kap         binary         0.408
+#&gt; 3 mn_log_loss binary         0.580
+#&gt; 4 roc_auc     binary         0.779</code></pre>
+<p>The original LSTM model with the larger vocabulary had an accuracy of 0.736 and an AUC of 0.805. Reducing the model’s capacity to capture and learn text meaning by restricting its access to vocabulary does result in a corresponding reduction in model performance, but a small one.</p>
 <div class="rmdnote">
 <p>
 The relationship between this hyperparameter and model performance is weak over this range. Notice that we cut the vocabulary in half, and saw only modest reductions in accuracy.
 </p>
 </div>
 </div>
-<div id="lstmfull" class="section level2" number="9.8">
-<h2><span class="header-section-number">9.8</span> The full game: LSTM</h2>
+<div id="lstmfull" class="section level2 hasAnchor" number="9.8">
+<h2><span class="header-section-number">9.8</span> The full game: LSTM<a href="dllstm.html#lstmfull" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We’ve come a long way in this chapter, even though we’ve focused on a very specific kind of recurrent neural network, the LSTM. Let’s step back and build one final model, incorporating what we have been able to learn.</p>
-<div id="lstmfullpreprocess" class="section level3" number="9.8.1">
-<h3><span class="header-section-number">9.8.1</span> Preprocess the data</h3>
+<div id="lstmfullpreprocess" class="section level3 hasAnchor" number="9.8.1">
+<h3><span class="header-section-number">9.8.1</span> Preprocess the data<a href="dllstm.html#lstmfullpreprocess" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We know that we want to stick with the defaults for padding, and to use a larger vocabulary for our final model. For this final model, we are not going to use our validation split again, so we only need to preprocess the training data.</p>
 <div class="sourceCode" id="cb565"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb565-1"><a href="dllstm.html#cb565-1" aria-hidden="true" tabindex="-1"></a>max_words <span class="ot">&lt;-</span> <span class="fl">2e4</span></span>
 <span id="cb565-2"><a href="dllstm.html#cb565-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="dv">30</span></span>
@@ -1082,8 +1080,8 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb565-12"><a href="dllstm.html#cb565-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(kick_train)</span></code></pre></div>
 <pre><code>#&gt; [1] 202092     30</code></pre>
 </div>
-<div id="lstmfullmodel" class="section level3" number="9.8.2">
-<h3><span class="header-section-number">9.8.2</span> Specify the model</h3>
+<div id="lstmfullmodel" class="section level3 hasAnchor" number="9.8.2">
+<h3><span class="header-section-number">9.8.2</span> Specify the model<a href="dllstm.html#lstmfullmodel" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We’ve learned a lot about how to model this data set over the course of this chapter.</p>
 <ul>
 <li><p>We can use <code>dropout</code> to reduce overfitting.</p></li>
@@ -1126,10 +1124,10 @@ The relationship between this hyperparameter and model performance is weak over 
 <span id="cb567-33"><a href="dllstm.html#cb567-33" aria-hidden="true" tabindex="-1"></a>final_history</span></code></pre></div>
 <pre><code>#&gt; 
 #&gt; Final epoch (plot to see history):
-#&gt;         loss: 0.4339
-#&gt;     accuracy: 0.8051
-#&gt;     val_loss: 0.5671
-#&gt; val_accuracy: 0.7366</code></pre>
+#&gt;         loss: 0.3258
+#&gt;     accuracy: 0.8527
+#&gt;     val_loss: 0.5475
+#&gt; val_accuracy: 0.7734</code></pre>
 <p>This looks promising! Let’s finally turn to the testing set, for the first time during this chapter, to evaluate this last model on data that has never been touched as part of the fitting process.</p>
 <div class="sourceCode" id="cb569"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb569-1"><a href="dllstm.html#cb569-1" aria-hidden="true" tabindex="-1"></a>kick_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(kick_prep, <span class="at">new_data =</span> kickstarter_test,</span>
 <span id="cb569-2"><a href="dllstm.html#cb569-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">composition =</span> <span class="st">&quot;matrix&quot;</span>)</span>
@@ -1138,10 +1136,10 @@ The relationship between this hyperparameter and model performance is weak over 
 <pre><code>#&gt; # A tibble: 4 × 3
 #&gt;   .metric     .estimator .estimate
 #&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-#&gt; 1 accuracy    binary         0.743
-#&gt; 2 kap         binary         0.484
-#&gt; 3 mn_log_loss binary         0.568
-#&gt; 4 roc_auc     binary         0.805</code></pre>
+#&gt; 1 accuracy    binary         0.766
+#&gt; 2 kap         binary         0.530
+#&gt; 3 mn_log_loss binary         0.559
+#&gt; 4 roc_auc     binary         0.837</code></pre>
 <p>This is our best-performing model in this chapter on LSTM models, although not by much. We can again create an ROC curve, this time using the test data in Figure <a href="dllstm.html#fig:lstmfinalroc">9.6</a>.</p>
 <div class="sourceCode" id="cb571"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb571-1"><a href="dllstm.html#cb571-1" aria-hidden="true" tabindex="-1"></a>final_res <span class="sc">%&gt;%</span></span>
 <span id="cb571-2"><a href="dllstm.html#cb571-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(state, .pred_1) <span class="sc">%&gt;%</span></span>
@@ -1171,11 +1169,11 @@ For this data set of Kickstarter campaign blurbs, an LSTM architecture is not tu
 <p>For the Kickstarter data, these less-than-spectacular results are likely due to the documents’ short lengths. LSTMs often work well for text data, but this is not universally true for all kinds of text. Also, keep in mind that LSTMs take both more time and memory to train, compared to the simpler models discussed in Chapter <a href="dldnn.html#dldnn">8</a>.</p>
 </div>
 </div>
-<div id="dllstmsummary" class="section level2" number="9.9">
-<h2><span class="header-section-number">9.9</span> Summary</h2>
+<div id="dllstmsummary" class="section level2 hasAnchor" number="9.9">
+<h2><span class="header-section-number">9.9</span> Summary<a href="dllstm.html#dllstmsummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>LSTMs are a specific kind of recurrent neural network that are capable of learning long-range dependencies and broader context. They are often an excellent choice for building supervised models for text because of this ability to model sequences and structures within text like word dependencies. Text must be heavily preprocessed for LSTMs in much the same way it needs to be preprocessed for dense neural networks, with tokenization and one-hot encoding of sequences. A major characteristic of LSTMs, like other deep learning architectures, is their tendency to memorize the features of training data; we can use strategies like dropout and ensuring that the batch size is large enough to reduce overfitting.</p>
-<div id="in-this-chapter-you-learned-8" class="section level3" number="9.9.1">
-<h3><span class="header-section-number">9.9.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-8" class="section level3 hasAnchor" number="9.9.1">
+<h3><span class="header-section-number">9.9.1</span> In this chapter, you learned:<a href="dllstm.html#in-this-chapter-you-learned-8" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>how to preprocess text data for LSTM models</p></li>
 <li><p>about RNN, LSTM, and bidirectional LSTM network architectures</p></li>
@@ -1188,7 +1186,7 @@ For this data set of Kickstarter campaign blurbs, an LSTM architecture is not tu
 </div>
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-ELMAN1990179" class="csl-entry">
 Elman, J. L. 1990. <span>“Finding Structure in Time.”</span> <em>Cognitive Science</em> 14 (2): 179–211. <a href="https://doi.org/10.1207/s15516709cog1402_1">https://doi.org/10.1207/s15516709cog1402_1</a>.
@@ -1197,7 +1195,7 @@ Elman, J. L. 1990. <span>“Finding Structure in Time.”</span> <em>Cognitive S
 Hochreiter, S., and Schmidhuber, J. 1997. <span>“Long Short-Term Memory.”</span> <em>Neural Comput.</em> 9 (8). Cambridge, MA: MIT Press: 1735–1780. <a href="https://doi.org/10.1162/neco.1997.9.8.1735">https://doi.org/10.1162/neco.1997.9.8.1735</a>.
 </div>
 <div id="ref-kingma2017adam" class="csl-entry">
-Kingma, D. P., and Ba, J. 2017. <span>“Adam: A Method for Stochastic Optimization.”</span> <a href="http://arxiv.org/abs/1412.6980">http://arxiv.org/abs/1412.6980</a>.
+Kingma, D. P., and Ba, J. 2017. <span>“Adam: A Method for Stochastic Optimization.”</span> <a href="https://arxiv.org/abs/1412.6980">https://arxiv.org/abs/1412.6980</a>.
 </div>
 <div id="ref-Minaee2020" class="csl-entry">
 Minaee, S., Kalchbrenner, N., Cambria, E., Nikzad, N., Chenaghlu, M., and Gao, J. 2021. <span>“Deep Learning–Based Text Classification: A Comprehensive Review.”</span> <em>ACM Comput. Surv.</em> 54 (3). New York, NY: Association for Computing Machinery. <a href="https://doi.org/10.1145/3439726">https://doi.org/10.1145/3439726</a>.
