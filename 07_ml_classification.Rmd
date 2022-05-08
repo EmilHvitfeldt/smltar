@@ -469,11 +469,11 @@ Instead of `penalty = tune()` like before, now our workflow has finalized values
 fitted_lasso <- fit(final_lasso, complaints_train)
 ```
 
-What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+What does the result look like? We can access the fit using `extract_fit_parsnip()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
 ```{r dependson="lassofit"}
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(-estimate)
 ```
@@ -484,7 +484,7 @@ What terms contribute to a complaint being about credit reporting, for this tune
 
 ```{r dependson="lassofit"}
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(estimate)
 ```
@@ -831,7 +831,7 @@ We see here that including more predictors did not measurably improve our model 
 finalize_workflow(more_vars_wf, 
                   select_best(more_vars_rs, "roc_auc")) %>%
   fit(complaints_train) %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>% 
   arrange(-abs(estimate)) %>% 
   mutate(term_rank = row_number()) %>% 
@@ -1367,7 +1367,7 @@ The output of `last_fit()` also contains a fitted model (a `workflow`, to be mor
 ```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
 library(vip)
 
-complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
+complaints_imp <- extract_fit_parsnip(final_fitted$.workflow[[1]]) %>%
   vi(lambda = choose_acc$penalty)
 
 complaints_imp %>%
