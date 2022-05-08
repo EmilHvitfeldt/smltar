@@ -133,11 +133,11 @@ svm_fit <- scotus_wf %>%
   fit(data = scotus_train)
 ```
 
-We have successfully fit an SVM model to this data set of Supreme Court opinions. What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+We have successfully fit an SVM model to this data set of Supreme Court opinions. What does the result look like? We can access the fit using `extract_fit_parsnip()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
 ```{r dependson="svmfit"}
 svm_fit %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(-estimate)
 ```
@@ -163,7 +163,7 @@ What terms contribute to a Supreme Court opinion being written further in the pa
 
 ```{r dependson="svmfit"}
 svm_fit %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(estimate)
 ```
@@ -1034,7 +1034,7 @@ The metrics for the test set look about the same as the resampled training data 
 The output of `last_fit()` also contains a fitted model (a `workflow`, to be more specific), that has been trained on the _training_ data. We can `tidy()` this final result to understand what the most important variables are in the predictions, shown in Figure \@ref(fig:scotusvip).
 
 ```{r scotusvip, dependson=c("scotusfinalwf", "scotussplit"), fig.cap="Some words or bigrams increase a Supreme Court opinion's probability of being written later (more recently) while some increase its probability of being written earlier"}
-scotus_fit <- pull_workflow_fit(final_fitted$.workflow[[1]])
+scotus_fit <- extract_fit_parsnip(final_fitted$.workflow[[1]])
 
 scotus_fit %>%
   tidy() %>%
