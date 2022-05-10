@@ -23,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2022-05-08" />
+<meta name="date" content="2022-05-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1447,6 +1447,11 @@ For the full set of regression metric options, see the <a href="https://yardstic
 <li><p>finally evaluate on the testing set, which we have not touched at all yet.</p></li>
 </ul>
 <p>We will include a much larger number of tokens than before, which should give us the latitude to include both unigrams and bigrams, despite the result we saw in Section <a href="mlregression.html#casestudyngrams">6.5</a>.</p>
+<div class="rmdnote">
+<p>
+Be aware that the tuning calculations we demonstrate here are computationally expensive, and take a long time to complete.
+</p>
+</div>
 <div id="preprocess-the-data" class="section level3 hasAnchor" number="6.9.1">
 <h3><span class="header-section-number">6.9.1</span> Preprocess the data<a href="mlregression.html#preprocess-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>First, let’s create the data preprocessing recipe. By setting the tokenization options to <code>list(n = 2, n_min = 1)</code>, we will include both unigrams and bigrams in our model.</p>
