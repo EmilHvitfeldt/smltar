@@ -1204,12 +1204,6 @@ multi_lasso_rs
 #>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
 #>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
 #> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#> 
-#> There were issues with some computations:
-#> 
-#>   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...
-#> 
-#> Use `collect_notes(object)` for more information.
 ```
 
 What do we see, in terms of performance metrics?
