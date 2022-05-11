@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 4 Stemming | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="stopwords.html"/>
 <link rel="next" href="embeddings.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="stemming" class="section level1" number="4">
-<h1><span class="header-section-number">Chapter 4</span> Stemming</h1>
+<div id="stemming" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Stemming<a href="stemming.html#stemming" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>When we deal with text, often documents contain different versions of one base word, often called a <em>stem</em>. “The Fir-Tree,” for example, contains more than one version (i.e., inflected form) of the word <code>"tree"</code>.</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="stemming.html#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hcandersenr)</span>
 <span id="cb79-2"><a href="stemming.html#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
@@ -480,8 +479,8 @@ div.csl-indent {
 #&gt; 3 tree&#39;s     1</code></pre>
 <p>Trees, we see once again, are important in this story; the singular form appears 76 times and the plural form appears 12 times. (We’ll come back to how we might handle the apostrophe in <code>"tree's"</code> later in this chapter.)</p>
 <p>What if we aren’t interested in the difference between <code>"trees"</code> and <code>"tree"</code> and we want to treat both together? That idea is at the heart of <em>stemming</em>, the process of identifying the base word (or stem) for a data set of words. Stemming is concerned with the linguistics subfield of morphology, how words are formed. In this example, <code>"trees"</code> would lose its letter <code>"s"</code> while <code>"tree"</code> stays the same. If we counted word frequencies again after stemming, we would find that there are 88 occurrences of the stem <code>"tree"</code> (89, if we also find the stem for <code>"tree's"</code>).</p>
-<div id="how-to-stem-text-in-r" class="section level2" number="4.1">
-<h2><span class="header-section-number">4.1</span> How to stem text in R</h2>
+<div id="how-to-stem-text-in-r" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> How to stem text in R<a href="stemming.html#how-to-stem-text-in-r" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>There have been many algorithms built for stemming words over the past half century or so; we’ll focus on two approaches. The first is the stemming algorithm of <span class="citation"><a href="#ref-Porter80" role="doc-biblioref">Porter</a> (<a href="#ref-Porter80" role="doc-biblioref">1980</a>)</span>, probably the most widely used stemmer for English. Porter himself released the algorithm implemented in the framework <a href="https://snowballstem.org/">Snowball</a> with an open-source license; you can use it from R via the <strong>SnowballC</strong> package <span class="citation">(<a href="#ref-R-SnowballC" role="doc-biblioref">Bouchet-Valat 2020</a>)</span>. (It has been extended to languages other than English as well.)</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="stemming.html#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SnowballC)</span>
 <span id="cb81-2"><a href="stemming.html#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -532,7 +531,7 @@ div.csl-indent {
 <span id="cb84-8"><a href="stemming.html#cb84-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(language) <span class="sc">%&gt;%</span></span>
 <span id="cb84-9"><a href="stemming.html#cb84-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(stem) <span class="sc">%&gt;%</span></span>
 <span id="cb84-10"><a href="stemming.html#cb84-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, n) <span class="sc">%&gt;%</span></span>
-<span id="cb84-11"><a href="stemming.html#cb84-11" aria-hidden="true" tabindex="-1"></a>  ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb84-11"><a href="stemming.html#cb84-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb84-12"><a href="stemming.html#cb84-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">fct_reorder</span>(stem, n), <span class="at">fill =</span> language)) <span class="sc">+</span></span>
 <span id="cb84-13"><a href="stemming.html#cb84-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
 <span id="cb84-14"><a href="stemming.html#cb84-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>language, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
@@ -571,8 +570,8 @@ FIGURE 4.1: Porter stemming results in five languages
 #&gt; [1] &quot;contented&quot; &quot;content&quot;</code></pre>
 <p>We have <em>two</em> stems! This stemmer works differently; it uses both morphological analysis of a word and existing dictionaries to find possible stems. It’s possible to end up with more than one, and it’s possible for a stem to be a word that is not related by meaning to the original word. For example, one of the stems of “number” is “numb” with this library. The Hunspell library was built to be a spell checker, so depending on your analytical purposes, it may not be an appropriate choice.</p>
 </div>
-<div id="should-you-use-stemming-at-all" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Should you use stemming at all?</h2>
+<div id="should-you-use-stemming-at-all" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Should you use stemming at all?<a href="stemming.html#should-you-use-stemming-at-all" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>You will often see stemming as part of NLP pipelines, sometimes without much comment about when it is helpful or not. We encourage you to think of stemming as a preprocessing step in text modeling, one that must be thought through and chosen (or not) with good judgment.</p>
 <p>Why does stemming often help, if you are training a machine learning model for text? Stemming <em>reduces the feature space</em> of text data. Let’s see this in action, with a data set of United States Supreme Court opinions available in the <strong>scotus</strong> package, discussed in more detail in Section <a href="appendixdata.html#scotus-opinions">B.2</a>. How many words are there, after removing a standard data set of stopwords?</p>
 <div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="stemming.html#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scotus)</span>
@@ -625,8 +624,8 @@ features (99.48% sparse) and 0 docvars.</code></pre>
 </ul>
 <p>In a supervised machine learning context, this affects a model’s positive predictive value (precision), or ability to not incorrectly label true negatives as positive. In Chapter <a href="mlclassification.html#mlclassification">7</a>, we will train models to predict whether a complaint to the United States Consumer Financial Protection Bureau was about a mortgage or not. Stemming can increase a model’s ability to find the positive examples, i.e., the complaints about mortgages. However, if the complaint text is over-stemmed, the resulting model loses its ability to label the negative examples, the complaints <em>not</em> about mortgages, correctly.</p>
 </div>
-<div id="understand-a-stemming-algorithm" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Understand a stemming algorithm</h2>
+<div id="understand-a-stemming-algorithm" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> Understand a stemming algorithm<a href="stemming.html#understand-a-stemming-algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>If stemming is going to be in our NLP toolbox, it’s worth sitting down with one approach in detail to understand how it works under the hood. The Porter stemming algorithm is so approachable that we can walk through its outline in less than a page or so. It involves five steps, and the idea of a word <strong>measure</strong>.</p>
 <p>Think of any word as made up alternating groups of vowels <span class="math inline">\(V\)</span> and consonants <span class="math inline">\(C\)</span>. One or more vowels together are one instance of <span class="math inline">\(V\)</span>, and one or more consonants togther are one instance of <span class="math inline">\(C\)</span>. We can write any word as</p>
 <p><span class="math display">\[[C](VC)^m[V]\]</span>
@@ -655,8 +654,8 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 </div>
 <p></p>
 </div>
-<div id="handling-punctuation-when-stemming" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> Handling punctuation when stemming</h2>
+<div id="handling-punctuation-when-stemming" class="section level2 hasAnchor" number="4.4">
+<h2><span class="header-section-number">4.4</span> Handling punctuation when stemming<a href="stemming.html#handling-punctuation-when-stemming" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Punctuation contains information that can be used in text analysis. Punctuation <em>is</em> typically less information-dense than the words themselves, and thus it is often removed early in a text mining analysis project, but it’s worth thinking through the impact of punctuation specifically on stemming. Think about words like <code>"they're"</code> and <code>"child's"</code>.</p>
 <p>We’ve already seen how punctuation and stemming can interact with our small example of “The Fir-Tree”; none of the stemming strategies we’ve discussed so far have recognized <code>"tree's"</code> as belonging to the same stem as <code>"trees"</code> and <code>"tree"</code>.</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="stemming.html#cb95-1" aria-hidden="true" tabindex="-1"></a>tidy_fir_tree <span class="sc">%&gt;%</span></span>
@@ -699,8 +698,8 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 #&gt; 1 tree     89</code></pre>
 <p>Handling punctuation in this way further reduces sparsity in word features. Whether this kind of tokenization and stemming strategy is a good choice in any particular data analysis situation depends on the particulars of the text characteristics.</p>
 </div>
-<div id="compare-some-stemming-options" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> Compare some stemming options</h2>
+<div id="compare-some-stemming-options" class="section level2 hasAnchor" number="4.5">
+<h2><span class="header-section-number">4.5</span> Compare some stemming options<a href="stemming.html#compare-some-stemming-options" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Let’s compare a few simple stemming algorithms and see what results we end with. Let’s look at “The Fir-Tree,” specifically the tidied data set from which we have removed stop words. Let’s compare three very straightforward stemming approaches.</p>
 <ul>
 <li><p><strong>Only remove final instances of the letter “s.”</strong> This probably strikes you as not a great idea after our discussion in this chapter, but it is something that people try in real life, so let’s see what the impact is.</p></li>
@@ -726,7 +725,7 @@ Check out the <a href="https://snowballstem.org/algorithms/german/stemmer.html">
 <span id="cb102-4"><a href="stemming.html#cb102-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Type, Result) <span class="sc">%&gt;%</span></span>
 <span id="cb102-5"><a href="stemming.html#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Type) <span class="sc">%&gt;%</span></span>
 <span id="cb102-6"><a href="stemming.html#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, n) <span class="sc">%&gt;%</span></span>
-<span id="cb102-7"><a href="stemming.html#cb102-7" aria-hidden="true" tabindex="-1"></a>  ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb102-7"><a href="stemming.html#cb102-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb102-8"><a href="stemming.html#cb102-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="fu">fct_reorder</span>(Result, n),</span>
 <span id="cb102-9"><a href="stemming.html#cb102-9" aria-hidden="true" tabindex="-1"></a>             n, <span class="at">fill =</span> Type)) <span class="sc">+</span></span>
 <span id="cb102-10"><a href="stemming.html#cb102-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
@@ -783,8 +782,8 @@ Language use is connected to culture and identity. How might the results of stem
 </p>
 </div>
 </div>
-<div id="lemmatization" class="section level2" number="4.6">
-<h2><span class="header-section-number">4.6</span> Lemmatization and stemming</h2>
+<div id="lemmatization" class="section level2 hasAnchor" number="4.6">
+<h2><span class="header-section-number">4.6</span> Lemmatization and stemming<a href="stemming.html#lemmatization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>When people use the word “stemming” in natural language processing, they typically mean a system like the one we’ve been describing in this chapter, with rules, conditions, heuristics, and lists of word endings. Think of stemming as typically implemented in NLP as <strong>rule-based</strong>, operating on the word by itself. There is another option for normalizing words to a root that takes a different approach. Instead of using rules to cut words down to their stems, lemmatization uses knowledge about a language’s structure to reduce words down to their lemmas, the canonical or dictionary forms of words. Think of lemmatization as typically implemented in NLP as <strong>linguistics-based</strong>, operating on the word in its context.</p>
 <p>Lemmatization requires more information than the rule-based stemmers we’ve discussed so far. We need to know what part of speech a word is to correctly identify its lemma,<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> and we also need more information about what words mean in their contexts. Often lemmatizers use a rich lexical database like <a href="https://wordnet.princeton.edu/">WordNet</a> as a way to look up word meanings for a given part-of-speech use <span class="citation">(<a href="#ref-Miller95" role="doc-biblioref">Miller 1995</a>)</span>. Notice that lemmatization involves more linguistic knowledge of a language than stemming.</p>
 <div class="rmdnote">
@@ -827,8 +826,8 @@ Why did we need to initialize the spaCy library? You may not need to, but spaCy 
 </div>
 <p>Implementing lemmatization is slower and more complex than stemming. Just like with stemming, lemmatization often improves the true positive rate (or recall) but at the expense of the true negative rate (or precision) compared to not using lemmatization, but typically less so than stemming.</p>
 </div>
-<div id="stemming-and-stop-words" class="section level2" number="4.7">
-<h2><span class="header-section-number">4.7</span> Stemming and stop words</h2>
+<div id="stemming-and-stop-words" class="section level2 hasAnchor" number="4.7">
+<h2><span class="header-section-number">4.7</span> Stemming and stop words<a href="stemming.html#stemming-and-stop-words" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Our deep dive into stemming came <em>after</em> our chapters on tokenization (Chapter <a href="tokenization.html#tokenization">2</a>) and stop words (Chapter <a href="stopwords.html#stopwords">3</a>) because this is typically when you will want to implement stemming, if appropriate to your analytical question. Stop word lists are usually unstemmed, so you need to remove stop words before stemming text data. For example, the Porter stemming algorithm transforms words like <code>"themselves"</code> to <code>"themselv"</code>, so stemming first would leave you without the ability to match up to the commonly-used stop word lexicons.</p>
 <p>A handy trick is to use the following function on your stop word list to return the words that don’t have a stemmed version in the list. If the function returns a length 0 vector then you can stem and remove stop words in any order.</p>
 <div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="stemming.html#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stopwords)</span>
@@ -851,11 +850,11 @@ Why did we need to initialize the spaCy library? You may not need to, but spaCy 
 In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored whether to include “tree” as a stop word for “The Fir-Tree.” Now we can understand that this is more complicated than we first discussed, because there are different versions of the base word (“trees,” “tree’s”) in our data set. Interactions between preprocessing steps can have a major impact on your analysis.
 </div>
 </div>
-<div id="stemmingsummary" class="section level2" number="4.8">
-<h2><span class="header-section-number">4.8</span> Summary</h2>
+<div id="stemmingsummary" class="section level2 hasAnchor" number="4.8">
+<h2><span class="header-section-number">4.8</span> Summary<a href="stemming.html#stemmingsummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In this chapter, we explored stemming, the practice of identifying and extracting the base or stem for a word using rules and heuristics. Stemming reduces the sparsity of text data, which can be helpful when training models, but at the cost of throwing information away. Lemmatization is another way to normalize words to a root, based on language structure and how words are used in their context.</p>
-<div id="in-this-chapter-you-learned-3" class="section level3" number="4.8.1">
-<h3><span class="header-section-number">4.8.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-3" class="section level3 hasAnchor" number="4.8.1">
+<h3><span class="header-section-number">4.8.1</span> In this chapter, you learned:<a href="stemming.html#in-this-chapter-you-learned-3" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>about the most broadly-used stemming algorithms</p></li>
 <li><p>how to implement stemming</p></li>
@@ -866,7 +865,7 @@ In Section <a href="stopwords.html#homemadestopwords">3.2</a>, we explored wheth
 </div>
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Arnold17" class="csl-entry">
 Arnold, T. 2017. <span>“<span class="nocase">A Tidy Data Model for Natural Language Processing using cleanNLP</span>.”</span> <em><span>The R Journal</span></em> 9 (2): 248–267. <a href="https://doi.org/10.32614/RJ-2017-035">https://doi.org/10.32614/RJ-2017-035</a>.

@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 5 Word Embeddings | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="stemming.html"/>
 <link rel="next" href="mloverview.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="embeddings" class="section level1" number="5">
-<h1><span class="header-section-number">Chapter 5</span> Word Embeddings</h1>
+<div id="embeddings" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Word Embeddings<a href="embeddings.html#embeddings" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <blockquote>
 You shall know a word by the company it keeps.<br />
 
@@ -464,8 +463,8 @@ You shall know a word by the company it keeps.<br />
 </footer>
 </blockquote>
 <p>So far in our discussion of natural language features, we have discussed preprocessing steps such as tokenization, removing stop words, and stemming in detail. We implement these types of preprocessing steps to be able to represent our text data in some data structure that is a good fit for modeling.</p>
-<div id="motivatingsparse" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Motivating embeddings for sparse, high-dimensional data</h2>
+<div id="motivatingsparse" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Motivating embeddings for sparse, high-dimensional data<a href="embeddings.html#motivatingsparse" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>What kind of data structure might work well for typical text data? Perhaps, if we wanted to analyze or build a model for consumer complaints to the <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/">United States Consumer Financial Protection Bureau (CFPB)</a>, described in Section <a href="appendixdata.html#cfpb-complaints">B.3</a>, we would start with straightforward word counts. Let’s create a sparse matrix, where the matrix elements are the counts of words in each document.</p>
 <div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="embeddings.html#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb110-2"><a href="embeddings.html#cb110-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
@@ -539,8 +538,8 @@ FIGURE 5.1: Memory requirements and sparsity increase with corpus size
 </div>
 <p>Linguists have long worked on vector models for language that can reduce the number of dimensions representing text data based on how people use language; the quote that opened this chapter dates to 1957. These kinds of dense word vectors are often called <em>word embeddings</em>.</p>
 </div>
-<div id="understand-word-embeddings-by-finding-them-yourself" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Understand word embeddings by finding them yourself</h2>
+<div id="understand-word-embeddings-by-finding-them-yourself" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Understand word embeddings by finding them yourself<a href="embeddings.html#understand-word-embeddings-by-finding-them-yourself" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Word embeddings are a way to represent text data as vectors of numbers based on a huge corpus of text, capturing semantic meaning from words’ context.</p>
 <div class="rmdnote">
 <p>
@@ -666,8 +665,8 @@ Let’s use the <code>widely_svd()</code> function in <strong>widyr</strong> <sp
 </div>
 <p>We have now successfully found word embeddings, with clear and understandable code. This is a real benefit of this approach; this approach is based on counting, dividing, and matrix decomposition and is thus easier to understand and implement than options based on deep learning. Training word vectors or embeddings, even with this straightforward method, still requires a large data set (ideally, hundreds of thousands of documents or more) and a not insignificant investment of time and computational power.</p>
 </div>
-<div id="exploring-cfpb-word-embeddings" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Exploring CFPB word embeddings</h2>
+<div id="exploring-cfpb-word-embeddings" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Exploring CFPB word embeddings<a href="embeddings.html#exploring-cfpb-word-embeddings" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now that we have determined word embeddings for the data set of CFPB complaints, let’s explore them and talk about how they are used in modeling. We have projected the sparse, high-dimensional set of word features into a more dense, 100-dimensional set of features.</p>
 <div class="rmdwarn">
 <p>
@@ -812,8 +811,8 @@ These hundred features are the word embeddings we learned from the text data its
 
 </p>
 </div>
-<div id="glove" class="section level2" number="5.4">
-<h2><span class="header-section-number">5.4</span> Use pre-trained word embeddings</h2>
+<div id="glove" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Use pre-trained word embeddings<a href="embeddings.html#glove" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>If your data set is too small, you typically cannot train reliable word embeddings.</p>
 <div class="rmdwarning">
 <p>
@@ -965,8 +964,8 @@ The package <strong>wordsalad</strong> <span class="citation">(<a href="#ref-R-w
 <p>
 </p>
 </div>
-<div id="fairnessembeddings" class="section level2" number="5.5">
-<h2><span class="header-section-number">5.5</span> Fairness and word embeddings</h2>
+<div id="fairnessembeddings" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Fairness and word embeddings<a href="embeddings.html#fairnessembeddings" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Perhaps more than any of the other preprocessing steps this book has covered so far, using word embeddings opens an analysis or model up to the possibility of being influenced by systemic unfairness and bias.</p>
 
 <div class="rmdwarning">
@@ -999,8 +998,8 @@ It’s safe to assume that any large corpus of language will contain latent stru
 </blockquote>
 <p>because of characteristics of the text the word embeddings were trained on.</p>
 </div>
-<div id="using-word-embeddings-in-the-real-world" class="section level2" number="5.6">
-<h2><span class="header-section-number">5.6</span> Using word embeddings in the real world</h2>
+<div id="using-word-embeddings-in-the-real-world" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Using word embeddings in the real world<a href="embeddings.html#using-word-embeddings-in-the-real-world" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Given these profound and fundamental challenges with word embeddings, what options are out there? First, consider not using word embeddings when building a text model. Depending on the particular analytical question you are trying to answer, another numerical representation of text data (such as word frequencies or tf-idf of single words or n-grams) may be more appropriate. Consider this option even more seriously if the model you want to train is already entangled with issues of bias, such as the sentiment analysis example in Section <a href="embeddings.html#fairnessembeddings">5.5</a>.</p>
 <p>Consider whether finding your own word embeddings, instead of relying on pre-trained embeddings created using an algorithm like GloVe or word2vec, may help you. Building your own vectors is likely to be a good option when the text domain you are working in is <em>specific</em> rather than general purpose; some examples of such domains could include customer feedback for a clothing e-commerce site, comments posted on a coding Q&amp;A site, or legal documents.</p>
 <p>Learning good quality word embeddings is only realistic when you have a large corpus of text data (say, a million tokens), but if you have that much data, it is possible that embeddings learned from scratch based on your own data may not exhibit the same kind of semantic biases that exist in pre-trained word embeddings. Almost certainly there will be some kind of bias latent in any large text corpus, but when you use your own training data for learning word embeddings, you avoid the problem of <em>adding</em> historic, systemic prejudice from general purpose language data sets.</p>
@@ -1013,11 +1012,11 @@ You can use the same approaches discussed in this chapter to check any new embed
 <p>NLP researchers have also proposed methods for debiasing embeddings. <span class="citation"><a href="#ref-Bolukbasi2016" role="doc-biblioref">Bolukbasi et al.</a> (<a href="#ref-Bolukbasi2016" role="doc-biblioref">2016</a>)</span> aim to remove stereotypes by postprocessing pre-trained word vectors, choosing specific sets of words that are reprojected in the vector space so that some specific bias, such as gender bias, is mitigated. This is the most established method for reducing bias in embeddings to date, although other methods have been proposed as well, such as augmenting data with counterfactuals <span class="citation">(<a href="#ref-Lu2018" role="doc-biblioref">Lu et al. 2020</a>)</span>. Recent work <span class="citation">(<a href="#ref-Ethayarajh2019" role="doc-biblioref">Ethayarajh, Duvenaud, and Hirst 2019</a>)</span> has explored whether the association tests used to measure bias are even useful, and under what conditions debiasing can be effective.</p>
 <p>Other researchers, such as <span class="citation"><a href="#ref-Caliskan2016" role="doc-biblioref">Caliskan, Bryson, and Narayanan</a> (<a href="#ref-Caliskan2016" role="doc-biblioref">2017</a>)</span>, suggest that corrections for fairness should happen at the point of <em>decision</em> or action rather than earlier in the process of modeling, such as preprocessing steps like building word embeddings. The concern is that methods for debiasing word embeddings may allow the stereotypes to seep back in, and more recent work shows that this is exactly what can happen. <span class="citation"><a href="#ref-Gonen2019" role="doc-biblioref">Gonen and Goldberg</a> (<a href="#ref-Gonen2019" role="doc-biblioref">2019</a>)</span> highlight how pervasive and consistent gender bias is across different word embedding models, <em>even after</em> applying current debiasing methods.</p>
 </div>
-<div id="embeddingssummary" class="section level2" number="5.7">
-<h2><span class="header-section-number">5.7</span> Summary</h2>
+<div id="embeddingssummary" class="section level2 hasAnchor" number="5.7">
+<h2><span class="header-section-number">5.7</span> Summary<a href="embeddings.html#embeddingssummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Mapping words (or other tokens) to an embedding in a special vector space is a powerful approach in natural language processing. This chapter started from fundamentals to demonstrate how to determine word embeddings from a text data set, but a whole host of highly sophisticated techniques have been built on this foundation. For example, document embeddings can be learned from text directly <span class="citation">(<a href="#ref-Le2014" role="doc-biblioref">Le and Mikolov 2014</a>)</span> rather than summarized from word embeddings. More recently, embeddings have acted as one part of language models with transformers like ULMFiT <span class="citation">(<a href="#ref-Howard2018" role="doc-biblioref">Howard and Ruder 2018</a>)</span> and ELMo <span class="citation">(<a href="#ref-Peters2018" role="doc-biblioref">Peters et al. 2018</a>)</span>. It’s important to keep in mind that even more advanced natural language algorithms, such as these language models with transformers, also exhibit such systemic biases <span class="citation">(<a href="#ref-Sheng2019" role="doc-biblioref">Sheng et al. 2019</a>)</span>.</p>
-<div id="in-this-chapter-you-learned-4" class="section level3" number="5.7.1">
-<h3><span class="header-section-number">5.7.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-4" class="section level3 hasAnchor" number="5.7.1">
+<h3><span class="header-section-number">5.7.1</span> In this chapter, you learned:<a href="embeddings.html#in-this-chapter-you-learned-4" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>what word embeddings are and why we use them</p></li>
 <li><p>how to determine word embeddings from a text data set</p></li>
@@ -1034,7 +1033,7 @@ You can use the same approaches discussed in this chapter to check any new embed
 
 
 
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender2021" class="csl-entry">
 Bender, E. M., Gebru, T., McMillan-Major, A., and Shmitchell, S. 2021. <span>“On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜.”</span> In <em>Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency</em>, 610–623. FAccT ’21. New York, NY: Association for Computing Machinery. <a href="https://doi.org/10.1145/3442188.3445922">https://doi.org/10.1145/3442188.3445922</a>.
