@@ -23,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2022-05-10" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1283,35 +1283,12 @@ The specification <code>multicomplaints_rec</code> is similar to what we created
 <span id="cb337-3"><a href="mlclassification.html#cb337-3" aria-hidden="true" tabindex="-1"></a>  multicomplaints_folds,</span>
 <span id="cb337-4"><a href="mlclassification.html#cb337-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> smaller_lambda,</span>
 <span id="cb337-5"><a href="mlclassification.html#cb337-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb337-6"><a href="mlclassification.html#cb337-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb337-7"><a href="mlclassification.html#cb337-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb337-8"><a href="mlclassification.html#cb337-8" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs</span></code></pre></div>
-<pre><code>#&gt; # Tuning results
-#&gt; # 10-fold cross-validation 
-#&gt; # A tibble: 10 × 5
-#&gt;    splits               id     .metrics          .notes           .predictions
-#&gt;    &lt;list&gt;               &lt;chr&gt;  &lt;list&gt;            &lt;list&gt;           &lt;list&gt;      
-#&gt;  1 &lt;split [79119/8791]&gt; Fold01 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt;  2 &lt;split [79119/8791]&gt; Fold02 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt;  3 &lt;split [79119/8791]&gt; Fold03 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
-#&gt;  4 &lt;split [79119/8791]&gt; Fold04 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
-#&gt;  5 &lt;split [79119/8791]&gt; Fold05 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt;  6 &lt;split [79119/8791]&gt; Fold06 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
-#&gt;  7 &lt;split [79119/8791]&gt; Fold07 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt;  8 &lt;split [79119/8791]&gt; Fold08 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt;  9 &lt;split [79119/8791]&gt; Fold09 &lt;tibble [40 × 5]&gt; &lt;tibble [1 × 3]&gt; &lt;tibble&gt;    
-#&gt; 10 &lt;split [79119/8791]&gt; Fold10 &lt;tibble [40 × 5]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
-#&gt; 
-#&gt; There were issues with some computations:
-#&gt; 
-#&gt;   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...
-#&gt; 
-#&gt; Use `collect_notes(object)` for more information.</code></pre>
+<span id="cb337-6"><a href="mlclassification.html#cb337-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>What do we see, in terms of performance metrics?</p>
-<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="mlclassification.html#cb339-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
-<span id="cb339-2"><a href="mlclassification.html#cb339-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
-<span id="cb339-3"><a href="mlclassification.html#cb339-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb339-4"><a href="mlclassification.html#cb339-4" aria-hidden="true" tabindex="-1"></a>best_acc</span></code></pre></div>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="mlclassification.html#cb338-1" aria-hidden="true" tabindex="-1"></a>best_acc <span class="ot">&lt;-</span> multi_lasso_rs <span class="sc">%&gt;%</span></span>
+<span id="cb338-2"><a href="mlclassification.html#cb338-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;accuracy&quot;</span>)</span>
+<span id="cb338-3"><a href="mlclassification.html#cb338-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb338-4"><a href="mlclassification.html#cb338-4" aria-hidden="true" tabindex="-1"></a>best_acc</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric  .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -1327,14 +1304,14 @@ In binary classification, there is one right answer and one wrong answer; in thi
 </p>
 </div>
 <p>To get a more detailed view of how our classifier is performing, let us look at one of the confusion matrices in Figure <a href="mlclassification.html#fig:multiheatmap">7.6</a>.</p>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="mlclassification.html#cb341-1" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs <span class="sc">%&gt;%</span></span>
-<span id="cb341-2"><a href="mlclassification.html#cb341-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb341-3"><a href="mlclassification.html#cb341-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(penalty <span class="sc">==</span> best_acc<span class="sc">$</span>penalty) <span class="sc">%&gt;%</span></span>
-<span id="cb341-4"><a href="mlclassification.html#cb341-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb341-5"><a href="mlclassification.html#cb341-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(product, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb341-6"><a href="mlclassification.html#cb341-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
-<span id="cb341-7"><a href="mlclassification.html#cb341-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
-<span id="cb341-8"><a href="mlclassification.html#cb341-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="mlclassification.html#cb340-1" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs <span class="sc">%&gt;%</span></span>
+<span id="cb340-2"><a href="mlclassification.html#cb340-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb340-3"><a href="mlclassification.html#cb340-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(penalty <span class="sc">==</span> best_acc<span class="sc">$</span>penalty) <span class="sc">%&gt;%</span></span>
+<span id="cb340-4"><a href="mlclassification.html#cb340-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb340-5"><a href="mlclassification.html#cb340-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(product, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb340-6"><a href="mlclassification.html#cb340-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
+<span id="cb340-7"><a href="mlclassification.html#cb340-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb340-8"><a href="mlclassification.html#cb340-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:multiheatmap"></span>
 <img src="07_ml_classification_files/figure-html/multiheatmap-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier, with most of the classifications along the diagonal" width="960" />
 <p class="caption">
@@ -1345,15 +1322,15 @@ FIGURE 7.6: Confusion matrix for multiclass lasso regularized classifier, with m
 The off-diagonal numbers are all the failures and where we should direct our focus.
 It is a little hard to see these cases well since the majority class affects the scale.
 A trick to deal with this problem is to remove all the correctly predicted observations.</p>
-<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="mlclassification.html#cb342-1" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs <span class="sc">%&gt;%</span></span>
-<span id="cb342-2"><a href="mlclassification.html#cb342-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb342-3"><a href="mlclassification.html#cb342-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(penalty <span class="sc">==</span> best_acc<span class="sc">$</span>penalty) <span class="sc">%&gt;%</span></span>
-<span id="cb342-4"><a href="mlclassification.html#cb342-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb342-5"><a href="mlclassification.html#cb342-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.pred_class <span class="sc">!=</span> product) <span class="sc">%&gt;%</span></span>
-<span id="cb342-6"><a href="mlclassification.html#cb342-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(product, .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb342-7"><a href="mlclassification.html#cb342-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
-<span id="cb342-8"><a href="mlclassification.html#cb342-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
-<span id="cb342-9"><a href="mlclassification.html#cb342-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="mlclassification.html#cb341-1" aria-hidden="true" tabindex="-1"></a>multi_lasso_rs <span class="sc">%&gt;%</span></span>
+<span id="cb341-2"><a href="mlclassification.html#cb341-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_predictions</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb341-3"><a href="mlclassification.html#cb341-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(penalty <span class="sc">==</span> best_acc<span class="sc">$</span>penalty) <span class="sc">%&gt;%</span></span>
+<span id="cb341-4"><a href="mlclassification.html#cb341-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> <span class="st">&quot;Fold01&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb341-5"><a href="mlclassification.html#cb341-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.pred_class <span class="sc">!=</span> product) <span class="sc">%&gt;%</span></span>
+<span id="cb341-6"><a href="mlclassification.html#cb341-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(product, .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb341-7"><a href="mlclassification.html#cb341-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>) <span class="sc">+</span></span>
+<span id="cb341-8"><a href="mlclassification.html#cb341-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb341-9"><a href="mlclassification.html#cb341-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">str_wrap</span>(x, <span class="dv">20</span>))</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:multiheatmapminusdiag"></span>
 <img src="07_ml_classification_files/figure-html/multiheatmapminusdiag-1.svg" alt="Confusion matrix for multiclass lasso regularized classifier without diagonal" width="960" />
 <p class="caption">
@@ -1385,34 +1362,34 @@ The variables we identify as available for use as predictors are:</p>
 <p>Let’s try including <code>date_received</code> in our modeling, along with the text variable we have already used, <code>consumer_complaint_narrative</code>, and a new variable <code>tags</code>.
 The <code>submitted_via</code> variable could have been a viable candidate, but all the entries are “web.”
 The other variables like ZIP code could be of use too, but they are categorical variables with many values so we will exclude them for now.</p>
-<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="mlclassification.html#cb343-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span></span>
-<span id="cb343-2"><a href="mlclassification.html#cb343-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(product <span class="sc">~</span> date_received <span class="sc">+</span> tags <span class="sc">+</span> consumer_complaint_narrative,</span>
-<span id="cb343-3"><a href="mlclassification.html#cb343-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> complaints_train)</span></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="mlclassification.html#cb342-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span></span>
+<span id="cb342-2"><a href="mlclassification.html#cb342-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(product <span class="sc">~</span> date_received <span class="sc">+</span> tags <span class="sc">+</span> consumer_complaint_narrative,</span>
+<span id="cb342-3"><a href="mlclassification.html#cb342-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">data =</span> complaints_train)</span></code></pre></div>
 <p>How should we preprocess the <code>date_received</code> variable? We can use the <code>step_date()</code> function to extract the month and day of the week (<code>"dow"</code>). Then we remove the original date variable and convert the new month and day-of-the-week columns to indicator variables with <code>step_dummy()</code>.</p>
 <div class="rmdnote">
 <p>
 Categorical variables like the month can be stored as strings or factors, but for some kinds of models, they must be converted to indicator or dummy variables. These are numeric binary variables for the levels of the original categorical variable. For example, a variable called <code>December</code> would be created that is all zeroes and ones specifying which complaints were submitted in December, plus a variable called <code>November</code>, a variable called <code>October</code>, and so on.
 </p>
 </div>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="mlclassification.html#cb344-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
-<span id="cb344-2"><a href="mlclassification.html#cb344-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_date</span>(date_received, <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;month&quot;</span>, <span class="st">&quot;dow&quot;</span>), <span class="at">role =</span> <span class="st">&quot;dates&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb344-3"><a href="mlclassification.html#cb344-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(date_received) <span class="sc">%&gt;%</span></span>
-<span id="cb344-4"><a href="mlclassification.html#cb344-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">has_role</span>(<span class="st">&quot;dates&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="mlclassification.html#cb343-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
+<span id="cb343-2"><a href="mlclassification.html#cb343-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_date</span>(date_received, <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;month&quot;</span>, <span class="st">&quot;dow&quot;</span>), <span class="at">role =</span> <span class="st">&quot;dates&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb343-3"><a href="mlclassification.html#cb343-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(date_received) <span class="sc">%&gt;%</span></span>
+<span id="cb343-4"><a href="mlclassification.html#cb343-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">has_role</span>(<span class="st">&quot;dates&quot;</span>))</span></code></pre></div>
 <p>The <code>tags</code> variable has some missing data. We can deal with this by using <code>step_unknown()</code>, which adds a new level to this factor variable for cases of missing data. Then we “dummify” (create dummy/indicator variables) the variable with <code>step_dummy()</code>.</p>
-<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="mlclassification.html#cb345-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
-<span id="cb345-2"><a href="mlclassification.html#cb345-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_unknown</span>(tags) <span class="sc">%&gt;%</span></span>
-<span id="cb345-3"><a href="mlclassification.html#cb345-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(tags)</span></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="mlclassification.html#cb344-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
+<span id="cb344-2"><a href="mlclassification.html#cb344-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_unknown</span>(tags) <span class="sc">%&gt;%</span></span>
+<span id="cb344-3"><a href="mlclassification.html#cb344-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(tags)</span></code></pre></div>
 <p>Now we add steps to process the text of the complaints, as before.</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="mlclassification.html#cb346-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
-<span id="cb346-2"><a href="mlclassification.html#cb346-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb346-3"><a href="mlclassification.html#cb346-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(consumer_complaint_narrative, <span class="at">max_tokens =</span> <span class="fl">1e3</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb346-4"><a href="mlclassification.html#cb346-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(consumer_complaint_narrative)</span></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="mlclassification.html#cb345-1" aria-hidden="true" tabindex="-1"></a>more_vars_rec <span class="ot">&lt;-</span> more_vars_rec <span class="sc">%&gt;%</span></span>
+<span id="cb345-2"><a href="mlclassification.html#cb345-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb345-3"><a href="mlclassification.html#cb345-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(consumer_complaint_narrative, <span class="at">max_tokens =</span> <span class="fl">1e3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb345-4"><a href="mlclassification.html#cb345-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(consumer_complaint_narrative)</span></code></pre></div>
 <p>Let’s combine this more extensive preprocessing recipe that handles more variables together with the tuneable lasso regularized classification model specification.</p>
-<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="mlclassification.html#cb347-1" aria-hidden="true" tabindex="-1"></a>more_vars_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb347-2"><a href="mlclassification.html#cb347-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(more_vars_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
-<span id="cb347-3"><a href="mlclassification.html#cb347-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tune_spec)</span>
-<span id="cb347-4"><a href="mlclassification.html#cb347-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb347-5"><a href="mlclassification.html#cb347-5" aria-hidden="true" tabindex="-1"></a>more_vars_wf</span></code></pre></div>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="mlclassification.html#cb346-1" aria-hidden="true" tabindex="-1"></a>more_vars_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb346-2"><a href="mlclassification.html#cb346-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(more_vars_rec, <span class="at">blueprint =</span> sparse_bp) <span class="sc">%&gt;%</span></span>
+<span id="cb346-3"><a href="mlclassification.html#cb346-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tune_spec)</span>
+<span id="cb346-4"><a href="mlclassification.html#cb346-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb346-5"><a href="mlclassification.html#cb346-5" aria-hidden="true" tabindex="-1"></a>more_vars_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: logistic_reg()
@@ -1438,15 +1415,15 @@ Categorical variables like the month can be stored as strings or factors, but fo
 #&gt; 
 #&gt; Computational engine: glmnet</code></pre>
 <p>Let’s tune this <code>workflow()</code> with our resampled data sets, find a good value for the regularization penalty, and estimate the model’s performance.</p>
-<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="mlclassification.html#cb349-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb349-2"><a href="mlclassification.html#cb349-2" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb349-3"><a href="mlclassification.html#cb349-3" aria-hidden="true" tabindex="-1"></a>  more_vars_wf,</span>
-<span id="cb349-4"><a href="mlclassification.html#cb349-4" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
-<span id="cb349-5"><a href="mlclassification.html#cb349-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> smaller_lambda,</span>
-<span id="cb349-6"><a href="mlclassification.html#cb349-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="mlclassification.html#cb348-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb348-2"><a href="mlclassification.html#cb348-2" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb348-3"><a href="mlclassification.html#cb348-3" aria-hidden="true" tabindex="-1"></a>  more_vars_wf,</span>
+<span id="cb348-4"><a href="mlclassification.html#cb348-4" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
+<span id="cb348-5"><a href="mlclassification.html#cb348-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> smaller_lambda,</span>
+<span id="cb348-6"><a href="mlclassification.html#cb348-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We can extract the metrics for the best-performing regularization penalties from these results with <code>show_best()</code> with an option like <code>"roc_auc"</code> or <code>"accuracy"</code> if we prefer. How did our chosen performance metric turn out for our model that included more than just the text data?</p>
-<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="mlclassification.html#cb350-1" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="sc">%&gt;%</span></span>
-<span id="cb350-2"><a href="mlclassification.html#cb350-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="mlclassification.html#cb349-1" aria-hidden="true" tabindex="-1"></a>more_vars_rs <span class="sc">%&gt;%</span></span>
+<span id="cb349-2"><a href="mlclassification.html#cb349-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">show_best</span>(<span class="st">&quot;roc_auc&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 5 × 7
 #&gt;    penalty .metric .estimator  mean     n  std_err .config              
 #&gt;      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
@@ -1456,14 +1433,14 @@ Categorical variables like the month can be stored as strings or factors, but fo
 #&gt; 4 0.00127  roc_auc binary     0.953    10 0.000507 Preprocessor1_Model09
 #&gt; 5 0.000113 roc_auc binary     0.953    10 0.000520 Preprocessor1_Model05</code></pre>
 <p>We see here that including more predictors did not measurably improve our model performance or even change the regularization. With only text features in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and the same grid and sparse encoding, we achieved an accuracy of 0.953, the same as what we see now by including the features dealing with dates and tags as well. The best regularization penalty in Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> was 0.0007 and is about the same here. We can use <code>tidy()</code> and some <strong>dplyr</strong> manipulation to find at what rank (<code>term_rank</code>) any of the date or tag variables were included in the regularized results, by absolute value of the model coefficient.</p>
-<div class="sourceCode" id="cb352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb352-1"><a href="mlclassification.html#cb352-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
-<span id="cb352-2"><a href="mlclassification.html#cb352-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb352-3"><a href="mlclassification.html#cb352-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(complaints_train) <span class="sc">%&gt;%</span></span>
-<span id="cb352-4"><a href="mlclassification.html#cb352-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb352-5"><a href="mlclassification.html#cb352-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb352-6"><a href="mlclassification.html#cb352-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span><span class="fu">abs</span>(estimate)) <span class="sc">%&gt;%</span> </span>
-<span id="cb352-7"><a href="mlclassification.html#cb352-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb352-8"><a href="mlclassification.html#cb352-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">&quot;tfidf&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb351"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb351-1"><a href="mlclassification.html#cb351-1" aria-hidden="true" tabindex="-1"></a><span class="fu">finalize_workflow</span>(more_vars_wf, </span>
+<span id="cb351-2"><a href="mlclassification.html#cb351-2" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select_best</span>(more_vars_rs, <span class="st">&quot;roc_auc&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb351-3"><a href="mlclassification.html#cb351-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(complaints_train) <span class="sc">%&gt;%</span></span>
+<span id="cb351-4"><a href="mlclassification.html#cb351-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb351-5"><a href="mlclassification.html#cb351-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb351-6"><a href="mlclassification.html#cb351-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span><span class="fu">abs</span>(estimate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb351-7"><a href="mlclassification.html#cb351-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term_rank =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb351-8"><a href="mlclassification.html#cb351-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">&quot;tfidf&quot;</span>))</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 21 × 4
 #&gt;    term                    estimate  penalty term_rank
 #&gt;    &lt;chr&gt;                      &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
@@ -1490,20 +1467,20 @@ This whole book focuses on supervised machine learning for text data, but models
 <p>The complaints data set already has sensitive information (PII) censored or protected using strings such as “XXXX” and “XX.”
 This data censoring can be viewed as data <em>annotation</em>; specific account numbers and birthdays are protected, but we know they were there. These values would be mostly unique anyway, and likely filtered out in their original form.</p>
 <p>Figure <a href="mlclassification.html#fig:censoredtrigram">7.8</a> shows the most frequent trigrams (Section <a href="tokenization.html#tokenizingngrams">2.2.3</a>) in our training data set.</p>
-<div class="sourceCode" id="cb354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb354-1"><a href="mlclassification.html#cb354-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
-<span id="cb354-2"><a href="mlclassification.html#cb354-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb354-3"><a href="mlclassification.html#cb354-3" aria-hidden="true" tabindex="-1"></a>complaints_train <span class="sc">%&gt;%</span></span>
-<span id="cb354-4"><a href="mlclassification.html#cb354-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb354-5"><a href="mlclassification.html#cb354-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
-<span id="cb354-6"><a href="mlclassification.html#cb354-6" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
-<span id="cb354-7"><a href="mlclassification.html#cb354-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb354-8"><a href="mlclassification.html#cb354-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb354-9"><a href="mlclassification.html#cb354-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">censored =</span> <span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb354-10"><a href="mlclassification.html#cb354-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb354-11"><a href="mlclassification.html#cb354-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">reorder</span>(trigrams, n), <span class="at">fill =</span> censored)) <span class="sc">+</span></span>
-<span id="cb354-12"><a href="mlclassification.html#cb354-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb354-13"><a href="mlclassification.html#cb354-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb354-14"><a href="mlclassification.html#cb354-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb353-1"><a href="mlclassification.html#cb353-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)</span>
+<span id="cb353-2"><a href="mlclassification.html#cb353-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb353-3"><a href="mlclassification.html#cb353-3" aria-hidden="true" tabindex="-1"></a>complaints_train <span class="sc">%&gt;%</span></span>
+<span id="cb353-4"><a href="mlclassification.html#cb353-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb353-5"><a href="mlclassification.html#cb353-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
+<span id="cb353-6"><a href="mlclassification.html#cb353-6" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
+<span id="cb353-7"><a href="mlclassification.html#cb353-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb353-8"><a href="mlclassification.html#cb353-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb353-9"><a href="mlclassification.html#cb353-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">censored =</span> <span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb353-10"><a href="mlclassification.html#cb353-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb353-11"><a href="mlclassification.html#cb353-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">reorder</span>(trigrams, n), <span class="at">fill =</span> censored)) <span class="sc">+</span></span>
+<span id="cb353-12"><a href="mlclassification.html#cb353-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb353-13"><a href="mlclassification.html#cb353-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb353-14"><a href="mlclassification.html#cb353-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:censoredtrigram"></span>
 <img src="07_ml_classification_files/figure-html/censoredtrigram-1.svg" alt="Many of the most frequent trigrams feature censored information" width="672" />
 <p class="caption">
@@ -1515,25 +1492,25 @@ Not only do the most used trigrams include some kind of censoring,
 but the censoring itself is informative as it is not used uniformly across the product classes.
 In Figure <a href="mlclassification.html#fig:trigram25">7.9</a>, we take the top-25 most frequent trigrams that include censoring,
 and plot the proportions for “Credit” and “Other.”</p>
-<div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb355-1"><a href="mlclassification.html#cb355-1" aria-hidden="true" tabindex="-1"></a>top_censored_trigrams <span class="ot">&lt;-</span> complaints_train <span class="sc">%&gt;%</span></span>
-<span id="cb355-2"><a href="mlclassification.html#cb355-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb355-3"><a href="mlclassification.html#cb355-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
-<span id="cb355-4"><a href="mlclassification.html#cb355-4" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
-<span id="cb355-5"><a href="mlclassification.html#cb355-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb355-6"><a href="mlclassification.html#cb355-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb355-7"><a href="mlclassification.html#cb355-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb355-8"><a href="mlclassification.html#cb355-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
-<span id="cb355-9"><a href="mlclassification.html#cb355-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb355-10"><a href="mlclassification.html#cb355-10" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> complaints_train <span class="sc">%&gt;%</span></span>
-<span id="cb355-11"><a href="mlclassification.html#cb355-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
-<span id="cb355-12"><a href="mlclassification.html#cb355-12" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
-<span id="cb355-13"><a href="mlclassification.html#cb355-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb355-14"><a href="mlclassification.html#cb355-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(top_censored_trigrams, <span class="at">by =</span> <span class="st">&quot;trigrams&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb355-15"><a href="mlclassification.html#cb355-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, product, <span class="at">.drop =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb355-16"><a href="mlclassification.html#cb355-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb355-17"><a href="mlclassification.html#cb355-17" aria-hidden="true" tabindex="-1"></a>plot_data <span class="sc">%&gt;%</span></span>
-<span id="cb355-18"><a href="mlclassification.html#cb355-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, trigrams, <span class="at">fill =</span> product)) <span class="sc">+</span></span>
-<span id="cb355-19"><a href="mlclassification.html#cb355-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;fill&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb354-1"><a href="mlclassification.html#cb354-1" aria-hidden="true" tabindex="-1"></a>top_censored_trigrams <span class="ot">&lt;-</span> complaints_train <span class="sc">%&gt;%</span></span>
+<span id="cb354-2"><a href="mlclassification.html#cb354-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb354-3"><a href="mlclassification.html#cb354-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
+<span id="cb354-4"><a href="mlclassification.html#cb354-4" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
+<span id="cb354-5"><a href="mlclassification.html#cb354-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb354-6"><a href="mlclassification.html#cb354-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb354-7"><a href="mlclassification.html#cb354-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb354-8"><a href="mlclassification.html#cb354-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">25</span>)</span>
+<span id="cb354-9"><a href="mlclassification.html#cb354-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-10"><a href="mlclassification.html#cb354-10" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> complaints_train <span class="sc">%&gt;%</span></span>
+<span id="cb354-11"><a href="mlclassification.html#cb354-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, </span>
+<span id="cb354-12"><a href="mlclassification.html#cb354-12" aria-hidden="true" tabindex="-1"></a>                consumer_complaint_narrative, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
+<span id="cb354-13"><a href="mlclassification.html#cb354-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb354-14"><a href="mlclassification.html#cb354-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(top_censored_trigrams, <span class="at">by =</span> <span class="st">&quot;trigrams&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb354-15"><a href="mlclassification.html#cb354-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, product, <span class="at">.drop =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb354-16"><a href="mlclassification.html#cb354-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb354-17"><a href="mlclassification.html#cb354-17" aria-hidden="true" tabindex="-1"></a>plot_data <span class="sc">%&gt;%</span></span>
+<span id="cb354-18"><a href="mlclassification.html#cb354-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, trigrams, <span class="at">fill =</span> product)) <span class="sc">+</span></span>
+<span id="cb354-19"><a href="mlclassification.html#cb354-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;fill&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:trigram25"></span>
 <img src="07_ml_classification_files/figure-html/trigram25-1.svg" alt="Many of the most frequent trigrams feature censored words, but there is a difference in how often they are used within each class" width="672" />
 <p class="caption">
@@ -1547,35 +1524,35 @@ This means that the above example will be turned into “we had a problem on 06 
 This isn’t quite right since dates will be given values between <code>00</code> and <code>99</code>, and we don’t know for sure that only numerals have been censored, but it gives us a place to start.
 Below is a simple function <code>uncensor_vec()</code> that locates all instances of <code>"XX"</code> and replaces them with a number between 11 and 99.
 We don’t need to handle the special case of <code>XXXX</code> as it automatically being handled.</p>
-<div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb356-1"><a href="mlclassification.html#cb356-1" aria-hidden="true" tabindex="-1"></a>uncensor <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
-<span id="cb356-2"><a href="mlclassification.html#cb356-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>(<span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">10</span> <span class="sc">^</span> (n <span class="sc">-</span> <span class="dv">1</span>), <span class="dv">10</span> <span class="sc">^</span> n <span class="sc">-</span> <span class="dv">1</span>), <span class="dv">1</span>))</span>
-<span id="cb356-3"><a href="mlclassification.html#cb356-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb356-4"><a href="mlclassification.html#cb356-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb356-5"><a href="mlclassification.html#cb356-5" aria-hidden="true" tabindex="-1"></a>uncensor_vec <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb356-6"><a href="mlclassification.html#cb356-6" aria-hidden="true" tabindex="-1"></a>  locs <span class="ot">&lt;-</span> <span class="fu">str_locate_all</span>(x, <span class="st">&quot;XX&quot;</span>)</span>
-<span id="cb356-7"><a href="mlclassification.html#cb356-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2_chr</span>(x, locs, <span class="sc">~</span> {</span>
-<span id="cb356-8"><a href="mlclassification.html#cb356-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(.y))) {</span>
-<span id="cb356-9"><a href="mlclassification.html#cb356-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_sub</span>(.x, .y[i, <span class="dv">1</span>], .y[i, <span class="dv">2</span>]) <span class="ot">&lt;-</span> <span class="fu">uncensor</span>(<span class="dv">2</span>)</span>
-<span id="cb356-10"><a href="mlclassification.html#cb356-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb356-11"><a href="mlclassification.html#cb356-11" aria-hidden="true" tabindex="-1"></a>    .x</span>
-<span id="cb356-12"><a href="mlclassification.html#cb356-12" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb356-13"><a href="mlclassification.html#cb356-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb355-1"><a href="mlclassification.html#cb355-1" aria-hidden="true" tabindex="-1"></a>uncensor <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb355-2"><a href="mlclassification.html#cb355-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>(<span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">10</span> <span class="sc">^</span> (n <span class="sc">-</span> <span class="dv">1</span>), <span class="dv">10</span> <span class="sc">^</span> n <span class="sc">-</span> <span class="dv">1</span>), <span class="dv">1</span>))</span>
+<span id="cb355-3"><a href="mlclassification.html#cb355-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb355-4"><a href="mlclassification.html#cb355-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb355-5"><a href="mlclassification.html#cb355-5" aria-hidden="true" tabindex="-1"></a>uncensor_vec <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb355-6"><a href="mlclassification.html#cb355-6" aria-hidden="true" tabindex="-1"></a>  locs <span class="ot">&lt;-</span> <span class="fu">str_locate_all</span>(x, <span class="st">&quot;XX&quot;</span>)</span>
+<span id="cb355-7"><a href="mlclassification.html#cb355-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map2_chr</span>(x, locs, <span class="sc">~</span> {</span>
+<span id="cb355-8"><a href="mlclassification.html#cb355-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(.y))) {</span>
+<span id="cb355-9"><a href="mlclassification.html#cb355-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_sub</span>(.x, .y[i, <span class="dv">1</span>], .y[i, <span class="dv">2</span>]) <span class="ot">&lt;-</span> <span class="fu">uncensor</span>(<span class="dv">2</span>)</span>
+<span id="cb355-10"><a href="mlclassification.html#cb355-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb355-11"><a href="mlclassification.html#cb355-11" aria-hidden="true" tabindex="-1"></a>    .x</span>
+<span id="cb355-12"><a href="mlclassification.html#cb355-12" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb355-13"><a href="mlclassification.html#cb355-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>We can run a quick test to see how it works.</p>
-<div class="sourceCode" id="cb357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb357-1"><a href="mlclassification.html#cb357-1" aria-hidden="true" tabindex="-1"></a><span class="fu">uncensor_vec</span>(<span class="st">&quot;In XX/XX/XXXX I leased a XXXX vehicle&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb356-1"><a href="mlclassification.html#cb356-1" aria-hidden="true" tabindex="-1"></a><span class="fu">uncensor_vec</span>(<span class="st">&quot;In XX/XX/XXXX I leased a XXXX vehicle&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;In 65/59/1659 I leased a 4598 vehicle&quot;</code></pre>
 <p>Now we can produce the same visualization as Figure <a href="mlclassification.html#fig:censoredtrigram">7.8</a> but can also apply our uncensoring function to the text before tokenizing.</p>
-<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="mlclassification.html#cb359-1" aria-hidden="true" tabindex="-1"></a>complaints_train <span class="sc">%&gt;%</span></span>
-<span id="cb359-2"><a href="mlclassification.html#cb359-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb359-3"><a href="mlclassification.html#cb359-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">uncensor_vec</span>(consumer_complaint_narrative)) <span class="sc">%&gt;%</span></span>
-<span id="cb359-4"><a href="mlclassification.html#cb359-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, text, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
-<span id="cb359-5"><a href="mlclassification.html#cb359-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb359-6"><a href="mlclassification.html#cb359-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb359-7"><a href="mlclassification.html#cb359-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">censored =</span> <span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb359-8"><a href="mlclassification.html#cb359-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb359-9"><a href="mlclassification.html#cb359-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">reorder</span>(trigrams, n), <span class="at">fill =</span> censored)) <span class="sc">+</span></span>
-<span id="cb359-10"><a href="mlclassification.html#cb359-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb359-11"><a href="mlclassification.html#cb359-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb359-12"><a href="mlclassification.html#cb359-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb358-1"><a href="mlclassification.html#cb358-1" aria-hidden="true" tabindex="-1"></a>complaints_train <span class="sc">%&gt;%</span></span>
+<span id="cb358-2"><a href="mlclassification.html#cb358-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb358-3"><a href="mlclassification.html#cb358-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">uncensor_vec</span>(consumer_complaint_narrative)) <span class="sc">%&gt;%</span></span>
+<span id="cb358-4"><a href="mlclassification.html#cb358-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(trigrams, text, <span class="at">token =</span> <span class="st">&quot;ngrams&quot;</span>,</span>
+<span id="cb358-5"><a href="mlclassification.html#cb358-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">collapse =</span> <span class="cn">NULL</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb358-6"><a href="mlclassification.html#cb358-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(trigrams, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb358-7"><a href="mlclassification.html#cb358-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">censored =</span> <span class="fu">str_detect</span>(trigrams, <span class="st">&quot;xx&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb358-8"><a href="mlclassification.html#cb358-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb358-9"><a href="mlclassification.html#cb358-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(n, <span class="fu">reorder</span>(trigrams, n), <span class="at">fill =</span> censored)) <span class="sc">+</span></span>
+<span id="cb358-10"><a href="mlclassification.html#cb358-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb358-11"><a href="mlclassification.html#cb358-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;firebrick&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb358-12"><a href="mlclassification.html#cb358-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Trigrams&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Count&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:uncensoredtrigram"></span>
 <img src="07_ml_classification_files/figure-html/uncensoredtrigram-1.svg" alt="Trigrams without numbers float to the top as the uncensored tokens are too spread out" width="672" />
 <p class="caption">
@@ -1608,15 +1585,15 @@ A social security number comes in the form <code>AAA-BB-CCCC</code> where <code>
 </div>
 <p>We can use a function to replace each social security number with an indicator that can be detected later by preprocessing steps.
 It’s a good idea to use a “word” that won’t be accidentally broken up by a tokenizer.</p>
-<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="mlclassification.html#cb360-1" aria-hidden="true" tabindex="-1"></a>ssn_text <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;My social security number is 498-08-6333&quot;</span>,</span>
-<span id="cb360-2"><a href="mlclassification.html#cb360-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;No way, mine is 362-60-9159&quot;</span>,</span>
-<span id="cb360-3"><a href="mlclassification.html#cb360-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;My parents numbers are 575-32-6985 and 576-36-5202&quot;</span>)</span>
-<span id="cb360-4"><a href="mlclassification.html#cb360-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb360-5"><a href="mlclassification.html#cb360-5" aria-hidden="true" tabindex="-1"></a>ssn_pattern <span class="ot">&lt;-</span>  <span class="st">&quot;(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}&quot;</span></span>
-<span id="cb360-6"><a href="mlclassification.html#cb360-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb360-7"><a href="mlclassification.html#cb360-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str_replace_all</span>(<span class="at">string =</span> ssn_text,</span>
-<span id="cb360-8"><a href="mlclassification.html#cb360-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">pattern =</span> ssn_pattern,</span>
-<span id="cb360-9"><a href="mlclassification.html#cb360-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">replacement =</span> <span class="st">&quot;ssnindicator&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="mlclassification.html#cb359-1" aria-hidden="true" tabindex="-1"></a>ssn_text <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;My social security number is 498-08-6333&quot;</span>,</span>
+<span id="cb359-2"><a href="mlclassification.html#cb359-2" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;No way, mine is 362-60-9159&quot;</span>,</span>
+<span id="cb359-3"><a href="mlclassification.html#cb359-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;My parents numbers are 575-32-6985 and 576-36-5202&quot;</span>)</span>
+<span id="cb359-4"><a href="mlclassification.html#cb359-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-5"><a href="mlclassification.html#cb359-5" aria-hidden="true" tabindex="-1"></a>ssn_pattern <span class="ot">&lt;-</span>  <span class="st">&quot;(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}&quot;</span></span>
+<span id="cb359-6"><a href="mlclassification.html#cb359-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-7"><a href="mlclassification.html#cb359-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str_replace_all</span>(<span class="at">string =</span> ssn_text,</span>
+<span id="cb359-8"><a href="mlclassification.html#cb359-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">pattern =</span> ssn_pattern,</span>
+<span id="cb359-9"><a href="mlclassification.html#cb359-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">replacement =</span> <span class="st">&quot;ssnindicator&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] &quot;My social security number is ssnindicator&quot;           
 #&gt; [2] &quot;No way, mine is ssnindicator&quot;                        
 #&gt; [3] &quot;My parents numbers are ssnindicator and ssnindicator&quot;</code></pre>
@@ -1659,40 +1636,40 @@ It is a good idea to create a small example regular expression where you know th
 </div>
 <p>We start by creating a vector with two positives, one negative, and one potential false positive.
 The last string is more tricky since it has the same shape as a credit card but has one too many groups.</p>
-<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="mlclassification.html#cb362-1" aria-hidden="true" tabindex="-1"></a>credit_cards <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;my XXXX XXXX XXXX XXXX balance, and XXXX XXXX XXXX XXXX.&quot;</span>,</span>
-<span id="cb362-2"><a href="mlclassification.html#cb362-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;card with number XXXX XXXX XXXX XXXX.&quot;</span>,</span>
-<span id="cb362-3"><a href="mlclassification.html#cb362-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;at XX/XX 2019 my first&quot;</span>,</span>
-<span id="cb362-4"><a href="mlclassification.html#cb362-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;live at XXXX XXXX XXXX XXXX XXXX SC&quot;</span>)</span>
-<span id="cb362-5"><a href="mlclassification.html#cb362-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb362-6"><a href="mlclassification.html#cb362-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb362-7"><a href="mlclassification.html#cb362-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;XXXX XXXX XXXX XXXX&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="mlclassification.html#cb361-1" aria-hidden="true" tabindex="-1"></a>credit_cards <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;my XXXX XXXX XXXX XXXX balance, and XXXX XXXX XXXX XXXX.&quot;</span>,</span>
+<span id="cb361-2"><a href="mlclassification.html#cb361-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;card with number XXXX XXXX XXXX XXXX.&quot;</span>,</span>
+<span id="cb361-3"><a href="mlclassification.html#cb361-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;at XX/XX 2019 my first&quot;</span>,</span>
+<span id="cb361-4"><a href="mlclassification.html#cb361-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;live at XXXX XXXX XXXX XXXX XXXX SC&quot;</span>)</span>
+<span id="cb361-5"><a href="mlclassification.html#cb361-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb361-6"><a href="mlclassification.html#cb361-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb361-7"><a href="mlclassification.html#cb361-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;XXXX XXXX XXXX XXXX&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE  TRUE</code></pre>
 <p>As we feared, the last vector was falsely detected to be a credit card.
 Sometimes you will have to accept a certain number of false positives and/or false negatives, depending on the data and what you are trying to detect.
 In this case, we can make the regex a little more complicated to avoid that specific false positive.
 We need to make sure that the word coming before the X’s doesn’t end in a capital X and the word following the last X doesn’t start with a capital X.
 We place spaces around the credit card and use some negated character classes (Appendix <a href="regexp.html#character-classes">A.3</a>) to detect anything BUT a capital X.</p>
-<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="mlclassification.html#cb364-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;[^X] XXXX XXXX XXXX XXXX [^X]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="mlclassification.html#cb363-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;[^X] XXXX XXXX XXXX XXXX [^X]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE FALSE FALSE FALSE</code></pre>
 <p>Hurray! This fixed the false positive.
 But it gave us a false negative in return.
 Turns out that this regex doesn’t allow the credit card to be followed by a period since it requires a space.
 We can fix this with an alteration to match for a period or a space and a non-X.</p>
-<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="mlclassification.html#cb366-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="mlclassification.html#cb365-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_detect</span>(credit_cards, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE FALSE</code></pre>
 <p>Now that we have a regular expression we are happy with we can wrap it up in a function we can use.
 We can extract the presence of a credit card with <code>str_detect()</code> and the number of credit cards with <code>str_count()</code>.</p>
-<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="mlclassification.html#cb368-1" aria-hidden="true" tabindex="-1"></a>creditcard_indicator <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb368-2"><a href="mlclassification.html#cb368-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_detect</span>(x, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span>
-<span id="cb368-3"><a href="mlclassification.html#cb368-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb368-4"><a href="mlclassification.html#cb368-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb368-5"><a href="mlclassification.html#cb368-5" aria-hidden="true" tabindex="-1"></a>creditcard_count <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb368-6"><a href="mlclassification.html#cb368-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_count</span>(x, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span>
-<span id="cb368-7"><a href="mlclassification.html#cb368-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb368-8"><a href="mlclassification.html#cb368-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb368-9"><a href="mlclassification.html#cb368-9" aria-hidden="true" tabindex="-1"></a><span class="fu">creditcard_indicator</span>(credit_cards)</span></code></pre></div>
+<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="mlclassification.html#cb367-1" aria-hidden="true" tabindex="-1"></a>creditcard_indicator <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb367-2"><a href="mlclassification.html#cb367-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_detect</span>(x, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span>
+<span id="cb367-3"><a href="mlclassification.html#cb367-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb367-4"><a href="mlclassification.html#cb367-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb367-5"><a href="mlclassification.html#cb367-5" aria-hidden="true" tabindex="-1"></a>creditcard_count <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb367-6"><a href="mlclassification.html#cb367-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_count</span>(x, <span class="st">&quot;[^X] +XXXX XXXX XXXX XXXX(</span><span class="sc">\\</span><span class="st">.| [^X])&quot;</span>)</span>
+<span id="cb367-7"><a href="mlclassification.html#cb367-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb367-8"><a href="mlclassification.html#cb367-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb367-9"><a href="mlclassification.html#cb367-9" aria-hidden="true" tabindex="-1"></a><span class="fu">creditcard_indicator</span>(credit_cards)</span></code></pre></div>
 <pre><code>#&gt; [1]  TRUE  TRUE FALSE FALSE</code></pre>
-<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="mlclassification.html#cb370-1" aria-hidden="true" tabindex="-1"></a><span class="fu">creditcard_count</span>(credit_cards)</span></code></pre></div>
+<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="mlclassification.html#cb369-1" aria-hidden="true" tabindex="-1"></a><span class="fu">creditcard_count</span>(credit_cards)</span></code></pre></div>
 <pre><code>#&gt; [1] 2 1 0 0</code></pre>
 </div>
 <div id="calculate-percentage-censoring" class="section level3 hasAnchor" number="7.9.2">
@@ -1705,29 +1682,29 @@ There are often many ways to get to the same solution when working with regular 
 </div>
 <p></p>
 <p>Let’s attack this problem by counting the number of X’s in each string, then count the number of alphanumeric characters and divide the two to get a percentage.</p>
-<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb372-1"><a href="mlclassification.html#cb372-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;X&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb371"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb371-1"><a href="mlclassification.html#cb371-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;X&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 32 16  4 20</code></pre>
-<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb374-1"><a href="mlclassification.html#cb374-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;[:alnum:]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb373"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb373-1"><a href="mlclassification.html#cb373-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;[:alnum:]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 44 30 17 28</code></pre>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="mlclassification.html#cb376-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;X&quot;</span>) <span class="sc">/</span> <span class="fu">str_count</span>(credit_cards, <span class="st">&quot;[:alnum:]&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="mlclassification.html#cb375-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_count</span>(credit_cards, <span class="st">&quot;X&quot;</span>) <span class="sc">/</span> <span class="fu">str_count</span>(credit_cards, <span class="st">&quot;[:alnum:]&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.7272727 0.5333333 0.2352941 0.7142857</code></pre>
 <p>We can finish up by creating a function.</p>
-<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="mlclassification.html#cb378-1" aria-hidden="true" tabindex="-1"></a>percent_censoring <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb378-2"><a href="mlclassification.html#cb378-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_count</span>(x, <span class="st">&quot;X&quot;</span>) <span class="sc">/</span> <span class="fu">str_count</span>(x, <span class="st">&quot;[:alnum:]&quot;</span>)</span>
-<span id="cb378-3"><a href="mlclassification.html#cb378-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb378-4"><a href="mlclassification.html#cb378-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb378-5"><a href="mlclassification.html#cb378-5" aria-hidden="true" tabindex="-1"></a><span class="fu">percent_censoring</span>(credit_cards)</span></code></pre></div>
+<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="mlclassification.html#cb377-1" aria-hidden="true" tabindex="-1"></a>percent_censoring <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb377-2"><a href="mlclassification.html#cb377-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_count</span>(x, <span class="st">&quot;X&quot;</span>) <span class="sc">/</span> <span class="fu">str_count</span>(x, <span class="st">&quot;[:alnum:]&quot;</span>)</span>
+<span id="cb377-3"><a href="mlclassification.html#cb377-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb377-4"><a href="mlclassification.html#cb377-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb377-5"><a href="mlclassification.html#cb377-5" aria-hidden="true" tabindex="-1"></a><span class="fu">percent_censoring</span>(credit_cards)</span></code></pre></div>
 <pre><code>#&gt; [1] 0.7272727 0.5333333 0.2352941 0.7142857</code></pre>
 </div>
 <div id="detect-monetary-amounts" class="section level3 hasAnchor" number="7.9.3">
 <h3><span class="header-section-number">7.9.3</span> Detect monetary amounts<a href="mlclassification.html#detect-monetary-amounts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We have already constructed a regular expression that detects the monetary amount from the text in Section <a href="mlclassification.html#classfirstattemptlookatdata">7.1</a>, so now we can look at how to use this information.
 Let’s start by creating a little example and see what we can extract.</p>
-<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="mlclassification.html#cb380-1" aria-hidden="true" tabindex="-1"></a>dollar_texts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;That will be {$20.00}&quot;</span>,</span>
-<span id="cb380-2"><a href="mlclassification.html#cb380-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;{$3.00}, {$2.00} and {$7.00}&quot;</span>,</span>
-<span id="cb380-3"><a href="mlclassification.html#cb380-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;I have no money&quot;</span>)</span>
-<span id="cb380-4"><a href="mlclassification.html#cb380-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb380-5"><a href="mlclassification.html#cb380-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract_all</span>(dollar_texts, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="mlclassification.html#cb379-1" aria-hidden="true" tabindex="-1"></a>dollar_texts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;That will be {$20.00}&quot;</span>,</span>
+<span id="cb379-2"><a href="mlclassification.html#cb379-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;{$3.00}, {$2.00} and {$7.00}&quot;</span>,</span>
+<span id="cb379-3"><a href="mlclassification.html#cb379-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;I have no money&quot;</span>)</span>
+<span id="cb379-4"><a href="mlclassification.html#cb379-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb379-5"><a href="mlclassification.html#cb379-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract_all</span>(dollar_texts, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
 #&gt; [1] &quot;{$20.00}&quot;
 #&gt; 
@@ -1739,8 +1716,8 @@ Let’s start by creating a little example and see what we can extract.</p>
 <p>We can create a function that simply detects the dollar amount, and we can count the number of times each amount appears.
 Each occurrence also has a value, so it would be nice to include that information as well, such as the mean, minimum, or maximum.</p>
 <p>First, let’s extract the number from the strings. We could write a regular expression for this, but the <code>parse_number()</code> function from the readr package does a really good job of pulling out numbers.</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="mlclassification.html#cb382-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract_all</span>(dollar_texts, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb382-2"><a href="mlclassification.html#cb382-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(readr<span class="sc">::</span>parse_number)</span></code></pre></div>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="mlclassification.html#cb381-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_extract_all</span>(dollar_texts, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb381-2"><a href="mlclassification.html#cb381-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(readr<span class="sc">::</span>parse_number)</span></code></pre></div>
 <pre><code>#&gt; [[1]]
 #&gt; [1] 20
 #&gt; 
@@ -1751,13 +1728,13 @@ Each occurrence also has a value, so it would be nice to include that informatio
 #&gt; numeric(0)</code></pre>
 <p>Now that we have the numbers we can iterate over them with the function of our choice.
 Since we are going to have texts with no monetary amounts, we need to handle the case with zero numbers. Defaults for some functions with vectors of length zero can be undesirable; we don’t want <code>-Inf</code> to be a value. Let’s extract the maximum value and give cases with no monetary amounts a maximum of zero.</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="mlclassification.html#cb384-1" aria-hidden="true" tabindex="-1"></a>max_money <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb384-2"><a href="mlclassification.html#cb384-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_extract_all</span>(x, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb384-3"><a href="mlclassification.html#cb384-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(readr<span class="sc">::</span>parse_number) <span class="sc">%&gt;%</span></span>
-<span id="cb384-4"><a href="mlclassification.html#cb384-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dbl</span>(<span class="sc">~</span> <span class="fu">ifelse</span>(<span class="fu">length</span>(.x) <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">0</span>, <span class="fu">max</span>(.x)))</span>
-<span id="cb384-5"><a href="mlclassification.html#cb384-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb384-6"><a href="mlclassification.html#cb384-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb384-7"><a href="mlclassification.html#cb384-7" aria-hidden="true" tabindex="-1"></a><span class="fu">max_money</span>(dollar_texts)</span></code></pre></div>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="mlclassification.html#cb383-1" aria-hidden="true" tabindex="-1"></a>max_money <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb383-2"><a href="mlclassification.html#cb383-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_extract_all</span>(x, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">{</span><span class="sc">\\</span><span class="st">$[0-9</span><span class="sc">\\</span><span class="st">.]*</span><span class="sc">\\</span><span class="st">}&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb383-3"><a href="mlclassification.html#cb383-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(readr<span class="sc">::</span>parse_number) <span class="sc">%&gt;%</span></span>
+<span id="cb383-4"><a href="mlclassification.html#cb383-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dbl</span>(<span class="sc">~</span> <span class="fu">ifelse</span>(<span class="fu">length</span>(.x) <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">0</span>, <span class="fu">max</span>(.x)))</span>
+<span id="cb383-5"><a href="mlclassification.html#cb383-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb383-6"><a href="mlclassification.html#cb383-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb383-7"><a href="mlclassification.html#cb383-7" aria-hidden="true" tabindex="-1"></a><span class="fu">max_money</span>(dollar_texts)</span></code></pre></div>
 <pre><code>#&gt; [1] 20  7  0</code></pre>
 <p>Now that we have created some feature engineering functions, we can use them to (hopefully) make our classification model better.</p>
 </div>
@@ -1766,23 +1743,23 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 <h2><span class="header-section-number">7.10</span> What evaluation metrics are appropriate?<a href="mlclassification.html#what-evaluation-metrics-are-appropriate-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We have focused on using accuracy and ROC AUC as metrics for our classification models so far. These are not the only classification metrics available, and your choice will often depend on how much you care about false positives compared to false negatives.</p>
 <p>If you know before you fit your model that you want to compute one or more metrics, you can specify them in a call to <code>metric_set()</code>. Let’s set up a tuning grid for two new classification metrics, <code>recall</code> and <code>precision</code>, that focuses not on the overall proportion of observations that are predicted correctly but instead on false positives and false negatives.</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="mlclassification.html#cb386-1" aria-hidden="true" tabindex="-1"></a>nb_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb386-2"><a href="mlclassification.html#cb386-2" aria-hidden="true" tabindex="-1"></a>  nb_wf,</span>
-<span id="cb386-3"><a href="mlclassification.html#cb386-3" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
-<span id="cb386-4"><a href="mlclassification.html#cb386-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(recall, precision)</span>
-<span id="cb386-5"><a href="mlclassification.html#cb386-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="mlclassification.html#cb385-1" aria-hidden="true" tabindex="-1"></a>nb_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb385-2"><a href="mlclassification.html#cb385-2" aria-hidden="true" tabindex="-1"></a>  nb_wf,</span>
+<span id="cb385-3"><a href="mlclassification.html#cb385-3" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
+<span id="cb385-4"><a href="mlclassification.html#cb385-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(recall, precision)</span>
+<span id="cb385-5"><a href="mlclassification.html#cb385-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>If you have already fit your model, you can still compute and explore non-default metrics as long as you saved the predictions for your resampled data sets using <code>control_resamples(save_pred = TRUE)</code>.</p>
 <p>Let’s go back to the naive Bayes model we tuned in Section <a href="mlclassification.html#classfirstmodel">7.1.1</a>, with predictions stored in <code>nb_rs_predictions</code>. We can compute the overall recall.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="mlclassification.html#cb387-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb387-2"><a href="mlclassification.html#cb387-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="mlclassification.html#cb386-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb386-2"><a href="mlclassification.html#cb386-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 3
 #&gt;   .metric .estimator .estimate
 #&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 #&gt; 1 recall  binary         0.694</code></pre>
 <p>We can also compute the recall for each resample using <code>group_by()</code>.</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="mlclassification.html#cb389-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
-<span id="cb389-2"><a href="mlclassification.html#cb389-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
-<span id="cb389-3"><a href="mlclassification.html#cb389-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="mlclassification.html#cb388-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb388-2"><a href="mlclassification.html#cb388-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
+<span id="cb388-3"><a href="mlclassification.html#cb388-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(product, .pred_class)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 4
 #&gt;    id     .metric .estimator .estimate
 #&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
@@ -1798,7 +1775,7 @@ Since we are going to have texts with no monetary amounts, we need to handle the
 #&gt; 10 Fold10 recall  binary         0.604</code></pre>
 <p>Many of the metrics used for classification are functions of the true positive, true negative, false positive, and false negative rates.
 The confusion matrix, a contingency table of observed classes and predicted classes, gives us information on these rates directly.</p>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="mlclassification.html#cb391-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="mlclassification.html#cb390-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>#&gt;        Credit  Other
 #&gt; Credit 2892.1  420.1
 #&gt; Other  1274.7 4204.1</code></pre>
@@ -1831,19 +1808,19 @@ Be aware that the tuning calculations we demonstrate here are computationally ex
 <div id="feature-selection" class="section level3 hasAnchor" number="7.11.1">
 <h3><span class="header-section-number">7.11.1</span> Feature selection<a href="mlclassification.html#feature-selection" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We start by creating a new preprocessing recipe, using only the text of the complaints for feature engineering.</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="mlclassification.html#cb393-1" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span></span>
-<span id="cb393-2"><a href="mlclassification.html#cb393-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(product <span class="sc">~</span> consumer_complaint_narrative, <span class="at">data =</span> complaints_train)</span></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="mlclassification.html#cb392-1" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span></span>
+<span id="cb392-2"><a href="mlclassification.html#cb392-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(product <span class="sc">~</span> consumer_complaint_narrative, <span class="at">data =</span> complaints_train)</span></code></pre></div>
 <p>After exploring this text data more in Section <a href="mlclassification.html#customfeatures">7.9</a>, we want to add these custom features to our final model.
 To do this, we use <code>step_textfeature()</code> to compute custom text features.
 We create a list of the custom text features and pass this list to <code>step_textfeature()</code> via the <code>extract_functions</code> argument.
 Note how we have to take a copy of <code>consumer_complaint_narrative</code> using <code>step_mutate()</code> as <code>step_textfeature()</code> consumes the column.</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="mlclassification.html#cb394-1" aria-hidden="true" tabindex="-1"></a>extract_funs <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">creditcard_count =</span> creditcard_count,</span>
-<span id="cb394-2"><a href="mlclassification.html#cb394-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">percent_censoring =</span> percent_censoring,</span>
-<span id="cb394-3"><a href="mlclassification.html#cb394-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">max_money =</span> max_money)</span>
-<span id="cb394-4"><a href="mlclassification.html#cb394-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb394-5"><a href="mlclassification.html#cb394-5" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span> complaints_rec_v2 <span class="sc">%&gt;%</span></span>
-<span id="cb394-6"><a href="mlclassification.html#cb394-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">narrative_copy =</span> consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb394-7"><a href="mlclassification.html#cb394-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_textfeature</span>(narrative_copy, <span class="at">extract_functions =</span> extract_funs)</span></code></pre></div>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="mlclassification.html#cb393-1" aria-hidden="true" tabindex="-1"></a>extract_funs <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">creditcard_count =</span> creditcard_count,</span>
+<span id="cb393-2"><a href="mlclassification.html#cb393-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">percent_censoring =</span> percent_censoring,</span>
+<span id="cb393-3"><a href="mlclassification.html#cb393-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">max_money =</span> max_money)</span>
+<span id="cb393-4"><a href="mlclassification.html#cb393-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb393-5"><a href="mlclassification.html#cb393-5" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span> complaints_rec_v2 <span class="sc">%&gt;%</span></span>
+<span id="cb393-6"><a href="mlclassification.html#cb393-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">narrative_copy =</span> consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb393-7"><a href="mlclassification.html#cb393-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_textfeature</span>(narrative_copy, <span class="at">extract_functions =</span> extract_funs)</span></code></pre></div>
 <p>The tokenization will be similar to the other models in this chapter.
 In our original model, we only included 1000 tokens; for our final model, let’s treat the number of tokens as a hyperparameter that we vary when we tune the final model.
 Let’s also set the <code>min_times</code> argument to 100, to throw away tokens that appear less than 100 times in the entire corpus.
@@ -1853,19 +1830,19 @@ We want our model to be robust and a token needs to appear enough times before w
 This data set has many more than 100 of even the most common 5000 or more tokens, but it can still be good practice to specify <code>min_times</code> to be safe. Your choice for <code>min_times</code> should depend on your data and how robust you need your model to be.
 </p>
 </div>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="mlclassification.html#cb395-1" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span> complaints_rec_v2 <span class="sc">%&gt;%</span></span>
-<span id="cb395-2"><a href="mlclassification.html#cb395-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb395-3"><a href="mlclassification.html#cb395-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(consumer_complaint_narrative,</span>
-<span id="cb395-4"><a href="mlclassification.html#cb395-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">max_tokens =</span> <span class="fu">tune</span>(), <span class="at">min_times =</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb395-5"><a href="mlclassification.html#cb395-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(consumer_complaint_narrative)</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="mlclassification.html#cb394-1" aria-hidden="true" tabindex="-1"></a>complaints_rec_v2 <span class="ot">&lt;-</span> complaints_rec_v2 <span class="sc">%&gt;%</span></span>
+<span id="cb394-2"><a href="mlclassification.html#cb394-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb394-3"><a href="mlclassification.html#cb394-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(consumer_complaint_narrative,</span>
+<span id="cb394-4"><a href="mlclassification.html#cb394-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">max_tokens =</span> <span class="fu">tune</span>(), <span class="at">min_times =</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb394-5"><a href="mlclassification.html#cb394-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(consumer_complaint_narrative)</span></code></pre></div>
 </div>
 <div id="specify-the-model-1" class="section level3 hasAnchor" number="7.11.2">
 <h3><span class="header-section-number">7.11.2</span> Specify the model<a href="mlclassification.html#specify-the-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We use a lasso regularized classifier since it performed well throughout this chapter. We can reuse parts of the old workflow <code>sparse_wf</code> from Section <a href="mlclassification.html#casestudysparseencoding">7.5</a> and update the recipe specification.</p>
-<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="mlclassification.html#cb396-1" aria-hidden="true" tabindex="-1"></a>sparse_wf_v2 <span class="ot">&lt;-</span> sparse_wf <span class="sc">%&gt;%</span></span>
-<span id="cb396-2"><a href="mlclassification.html#cb396-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_recipe</span>(complaints_rec_v2, <span class="at">blueprint =</span> sparse_bp)</span>
-<span id="cb396-3"><a href="mlclassification.html#cb396-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb396-4"><a href="mlclassification.html#cb396-4" aria-hidden="true" tabindex="-1"></a>sparse_wf_v2</span></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="mlclassification.html#cb395-1" aria-hidden="true" tabindex="-1"></a>sparse_wf_v2 <span class="ot">&lt;-</span> sparse_wf <span class="sc">%&gt;%</span></span>
+<span id="cb395-2"><a href="mlclassification.html#cb395-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_recipe</span>(complaints_rec_v2, <span class="at">blueprint =</span> sparse_bp)</span>
+<span id="cb395-3"><a href="mlclassification.html#cb395-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb395-4"><a href="mlclassification.html#cb395-4" aria-hidden="true" tabindex="-1"></a>sparse_wf_v2</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: logistic_reg()
@@ -1894,13 +1871,13 @@ There are <em>two</em> tunable parameters in this model, the regularization para
 </p>
 </div>
 <p>Let’s include different possible values for each parameter, for a combination of 60 models.</p>
-<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="mlclassification.html#cb398-1" aria-hidden="true" tabindex="-1"></a>final_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
-<span id="cb398-2"><a href="mlclassification.html#cb398-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)),</span>
-<span id="cb398-3"><a href="mlclassification.html#cb398-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">3e3</span>)),</span>
-<span id="cb398-4"><a href="mlclassification.html#cb398-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="at">penalty =</span> <span class="dv">20</span>, <span class="at">max_tokens =</span> <span class="dv">3</span>)</span>
-<span id="cb398-5"><a href="mlclassification.html#cb398-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb398-6"><a href="mlclassification.html#cb398-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb398-7"><a href="mlclassification.html#cb398-7" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="mlclassification.html#cb397-1" aria-hidden="true" tabindex="-1"></a>final_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(</span>
+<span id="cb397-2"><a href="mlclassification.html#cb397-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)),</span>
+<span id="cb397-3"><a href="mlclassification.html#cb397-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">max_tokens</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">1e3</span>, <span class="fl">3e3</span>)),</span>
+<span id="cb397-4"><a href="mlclassification.html#cb397-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="at">penalty =</span> <span class="dv">20</span>, <span class="at">max_tokens =</span> <span class="dv">3</span>)</span>
+<span id="cb397-5"><a href="mlclassification.html#cb397-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb397-6"><a href="mlclassification.html#cb397-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb397-7"><a href="mlclassification.html#cb397-7" aria-hidden="true" tabindex="-1"></a>final_grid</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 60 × 2
 #&gt;     penalty max_tokens
 #&gt;       &lt;dbl&gt;      &lt;int&gt;
@@ -1920,24 +1897,24 @@ There are <em>two</em> tunable parameters in this model, the regularization para
 We used <code>grid_regular()</code> here where we fit a model at every combination of parameters, but if you have a model with many tuning parameters, you may wish to try a space-filling grid instead, such as <code>grid_max_entropy()</code> or <code>grid_latin_hypercube()</code>. The <strong>tidymodels</strong> package for creating and handling tuning parameters and parameter grids is <strong>dials</strong> <span class="citation">(<a href="#ref-R-dials" role="doc-biblioref">Kuhn 2020</a>)</span>.
 </div>
 <p>Now it’s time to set up our tuning grid. Let’s save the predictions so we can explore them in more detail, and let’s also set custom metrics instead of using the defaults. Let’s compute accuracy, sensitivity, and specificity during tuning. Sensitivity and specificity are closely related to recall and precision.</p>
-<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="mlclassification.html#cb400-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
-<span id="cb400-2"><a href="mlclassification.html#cb400-2" aria-hidden="true" tabindex="-1"></a>tune_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb400-3"><a href="mlclassification.html#cb400-3" aria-hidden="true" tabindex="-1"></a>  sparse_wf_v2,</span>
-<span id="cb400-4"><a href="mlclassification.html#cb400-4" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
-<span id="cb400-5"><a href="mlclassification.html#cb400-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> final_grid,</span>
-<span id="cb400-6"><a href="mlclassification.html#cb400-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, sensitivity, specificity)</span>
-<span id="cb400-7"><a href="mlclassification.html#cb400-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="mlclassification.html#cb399-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2020</span>)</span>
+<span id="cb399-2"><a href="mlclassification.html#cb399-2" aria-hidden="true" tabindex="-1"></a>tune_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb399-3"><a href="mlclassification.html#cb399-3" aria-hidden="true" tabindex="-1"></a>  sparse_wf_v2,</span>
+<span id="cb399-4"><a href="mlclassification.html#cb399-4" aria-hidden="true" tabindex="-1"></a>  complaints_folds,</span>
+<span id="cb399-5"><a href="mlclassification.html#cb399-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> final_grid,</span>
+<span id="cb399-6"><a href="mlclassification.html#cb399-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, sensitivity, specificity)</span>
+<span id="cb399-7"><a href="mlclassification.html#cb399-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>We have fitted these classification models!</p>
 </div>
 <div id="classification-final-evaluation" class="section level3 hasAnchor" number="7.11.3">
 <h3><span class="header-section-number">7.11.3</span> Evaluate the modeling<a href="mlclassification.html#classification-final-evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Now that all of the models with possible parameter values have been trained, we can compare their performance. Figure <a href="mlclassification.html#fig:complaintsfinaltunevis">7.11</a> shows us the relationship between performance (as measured by the metrics we chose), the number of tokens, and regularization.</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="mlclassification.html#cb401-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tune_rs) <span class="sc">+</span></span>
-<span id="cb401-2"><a href="mlclassification.html#cb401-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb401-3"><a href="mlclassification.html#cb401-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
-<span id="cb401-4"><a href="mlclassification.html#cb401-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance across regularization penalties and tokens&quot;</span>,</span>
-<span id="cb401-5"><a href="mlclassification.html#cb401-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
-<span id="cb401-6"><a href="mlclassification.html#cb401-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="mlclassification.html#cb400-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tune_rs) <span class="sc">+</span></span>
+<span id="cb400-2"><a href="mlclassification.html#cb400-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb400-3"><a href="mlclassification.html#cb400-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Number of tokens&quot;</span>,</span>
+<span id="cb400-4"><a href="mlclassification.html#cb400-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Model performance across regularization penalties and tokens&quot;</span>,</span>
+<span id="cb400-5"><a href="mlclassification.html#cb400-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste</span>(<span class="st">&quot;We can choose a simpler model with higher regularization&quot;</span>)</span>
+<span id="cb400-6"><a href="mlclassification.html#cb400-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaintsfinaltunevis"></span>
 <img src="07_ml_classification_files/figure-html/complaintsfinaltunevis-1.svg" alt="Model performance is similar for the higher token options so we can choose a simpler model. Note the logarithmic scale on the x-axis for the regularization penalty." width="672" />
 <p class="caption">
@@ -1945,17 +1922,17 @@ FIGURE 7.11: Model performance is similar for the higher token options so we can
 </p>
 </div>
 <p>Since this is our final version of this model, we want to choose final parameters and update our model object so we can use it with new data. We have several options for choosing our final parameters, such as selecting the numerically best model. Instead, let’s choose a simpler model within some limit around that numerically best result, with more regularization that gives close-to-best performance. Let’s choose by percent loss compared to the best model (the default choice is 2% loss), and let’s say we care most about overall accuracy (rather than sensitivity or specificity).</p>
-<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="mlclassification.html#cb402-1" aria-hidden="true" tabindex="-1"></a>choose_acc <span class="ot">&lt;-</span> tune_rs <span class="sc">%&gt;%</span></span>
-<span id="cb402-2"><a href="mlclassification.html#cb402-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;accuracy&quot;</span>, <span class="sc">-</span>penalty)</span>
-<span id="cb402-3"><a href="mlclassification.html#cb402-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb402-4"><a href="mlclassification.html#cb402-4" aria-hidden="true" tabindex="-1"></a>choose_acc</span></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="mlclassification.html#cb401-1" aria-hidden="true" tabindex="-1"></a>choose_acc <span class="ot">&lt;-</span> tune_rs <span class="sc">%&gt;%</span></span>
+<span id="cb401-2"><a href="mlclassification.html#cb401-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_by_pct_loss</span>(<span class="at">metric =</span> <span class="st">&quot;accuracy&quot;</span>, <span class="sc">-</span>penalty)</span>
+<span id="cb401-3"><a href="mlclassification.html#cb401-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb401-4"><a href="mlclassification.html#cb401-4" aria-hidden="true" tabindex="-1"></a>choose_acc</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 1 × 10
 #&gt;   penalty max_tokens .metric  .estimator  mean     n std_err .config .best .loss
 #&gt;     &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1 0.00483       1000 accuracy binary     0.882    10 0.00100 Prepro… 0.898  1.74</code></pre>
 <p>After we have those parameters, <code>penalty</code> and <code>max_tokens</code>, we can finalize our earlier tunable workflow, by updating it with this value.</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="mlclassification.html#cb404-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(sparse_wf_v2, choose_acc)</span>
-<span id="cb404-2"><a href="mlclassification.html#cb404-2" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
+<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="mlclassification.html#cb403-1" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(sparse_wf_v2, choose_acc)</span>
+<span id="cb403-2"><a href="mlclassification.html#cb403-2" aria-hidden="true" tabindex="-1"></a>final_wf</span></code></pre></div>
 <pre><code>#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════
 #&gt; Preprocessor: Recipe
 #&gt; Model: logistic_reg()
@@ -1985,9 +1962,9 @@ Notice that this is the first time we have used our testing data during this ent
 </p>
 </div>
 <p>We can use the function <code>last_fit()</code> to <strong>fit</strong> our model one last time on our training data and <strong>evaluate</strong> it on our testing data. We only have to pass this function our finalized model/workflow and our data split.</p>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb406-1"><a href="mlclassification.html#cb406-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, complaints_split)</span>
-<span id="cb406-2"><a href="mlclassification.html#cb406-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb406-3"><a href="mlclassification.html#cb406-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
+<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb405-1"><a href="mlclassification.html#cb405-1" aria-hidden="true" tabindex="-1"></a>final_fitted <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(final_wf, complaints_split)</span>
+<span id="cb405-2"><a href="mlclassification.html#cb405-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb405-3"><a href="mlclassification.html#cb405-3" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fitted)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 2 × 4
 #&gt;   .metric  .estimator .estimate .config             
 #&gt;   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
@@ -1995,9 +1972,9 @@ Notice that this is the first time we have used our testing data during this ent
 #&gt; 2 roc_auc  binary         0.949 Preprocessor1_Model1</code></pre>
 <p>The metrics for the test set look about the same as the resampled training data and indicate we did not overfit during tuning. The accuracy of our final model has improved compared to our earlier models, both because we are combining multiple preprocessing steps and because we have tuned the number of tokens.</p>
 <p>The confusion matrix on the testing data in Figure <a href="mlclassification.html#fig:finalheatmap">7.12</a> also yields pleasing results. It appears symmetric with a strong presence on the diagonal, showing that there isn’t any strong bias towards either of the classes.</p>
-<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb408-1"><a href="mlclassification.html#cb408-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
-<span id="cb408-2"><a href="mlclassification.html#cb408-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> product, <span class="at">estimate =</span> .pred_class) <span class="sc">%&gt;%</span></span>
-<span id="cb408-3"><a href="mlclassification.html#cb408-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="mlclassification.html#cb407-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
+<span id="cb407-2"><a href="mlclassification.html#cb407-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> product, <span class="at">estimate =</span> .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb407-3"><a href="mlclassification.html#cb407-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">&quot;heatmap&quot;</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:finalheatmap"></span>
 <img src="07_ml_classification_files/figure-html/finalheatmap-1.svg" alt="Confusion matrix on the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
@@ -2005,14 +1982,14 @@ FIGURE 7.12: Confusion matrix on the test set for final lasso regularized classi
 </p>
 </div>
 <p>Figure <a href="mlclassification.html#fig:finalroccurve">7.13</a> shows the ROC curve for the testing set, to demonstrate how well this final classification model can distinguish between the two classes.</p>
-<div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="mlclassification.html#cb409-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fitted)  <span class="sc">%&gt;%</span></span>
-<span id="cb409-2"><a href="mlclassification.html#cb409-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> product, .pred_Credit) <span class="sc">%&gt;%</span></span>
-<span id="cb409-3"><a href="mlclassification.html#cb409-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
-<span id="cb409-4"><a href="mlclassification.html#cb409-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb409-5"><a href="mlclassification.html#cb409-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>,</span>
-<span id="cb409-6"><a href="mlclassification.html#cb409-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;ROC curve for US Consumer Finance Complaints&quot;</span>,</span>
-<span id="cb409-7"><a href="mlclassification.html#cb409-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;With final tuned lasso regularized classifier on the test set&quot;</span></span>
-<span id="cb409-8"><a href="mlclassification.html#cb409-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb408-1"><a href="mlclassification.html#cb408-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fitted)  <span class="sc">%&gt;%</span></span>
+<span id="cb408-2"><a href="mlclassification.html#cb408-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> product, .pred_Credit) <span class="sc">%&gt;%</span></span>
+<span id="cb408-3"><a href="mlclassification.html#cb408-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb408-4"><a href="mlclassification.html#cb408-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb408-5"><a href="mlclassification.html#cb408-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>,</span>
+<span id="cb408-6"><a href="mlclassification.html#cb408-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;ROC curve for US Consumer Finance Complaints&quot;</span>,</span>
+<span id="cb408-7"><a href="mlclassification.html#cb408-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;With final tuned lasso regularized classifier on the test set&quot;</span></span>
+<span id="cb408-8"><a href="mlclassification.html#cb408-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:finalroccurve"></span>
 <img src="07_ml_classification_files/figure-html/finalroccurve-1.svg" alt="ROC curve with the test set for final lasso regularized classifier" width="672" />
 <p class="caption">
@@ -2020,34 +1997,34 @@ FIGURE 7.13: ROC curve with the test set for final lasso regularized classifier
 </p>
 </div>
 <p>The output of <code>last_fit()</code> also contains a fitted model (a <code>workflow</code>, to be more specific) that has been trained on the <em>training</em> data. We can use the vip package to understand what the most important variables are in the predictions, shown in Figure <a href="mlclassification.html#fig:complaintsvip">7.14</a>.</p>
-<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="mlclassification.html#cb410-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span>
-<span id="cb410-2"><a href="mlclassification.html#cb410-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb410-3"><a href="mlclassification.html#cb410-3" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="ot">&lt;-</span> <span class="fu">extract_fit_parsnip</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span></span>
-<span id="cb410-4"><a href="mlclassification.html#cb410-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>(<span class="at">lambda =</span> choose_acc<span class="sc">$</span>penalty)</span>
-<span id="cb410-5"><a href="mlclassification.html#cb410-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb410-6"><a href="mlclassification.html#cb410-6" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="sc">%&gt;%</span></span>
-<span id="cb410-7"><a href="mlclassification.html#cb410-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb410-8"><a href="mlclassification.html#cb410-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sign =</span> <span class="fu">case_when</span>(Sign <span class="sc">==</span> <span class="st">&quot;POS&quot;</span> <span class="sc">~</span> <span class="st">&quot;Less about credit reporting&quot;</span>,</span>
-<span id="cb410-9"><a href="mlclassification.html#cb410-9" aria-hidden="true" tabindex="-1"></a>                     Sign <span class="sc">==</span> <span class="st">&quot;NEG&quot;</span> <span class="sc">~</span> <span class="st">&quot;More about credit reporting&quot;</span>),</span>
-<span id="cb410-10"><a href="mlclassification.html#cb410-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Importance =</span> <span class="fu">abs</span>(Importance),</span>
-<span id="cb410-11"><a href="mlclassification.html#cb410-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Variable =</span> <span class="fu">str_remove_all</span>(Variable, <span class="st">&quot;tfidf_consumer_complaint_narrative_&quot;</span>),</span>
-<span id="cb410-12"><a href="mlclassification.html#cb410-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Variable =</span> <span class="fu">str_remove_all</span>(Variable, <span class="st">&quot;textfeature_narrative_copy_&quot;</span>)</span>
-<span id="cb410-13"><a href="mlclassification.html#cb410-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb410-14"><a href="mlclassification.html#cb410-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Sign) <span class="sc">%&gt;%</span></span>
-<span id="cb410-15"><a href="mlclassification.html#cb410-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, Importance) <span class="sc">%&gt;%</span></span>
-<span id="cb410-16"><a href="mlclassification.html#cb410-16" aria-hidden="true" tabindex="-1"></a>  ungroup <span class="sc">%&gt;%</span></span>
-<span id="cb410-17"><a href="mlclassification.html#cb410-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance,</span>
-<span id="cb410-18"><a href="mlclassification.html#cb410-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">fct_reorder</span>(Variable, Importance),</span>
-<span id="cb410-19"><a href="mlclassification.html#cb410-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> Sign)) <span class="sc">+</span></span>
-<span id="cb410-20"><a href="mlclassification.html#cb410-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb410-21"><a href="mlclassification.html#cb410-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb410-22"><a href="mlclassification.html#cb410-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Sign, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
-<span id="cb410-23"><a href="mlclassification.html#cb410-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb410-24"><a href="mlclassification.html#cb410-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb410-25"><a href="mlclassification.html#cb410-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Variable importance for predicting the topic of a CFPB complaint&quot;</span>,</span>
-<span id="cb410-26"><a href="mlclassification.html#cb410-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">&quot;These features are the most important in predicting</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
-<span id="cb410-27"><a href="mlclassification.html#cb410-27" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;whether a complaint is about credit or not&quot;</span>)</span>
-<span id="cb410-28"><a href="mlclassification.html#cb410-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="mlclassification.html#cb409-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span>
+<span id="cb409-2"><a href="mlclassification.html#cb409-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-3"><a href="mlclassification.html#cb409-3" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="ot">&lt;-</span> <span class="fu">extract_fit_parsnip</span>(final_fitted<span class="sc">$</span>.workflow[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span></span>
+<span id="cb409-4"><a href="mlclassification.html#cb409-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>(<span class="at">lambda =</span> choose_acc<span class="sc">$</span>penalty)</span>
+<span id="cb409-5"><a href="mlclassification.html#cb409-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb409-6"><a href="mlclassification.html#cb409-6" aria-hidden="true" tabindex="-1"></a>complaints_imp <span class="sc">%&gt;%</span></span>
+<span id="cb409-7"><a href="mlclassification.html#cb409-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb409-8"><a href="mlclassification.html#cb409-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sign =</span> <span class="fu">case_when</span>(Sign <span class="sc">==</span> <span class="st">&quot;POS&quot;</span> <span class="sc">~</span> <span class="st">&quot;Less about credit reporting&quot;</span>,</span>
+<span id="cb409-9"><a href="mlclassification.html#cb409-9" aria-hidden="true" tabindex="-1"></a>                     Sign <span class="sc">==</span> <span class="st">&quot;NEG&quot;</span> <span class="sc">~</span> <span class="st">&quot;More about credit reporting&quot;</span>),</span>
+<span id="cb409-10"><a href="mlclassification.html#cb409-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Importance =</span> <span class="fu">abs</span>(Importance),</span>
+<span id="cb409-11"><a href="mlclassification.html#cb409-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Variable =</span> <span class="fu">str_remove_all</span>(Variable, <span class="st">&quot;tfidf_consumer_complaint_narrative_&quot;</span>),</span>
+<span id="cb409-12"><a href="mlclassification.html#cb409-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Variable =</span> <span class="fu">str_remove_all</span>(Variable, <span class="st">&quot;textfeature_narrative_copy_&quot;</span>)</span>
+<span id="cb409-13"><a href="mlclassification.html#cb409-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb409-14"><a href="mlclassification.html#cb409-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Sign) <span class="sc">%&gt;%</span></span>
+<span id="cb409-15"><a href="mlclassification.html#cb409-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">top_n</span>(<span class="dv">20</span>, Importance) <span class="sc">%&gt;%</span></span>
+<span id="cb409-16"><a href="mlclassification.html#cb409-16" aria-hidden="true" tabindex="-1"></a>  ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb409-17"><a href="mlclassification.html#cb409-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance,</span>
+<span id="cb409-18"><a href="mlclassification.html#cb409-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">fct_reorder</span>(Variable, Importance),</span>
+<span id="cb409-19"><a href="mlclassification.html#cb409-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> Sign)) <span class="sc">+</span></span>
+<span id="cb409-20"><a href="mlclassification.html#cb409-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb409-21"><a href="mlclassification.html#cb409-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb409-22"><a href="mlclassification.html#cb409-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Sign, <span class="at">scales =</span> <span class="st">&quot;free&quot;</span>) <span class="sc">+</span></span>
+<span id="cb409-23"><a href="mlclassification.html#cb409-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb409-24"><a href="mlclassification.html#cb409-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb409-25"><a href="mlclassification.html#cb409-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Variable importance for predicting the topic of a CFPB complaint&quot;</span>,</span>
+<span id="cb409-26"><a href="mlclassification.html#cb409-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">&quot;These features are the most important in predicting</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb409-27"><a href="mlclassification.html#cb409-27" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;whether a complaint is about credit or not&quot;</span>)</span>
+<span id="cb409-28"><a href="mlclassification.html#cb409-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:complaintsvip"></span>
 <img src="07_ml_classification_files/figure-html/complaintsvip-1.svg" alt="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability" width="672" />
 <p class="caption">
@@ -2061,13 +2038,13 @@ The top features we see here are all tokens learned directly from the text. None
 </p>
 </div>
 <p>We can gain some final insight into our model by looking at observations from the test set that it <em>misclassified</em>. Let’s bind together the predictions on the test set with the original <code>complaints_test</code> data. Then let’s look at complaints that were labeled as about credit reporting in the original data but that our final model thought had a low probability of being about credit reporting.</p>
-<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb411-1"><a href="mlclassification.html#cb411-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
-<span id="cb411-2"><a href="mlclassification.html#cb411-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(complaints_test <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>product))</span>
-<span id="cb411-3"><a href="mlclassification.html#cb411-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb411-4"><a href="mlclassification.html#cb411-4" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
-<span id="cb411-5"><a href="mlclassification.html#cb411-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Credit&quot;</span>, .pred_Credit <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb411-6"><a href="mlclassification.html#cb411-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb411-7"><a href="mlclassification.html#cb411-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="mlclassification.html#cb410-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(final_fitted) <span class="sc">%&gt;%</span></span>
+<span id="cb410-2"><a href="mlclassification.html#cb410-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(complaints_test <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>product))</span>
+<span id="cb410-3"><a href="mlclassification.html#cb410-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb410-4"><a href="mlclassification.html#cb410-4" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
+<span id="cb410-5"><a href="mlclassification.html#cb410-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Credit&quot;</span>, .pred_Credit <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb410-6"><a href="mlclassification.html#cb410-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb410-7"><a href="mlclassification.html#cb410-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
@@ -2083,10 +2060,10 @@ The top features we see here are all tokens learned directly from the text. None
 #&gt; 10 &quot;Old debt is sold or reassigned to another agency at the end of the seven ye…</code></pre>
 <p>We can see why some of these would be difficult for our model to classify as about credit reporting, since some are about other topics as well. The original label may also be incorrect in some cases.</p>
 <p>What about misclassifications in the other direction, observations in the test set that were <em>not</em> labeled as about credit reporting but that our final model gave a high probability of being about credit reporting?</p>
-<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb413-1"><a href="mlclassification.html#cb413-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
-<span id="cb413-2"><a href="mlclassification.html#cb413-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Other&quot;</span>, .pred_Credit <span class="sc">&gt;</span> <span class="fl">0.8</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb413-3"><a href="mlclassification.html#cb413-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
-<span id="cb413-4"><a href="mlclassification.html#cb413-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb412"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb412-1"><a href="mlclassification.html#cb412-1" aria-hidden="true" tabindex="-1"></a>complaints_bind <span class="sc">%&gt;%</span></span>
+<span id="cb412-2"><a href="mlclassification.html#cb412-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(product <span class="sc">==</span> <span class="st">&quot;Other&quot;</span>, .pred_Credit <span class="sc">&gt;</span> <span class="fl">0.8</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb412-3"><a href="mlclassification.html#cb412-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(consumer_complaint_narrative) <span class="sc">%&gt;%</span></span>
+<span id="cb412-4"><a href="mlclassification.html#cb412-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
 <pre><code>#&gt; # A tibble: 10 × 1
 #&gt;    consumer_complaint_narrative                                                 
 #&gt;    &lt;chr&gt;                                                                        
