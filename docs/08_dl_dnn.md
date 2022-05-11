@@ -15,7 +15,7 @@ This chapter explores one of the most straightforward configurations for a deep 
 Figure \@ref(fig:dnndiag) depicts a densely-connected neural network architecture \index{neural network!feed forward}*feed-forward*. The input comes in to the network all at once and is densely (in this case, fully) connected to the first hidden layer. A layer is "hidden" in the sense that it doesn't connect to the outside world; the input and output layers take care of this. The neurons in any given layer are only connected to the next layer. The numbers of layers and nodes within each layer are variable and are hyperparameters of the model selected by the practitioner.
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/dnn-architecture.pdf" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
+<img src="diagram-files/dnn-architecture.png" alt="A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units." width="90%" />
 <p class="caption">(\#fig:dnndiag)A high-level diagram of a feed-forward neural network. The lines connecting the nodes are shaded differently to illustrate the different weights connecting units.</p>
 </div>
 

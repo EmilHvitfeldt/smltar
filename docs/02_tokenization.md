@@ -53,7 +53,7 @@ These elements don't contain any metadata or information to tell us which charac
 In tokenization, we take an input (a string) and a token type (a meaningful unit of text, such as a word) and split the input into pieces (tokens) that correspond to the type [@Manning:2008:IIR:1394399]. Figure \@ref(fig:tokenizationdiag) outlines this process.\index{tokenization!definition}
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/tokenization-black-box.pdf" alt="A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split." width="90%" />
+<img src="diagram-files/tokenization-black-box.png" alt="A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split." width="90%" />
 <p class="caption">(\#fig:tokenizationdiag)A black box representation of a tokenizer. The text of these three example text fragments has been converted to lowercase and punctuation has been removed before the text is split.</p>
 </div>
 
