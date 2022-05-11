@@ -469,11 +469,11 @@ Instead of `penalty = tune()` like before, now our workflow has finalized values
 fitted_lasso <- fit(final_lasso, complaints_train)
 ```
 
-What does the result look like? We can access the fit using `pull_workflow_fit()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
+What does the result look like? We can access the fit using `extract_fit_parsnip()`, and even `tidy()` the model coefficient results into a convenient dataframe format.
 
 ```{r dependson="lassofit"}
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(-estimate)
 ```
@@ -484,7 +484,7 @@ What terms contribute to a complaint being about credit reporting, for this tune
 
 ```{r dependson="lassofit"}
 fitted_lasso %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>%
   arrange(estimate)
 ```
@@ -677,8 +677,6 @@ multi_lasso_rs <- tune_grid(
   grid = smaller_lambda,
   control = control_resamples(save_pred = TRUE)
 )
-
-multi_lasso_rs
 ```
 
 What do we see, in terms of performance metrics?
@@ -831,7 +829,7 @@ We see here that including more predictors did not measurably improve our model 
 finalize_workflow(more_vars_wf, 
                   select_best(more_vars_rs, "roc_auc")) %>%
   fit(complaints_train) %>%
-  pull_workflow_fit() %>%
+  extract_fit_parsnip() %>%
   tidy() %>% 
   arrange(-abs(estimate)) %>% 
   mutate(term_rank = row_number()) %>% 
@@ -1205,6 +1203,10 @@ For our final model, let's use some of the domain-specific features\index{featur
 
 - finally evaluate on the testing set, which we have not touched at all yet.
 
+```{block, type = "rmdnote"}
+Be aware that the tuning calculations we demonstrate here are computationally expensive, and take a long time to complete.
+```
+
 ### Feature selection
 
 We start by creating a new preprocessing recipe, using only the text of the complaints for feature engineering. 
@@ -1367,7 +1369,7 @@ The output of `last_fit()` also contains a fitted model (a `workflow`, to be mor
 ```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
 library(vip)
 
-complaints_imp <- pull_workflow_fit(final_fitted$.workflow[[1]]) %>%
+complaints_imp <- extract_fit_parsnip(final_fitted$.workflow[[1]]) %>%
   vi(lambda = choose_acc$penalty)
 
 complaints_imp %>%

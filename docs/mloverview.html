@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Overview | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Overview | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Overview | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Overview | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="embeddings.html"/>
 <link rel="next" href="mlregression.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="mloverview" class="section level1 unnumbered">
-<h1>Overview</h1>
+<div id="mloverview" class="section level1 unnumbered hasAnchor">
+<h1>Overview<a href="mloverview.html#mloverview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>It’s time to use what we have discussed and learned in the first five chapters of this book in a supervised machine learning context, to make predictions from text data. In the next two chapters, we will focus on putting into practice such machine learning algorithms as:</p>
 <ul>
 <li><p>naive Bayes,</p></li>
@@ -474,43 +473,43 @@ div.csl-indent {
 The <strong>tidymodels</strong> framework <span class="citation">(<a href="#ref-R-tidymodels" role="doc-biblioref">Kuhn and Wickham 2021a</a>)</span> is a collection of R packages for modeling and machine learning using tidyverse principles <span class="citation">(<a href="#ref-Wickham2019" role="doc-biblioref">Wickham et al. 2019</a>)</span>. These packages facilitate resampling, preprocessing, modeling, and evaluation. There are core packages that you can load all together via <code>library(tidymodels)</code> and then extra packages for more specific tasks.
 </div>
 <p>As you read through these next chapters, notice the modeling <em>process</em> moving through these stages; we’ll discuss the structure of this process in more detail in the overview for the deep learning chapters.</p>
-<p>Before we starting fitting these models to real data sets, let’s consider how to think about algorithmic bias for predictive modeling.
+<p>Before we start fitting these models to real data sets, let’s consider how to think about algorithmic bias for predictive modeling.
 Rachel Thomas proposed a checklist at <a href="https://opendatascience.com/odsc-west-2019-keynote-rachel-thomas-on-algorithmic-bias/">ODSC West 2019</a> for algorithmic bias in machine learning.</p>
-<div id="should-we-even-be-doing-this" class="section level2 unnumbered">
-<h2>Should we even be doing this?</h2>
+<div id="should-we-even-be-doing-this" class="section level2 unnumbered hasAnchor">
+<h2>Should we even be doing this?<a href="mloverview.html#should-we-even-be-doing-this" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This is always the first step. Machine learning algorithms involve math and data, but that does not mean they are neutral. They can be used for purposes that are helpful, harmful, or even unethical.</p>
 </div>
-<div id="what-bias-is-already-in-the-data" class="section level2 unnumbered">
-<h2>What bias is already in the data?</h2>
+<div id="what-bias-is-already-in-the-data" class="section level2 unnumbered hasAnchor">
+<h2>What bias is already in the data?<a href="mloverview.html#what-bias-is-already-in-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Chapter <a href="mlregression.html#mlregression">6</a> uses a data set of United States Supreme Court opinions, with an uneven distribution of years. There are many more opinions from more recent decades than from earlier ones. Bias like this is extremely common in data sets and must be considered in modeling. In this case, we show how using regularized linear models results in better predictions across years than other approaches (Section <a href="mlregression.html#comparerf">6.3</a>).</p>
 </div>
-<div id="can-the-code-and-data-be-audited" class="section level2 unnumbered">
-<h2>Can the code and data be audited?</h2>
+<div id="can-the-code-and-data-be-audited" class="section level2 unnumbered hasAnchor">
+<h2>Can the code and data be audited?<a href="mloverview.html#can-the-code-and-data-be-audited" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In the case of this book, the code and data are all publicly available. You as a reader can audit our methods and what kinds of bias exist in the data sets. When you take what you have learned in this book and apply it your real-world work, consider how accessible your code and data are to internal and external stakeholders.</p>
 </div>
-<div id="what-are-the-error-rates-for-sub-groups" class="section level2 unnumbered">
-<h2>What are the error rates for sub-groups?</h2>
+<div id="what-are-the-error-rates-for-sub-groups" class="section level2 unnumbered hasAnchor">
+<h2>What are the error rates for sub-groups?<a href="mloverview.html#what-are-the-error-rates-for-sub-groups" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In Section <a href="mlclassification.html#mlmulticlass">7.6</a> we demonstrate how to measure model performance for a multiclass classifier, but you can also compute model metrics for sub-groups that are not explicitly in your model as class labels or predictors. Using tidy data principles and the <strong>yardstick</strong> package makes this task well within the reach of data practitioners.</p>
 
 <div class="rmdpackage">
 In <strong>tidymodels</strong>, the <strong>yardstick</strong> package <span class="citation">(<a href="#ref-R-yardstick" role="doc-biblioref">Kuhn and Vaughan 2021a</a>)</span> has functions for model evaluation.
 </div>
 </div>
-<div id="what-is-the-accuracy-of-a-simple-rule-based-alternative" class="section level2 unnumbered">
-<h2>What is the accuracy of a simple rule-based alternative?</h2>
+<div id="what-is-the-accuracy-of-a-simple-rule-based-alternative" class="section level2 unnumbered hasAnchor">
+<h2>What is the accuracy of a simple rule-based alternative?<a href="mloverview.html#what-is-the-accuracy-of-a-simple-rule-based-alternative" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Chapter <a href="mlclassification.html#mlclassification">7</a> shows how to train models to predict the category of a user complaint using sophisticated preprocessing steps and machine learning algorithms, but such a complaint could be categorized using simple regular expressions (Appendix <a href="regexp.html#regexp">A</a>), perhaps combined with other rules. Straightforward heuristics are easy to implement, maintain, and audit, compared to machine learning models; consider comparing the accuracy of models to simpler options.</p>
 </div>
-<div id="what-processes-are-in-place-to-handle-appeals-or-mistakes" class="section level2 unnumbered">
-<h2>What processes are in place to handle appeals or mistakes?</h2>
+<div id="what-processes-are-in-place-to-handle-appeals-or-mistakes" class="section level2 unnumbered hasAnchor">
+<h2>What processes are in place to handle appeals or mistakes?<a href="mloverview.html#what-processes-are-in-place-to-handle-appeals-or-mistakes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>If models such as those built in Chapter <a href="mlclassification.html#mlclassification">7</a> were put into production by an organization, what would happen if a complaint was classified incorrectly? We as data practitioners typically (hopefully) have a reasonable estimate of the true positive rate and true negative rate for models we train, so processes to handle misclassifications can be built with a good understanding of how often they will be used.</p>
 </div>
-<div id="how-diverse-is-the-team-that-built-it" class="section level2 unnumbered">
-<h2>How diverse is the team that built it?</h2>
+<div id="how-diverse-is-the-team-that-built-it" class="section level2 unnumbered hasAnchor">
+<h2>How diverse is the team that built it?<a href="mloverview.html#how-diverse-is-the-team-that-built-it" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The two-person team that wrote this book includes perspectives from a man and woman, and from someone who has always lived inside the United States and someone who is from a European country. However, we are both white with similar educational backgrounds. We must be aware of how the limited life experiences of individuals training and assessing machine learning models can cause unintentional harm.</p>
 
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Boser1992" class="csl-entry">
 Boser, B. E., Guyon, I. M., and Vapnik, V. N. 1992. <span>“A Training Algorithm for Optimal Margin Classifiers.”</span> In <em><span class="nocase">Proceedings of the Fifth Annual Workshop on Computational Learning Theory</span></em>, 144–152. COLT ’92. New York, NY: Association for Computing Machinery. <a href="https://doi.org/10.1145/130385.130401">https://doi.org/10.1145/130385.130401</a>.

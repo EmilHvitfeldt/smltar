@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Chapter 2 Tokenization | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="language.html"/>
 <link rel="next" href="stopwords.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,11 +453,11 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="tokenization" class="section level1" number="2">
-<h1><span class="header-section-number">Chapter 2</span> Tokenization</h1>
+<div id="tokenization" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Tokenization<a href="tokenization.html#tokenization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>To build features for supervised machine learning from natural language, we need some way of representing raw text as numbers so we can perform computation on them. Typically, one of the first steps in this transformation from natural language to feature, or any of kind of text analysis, is <em>tokenization</em>. Knowing what tokenization and tokens are, along with the related concept of an n-gram, is important for almost any natural language processing task.</p>
-<div id="what-is-a-token" class="section level2" number="2.1">
-<h2><span class="header-section-number">2.1</span> What is a token?</h2>
+<div id="what-is-a-token" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> What is a token?<a href="tokenization.html#what-is-a-token" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>In R, text is typically represented with the <em>character</em> data type, similar to strings in other languages. Let’s explore text from fairy tales written by Hans Christian Andersen, available in the <strong>hcandersenr</strong> package <span class="citation">(<a href="#ref-R-hcandersenr" role="doc-biblioref">Hvitfeldt 2019a</a>)</span>. This package stores text as lines such as those you would read in a book; this is just one way that you may find text data in the wild and does allow us to more easily read the text when doing analysis.
 If we look at the first paragraph of one story titled “The Fir-Tree,” we find the text of the story is in a character vector: a series of letters, spaces, and punctuation stored as a vector.</p>
 <div class="rmdpackage">
@@ -543,8 +542,8 @@ FIGURE 2.1: A black box representation of a tokenizer. The text of these three e
 </ul>
 <p>While we might not understand what each and every step in this algorithm is doing, we can appreciate that it is many times more sophisticated than our initial approach of splitting on non-alphanumeric characters. In most of this book, we will use the <strong>tokenizers</strong> package as a baseline tokenizer for reference. Your choice of tokenizer will influence your results, so don’t be afraid to experiment with different tokenizers or, if necessary, to write your own to fit your problem.</p>
 </div>
-<div id="types-of-tokens" class="section level2" number="2.2">
-<h2><span class="header-section-number">2.2</span> Types of tokens</h2>
+<div id="types-of-tokens" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Types of tokens<a href="tokenization.html#types-of-tokens" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Thinking of a token as a word is a useful way to start understanding tokenization, even if it is hard to implement concretely in software. We can generalize the idea of a token beyond only a single word to other units of text. We can tokenize text at a variety of units including:</p>
 <ul>
 <li><p>characters,</p></li>
@@ -610,8 +609,8 @@ The <strong>tidytext</strong> package provides functions to transform text to an
 #&gt; 10 fir   
 #&gt; 11 -     
 #&gt; 12 tree</code></pre>
-<div id="character-tokens" class="section level3" number="2.2.1">
-<h3><span class="header-section-number">2.2.1</span> Character tokens</h3>
+<div id="character-tokens" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Character tokens<a href="tokenization.html#character-tokens" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Perhaps the simplest tokenization is character tokenization, which splits texts into characters. Let’s use <code>tokenize_characters()</code> with its default parameters; this function has arguments to convert to lowercase and to strip all non-alphanumeric characters. These defaults will reduce the number of different tokens that are returned. The <code>tokenize_*()</code> functions by default return a list of character vectors, one character vector for each string in the input.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="tokenization.html#cb14-1" aria-hidden="true" tabindex="-1"></a>tft_token_characters <span class="ot">&lt;-</span> <span class="fu">tokenize_characters</span>(<span class="at">x =</span> the_fir_tree,</span>
 <span id="cb14-2"><a href="tokenization.html#cb14-2" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">lowercase =</span> <span class="cn">TRUE</span>,</span>
@@ -646,8 +645,8 @@ The <strong>tidytext</strong> package provides functions to transform text to an
 #&gt; [1] &quot;ﬂ&quot; &quot;o&quot; &quot;w&quot; &quot;e&quot; &quot;r&quot; &quot;s&quot;</code></pre>
 <p>We might want to have these ligatures separated back into separate characters, but first, we need to consider a couple of things. First, we need to consider if the presence of ligatures is a meaningful feature to the question we are trying to answer. Second, there are two main types of ligatures: stylistic and functional. Stylistic ligatures are when two characters are combined because the spacing between the characters has been deemed unpleasant. Functional ligatures like the German Eszett (also called the scharfes S, meaning sharp s) ß, is an official letter of the German alphabet. It is described as a long S and Z and historically has never gotten an uppercase character. This has led the typesetters to use SZ or SS as a replacement when writing a word in uppercase. Additionally, ß is omitted entirely in German writing in Switzerland and is replaced with ss. Other examples include the “W” in the Latin alphabet (two “v” or two “u” joined together), and æ, ø, and å in the Nordic languages. Some place names for historical reasons use the old spelling “aa” instead of å. In Section <a href="mlregression.html#text-normalization">6.7.1</a> we will discuss text normalization approaches to deal with ligatures.</p>
 </div>
-<div id="word-tokens" class="section level3" number="2.2.2">
-<h3><span class="header-section-number">2.2.2</span> Word tokens</h3>
+<div id="word-tokens" class="section level3 hasAnchor" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Word tokens<a href="tokenization.html#word-tokens" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Tokenizing at the word level is perhaps the most common and widely used tokenization. We started our discussion in this chapter with this kind of tokenization, and as we described before, this is the procedure of splitting text into words. To do this, let’s use the <code>tokenize_words()</code> function.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="tokenization.html#cb21-1" aria-hidden="true" tabindex="-1"></a>tft_token_words <span class="ot">&lt;-</span> <span class="fu">tokenize_words</span>(<span class="at">x =</span> the_fir_tree,</span>
 <span id="cb21-2"><a href="tokenization.html#cb21-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">lowercase =</span> <span class="cn">TRUE</span>,</span>
@@ -693,8 +692,8 @@ The <strong>tidytext</strong> package provides functions to transform text to an
 <p>These uninformative words are called <strong>stop words</strong> and will be explored in-depth in Chapter <a href="stopwords.html#stopwords">3</a>.</p>
 </div>
 </div>
-<div id="tokenizingngrams" class="section level3" number="2.2.3">
-<h3><span class="header-section-number">2.2.3</span> Tokenizing by n-grams</h3>
+<div id="tokenizingngrams" class="section level3 hasAnchor" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> Tokenizing by n-grams<a href="tokenization.html#tokenizingngrams" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>An n-gram (sometimes written “ngram”) is a term in linguistics for a contiguous sequence of <span class="math inline">\(n\)</span> items from a given sequence of text or speech. The item can be phonemes, syllables, letters, or words depending on the application, but when most people talk about n-grams, they mean a group of <span class="math inline">\(n\)</span> words. In this book, we will use n-gram to denote word n-grams unless otherwise stated.</p>
 <div class="rmdnote">
 <p>
@@ -745,8 +744,8 @@ FIGURE 2.2: Using longer n-grams results in a higher number of unique tokens wit
 #&gt; [31] &quot;sweet&quot;</code></pre>
 <p>Combining different degrees of n-grams can allow you to extract different levels of detail from text data. Unigrams tell you which individual words have been used a lot of times; some of these words could be overlooked in bigram or trigram counts if they don’t co-appear with other words often. Consider a scenario where every time the word “dog” was used it came after an adjective: “happy dog,” “sad dog,” “brown dog,” “white dog,” “playful dog,” etc. If this is fairly consistent and the adjectives varied enough, then bigrams would not be able to detect that this story is about dogs. Similarly “very happy” and “not happy” will be recognized as different from bigrams and not with unigrams alone.</p>
 </div>
-<div id="lines-sentence-and-paragraph-tokens" class="section level3" number="2.2.4">
-<h3><span class="header-section-number">2.2.4</span> Lines, sentence, and paragraph tokens</h3>
+<div id="lines-sentence-and-paragraph-tokens" class="section level3 hasAnchor" number="2.2.4">
+<h3><span class="header-section-number">2.2.4</span> Lines, sentence, and paragraph tokens<a href="tokenization.html#lines-sentence-and-paragraph-tokens" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Tokenizers to split text into larger units of text like lines, sentences, and paragraphs are rarely used directly for modeling purposes, as the tokens produced tend to be fairly unique. It is very uncommon for multiple sentences in a text to be identical! However, these tokenizers are useful for preprocessing and labeling.</p>
 <p>For example, Jane Austen’s novel <em>Northanger Abbey</em> (as available in the <strong>janeaustenr</strong> package) is already preprocessed with each line being at most 80 characters long. However, it might be useful to split the data into chapters and paragraphs instead.</p>
 <p>Let’s create a function that takes a dataframe containing a variable called <code>text</code> and turns it into a dataframe where the text is transformed into paragraphs. First, we can collapse the text into one long string using <code>collapse = "\n"</code> to denote line breaks, and then next we can use <code>tokenize_paragraphs()</code> to identify the paragraphs and put them back into a dataframe. We can add a paragraph count with <code>row_number()</code>.</p>
@@ -807,8 +806,8 @@ To do this we use <code>nest()</code> and <code>map_chr()</code> to create a dat
 <p>Now that we have turned the text into “one sentence per element,” we can analyze on the sentence level.</p>
 </div>
 </div>
-<div id="where-does-tokenization-break-down" class="section level2" number="2.3">
-<h2><span class="header-section-number">2.3</span> Where does tokenization break down?</h2>
+<div id="where-does-tokenization-break-down" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Where does tokenization break down?<a href="tokenization.html#where-does-tokenization-break-down" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Tokenization will generally be one of the first steps when building a model or any kind of text analysis, so it is important to consider carefully what happens in this step of data preprocessing. As with most software, there is a trade-off between speed and customizability, as demonstrated in Section <a href="tokenization.html#tokenization-benchmark">2.6</a>. The fastest tokenization methods give us less control over how it is done.</p>
 <p>While the defaults work well in many cases, we encounter situations where we want to impose stricter rules to get better or different tokenized results. Consider the following sentence.</p>
 <blockquote>
@@ -834,8 +833,8 @@ FIGURE 2.3: The number of distinct tokens can vary enormously for different toke
 </p>
 </div>
 </div>
-<div id="building-your-own-tokenizer" class="section level2" number="2.4">
-<h2><span class="header-section-number">2.4</span> Building your own tokenizer</h2>
+<div id="building-your-own-tokenizer" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Building your own tokenizer<a href="tokenization.html#building-your-own-tokenizer" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Sometimes the out-of-the-box tokenizers won’t be able to do what you need them to do. In this case, we will have to wield <strong>stringi</strong>/<strong>stringr</strong> and regular expressions (see Appendix <a href="regexp.html#regexp">A</a>).</p>
 <p>There are two main approaches to tokenization.</p>
 <ol style="list-style-type: decimal">
@@ -843,8 +842,8 @@ FIGURE 2.3: The number of distinct tokens can vary enormously for different toke
 <li><em>Extract</em> tokens based on some rule.</li>
 </ol>
 <p>The number and complexity of our rules are determined by our desired outcome. We can reach complex outcomes by chaining together many smaller rules. In this section, we will implement a couple of specialty tokenizers to showcase these techniques.</p>
-<div id="tokenize-to-characters-only-keeping-letters" class="section level3" number="2.4.1">
-<h3><span class="header-section-number">2.4.1</span> Tokenize to characters, only keeping letters</h3>
+<div id="tokenize-to-characters-only-keeping-letters" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> Tokenize to characters, only keeping letters<a href="tokenization.html#tokenize-to-characters-only-keeping-letters" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Here we want to modify what <code>tokenize_characters()</code> does, such that we only keep letters. There are two main options. We can use <code>tokenize_characters()</code> and remove anything that is not a letter, or we can extract the letters one by one. Let’s try the latter option. This is an <strong>extract</strong> task, and we will use <code>str_extract_all()</code> as each string has the possibility of including more than one token. Since we want to extract letters we can use the letters character class <code>[:alpha:]</code> to match letters and the quantifier <code>{1}</code> to only extract the first one.</p>
 <div class="rmdnote">
 <p>
@@ -876,8 +875,8 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 </p>
 </div>
 </div>
-<div id="allow-for-hyphenated-words" class="section level3" number="2.4.2">
-<h3><span class="header-section-number">2.4.2</span> Allow for hyphenated words</h3>
+<div id="allow-for-hyphenated-words" class="section level3 hasAnchor" number="2.4.2">
+<h3><span class="header-section-number">2.4.2</span> Allow for hyphenated words<a href="tokenization.html#allow-for-hyphenated-words" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In our examples so far, we have noticed that the string “fir-tree” is typically split into two tokens. Let’s explore two different approaches for how to handle this hyphenated word as one token. First, let’s split on white space; this is a decent way to identify words in English and some other languages, and it does not split hyphenated words as the hyphen character isn’t considered a white-space. Second, let’s find a regex to match words with a hyphen and extract those.</p>
 <p>Splitting by white space is not too difficult because we can use character classes, as shown in Table <a href="regexp.html#tab:characterclasses">A.2</a>. We will use the white space character class <code>[:space:]</code> to split our sentence.</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="tokenization.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str_split</span>(<span class="st">&quot;This isn&#39;t a sentence with hyphenated-words.&quot;</span>, <span class="st">&quot;[:space:]&quot;</span>)</span></code></pre></div>
@@ -931,8 +930,8 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 #&gt; [5] &quot;with&quot;             &quot;hyphenated-words&quot;</code></pre>
 <p>That is getting to be quite a complex regex, but we are now getting the same answer as before.</p>
 </div>
-<div id="wrapping-it-in-a-function" class="section level3" number="2.4.3">
-<h3><span class="header-section-number">2.4.3</span> Wrapping it in a function</h3>
+<div id="wrapping-it-in-a-function" class="section level3 hasAnchor" number="2.4.3">
+<h3><span class="header-section-number">2.4.3</span> Wrapping it in a function<a href="tokenization.html#wrapping-it-in-a-function" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>We have shown how we can use regular expressions to extract the tokens we want, perhaps to use in modeling. So far, the code has been rather unstructured. We would ideally wrap these tasks into functions that can be used the same way <code>tokenize_words()</code> is used.</p>
 <p>Let’s start with the example with hyphenated words. To make the function a little more flexible, let’s add an option to transform all the output to lowercase.</p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="tokenization.html#cb59-1" aria-hidden="true" tabindex="-1"></a>tokenize_hyphenated_words <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">lowercase =</span> <span class="cn">TRUE</span>) {</span>
@@ -984,8 +983,8 @@ Choosing between <code>[:alpha:]</code> and <code>[a-zA-Z]</code> may seem quite
 <p>We can use <code>paste0()</code> in this function to construct an actual regex.</p>
 </div>
 </div>
-<div id="tokenization-for-non-latin-alphabets" class="section level2" number="2.5">
-<h2><span class="header-section-number">2.5</span> Tokenization for non-Latin alphabets</h2>
+<div id="tokenization-for-non-latin-alphabets" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Tokenization for non-Latin alphabets<a href="tokenization.html#tokenization-for-non-latin-alphabets" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Our discussion of tokenization so far has focused on text where words are separated by white space and punctuation. For such text, even a quite basic tokenizer can give decent results. However, many written languages don’t separate words in this way.</p>
 <p>One of these languages is Chinese where each “word” can be represented by one or more consecutive characters.
 Splitting Chinese text into words is called “word segmentation” and is still an active area of research <span class="citation">(<a href="#ref-ma-etal-2018-state" role="doc-biblioref">Ma, Ganchev, and Weiss 2018</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al. 2020</a>)</span>.</p>
@@ -1002,8 +1001,8 @@ Splitting Chinese text into words is called “word segmentation” and is still
 #&gt; [[2]]
 #&gt; [1] &quot;下面&quot; &quot;是&quot;   &quot;不&quot;   &quot;输出&quot; &quot;的&quot;   &quot;结果&quot;</code></pre>
 </div>
-<div id="tokenization-benchmark" class="section level2" number="2.6">
-<h2><span class="header-section-number">2.6</span> Tokenization benchmark</h2>
+<div id="tokenization-benchmark" class="section level2 hasAnchor" number="2.6">
+<h2><span class="header-section-number">2.6</span> Tokenization benchmark<a href="tokenization.html#tokenization-benchmark" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Not all tokenization packages are the same. Most open-source tokenizers in R are well-designed, but they are designed to serve different purposes. Some have a multitude of arguments to allow you to customize your tokenizer for greater flexibility, but this flexibility comes at a price; they tend to have relatively slower performance.</p>
 <p>While we can’t easily quantify flexibility, it is straightforward to benchmark some of the tokenizers available in R so you can pick the one that best suits your needs.</p>
 <div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="tokenization.html#cb65-1" aria-hidden="true" tabindex="-1"></a>bench<span class="sc">::</span><span class="fu">mark</span>(<span class="at">check =</span> <span class="cn">FALSE</span>, <span class="at">iterations =</span> <span class="dv">10</span>,</span>
@@ -1016,18 +1015,18 @@ Splitting Chinese text into words is called “word segmentation” and is still
 <pre><code>#&gt; # A tibble: 5 × 6
 #&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`
 #&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
-#&gt; 1 corpus       45.1ms   45.8ms     20.5    12.19MB     8.79
-#&gt; 2 tokenizers   60.9ms   61.6ms     16.0     1.08MB     0   
-#&gt; 3 text2vec     51.4ms   52.2ms     18.9    21.43MB     2.10
-#&gt; 4 quanteda     95.9ms   99.5ms     10.0     8.71MB     2.50
-#&gt; 5 base R      187.6ms    192ms      5.16   10.51MB     3.44</code></pre>
+#&gt; 1 corpus       75.9ms     81ms     11.9     4.58MB     1.33
+#&gt; 2 tokenizers   96.2ms    104ms      9.54    1.01MB     2.38
+#&gt; 3 text2vec     78.5ms     82ms     11.9    15.61MB     1.33
+#&gt; 4 quanteda    163.2ms    172ms      5.69     8.7MB     1.42
+#&gt; 5 base R      294.1ms    302ms      3.15   10.51MB     2.10</code></pre>
 <p>The corpus package <span class="citation">(<a href="#ref-Perry2020" role="doc-biblioref">Perry 2020</a>)</span> offers excellent performance for tokenization, and other options are not much worse. One exception is using a base R function as a tokenizer; you will see significant performance gains by instead using a package built specifically for text tokenization.</p>
 </div>
-<div id="tokensummary" class="section level2" number="2.7">
-<h2><span class="header-section-number">2.7</span> Summary</h2>
+<div id="tokensummary" class="section level2 hasAnchor" number="2.7">
+<h2><span class="header-section-number">2.7</span> Summary<a href="tokenization.html#tokensummary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>To build a predictive model, text data needs to be split into meaningful units, called tokens. These tokens range from individual characters to words to n-grams and even more complex structures, and the particular procedure used to identify tokens from text can be important to your results. Fast and consistent tokenizers are available, but understanding how they behave and in what circumstances they work best will set you up for success. It’s also possible to build custom tokenizers when necessary. Once text data is tokenized, a common next preprocessing step is to consider how to handle very common words that are not very informative— stop words. Chapter <a href="stopwords.html#stopwords">3</a> examines this in detail.</p>
-<div id="in-this-chapter-you-learned-1" class="section level3" number="2.7.1">
-<h3><span class="header-section-number">2.7.1</span> In this chapter, you learned:</h3>
+<div id="in-this-chapter-you-learned-1" class="section level3 hasAnchor" number="2.7.1">
+<h3><span class="header-section-number">2.7.1</span> In this chapter, you learned:<a href="tokenization.html#in-this-chapter-you-learned-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li><p>that tokens are meaningful units of text, such as words or n-grams</p></li>
 <li><p>to implement different kinds of tokenization, the process of splitting text into tokens</p></li>
@@ -1038,7 +1037,7 @@ Splitting Chinese text into words is called “word segmentation” and is still
 </div>
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bender13" class="csl-entry">
 Bender, E. M. 2013. <span>“Linguistic Fundamentals for Natural Language Processing: 100 Essentials from Morphology and Syntax.”</span> <em>Synthesis Lectures on Human Language Technologies</em> 6 (3). Morgan &amp; Claypool Publishers: 1–184.

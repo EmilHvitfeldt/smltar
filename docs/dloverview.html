@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Overview | Supervised Machine Learning for Text Analysis in R</title>
   <meta name="description" content="Overview | Supervised Machine Learning for Text Analysis in R" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Overview | Supervised Machine Learning for Text Analysis in R" />
   <meta property="og:type" content="book" />
-  <meta property="og:url" content="https://smltar.com" />
   <meta property="og:image" content="https://smltar.com/cover.jpg" />
   <meta property="og:description" content="Overview | Supervised Machine Learning for Text Analysis in R" />
   <meta name="github-repo" content="EmilHvitfeldt/smltar" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Emil Hvitfeldt and Julia Silge" />
 
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2022-05-11" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="mlclassification.html"/>
 <link rel="next" href="dldnn.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
@@ -454,8 +453,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="dloverview" class="section level1 unnumbered">
-<h1>Overview</h1>
+<div id="dloverview" class="section level1 unnumbered hasAnchor">
+<h1>Overview<a href="dloverview.html#dloverview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>In Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>, we use algorithms such as regularized linear models, support vector machines, and naive Bayes models to predict outcomes from predictors including text data. Deep learning models approach the same tasks and have the same goals, but the algorithms involved are different. Deep learning models are “deep” in the sense that they use multiple layers to learn how to map from input features to output outcomes; this is in contrast to the kinds of models we used in the previous two chapters, which use a shallow (single) mapping.</p>
 <div class="rmdnote">
 <p>
@@ -523,13 +522,13 @@ Can model highly complex relationships
 </tbody>
 </table>
 <p>Deep learning and more traditional machine learning algorithms are different, but the structure of the modeling process is largely the same, no matter what the specific details of prediction or algorithm are.</p>
-<div id="spending-your-data-budget" class="section level2 unnumbered">
-<h2>Spending your data budget</h2>
+<div id="spending-your-data-budget" class="section level2 unnumbered hasAnchor">
+<h2>Spending your data budget<a href="dloverview.html#spending-your-data-budget" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A limited amount of data is available for any given modeling project, and this data must be allocated to different tasks to balance competing priorities. We espouse an approach of first splitting data in testing and training sets, holding the testing set back until all modeling tasks are completed, including feature engineering and tuning. This testing set is then used as a final check on model performance, to estimate how the final model will perform on new data.</p>
 <p>The training data is available for tasks from model parameter estimation to determining which features are important and more. To compare or tune model options or parameters, this training set can be further split so that models can be evaluated on a validation set, or it can be resampled as described in Section <a href="mlregression.html#firstregressionevaluation">6.1.2</a> to create new simulated data sets for the purpose of evaluation.</p>
 </div>
-<div id="feature-engineering" class="section level2 unnumbered">
-<h2>Feature engineering</h2>
+<div id="feature-engineering" class="section level2 unnumbered hasAnchor">
+<h2>Feature engineering<a href="dloverview.html#feature-engineering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Text data requires extensive processing to be appropriate for modeling, whether via an algorithm like regularized regression or a neural network. Chapters <a href="language.html#language">1</a> through <a href="embeddings.html#embeddings">5</a> covered several of the most important techniques that are used to transform language into a representation appropriate for computation. This feature engineering part of the modeling process can be intensive for text, sometimes more computationally expensive than fitting a model algorithm.</p>
 <p>We espouse an approach of implementing feature engineering on training data only, typically using resampled data sets, to avoid obtaining an overly optimistic estimate of model performance. Feature engineering can sometimes be a part of the machine learning process where subtle <em>data leakage</em> occurs, when practitioners use information (say, to preprocess data or engineer features) that will not be available at prediction time. One example of this is tf-idf, which we introduced in Chapter <a href="embeddings.html#embeddings">5</a> and used in both Chapters <a href="mlregression.html#mlregression">6</a> and <a href="mlclassification.html#mlclassification">7</a>. As a reminder, the term frequency of a word is how frequently a word occurs in a document, and the inverse document frequency of a word is a weight, typically defined as:</p>
 <p><span class="math display">\[idf(\text{term}) = \ln{\left(\frac{n_{\text{documents}}}{n_{\text{documents containing term}}}\right)}\]</span></p>
@@ -541,22 +540,22 @@ This specific example focused on tf-idf, but data leakage is a serious challenge
 </p>
 </div>
 </div>
-<div id="fitting-and-tuning" class="section level2 unnumbered">
-<h2>Fitting and tuning</h2>
+<div id="fitting-and-tuning" class="section level2 unnumbered hasAnchor">
+<h2>Fitting and tuning<a href="dloverview.html#fitting-and-tuning" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Many different kinds of models are appropriate for text data, from more straightforward models like the linear models explored deeply in Chapter <a href="mlregression.html#mlregression">6</a> to the neural network models we cover in Chapters <a href="dlcnn.html#dlcnn">10</a> and <a href="dllstm.html#dllstm">9</a>. Some of these models have hyperparameters that cannot be learned from data during fitting, like the regularization parameter of the models in Chapter <a href="mlregression.html#mlregression">6</a>; these hyperparameters can be tuned using resampled data sets.</p>
 </div>
-<div id="model-evaluation" class="section level2 unnumbered">
-<h2>Model evaluation</h2>
+<div id="model-evaluation" class="section level2 unnumbered hasAnchor">
+<h2>Model evaluation<a href="dloverview.html#model-evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Once models are trained and perhaps tuned, we can evaluate their performance quantitatively using metrics appropriate for the kind of practical problem being dealt with. Model explanation analysis, such as feature importance, also helps us understand how well and why models are behaving the way they do.</p>
 </div>
-<div id="putting-the-model-process-in-context" class="section level2 unnumbered">
-<h2>Putting the model process in context</h2>
+<div id="putting-the-model-process-in-context" class="section level2 unnumbered hasAnchor">
+<h2>Putting the model process in context<a href="dloverview.html#putting-the-model-process-in-context" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This outline of the model process depends on us as data practitioners coming prepared for modeling with a healthy understanding of our data sets from exploratory data analysis. <span class="citation"><a href="#ref-Silge2017" role="doc-biblioref">Silge and Robinson</a> (<a href="#ref-Silge2017" role="doc-biblioref">2017</a>)</span> provide a guide for exploratory data analysis for text.</p>
 <p>Also, in practice, the structure of a real modeling project is iterative. After fitting and tuning a first model or set of a models, a practitioner will often return to build more or better features, then refit models, and evaluate in a more detailed way. Notice that we take this approach in each chapter, both for more straightforward machine learning and deep learning; we start with a simpler model and then go back again and again to improve it in several ways. This iterative approach is healthy and appropriate, as long as good practices in data “spending” are observed. The testing set cannot be used during this iterative back-and-forth, and using resampled data sets can set us up as practitioners for more accurate estimates of performance.</p>
 
 </div>
 </div>
-<h3>References</h3>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-R-keras" class="csl-entry">
 Allaire, J., and Chollet, F. 2021. <em><span class="nocase">keras</span>: R Interface to <span>‘Keras’</span></em>. R package version 2.4.0. <a href="https://CRAN.R-project.org/package=keras">https://CRAN.R-project.org/package=keras</a>.
