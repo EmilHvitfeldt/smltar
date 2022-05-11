@@ -1184,32 +1184,6 @@ multi_lasso_rs <- tune_grid(
   grid = smaller_lambda,
   control = control_resamples(save_pred = TRUE)
 )
-
-multi_lasso_rs
-```
-
-```
-#> # Tuning results
-#> # 10-fold cross-validation 
-#> # A tibble: 10 × 5
-#>    splits               id     .metrics          .notes           .predictions
-#>    <list>               <chr>  <list>            <list>           <list>      
-#>  1 <split [79119/8791]> Fold01 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#>  2 <split [79119/8791]> Fold02 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#>  3 <split [79119/8791]> Fold03 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
-#>  4 <split [79119/8791]> Fold04 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
-#>  5 <split [79119/8791]> Fold05 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#>  6 <split [79119/8791]> Fold06 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
-#>  7 <split [79119/8791]> Fold07 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#>  8 <split [79119/8791]> Fold08 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#>  9 <split [79119/8791]> Fold09 <tibble [40 × 5]> <tibble [1 × 3]> <tibble>    
-#> 10 <split [79119/8791]> Fold10 <tibble [40 × 5]> <tibble [0 × 3]> <tibble>    
-#> 
-#> There were issues with some computations:
-#> 
-#>   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...   - Warning(s) x1: from glmnet C++ code (error code -100); Convergence for 100th lam...
-#> 
-#> Use `collect_notes(object)` for more information.
 ```
 
 What do we see, in terms of performance metrics?

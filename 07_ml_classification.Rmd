@@ -670,15 +670,13 @@ multi_lasso_wf
 
 Now we have everything we need to tune the regularization penalty and find an appropriate value. Note that we specify `save_pred = TRUE`, so we can create ROC curves and a confusion matrix later. This is especially beneficial for multiclass classification.
 
-```{r multilassors, dependson=c("multilassowf", "multicomplaintsfolds"), message=FALSE}
+```{r multilassors, dependson=c("multilassowf", "multicomplaintsfolds")}
 multi_lasso_rs <- tune_grid(
   multi_lasso_wf,
   multicomplaints_folds,
   grid = smaller_lambda,
   control = control_resamples(save_pred = TRUE)
 )
-
-multi_lasso_rs
 ```
 
 What do we see, in terms of performance metrics?
