@@ -17,7 +17,7 @@ Figure \@ref(fig:cnn-architecture) illustrates a typical CNN architecture.
 A convolutional filter slides along the sequence to produce a new, smaller sequence. This is repeated multiple times, typically with different parameters for each layer, until we are left with a small data cube that we can transform into our required output shape, a value between 0 and 1 in the case of binary classification.
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-architecture.pdf" alt="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value." width="100%" />
+<img src="diagram-files/cnn-architecture.png" alt="A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value." width="100%" />
 <p class="caption">(\#fig:cnn-architecture)A template CNN architecture for one-dimensional input data. A sequence of consecutive CNN layers incremently reduces the size, ending with single output value.</p>
 </div>
 
@@ -37,7 +37,7 @@ The most prominent hyperparameter is the kernel size.
 The kernel size is the length of the vector that contains the weights. A kernel of size 5 will have 5 weights. These kernels can capture local information similarly to how n-grams capture location patterns. Increasing the size of the kernel decreases the size of the output, as shown in Figure \@ref(fig:cnn-kernel-size).
 
 <div class="figure" style="text-align: center">
-<img src="diagram-files/cnn-kernel-size.pdf" alt="The kernel size affects the size of the output. A kernel size of 3 uses the information from 3 values to compute 1 value." width="100%" />
+<img src="diagram-files/cnn-kernel-size.png" alt="The kernel size affects the size of the output. A kernel size of 3 uses the information from 3 values to compute 1 value." width="100%" />
 <p class="caption">(\#fig:cnn-kernel-size)The kernel size affects the size of the output. A kernel size of 3 uses the information from 3 values to compute 1 value.</p>
 </div>
 

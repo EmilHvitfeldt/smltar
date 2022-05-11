@@ -97,7 +97,7 @@ Figure \@ref(fig:rnndiag) depicts a high-level diagram of how the LSTM unit of a
 
 \index{neural network!recurrent}
 <div class="figure" style="text-align: center">
-<img src="diagram-files/rnn-architecture.pdf" alt="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks." width="90%" />
+<img src="diagram-files/rnn-architecture.png" alt="High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks." width="90%" />
 <p class="caption">(\#fig:rnndiag)High-level diagram of an unrolled recurrent neural network. The recurrent neural network is the backbone of LSTM networks.</p>
 </div>
 
