@@ -1369,7 +1369,7 @@ The output of `last_fit()` also contains a fitted model (a `workflow`, to be mor
 ```{r complaintsvip, dependson=c("complaintsfinalfitted", "complaintssplit"), fig.cap="Some words increase a CFPB complaint's probability of being about credit reporting while some decrease that probability"}
 library(vip)
 
-complaints_imp <- extract_fit_parsnip(final_fitted$.workflow[[1]]) %>%
+complaints_imp <- extract_fit_parsnip(final_fitted) %>%
   vi(lambda = choose_acc$penalty)
 
 complaints_imp %>%
