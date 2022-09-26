@@ -115,7 +115,7 @@ library(keras)
 simple_cnn_model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_conv_1d(filters = 32, kernel_size = 5, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
@@ -217,7 +217,7 @@ We can think of the convolutional layers as doing preprocessing\index{preprocess
 cnn_double_dense <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_conv_1d(filters = 32, kernel_size = 5, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 64, activation = "relu") %>%
@@ -266,9 +266,9 @@ We can also change the number of convolutional layers, by adding more such layer
 cnn_double_conv <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+  layer_conv_1d(filters = 32, kernel_size = 5, activation = "relu") %>%
   layer_max_pooling_1d(pool_size = 2) %>%
-  layer_conv_1d(filter = 64, kernel_size = 3, activation = "relu") %>%
+  layer_conv_1d(filters = 64, kernel_size = 3, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
@@ -445,7 +445,7 @@ Our model will be very similar to the baseline CNN model from Section \@ref(firs
 cnn_bpe <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = bpe_max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 7, activation = "relu") %>%
+  layer_conv_1d(filters = 32, kernel_size = 7, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
   layer_dense(units = 1, activation = "sigmoid")
@@ -708,7 +708,7 @@ Next, we specify the Keras model we want to run.
 model <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32,
+  layer_conv_1d(filters = 32,
                 kernel_size = FLAGS$kernel_size1,
                 strides = FLAGS$strides1,
                 activation = "relu") %>%
@@ -828,7 +828,7 @@ fit_split <- function(split, prepped_rec) {
   mod <- keras_model_sequential() %>%
     layer_embedding(input_dim = max_words + 1, output_dim = 16,
                     input_length = max_length) %>%
-    layer_conv_1d(filter = 32, kernel_size = 5, activation = "relu") %>%
+    layer_conv_1d(filters = 32, kernel_size = 5, activation = "relu") %>%
     layer_global_max_pooling_1d() %>%
     layer_dense(units = 64, activation = "relu") %>%
     layer_dense(units = 1, activation = "sigmoid") %>%
@@ -924,7 +924,7 @@ Instead of using specific validation data that we can then compute performance m
 final_mod <- keras_model_sequential() %>%
   layer_embedding(input_dim = max_words + 1, output_dim = 16,
                   input_length = max_length) %>%
-  layer_conv_1d(filter = 32, kernel_size = 7,
+  layer_conv_1d(filters = 32, kernel_size = 7,
                 strides = 1, activation = "relu") %>%
   layer_global_max_pooling_1d() %>%
   layer_dense(units = 64, activation = "relu") %>%
