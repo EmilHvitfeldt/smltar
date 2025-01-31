@@ -262,7 +262,7 @@ These values are quantitative estimates for how well our model performed, and ca
 svm_rs %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred, color = id)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_abline(lty = 2, color = "gray80", linewidth = 1.5) +
   geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
@@ -352,7 +352,7 @@ This looks pretty promising, so let's explore the predictions for this random fo
 ```{r rfpredict, dependson="scotusrfrs", opts.label = "fig.large", fig.cap="The random forest model did not perform very sensibly across years, compared to our first attempt using a linear SVM model"}
 collect_predictions(rf_rs) %>%
   ggplot(aes(year, .pred, color = id)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_abline(lty = 2, color = "gray80", linewidth = 1.5) +
   geom_point(alpha = 0.3) +
   labs(
     x = "Truth",
@@ -981,7 +981,7 @@ Now that all of the models with possible parameter values have been trained, we 
 final_rs %>%
   collect_metrics() %>%
   ggplot(aes(max_tokens, mean, color = .metric)) +
-  geom_line(size = 1.5, alpha = 0.5) +
+  geom_line(linewidth = 1.5, alpha = 0.5) +
   geom_point(size = 2, alpha = 0.9) +
   facet_wrap(~.metric, scales = "free_y", ncol = 1) +
   theme(legend.position = "none") +
@@ -1114,7 +1114,7 @@ We can also examine how the true and predicted years compare for the testing set
 final_fitted %>%
   collect_predictions() %>%
   ggplot(aes(year, .pred)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_abline(lty = 2, color = "gray80", linewidth = 1.5) +
   geom_point(alpha = 0.3) +
   labs(
     x = "Truth",

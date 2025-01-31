@@ -86,7 +86,7 @@ tibble(frac = 2 ^ seq(-16, -6, 2)) %>%
          `RAM (in bytes)` = map_dbl(dfm, lobstr::obj_size)) %>%
   pivot_longer(sparsity:`RAM (in bytes)`, names_to = "measure") %>%
   ggplot(aes(words, value, color = measure)) +
-  geom_line(size = 1.5, alpha = 0.5) +
+  geom_line(linewidth = 1.5, alpha = 0.5) +
   geom_point(size = 2) +
   facet_wrap(~measure, scales = "free_y") +
   scale_x_log10(labels = scales::label_comma()) +
