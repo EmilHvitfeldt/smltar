@@ -371,6 +371,8 @@ This appendix covered some of the basics of getting started with (or refreshed a
 
 - https://www.regular-expressions.info/ is another great general regular expression site.
 
+- [Cyrilex](https://extendsclass.com/regex-tester.html) is a useful online tool for testing and visualizing regular expressions.
+
 - The [strings chapter](https://r4ds.had.co.nz/strings.html) in *R for Data Science* [@Wickham2017] delves into examples written in R.
 
 - Lastly if you want to go down to the metal, check out [*Mastering Regular Expressions*](http://shop.oreilly.com/product/9780596528126.do).
